@@ -1265,26 +1265,43 @@
 
 /* =========================================================
    IOS 27 FLUID APP LAUNCH MORPH ENGINE (ORB -> FULL WINDOW)
-   High-performance GPU composited launch
+   Smooth fluid circular expansion blooming straight from orb coordinates
    ========================================================= */
 #music-screen.is-launching-from-orb {
   display: flex !important;
   opacity: 1 !important;
   z-index: 90 !important;
   pointer-events: auto !important;
-  animation: iosAppLaunchFluid 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: transform, opacity;
+  animation: iosAppLaunchExpand 0.50s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: clip-path, transform;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.85);
 }
 
 #music-screen.is-launching-from-orb .apple-now-playing-container {
-  animation: iosAppContentFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: iosAppContentUnfold 0.50s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   will-change: transform, opacity;
 }
 
-@keyframes iosAppLaunchFluid {
+@keyframes iosAppLaunchExpand {
   0% {
-    transform: scale(0.94) translateY(18px);
-    opacity: 0;
+    clip-path: circle(var(--launch-r, 24px) at var(--launch-x, 85%) var(--launch-y, 90%));
+    transform: scale(0.96);
+    opacity: 0.95;
+  }
+  100% {
+    clip-path: circle(150% at var(--launch-x, 85%) var(--launch-y, 90%));
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes iosAppContentUnfold {
+  0% {
+    transform: scale(0.88) translateY(28px);
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 0.85;
   }
   100% {
     transform: scale(1) translateY(0);
@@ -1292,25 +1309,14 @@
   }
 }
 
-@keyframes iosAppContentFadeIn {
-  0% {
-    transform: scale(0.96) translateY(10px);
-    opacity: 0.4;
-  }
-  100% {
-    transform: scale(1) translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Background screen recedes smoothly during launch */
+/* Background screen gently recedes in 3D during app launch (Apple iOS depth physics) */
 .app-screen.screen-launch-recede {
   display: flex !important;
-  opacity: 0 !important;
-  transform: scale(0.96) translateY(-6px) !important;
+  opacity: 0.35 !important;
+  transform: scale(0.94) translateY(6px) !important;
   pointer-events: none !important;
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.24s ease !important;
+  transition: transform 0.50s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.40s ease !important;
 }
 
 /* Luminous Glass Portal Ring Shockwave */
@@ -1318,39 +1324,43 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   pointer-events: none;
   z-index: 105;
   opacity: 0;
-  margin-left: -22px;
-  margin-top: -22px;
-  border: 2px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 0 20px var(--song-active-color, #ff5e7e);
+  margin-left: -24px;
+  margin-top: -24px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.8),
+              0 0 45px var(--song-active-color, #ff5e7e);
   will-change: transform, opacity;
 }
 
 .music-launch-portal-ring.is-animating {
-  animation: portalRingShockwave 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: portalRingShockwave 0.50s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes portalRingShockwave {
   0% {
     transform: scale(1);
-    opacity: 0.85;
+    opacity: 0.95;
+  }
+  40% {
+    opacity: 0.75;
   }
   100% {
-    transform: scale(16);
+    transform: scale(28);
     opacity: 0;
   }
 }
 
 .music-floating-orb.is-clicked-launching {
-  transform: translateY(-50%) translateX(12px) scale(0.88) !important;
+  transform: translateY(-50%) translateX(12px) scale(0.84) !important;
   opacity: 0 !important;
-  transition: transform 0.20s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.20s ease !important;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.22s ease !important;
 }
 
 .apple-now-playing-container {

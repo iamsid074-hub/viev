@@ -336,14 +336,22 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 1. Tactile click feedback on the floating orb
+    // 1. Calculate exact viewport center coordinates of floating orb for circular bloom
+    const orbRect = floatingOrb.getBoundingClientRect();
+    const centerX = Math.round(orbRect.left + orbRect.width / 2);
+    const centerY = Math.round(orbRect.top + orbRect.height / 2);
+    const radius = Math.round(orbRect.width / 2);
+
+    // 2. Set dynamic CSS variables for circular morph expansion origin
+    musicScreen.style.setProperty('--launch-x', `${centerX}px`);
+    musicScreen.style.setProperty('--launch-y', `${centerY}px`);
+    musicScreen.style.setProperty('--launch-r', `${radius}px`);
+
+    // 3. Tactile click feedback on the floating orb
     floatingOrb.classList.add('is-clicked-launching');
 
-    // 2. Trigger lightweight expanding ring shockwave
+    // 4. Trigger expanding luminous glass ring shockwave from exact origin
     if (launchRing) {
-      const orbRect = floatingOrb.getBoundingClientRect();
-      const centerX = Math.round(orbRect.left + orbRect.width / 2);
-      const centerY = Math.round(orbRect.top + orbRect.height / 2);
       launchRing.style.left = `${centerX}px`;
       launchRing.style.top = `${centerY}px`;
       if (typeof PLAYLIST !== 'undefined' && typeof currentTrackIndex !== 'undefined' && PLAYLIST[currentTrackIndex]) {
@@ -353,11 +361,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       launchRing.classList.remove('is-animating');
-      void launchRing.offsetWidth;
+      void launchRing.offsetWidth; // Force reflow to restart CSS animation cleanly
       launchRing.classList.add('is-animating');
     }
 
-    // 3. Navbar updates active tab & indicator smoothly
+    // 5. Navbar updates active tab & indicator smoothly
     currentTab = 'music';
     tabBtns.forEach(b => {
       b.classList.remove('active');
@@ -370,40 +378,47 @@ document.addEventListener('DOMContentLoaded', () => {
       updateIndicator(musicTab);
     }
 
-    // 4. Background screen cleanly recedes
+    // 6. Background screen gently recedes in 3D (iOS wallpaper depth physics)
     if (previousScreen && previousScreen !== musicScreen) {
       previousScreen.classList.add('screen-launch-recede');
     }
 
-    // 5. Trigger GPU-accelerated fluid launch on musicScreen
+    // 7. Trigger the fluid launch morph expansion blooming out of orb on musicScreen
     musicScreen.classList.remove('hidden');
     musicScreen.classList.add('is-launching-from-orb', 'active');
     musicScreen.scrollTop = 0;
 
-    // 6. Resume visualizers if playing
-    if (typeof isPlaying !== 'undefined' && isPlaying && typeof audio !== 'undefined' && !audio.paused) {
-      if (typeof currentCardView !== 'undefined' && currentCardView === 'artwork') {
-        startBeatVisualizer();
-      } else if (typeof currentCardView !== 'undefined' && currentCardView === 'lyrics') {
-        startSyncLoop();
-      }
-    }
-
-    // 7. Orb smoothly hides since we are now in music section
+    // 8. Orb will smoothly hide since we are now in music section
     updateFloatingOrbVisibility();
 
-    // 8. Snappy 320ms transition settlement
+    // 9. When 500ms animation finishes, cleanly settle into resting state
     setTimeout(() => {
       musicScreen.classList.remove('is-launching-from-orb');
+      musicScreen.style.removeProperty('--launch-x');
+      musicScreen.style.removeProperty('--launch-y');
+      musicScreen.style.removeProperty('--launch-r');
+
       if (previousScreen && previousScreen !== musicScreen) {
         previousScreen.classList.remove('screen-launch-recede', 'active');
       }
+
       if (launchRing) {
         launchRing.classList.remove('is-animating');
       }
+
       floatingOrb.classList.remove('is-clicked-launching');
+
+      // Resume visualizers if playing in artwork mode
+      if (typeof isPlaying !== 'undefined' && isPlaying && typeof audio !== 'undefined' && !audio.paused) {
+        if (typeof currentCardView !== 'undefined' && currentCardView === 'artwork') {
+          startBeatVisualizer();
+        } else if (typeof currentCardView !== 'undefined' && currentCardView === 'lyrics') {
+          startSyncLoop();
+        }
+      }
+
       isLaunchingMusic = false;
-    }, 320);
+    }, 500);
   }
 
   // Floating Music Orb: Click to launch music section with iOS 27 fluid morph
