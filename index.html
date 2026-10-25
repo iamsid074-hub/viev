@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Digi OS 1.0 - Special Viev</title>
+  <meta name="description" content="A special liquid glass web experience crafted exclusively for Princess Digi.">
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Digi Viev">
+  <link rel="apple-touch-icon" href="assets/digi.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/liquid-glass.css">
+  <link rel="stylesheet" href="css/apple-intro.css?v=2.7">
+  <link rel="stylesheet" href="css/cinema-player.css">
+</head>
+<body>
+
+  <!-- =========================================================
+       APPLE STARTUP INTRO (Pure Single-Line Cursive "viev" Drawing)
+       Exact Apple Hello Style: One pure white line continuously drawing the word
+       Zero mask, zero cloud overlay, zero flash
+       ========================================================= -->
+  <aside class="apple-hello-splash" id="apple-hello-splash" aria-label="VIEV Startup Intro">
+    <div class="hello-stage-wrap">
+      <div class="hello-ambient-glow" aria-hidden="true"></div>
+      
+      <!-- Pure Single-Line Cursive Viev SVG -->
+      <div class="viev-cursive-stage">
+        <svg class="viev-cursive-svg" viewBox="0 0 500 220" aria-label="viev">
+          <path class="viev-pure-stroke" id="viev-pure-line" d="
+            M 108,92 
+            C 114,118 126,145 138,145 
+            C 152,145 162,120 168,95 
+            C 170,84 178,88 178,98 
+            C 176,112 186,126 194,126 
+            C 198,122 204,106 208,92 
+            L 208,134 
+            C 208,145 220,145 230,130 
+            C 238,118 248,95 256,92 
+            C 264,88 266,102 258,114 
+            C 248,126 254,145 270,145 
+            C 284,145 294,124 300,112 
+            C 304,102 308,94 314,92 
+            C 320,118 330,145 342,145 
+            C 356,145 366,120 372,95 
+            C 374,84 384,92 396,102 
+            C 404,108 416,112 426,110
+          " />
+          <circle class="viev-pure-dot" id="viev-pure-dot" cx="208" cy="68" r="4.2" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Skip Hint (Tap anywhere to enter) -->
+    <button class="hello-skip-btn" id="hello-skip-btn" type="button" aria-label="Skip Intro">
+      <span>Tap anywhere to skip</span>
+    </button>
+  </aside>
+
+  <!-- Fluid Liquid Ambient Light Meshes -->
+  <div class="liquid-ambient-canvas" aria-hidden="true">
+    <div class="aurora-blob blob-1"></div>
+    <div class="aurora-blob blob-2"></div>
+    <div class="aurora-blob blob-3"></div>
+  </div>
+
+  <!-- Main Phone Container -->
+  <main id="app">
+
+    <!-- SCREEN 1: WELCOME SCREEN (APPLE LOCKSCREEN & PRODUCT AESTHETIC) -->
+    <section id="welcome-screen" class="app-screen active" aria-label="Welcome Screen">
+      
+
+
+      <!-- Half-Screen Photo: Full length & width, bottom rounded corners -->
+      <div class="hero-photo-wrapper revealed" id="hero-photo-wrapper">
+        <img src="assets/digi.png" alt="Princess Digi" class="hero-photo-img" id="hero-photo-img">
+        <div class="hero-photo-bottom-glow" aria-hidden="true"></div>
+      </div>
+
+      <!-- Lower Content Flow (Centered along single vertical axis) -->
+      <div class="welcome-lower-content">
+        
+        <!-- SECTION 1: HOME -->
+        <div class="welcome-tab-section active" id="section-home">
+          <!-- Option 2: Dual-Pill Balance (Hero Days on Left • Live Time Ticker on Right) -->
+          <div class="apple-live-clock dual-pill-mode" id="apple-live-clock">
+            <!-- Left Side: Grand Milestone (Days of Love) -->
+            <div class="clock-milestone-half">
+              <div class="milestone-value-wrap">
+                <span class="segment-num hero-days-num" id="counter-days"></span>
+              </div>
+              <span class="milestone-label">Days Together</span>
+            </div>
+
+            <!-- Subtle Vertical Glass Divider -->
+            <div class="clock-vertical-divider" aria-hidden="true"></div>
+
+            <!-- Right Side: Clean Live Time Ticker (Hours : Mins : Secs) -->
+            <div class="clock-ticker-half">
+              <div class="ticker-digits-row">
+                <span class="segment-num ticker-unit" id="counter-hours"></span>
+                <span class="ticker-colon">:</span>
+                <span class="segment-num ticker-unit" id="counter-minutes"></span>
+                <span class="ticker-colon">:</span>
+                <span class="segment-num ticker-unit" id="counter-seconds"></span>
+              </div>
+              <div class="ticker-label-row">
+                <span class="ticker-sublabel">Hours</span>
+                <span class="ticker-sublabel">Mins</span>
+                <span class="ticker-sublabel">Secs</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Note for Digi (Card is visible to balance layout, content locked until quiz) -->
+          <div class="daily-note-wrap" id="daily-note-wrap">
+            <div class="daily-note-capsule is-revealed is-locked" id="daily-note-capsule" role="region" aria-label="Daily note for Digi">
+              <div class="note-revealed-content">
+                <div class="note-top-meta">
+                  <span class="note-tag is-locked" id="daily-note-tag">LOCKED</span>
+                  <span class="note-status" id="daily-note-date">Today</span>
+                </div>
+                <!-- Note text displayed when unlocked -->
+                <p class="note-body-text" id="daily-note-text" style="display: none;">
+                  My Dear Digi , Tujhe sochne par jamana bhull jata hu , or jamane ko yaad karu to sirf tu nazar ati hai !!
+                </p>
+                <!-- Locked view shown initially (keeps page layout balanced) -->
+                <div class="note-locked-body" id="daily-note-locked-state">
+                  <svg class="locked-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                  <span class="locked-label">LOCKED • TAP OPEN NOTE TO REVEAL</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Note Control: Open Note / Hide Note Button -->
+          <div class="cta-container revealed" id="cta-container">
+            <button id="toggle-note-btn" class="liquid-btn note-toggle-btn" aria-label="Open Note">
+              <span class="note-btn-icon" id="note-btn-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </span>
+              <span id="note-btn-text">Open Note</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Apple Intelligence Bottom Edge Aura (Option 4: Crisp liquid perimeter rim) -->
+      <div class="apple-intelligence-edge-aura" aria-hidden="true">
+        <div class="edge-aura-glow"></div>
+        <div class="edge-aura-line"></div>
+      </div>
+    </section>
+
+    <!-- SCREEN 2: DEDICATED FULL PAGE - APPLE MUSIC NOW PLAYING -->
+    <section id="music-screen" class="app-screen" aria-label="Apple Music - Now Playing">
+      <div class="apple-now-playing-container">
+        
+        <!-- Apple Sheet Grabber -->
+        <div class="apple-music-grabber" aria-hidden="true"></div>
+
+        <!-- Real Audio Engine for Apple Music Player -->
+        <audio id="apple-music-audio" preload="metadata"></audio>
+
+        <!-- Big Floating Album Artwork / Lyrics / Song List Area -->
+        <div class="apple-artwork-container" id="apple-artwork-container">
+          <!-- Option 1: True Cinematic Ambilight Projection (Mirrored artwork projected backward) -->
+          <div class="apple-artwork-glow" id="music-art-glow" aria-hidden="true">
+            <img src="song/Screenshot 2026-10-24 224431.png" alt="" class="ambilight-canvas" id="music-ambilight-img">
+            <div class="ambilight-diffuse-bloom"></div>
+          </div>
+
+          <!-- Option 4: Apple Vision Pro Liquid Glass Refraction Frame with Traveling Specular Rim Prism -->
+          <div class="apple-glass-frame" id="music-glass-frame" aria-hidden="true">
+            <div class="art-glow-aura aura-outer" id="art-glow-outer"></div>
+            <div class="art-glow-aura aura-inner" id="art-glow-inner"></div>
+          </div>
+          
+          <!-- View 1: Big Floating 16:9 Album Artwork Card (Default) -->
+          <div class="apple-artwork-card" id="music-artwork-card">
+            <img src="song/Screenshot 2026-10-24 224431.png" alt="Ve Haaniyaan 16:9 Poster" class="apple-artwork-img" id="music-artwork-img">
+            <div class="glass-card-reflection" aria-hidden="true"></div>
+          </div>
+
+          <!-- View 2: Immersive Apple Music Lyrics View -->
+          <div class="apple-lyrics-card" id="music-lyrics-card">
+            <div class="apple-card-top-bar">
+              <div class="apple-card-kicker-group">
+                <span class="apple-card-kicker">LYRICS</span>
+                <div class="lyrics-calibrator-pill" id="lyrics-calibrator-pill" title="Fine-tune lyrics timing">
+                  <button class="calib-btn" id="calib-minus-btn" title="Delayed (-0.5s)">-0.5s</button>
+                  <span class="calib-val" id="calib-offset-val">0.0s</span>
+                  <button class="calib-btn" id="calib-plus-btn" title="Faster (+0.5s)">+0.5s</button>
+                  <button class="calib-reset-btn" id="calib-reset-btn" title="Reset offset">↺</button>
+                </div>
+              </div>
+              <button class="apple-card-close-btn" id="lyrics-close-btn" aria-label="Close Lyrics">✕</button>
+            </div>
+            <div class="apple-lyrics-scroll-container" id="music-lyrics-content">
+              <!-- Dynamically populated exact lyrics -->
+            </div>
+          </div>
+
+          <!-- View 3: Sleek Apple Music Song List View -->
+          <div class="apple-songlist-card" id="music-songlist-card">
+            <div class="apple-card-top-bar">
+              <span class="apple-card-kicker">ALL SONGS</span>
+              <button class="apple-card-close-btn" id="songlist-close-btn" aria-label="Close Song List">✕</button>
+            </div>
+            <div class="apple-songlist-items" id="music-songlist-items">
+              <!-- Dynamically populated song list rows -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Track Meta Header (Left-aligned, Apple style) -->
+        <div class="apple-track-info-row">
+          <div class="apple-track-meta">
+            <h1 class="apple-track-title" id="music-track-title">Ve Haaniyaan</h1>
+            <p class="apple-track-artist" id="music-track-artist">Danny • Avvy Sra</p>
+            <!-- Feature 1: Apple Lossless & Dolby Atmos Interactive Badges -->
+            <div class="apple-audio-badges" id="music-audio-badges">
+              <button class="audio-badge" id="badge-lossless" title="View Lossless Audio Fidelity">Lossless</button>
+              <button class="audio-badge" id="badge-atmos" title="Dolby Atmos Spatial Audio">Dolby Atmos</button>
+              <button class="audio-badge" id="badge-master" title="Apple Digital Master">Master</button>
+            </div>
+          </div>
+          <button class="apple-favorite-btn" id="music-fav-btn" aria-label="Favorite track" title="Love this melody">
+            <svg class="heart-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="heart-particles" id="heart-particles" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <!-- Apple Scrubber Slider & Timestamps -->
+        <div class="apple-scrubber-section">
+          <div class="apple-scrubber-bar" id="apple-scrubber-bar">
+            <div class="apple-scrubber-progress" id="apple-scrubber-progress" style="width: 0%;">
+              <div class="apple-scrubber-thumb" id="apple-scrubber-thumb"></div>
+            </div>
+            <!-- Feature 4: Floating Timestamp Bubble on Scrub -->
+            <div class="apple-scrub-bubble" id="apple-scrub-bubble">0:00</div>
+          </div>
+          <div class="apple-time-stamps">
+            <span id="music-cur-time">0:00</span>
+            <span id="music-rem-time">-:--</span>
+          </div>
+        </div>
+
+        <!-- Apple Playback Modes Row (Shuffle, Repeat, Speed, Sleep Timer) -->
+        <div class="apple-modes-row" id="apple-modes-row">
+          <!-- Shuffle Toggle -->
+          <button class="mode-btn" id="mode-shuffle-btn" aria-label="Shuffle" title="Shuffle: Off">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 3 21 3 21 8"></polyline>
+              <line x1="4" y1="20" x2="21" y2="3"></line>
+              <polyline points="21 16 21 21 16 21"></polyline>
+              <line x1="15" y1="15" x2="21" y2="21"></line>
+              <line x1="4" y1="4" x2="9" y2="9"></line>
+            </svg>
+            <span class="mode-dot" aria-hidden="true"></span>
+          </button>
+
+          <!-- Repeat Toggle (Off -> All -> One) -->
+          <button class="mode-btn is-all" id="mode-repeat-btn" aria-label="Repeat" title="Repeat: All">
+            <svg class="repeat-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"></polyline>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+            <span class="repeat-badge-one" id="repeat-badge-one" style="display:none;">1</span>
+            <span class="mode-dot" aria-hidden="true"></span>
+          </button>
+
+          <!-- Playback Speed Selector Pill -->
+          <button class="mode-btn mode-btn-pill" id="mode-speed-btn" aria-label="Playback Speed" title="Playback Speed: 1.0×">
+            <span class="speed-label" id="speed-label">1.0×</span>
+          </button>
+
+          <!-- Sleep Timer Toggle & Picker -->
+          <button class="mode-btn" id="mode-sleep-btn" aria-label="Sleep Timer" title="Sleep Timer: Off">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span class="sleep-badge" id="sleep-badge" style="display:none;">15m</span>
+            <span class="mode-dot" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <!-- Main Apple Playback Controls -->
+        <div class="apple-controls-row">
+          <button class="apple-ctrl-action" id="music-prev-btn" aria-label="Previous track">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+            </svg>
+          </button>
+
+          <button class="apple-play-toggle" id="music-play-btn" aria-label="Play or Pause">
+            <svg class="play-icon" width="44" height="44" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg class="pause-icon" width="44" height="44" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+          </button>
+
+          <button class="apple-ctrl-action" id="music-next-btn" aria-label="Next track">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Apple Bottom Controls Deck (Volume Slider + 4 Utility Icons) -->
+        <div class="apple-bottom-deck">
+          <!-- Apple Volume Slider Row -->
+          <div class="apple-volume-row">
+            <svg class="vol-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7 9v6h4l5 5V4l-5 5H7z"/>
+            </svg>
+            <div class="apple-volume-track" id="apple-volume-track">
+              <div class="apple-volume-fill" style="width: 75%;"></div>
+            </div>
+            <svg class="vol-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+          </div>
+
+          <!-- Apple Bottom Utility Icons (Lyrics, AirPlay, Song List, Story Card) -->
+          <div class="apple-bottom-utilities">
+            <button class="utility-btn" id="music-lyrics-btn" aria-label="Exact Lyrics" title="View Exact Lyrics">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+
+            <button class="utility-btn" id="music-airplay-btn" aria-label="AirPlay" title="AirPlay Connected">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path>
+                <polygon points="12 15 17 21 7 21 12 15"></polygon>
+              </svg>
+            </button>
+
+            <button class="utility-btn" id="music-songlist-btn" aria-label="Song List" title="All Songs">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+            </button>
+
+            <button class="utility-btn" id="music-story-btn" aria-label="Share Story Card" title="Create Digi Story Card">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                <polyline points="16 6 12 2 8 6"></polyline>
+                <line x1="12" y1="2" x2="12" y2="15"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Apple Sleep Timer Modal Sheet -->
+        <div class="apple-timer-sheet" id="apple-timer-sheet" aria-hidden="true">
+          <div class="timer-sheet-backdrop" id="timer-sheet-backdrop"></div>
+          <div class="timer-sheet-panel">
+            <div class="timer-sheet-header">
+              <span class="timer-sheet-title">Sleep Timer</span>
+              <button class="timer-close-btn" id="timer-close-btn" aria-label="Close sleep timer">✕</button>
+            </div>
+            <div class="timer-options-list" id="timer-options-list">
+              <button class="timer-option is-active" data-mins="0">Turn Off Timer</button>
+              <button class="timer-option" data-mins="15">15 Minutes</button>
+              <button class="timer-option" data-mins="30">30 Minutes</button>
+              <button class="timer-option" data-mins="45">45 Minutes</button>
+              <button class="timer-option" data-mins="60">1 Hour</button>
+              <button class="timer-option" data-mins="-1">When Current Song Ends</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 1: Apple Fidelity Modal (Lossless & Dolby Atmos) -->
+        <div class="apple-fidelity-modal" id="apple-fidelity-modal" aria-hidden="true">
+          <div class="fidelity-backdrop" id="fidelity-backdrop"></div>
+          <div class="fidelity-card">
+            <div class="fidelity-header">
+              <div class="fidelity-title-wrap">
+                <span class="fidelity-kicker">AUDIO FIDELITY</span>
+                <h3 class="fidelity-title">Apple Lossless & Spatial Audio</h3>
+              </div>
+              <button class="fidelity-close-btn" id="fidelity-close-btn" aria-label="Close audio quality info">✕</button>
+            </div>
+            <div class="fidelity-specs-list">
+              <div class="fidelity-row">
+                <span class="fidelity-badge-pill">ALAC</span>
+                <div class="fidelity-meta">
+                  <span class="fidelity-name">Lossless Audio</span>
+                  <span class="fidelity-desc">24-bit / 48 kHz ALAC • Apple Lossless Audio Codec</span>
+                </div>
+              </div>
+              <div class="fidelity-row">
+                <span class="fidelity-badge-pill">ATMOS</span>
+                <div class="fidelity-meta">
+                  <span class="fidelity-name">Spatial Audio</span>
+                  <span class="fidelity-desc">Dolby Atmos • Immersive 3D Soundstage with Head Tracking</span>
+                </div>
+              </div>
+              <div class="fidelity-row">
+                <span class="fidelity-badge-pill">MASTER</span>
+                <div class="fidelity-meta">
+                  <span class="fidelity-name">Apple Digital Master</span>
+                  <span class="fidelity-desc">Mastered directly from high-resolution studio master recording</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2: AirPlay Glass Sheet -->
+        <div class="apple-airplay-sheet" id="apple-airplay-sheet" aria-hidden="true">
+          <div class="airplay-backdrop" id="airplay-backdrop"></div>
+          <div class="airplay-panel">
+            <div class="airplay-grabber"></div>
+            <div class="airplay-header">
+              <div class="airplay-header-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path>
+                  <polygon points="12 15 17 21 7 21 12 15"></polygon>
+                </svg>
+                <span>AirPlay & Bluetooth</span>
+              </div>
+              <button class="airplay-done-btn" id="airplay-done-btn">Done</button>
+            </div>
+            <div class="airplay-devices-list" id="airplay-devices-list">
+              <div class="airplay-device-item is-connected" data-device="airpods">
+                <div class="device-icon-wrap">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                  </svg>
+                </div>
+                <div class="device-meta">
+                  <div class="device-name">AirPods Pro (2nd Gen)</div>
+                  <div class="device-sub">Spatial Audio Active • 94% Battery</div>
+                </div>
+                <div class="device-check">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="airplay-device-item" data-device="macbook">
+                <div class="device-icon-wrap">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="2" y1="20" x2="22" y2="20"></line>
+                  </svg>
+                </div>
+                <div class="device-meta">
+                  <div class="device-name">MacBook Pro Speakers</div>
+                  <div class="device-sub">Built-in Stereo Studio Monitors</div>
+                </div>
+                <div class="device-check">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="airplay-device-item" data-device="homepod">
+                <div class="device-icon-wrap">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="5" y="2" width="14" height="20" rx="4"></rect>
+                    <line x1="12" y1="6" x2="12" y2="6.01"></line>
+                  </svg>
+                </div>
+                <div class="device-meta">
+                  <div class="device-name">Living Room HomePod</div>
+                  <div class="device-sub">AirPlay 2 • Room-Filling Acoustics</div>
+                </div>
+                <div class="device-check">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 6: macOS Frosted Glass Shortcut HUD -->
+        <div class="apple-glass-hud" id="apple-glass-hud" aria-hidden="true">
+          <div class="hud-icon-wrap" id="hud-icon-wrap">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+          <div class="hud-label" id="hud-label">Play</div>
+          <div class="hud-bar-wrap" id="hud-bar-wrap" style="display: none;">
+            <div class="hud-bar-fill" id="hud-bar-fill" style="width: 75%;"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SCREEN 3: DEDICATED FULL PAGE - SETTINGS -->
+    <section id="settings-screen" class="app-screen" aria-label="Settings">
+      <div class="dedicated-screen-container settings-nav-viewport" id="settings-nav-viewport">
+        
+        <!-- =========================================================
+             VIEW 1: MAIN SETTINGS MENU (ROOT PANE)
+             Clean, uncluttered, matching user reference image
+             ========================================================= -->
+        <div class="settings-view-pane settings-root-pane" id="settings-root-pane">
+          <!-- Clean Settings Title -->
+          <header class="dedicated-header">
+            <h1 class="dedicated-title">Settings</h1>
+          </header>
+
+          <!-- Minimal Profile Header (Avatar + Name) -->
+          <div class="settings-user-card">
+            <div class="user-avatar-wrap">
+              <img src="assets/digi.png" alt="DIGI" class="user-avatar-img">
+            </div>
+            <div class="user-meta-wrap">
+              <h2 class="user-display-name">DIGI</h2>
+            </div>
+          </div>
+
+          <!-- GROUP 1: PREFERENCES -->
+          <div class="settings-menu-group">
+            <span class="settings-group-kicker">Preferences</span>
+            <div class="settings-pills-list">
+              <button class="settings-nav-pill" data-target="subpage-favorites" type="button">
+                <span class="pill-nav-title">Favorite Songs</span>
+                <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+              <button class="settings-nav-pill" data-target="subpage-display" type="button">
+                <span class="pill-nav-title">Display & Ambient Glow</span>
+                <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+              <button class="settings-nav-pill" data-target="subpage-spatial" type="button">
+                <span class="pill-nav-title">Spatial Audio & 3D Acoustics</span>
+                <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- GROUP 2: EXPERIENCE & SYSTEM -->
+          <div class="settings-menu-group">
+            <span class="settings-group-kicker">Experience & System</span>
+            <div class="settings-pills-list">
+              <button class="settings-nav-pill" data-target="subpage-cinema" type="button">
+                <span class="pill-nav-title">Cinema & Experience</span>
+                <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+
+              <button class="settings-nav-pill" data-target="subpage-software" type="button">
+                <span class="pill-nav-title">Software Update</span>
+                <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             VIEW 2: SLIDING SUB-PAGE (SLIDES IN FROM RIGHT LIKE IPHONE)
+             ========================================================= -->
+        <div class="settings-view-pane settings-subpage-pane" id="settings-subpage-pane">
+          <!-- Native iPhone Navigation Bar (< Settings) -->
+          <div class="subpage-top-bar">
+            <button class="subpage-back-btn" id="settings-back-btn" type="button" aria-label="Back to Settings">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              <span>Settings</span>
+            </button>
+          </div>
+
+          <!-- SUBPAGE 1: DISPLAY & AMBIENT GLOW -->
+          <div class="subpage-body-container" id="subpage-display" style="display: none;">
+            <h2 class="subpage-large-heading">Display & Ambient Glow</h2>
+            
+            <div class="settings-group-card">
+              <div class="settings-rows-list">
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Ambient Aurora Meshes</span>
+                    <span class="item-desc">Liquid background multi-color lighting</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Toggle Ambient Aurora">
+                    <input type="checkbox" id="pref-ambient" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Fluid Glass Blur</span>
+                    <span class="item-desc">Hardware-accelerated saturation & blur</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Toggle Glass Blur">
+                    <input type="checkbox" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Live Time Morph</span>
+                    <span class="item-desc">Apple soft morph animation for live digits</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Toggle Live Time Morph">
+                    <input type="checkbox" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBPAGE 2: SPATIAL AUDIO & 3D ACOUSTICS -->
+          <div class="subpage-body-container" id="subpage-spatial" style="display: none;">
+            <h2 class="subpage-large-heading">Spatial Audio & 3D</h2>
+            
+            <div class="settings-group-card" id="spatial-settings-group">
+              <div class="settings-rows-list">
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Spatial Audio Processing</span>
+                    <span class="item-desc">Hardware binaural room impulse convolution</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Toggle Spatial Audio">
+                    <input type="checkbox" id="pref-spatial-toggle" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+
+                <div class="settings-spatial-modes-wrap">
+                  <span class="spatial-sublabel">Acoustic Environment</span>
+                  <div class="spatial-mode-pills" id="spatial-mode-pills">
+                    <button class="spatial-pill active" data-mode="hall" id="spatial-mode-hall">
+                      <span class="pill-dot"></span>
+                      <span class="pill-title">Concert Hall</span>
+                      <span class="pill-desc">Expansive 3D Reverb</span>
+                    </button>
+                    <button class="spatial-pill" data-mode="studio" id="spatial-mode-studio">
+                      <span class="pill-dot"></span>
+                      <span class="pill-title">Intimate Studio</span>
+                      <span class="pill-desc">Crisp Vocal Presence</span>
+                    </button>
+                    <button class="spatial-pill" data-mode="wide" id="spatial-mode-wide">
+                      <span class="pill-dot"></span>
+                      <span class="pill-title">Wide Stage</span>
+                      <span class="pill-desc">Binaural Haas Widener</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Live 3D Acoustic Stage Visualizer -->
+                <div class="spatial-stage-visualizer" id="spatial-stage-visualizer">
+                  <div class="stage-center-listener" title="Princess Digi's Head Position">
+                    <span class="listener-icon">👸</span>
+                    <span class="listener-tag">Digi</span>
+                  </div>
+                  <div class="stage-wave left-wave wave-1"></div>
+                  <div class="stage-wave left-wave wave-2"></div>
+                  <div class="stage-wave right-wave wave-1"></div>
+                  <div class="stage-wave right-wave wave-2"></div>
+                  <div class="stage-status-badge" id="stage-status-badge">Concert Hall Reverb Active</div>
+                </div>
+
+                <div class="settings-item-row" style="flex-direction: column; align-items: stretch; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="item-title">Spatial Reverb Wetness</span>
+                    <span class="item-value" id="spatial-depth-val">35%</span>
+                  </div>
+                  <input type="range" id="spatial-depth-slider" min="10" max="70" value="35" class="apple-range-slider" aria-label="Spatial Reverb Wetness">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBPAGE 3: CINEMA & EXPERIENCE -->
+          <div class="subpage-body-container" id="subpage-cinema" style="display: none;">
+            <h2 class="subpage-large-heading">Cinema & Experience</h2>
+
+            <div class="settings-group-card">
+              <div class="settings-rows-list">
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Real-Time Ambient Backglow</span>
+                    <span class="item-desc">Cinema canvas dynamically illuminates with video</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Toggle Backglow">
+                    <input type="checkbox" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Haptic Sound Simulation</span>
+                    <span class="item-desc">Gentle audio cues on button taps</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Toggle Haptics">
+                    <input type="checkbox" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBPAGE: FAVORITE SONGS -->
+          <div class="subpage-body-container" id="subpage-favorites" style="display: none;">
+            <h2 class="subpage-large-heading">Favorite Songs</h2>
+
+            <!-- Apple iOS Loader State -->
+            <div class="apple-loader-container" id="favorites-loader">
+              <div class="apple-ios-spinner">
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+              </div>
+              <span class="apple-loader-label">Loading Favorites…</span>
+            </div>
+
+            <!-- Result State -->
+            <div class="favorites-result-container" id="favorites-result" style="display: none;">
+              <div class="favorites-cards-list" id="favorites-cards-list"></div>
+            </div>
+          </div>
+
+          <!-- SUBPAGE 4: SOFTWARE UPDATE (DIGI OS) -->
+          <div class="subpage-body-container" id="subpage-software" style="display: none;">
+            <h2 class="subpage-large-heading">Software Update</h2>
+
+            <!-- Apple iOS Loader State (Centered) -->
+            <div class="apple-loader-container" id="software-loader">
+              <div class="apple-ios-spinner">
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+                <div class="ios-blade"></div>
+              </div>
+              <span class="apple-loader-label">Looking for Update…</span>
+            </div>
+
+            <!-- Software Update Result (Clean Minimal Apple Card) -->
+            <div class="settings-group-card software-uptodate-card" id="software-result" style="display: none;" title="Tap to check again">
+              <div class="software-uptodate-body">
+                <div class="software-uptodate-icon-wrap">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="9 12 11.5 14.5 15.5 9.5"></polyline>
+                  </svg>
+                </div>
+                <h3 class="software-uptodate-title">Digi OS is up to date</h3>
+                <span class="software-uptodate-ver">OS 1.0</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Detached Floating Apple Liquid Glass Dock (Fixed at Bottom across Home, Music, Settings) -->
+    <div class="apple-floating-dock" id="apple-floating-dock">
+      <nav class="apple-floating-navbar" id="apple-floating-navbar" aria-label="Main Navigation">
+        <div class="nav-indicator-pill" id="nav-indicator-pill"></div>
+        <button class="nav-tab-btn active" data-tab="home" id="tab-home" aria-selected="true">
+          <span class="nav-tab-label">Home</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="music" id="tab-music" aria-selected="false">
+          <span class="nav-tab-label">Music</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="settings" id="tab-settings" aria-selected="false">
+          <span class="nav-tab-label">Settings</span>
+        </button>
+      </nav>
+
+      <!-- Detached Companion Circular Album Pill Orb (Emerges when music is playing in Home/Settings) -->
+      <button class="music-floating-orb" id="music-floating-orb" aria-label="Now Playing: Return to Music" title="Now Playing">
+        <div class="orb-disc-wrapper">
+          <img src="song/Screenshot 2026-10-24 224431.png" alt="Song Poster" class="orb-cover-img" id="orb-cover-img">
+        </div>
+      </button>
+    </div>
+
+    <!-- iOS 27 Fluid App Launch Morph Shockwave Ring -->
+    <div class="music-launch-portal-ring" id="music-launch-portal-ring" aria-hidden="true"></div>
+
+    <!-- SCREEN 2: LIQUID OS HUB & SPECIAL VIDEO VIEW -->
+    <section id="hub-screen" aria-label="Liquid OS Hub">
+      
+      <!-- Hub Top Bar -->
+      <div class="hub-top-bar">
+        <button class="icon-glass-btn" id="hub-back-btn" title="Back">
+          <span class="back-arrow-text">Back</span>
+        </button>
+
+        <button class="os-badge-btn" id="os-badge-btn" title="System Settings">
+          <span class="os-badge-text">OS 1.0</span>
+        </button>
+
+        <button class="icon-glass-btn" id="settings-btn" title="Settings">
+          <span class="settings-text">Settings</span>
+        </button>
+      </div>
+
+      <!-- Special Cinema Player Section -->
+      <div class="cinema-section">
+        <div class="cinema-header">
+          <div class="cinema-title">
+            <span>Special View</span>
+            <span class="cinema-title-badge">Liquid Cinema</span>
+          </div>
+        </div>
+
+        <div class="cinema-container">
+          <div class="ambient-glow-layer" id="ambient-glow-layer"></div>
+          <canvas id="ambient-glow-canvas" class="ambient-glow-canvas" width="64" height="36"></canvas>
+
+          <div class="video-stage" id="video-stage">
+            <video id="cinema-video" playsinline webkit-playsinline loop preload="metadata">
+              <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+            </video>
+
+            <div class="center-play-indicator initial-hint" id="center-play-indicator">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="6 4 20 12 6 20 6 4"/>
+              </svg>
+            </div>
+
+            <div class="cinema-controls-bar" id="cinema-controls-bar">
+              <div class="timeline-slider-wrap">
+                <div class="timeline-track" id="timeline-track">
+                  <div class="timeline-progress" id="timeline-progress"></div>
+                </div>
+                <div class="timeline-thumb" id="timeline-thumb"></div>
+              </div>
+
+              <div class="controls-actions-row">
+                <div class="controls-left">
+                  <button class="mini-control-btn" id="play-btn" aria-label="Play/Pause">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                  </button>
+                  <span class="time-label"><span id="time-current">0:00</span> / <span id="time-duration">0:00</span></span>
+                </div>
+
+                <div class="controls-right">
+                  <button class="mini-control-btn" id="mute-btn" aria-label="Mute/Unmute">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    </svg>
+                  </button>
+                  <button class="mini-control-btn" id="fullscreen-btn" aria-label="Fullscreen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cinema-action-bar">
+          <button class="action-pill-btn" id="add-video-btn">
+            <span>Add Special Video</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Memories & Moments Section -->
+      <div class="memories-section">
+        <div class="section-label">Moments & Memories</div>
+
+        <div class="memory-card" data-title="Our Journey" data-text="From that unforgettable sunny day on the terrace to every precious laugh we share. You bring calm and joy into my world, Princess Digi. Always right by your side.">
+          <div class="memory-card-left">
+            <div class="memory-card-info">
+              <h4>Our Journey</h4>
+              <p>Two hearts walking together</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="memory-card" data-title="A Note For Princess Digi" data-text="You are the most precious person, and this special view was designed just for you. With pure liquid glass and timeless memories that will never fade.">
+          <div class="memory-card-left">
+            <div class="memory-card-info">
+              <h4>A Note For Princess Digi</h4>
+              <p>Words straight from the heart</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="memory-card" data-title="The Rooftop Moment" data-text="That bright afternoon under the open sky, standing together by the ledge with our lanyards and bright smiles. A memory that stays etched in diamond.">
+          <div class="memory-card-left">
+            <div class="memory-card-info">
+              <h4>The Rooftop Moment</h4>
+              <p>A frame frozen in forever</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL 1: SETTINGS SHEET - OS 1.0 -->
+  <div class="ios-modal-backdrop" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-heading">
+    <div class="ios-modal-sheet">
+      <div class="sheet-handle-bar"></div>
+      
+      <div class="sheet-header">
+        <h3 id="settings-heading">Settings</h3>
+        <button class="sheet-close-btn" id="settings-close-btn" aria-label="Close Settings">X</button>
+      </div>
+
+      <div class="os-spec-hero">
+        <div class="os-version-title">Digi OS 1.0</div>
+        <div class="os-version-sub">Diamond Edition</div>
+      </div>
+
+      <div class="settings-spec-group">
+        <div class="spec-row">
+          <span class="spec-name">System Version</span>
+          <span class="spec-val">OS 1.0 (Official)</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-name">Designation</span>
+          <span class="spec-val">Princess Digi's Viev</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-name">Display Engine</span>
+          <span class="spec-val">Liquid Glass 60 FPS</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-name">Ambient Cinema Glow</span>
+          <span class="spec-val">Dynamic Synced</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-name">iOS Compatibility</span>
+          <span class="spec-val">iPhone 14 Pro Max</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-name">Viev Security</span>
+          <span class="spec-val">Locked for Digi Only</span>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 10px;">
+        <p style="font-size: 12px; color: rgba(255, 255, 255, 0.45); letter-spacing: 0.3px;">
+          Created with infinite love
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ADD / CHANGE SPECIAL VIDEO -->
+  <div class="ios-modal-backdrop" id="add-video-modal" role="dialog" aria-modal="true">
+    <div class="ios-modal-sheet">
+      <div class="sheet-handle-bar"></div>
+      
+      <div class="sheet-header">
+        <h3>Add Special Video</h3>
+        <button class="sheet-close-btn" id="add-video-close-btn" aria-label="Close">X</button>
+      </div>
+
+      <div class="video-picker-options">
+        <input type="file" id="video-file-input" accept="video/*" style="display: none;">
+        <label for="video-file-input" class="picker-card-btn">
+          <div class="picker-card-text">
+            <h4>Pick from iPhone Photos</h4>
+            <p>Select any personal video from camera roll</p>
+          </div>
+        </label>
+
+        <div style="background: rgba(255, 255, 255, 0.05); padding: 14px; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.12);">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">Paste Video URL</div>
+          <p style="font-size: 12px; color: rgba(255, 255, 255, 0.6);">Direct MP4 or online video link</p>
+          <input type="url" id="video-url-input" class="url-input-field" placeholder="https://example.com/video.mp4">
+          <button id="url-submit-btn" class="liquid-btn" style="width: 100%; margin-top: 10px; padding: 12px; font-size: 14px;">
+            Load Video
+          </button>
+        </div>
+
+        <div style="margin-top: 4px;">
+          <div style="font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.6); margin-bottom: 8px;">
+            Preset Special Views
+          </div>
+          <button class="picker-card-btn demo-picker-card" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" data-title="Golden Hour Romance" style="width: 100%; margin-bottom: 8px;">
+            <div class="picker-card-text">
+              <h4>Golden Hour Romance</h4>
+              <p>Warm ambient sunset cinematic</p>
+            </div>
+          </button>
+          <button class="picker-card-btn demo-picker-card" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" data-title="Aurora Starlight" style="width: 100%;">
+            <div class="picker-card-text">
+              <h4>Aurora Starlight</h4>
+              <p>Ethereal deep glow and calm</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: MEMORY NOTE DETAIL -->
+  <div class="ios-modal-backdrop" id="memory-modal" role="dialog" aria-modal="true">
+    <div class="ios-modal-sheet">
+      <div class="sheet-handle-bar"></div>
+      
+      <div class="sheet-header">
+        <h3 id="memory-modal-title">Special Memory</h3>
+        <button class="sheet-close-btn" id="memory-close-btn" aria-label="Close">X</button>
+      </div>
+
+      <div style="padding: 10px 4px 20px 4px;">
+        <p id="memory-modal-text" style="font-size: 15.5px; line-height: 1.7; color: rgba(255, 255, 255, 0.88); text-align: left; font-style: italic;">
+          Every memory with you is treasured.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: APPLE MUSIC STORY & MEMORY CARD SHEET -->
+  <div class="apple-story-sheet" id="apple-story-sheet" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="story-backdrop" id="story-backdrop"></div>
+    <div class="story-panel">
+      <div class="story-grabber"></div>
+      <div class="story-header">
+        <div class="story-header-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+            <polyline points="16 6 12 2 8 6"></polyline>
+            <line x1="12" y1="2" x2="12" y2="15"></line>
+          </svg>
+          <span>Digi Story & Memory Card</span>
+        </div>
+        <button class="story-close-btn" id="story-close-btn" aria-label="Close Story Sheet">✕</button>
+      </div>
+
+      <!-- Story Card Live Preview Container -->
+      <div class="story-preview-wrapper">
+        <div class="story-card-canvas-wrap" id="story-card-canvas-wrap">
+          <div class="story-ambient-glow" id="story-ambient-glow"></div>
+          <div class="story-preview-card" id="story-preview-card">
+            <div class="story-card-glass-specular"></div>
+            
+            <div class="story-top-badge">
+              <span class="story-app-logo"> Music</span>
+              <span class="story-dedication-tag">Dedicated to Princess Digi</span>
+            </div>
+
+            <div class="story-artwork-frame">
+              <img src="song/Screenshot 2026-10-24 224431.png" alt="Song Artwork" class="story-artwork-img" id="story-artwork-img">
+            </div>
+
+            <div class="story-meta-block">
+              <h3 class="story-track-title" id="story-track-title">Ve Haaniyaan</h3>
+              <p class="story-track-artist" id="story-track-artist">Danny • Avvy Sra</p>
+            </div>
+
+            <div class="story-quote-block">
+              <span class="story-quote-mark">“</span>
+              <p class="story-lyric-quote" id="story-lyric-quote">Tere kolon mainu saah milde, Assi aivein ni tainu bewajah milde</p>
+            </div>
+
+            <div class="story-footer-block">
+              <div class="story-together-counter" id="story-together-counter">Time Together • Met on 31 Jan 2026</div>
+              <div class="story-branding">Digi OS 1.0 • Special Viev</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customization & Action Controls -->
+      <div class="story-actions-container">
+        <div class="story-option-row">
+          <span class="story-option-label">Featured Lyric</span>
+          <div class="story-lyric-controls">
+            <button class="story-chip-btn" id="story-prev-lyric-btn" title="Previous Line">◀</button>
+            <span class="story-lyric-indicator" id="story-lyric-indicator">Line 1</span>
+            <button class="story-chip-btn" id="story-next-lyric-btn" title="Next Line">▶</button>
+          </div>
+        </div>
+
+        <div class="story-option-row">
+          <span class="story-option-label">Personal Note</span>
+          <input type="text" id="story-custom-note" class="story-input-field" placeholder="Add custom memory note (optional)..." maxlength="90">
+        </div>
+
+        <div class="story-buttons-row">
+          <button class="story-action-btn primary" id="story-download-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download Card (PNG)</span>
+          </button>
+
+          <button class="story-action-btn secondary" id="story-copy-btn" title="Copy Lyric & Dedication">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy Quote</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Hidden export canvas for crystal clear PNG generation -->
+      <canvas id="story-export-canvas" width="1080" height="1920" style="display: none;"></canvas>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       DIGI SPECIAL NOTE VERIFICATION SHEET (Apple Bottom Sheet)
+       Opens from bottom when clicking "Open Note", asks quiz to unlock
+       ========================================================= -->
+  <div class="apple-quiz-sheet" id="apple-note-quiz-sheet" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="quiz-backdrop" id="quiz-backdrop"></div>
+    <div class="quiz-panel" id="quiz-panel">
+      <div class="quiz-grabber"></div>
+      
+      <div class="quiz-header">
+        <div class="quiz-badge-wrap">
+          <span class="quiz-badge">SECRET NOTE • VERIFICATION</span>
+        </div>
+        <button class="quiz-close-btn" id="quiz-close-btn" aria-label="Close Verification">✕</button>
+      </div>
+
+      <div class="quiz-body">
+        <div class="quiz-question-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"></path>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+
+        <h3 class="quiz-question-title">Virat kya jyada pasand karta hai ?</h3>
+        <p class="quiz-question-sub">Sahi answer select karo note open karne ke liye 💌</p>
+
+        <!-- Quiz Options Stack -->
+        <div class="quiz-options-grid" id="quiz-options-list">
+          <button class="quiz-option-btn" data-option="1" type="button">
+            <span class="option-num">1</span>
+            <span class="option-text">Diwali ke patakhe</span>
+            <span class="option-status-icon"></span>
+          </button>
+          <button class="quiz-option-btn" data-option="2" data-correct="true" type="button">
+            <span class="option-num">2</span>
+            <span class="option-text">Diwali ki mithaiyan</span>
+            <span class="option-status-icon"></span>
+          </button>
+          <button class="quiz-option-btn" data-option="3" type="button">
+            <span class="option-num">3</span>
+            <span class="option-text">Diwali ki rangoliyan</span>
+            <span class="option-status-icon"></span>
+          </button>
+          <button class="quiz-option-btn" data-option="4" type="button">
+            <span class="option-num">4</span>
+            <span class="option-text">Diwali ki decoration</span>
+            <span class="option-status-icon"></span>
+          </button>
+        </div>
+
+        <div class="quiz-feedback" id="quiz-feedback-msg" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/apple-welcome.js"></script>
+  <script src="js/daily-note.js?v=2.2"></script>
+  <script src="js/navbar.js?v=1.8"></script>
+  <script src="js/cinema.js"></script>
+  <script src="js/app.js?v=2.5"></script>
+</body>
+</html>
