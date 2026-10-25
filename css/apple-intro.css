@@ -190,7 +190,9 @@
 }
 
 #welcome-screen {
-  overflow: hidden !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 .app-screen.active {
@@ -210,9 +212,9 @@
 .hero-photo-wrapper {
   position: relative;
   width: 100%;
-  height: 50dvh;
-  min-height: 50dvh;
-  max-height: 50dvh;
+  height: clamp(340px, 44dvh, 410px);
+  min-height: clamp(340px, 44dvh, 410px);
+  max-height: 44dvh;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   border-bottom-left-radius: 36px;
@@ -333,14 +335,13 @@
 .welcome-lower-content {
   flex: 1;
   width: 100%;
-  max-width: 410px;
+  max-width: 420px;
   margin: 0 auto;
-  padding: 14px 20px calc(var(--sab) + 74px) 20px;
+  padding: 12px 18px calc(var(--sab) + 84px) 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  min-height: calc(50dvh - 10px);
   position: relative;
 }
 
@@ -391,9 +392,9 @@
    ========================================================= */
 .apple-live-clock.dual-pill-mode {
   width: 100%;
-  max-width: 360px;
-  margin: 12px auto 0 auto;
-  padding: 18px 20px;
+  max-width: 380px;
+  margin: 10px auto 0 auto;
+  padding: 14px 18px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -648,8 +649,8 @@
    ========================================================= */
 .daily-note-wrap {
   width: 100%;
-  max-width: 340px;
-  margin: 24px auto 0 auto;
+  max-width: 380px;
+  margin: 12px auto 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -867,7 +868,7 @@
 /* ---- Note Control CTA Container (Open Note / Hide Note) ---- */
 .cta-container {
   width: 100%;
-  margin: 14px auto 0 auto;
+  margin: 12px auto 0 auto;
   padding-top: 0;
   display: flex;
   flex-direction: column;
@@ -876,8 +877,8 @@
 
 .note-toggle-btn {
   width: 100%;
-  max-width: 330px;
-  height: 52px;
+  max-width: 360px;
+  height: 50px;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.2px;
@@ -1390,10 +1391,10 @@
 
 .apple-now-playing-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   min-height: 100dvh;
   margin: 0 auto;
-  padding: calc(var(--sat) + 14px) 24px calc(var(--sab) + 90px) 24px;
+  padding: calc(var(--sat) + 10px) 20px calc(var(--sab) + 84px) 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1407,28 +1408,32 @@
   height: 5px;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.28);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   flex-shrink: 0;
 }
 
 .apple-artwork-container {
   position: relative;
   width: 100%;
-  max-width: 350px;
+  max-width: 380px;
   aspect-ratio: 16 / 9;
-  margin: 0 auto 20px auto;
+  margin: 0 auto 16px auto;
   display: flex;
   align-items: center;
   justify-content: center;
   perspective: 1000px;
   transition: aspect-ratio 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+              max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Expanded panel mode for lyrics and song list */
 .apple-artwork-container.is-panel-mode {
-  aspect-ratio: 1 / 0.96;
-  max-width: 330px;
+  width: 100%;
+  max-width: 380px;
+  height: clamp(250px, 32vh, 305px);
+  aspect-ratio: unset;
+  margin: 0 auto 12px auto;
 }
 
 /* =========================================================
@@ -1997,7 +2002,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   padding: 0 4px;
 }
 
@@ -2061,7 +2066,7 @@
 /* Scrubber Section */
 .apple-scrubber-section {
   width: 100%;
-  margin-bottom: 22px;
+  margin-bottom: 12px;
   padding: 0 4px;
 }
 
@@ -2380,8 +2385,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
-  margin-bottom: 18px;
+  padding: 0 24px;
+  margin-bottom: 12px;
 }
 
 .apple-ctrl-action {
@@ -2429,9 +2434,9 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 13px;
-  transform: translateY(-8px);
-  margin-bottom: 2px;
+  gap: 10px;
+  transform: none;
+  margin-bottom: 0;
 }
 
 /* Volume Slider */
@@ -2575,10 +2580,23 @@
   top: 0;
   left: 0;
   width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   transform: translateX(100%);
   opacity: 0;
   pointer-events: none;
-  padding-top: calc(var(--sat) + 28px);
+  padding-top: calc(var(--sat) + 16px);
+  padding-bottom: calc(var(--sab) + 120px);
+  box-sizing: border-box;
+}
+
+.settings-subpage-pane::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .settings-nav-viewport.is-subpage-open .settings-subpage-pane {
@@ -4732,4 +4750,291 @@
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* =========================================================
+   IPHONE 14 PRO MAX & 16 PRO MAX AUDIT & PERFECTION SUITE
+   Screen Size: 6.7" to 6.78" (Logical CSS: 430px × 932px to 440px × 956px)
+   Dynamic Island & Home Indicator Safe Areas Guaranteed
+   Zero Congestion, Apple Luxury Breathing Spacing, 100% Fluid
+   ========================================================= */
+@media screen and (max-width: 480px) {
+  :root {
+    --sat: max(env(safe-area-inset-top, 0px), 44px);
+    --sab: max(env(safe-area-inset-bottom, 0px), 24px);
+  }
+
+  /* Full 100% Edge-to-Edge OLED Display Fit */
+  #app {
+    width: 100vw;
+    max-width: 100%;
+    height: 100dvh;
+    margin: 0;
+  }
+
+  /* --- 1. WELCOME SCREEN AUDIT --- */
+  #welcome-screen {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .hero-photo-wrapper {
+    height: clamp(330px, 43dvh, 400px) !important;
+    min-height: clamp(330px, 43dvh, 400px) !important;
+    max-height: 44dvh !important;
+    border-bottom-left-radius: 34px;
+    border-bottom-right-radius: 34px;
+  }
+
+  .welcome-lower-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 18px calc(var(--sab) + 84px) 18px !important;
+  }
+
+  .apple-live-clock.dual-pill-mode {
+    width: 100%;
+    max-width: 384px;
+    margin: 8px auto 0 auto;
+    padding: 14px 16px;
+    border-radius: 24px;
+  }
+
+  .hero-days-num {
+    font-size: 35px !important;
+  }
+
+  .milestone-label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-top: 5px;
+  }
+
+  .ticker-unit {
+    font-size: 21px !important;
+  }
+
+  .ticker-colon {
+    font-size: 18px;
+    margin: 0 1px;
+  }
+
+  .ticker-sublabel {
+    font-size: 9px;
+  }
+
+  .daily-note-wrap {
+    width: 100%;
+    max-width: 384px;
+    margin: 11px auto 0 auto;
+  }
+
+  .daily-note-capsule {
+    border-radius: 20px;
+    padding: 13px 16px;
+  }
+
+  .note-body-text {
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  .cta-container {
+    width: 100%;
+    margin: 11px auto 0 auto;
+  }
+
+  .note-toggle-btn {
+    width: 100%;
+    max-width: 360px;
+    height: 48px;
+    font-size: 14.5px;
+  }
+
+  /* --- 2. APPLE MUSIC SCREEN AUDIT --- */
+  .apple-now-playing-container {
+    width: 100%;
+    max-width: 100%;
+    padding: calc(var(--sat) + 8px) 18px calc(var(--sab) + 82px) 18px !important;
+    justify-content: space-between;
+  }
+
+  .apple-music-grabber {
+    width: 36px;
+    height: 4.5px;
+    margin-bottom: 12px;
+  }
+
+  .apple-artwork-container {
+    width: 100%;
+    max-width: 375px;
+    aspect-ratio: 16 / 9;
+    margin: 0 auto 12px auto;
+  }
+
+  .apple-artwork-container.is-panel-mode {
+    width: 100%;
+    max-width: 375px;
+    height: clamp(245px, 30vh, 295px) !important;
+    aspect-ratio: unset !important;
+    margin: 0 auto 10px auto;
+  }
+
+  .apple-track-info-row {
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+
+  .apple-track-title {
+    font-size: 20px;
+  }
+
+  .apple-track-artist {
+    font-size: 14px;
+    margin-top: 3px;
+  }
+
+  .audio-badge {
+    font-size: 9.5px;
+    padding: 2px 7px;
+  }
+
+  .apple-scrubber-section {
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+
+  .apple-modes-row {
+    max-width: 310px;
+    margin: 2px auto 8px auto;
+    padding: 3px 12px;
+  }
+
+  .mode-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .apple-controls-row {
+    padding: 0 20px;
+    margin-bottom: 10px;
+  }
+
+  .apple-play-toggle {
+    width: 64px;
+    height: 64px;
+  }
+
+  .apple-play-toggle svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .apple-ctrl-action {
+    width: 44px;
+    height: 44px;
+  }
+
+  .apple-ctrl-action svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .apple-bottom-deck {
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .apple-volume-row {
+    padding: 0 6px;
+  }
+
+  .apple-bottom-utilities {
+    padding: 0 16px;
+  }
+
+  /* --- 3. SETTINGS & SUBPAGE AUDIT --- */
+  .dedicated-screen-container {
+    width: 100%;
+    max-width: 100%;
+    padding: calc(var(--sat) + 16px) 16px calc(var(--sab) + 94px) 16px !important;
+  }
+
+  .settings-user-card {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+  }
+
+  .settings-nav-pill {
+    padding: 13px 16px;
+  }
+
+  .settings-subpage-pane {
+    padding-top: calc(var(--sat) + 12px) !important;
+    padding-bottom: calc(var(--sab) + 110px) !important;
+  }
+
+  .spatial-mode-pills {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .spatial-pill {
+    padding: 10px 4px;
+  }
+
+  .pill-title {
+    font-size: 11px;
+  }
+
+  .pill-desc {
+    font-size: 8.5px;
+  }
+
+  /* --- 4. FLOATING DOCK & ORB --- */
+  .apple-floating-dock {
+    bottom: calc(var(--sab) + 14px) !important;
+  }
+
+  .apple-floating-navbar {
+    padding: 4.5px;
+  }
+
+  .nav-tab-btn {
+    padding: 7px 17px;
+    min-height: 36px;
+    font-size: 13px;
+  }
+
+  .music-floating-orb {
+    width: 44px;
+    height: 44px;
+  }
+
+  .orb-disc-wrapper {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* --- 5. MODALS & BOTTOM SHEETS AUDIT --- */
+  .quiz-panel,
+  .story-panel,
+  .timer-sheet-panel {
+    max-width: 100% !important;
+    border-radius: 30px 30px 0 0 !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+    padding-bottom: calc(var(--sab) + 24px) !important;
+  }
+
+  .quiz-option-btn {
+    padding: 12px 15px;
+    border-radius: 14px;
+  }
+
+  .option-text {
+    font-size: 14px;
+  }
+}
+
 

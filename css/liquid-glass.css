@@ -20,10 +20,10 @@
 
   --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", 'Outfit', system-ui, sans-serif;
 
-  --sat: env(safe-area-inset-top, 0px);
-  --sab: env(safe-area-inset-bottom, 0px);
-  --sal: env(safe-area-inset-left, 0px);
-  --sar: env(safe-area-inset-right, 0px);
+  --sat: max(env(safe-area-inset-top, 0px), 0px);
+  --sab: max(env(safe-area-inset-bottom, 0px), 0px);
+  --sal: max(env(safe-area-inset-left, 0px), 0px);
+  --sar: max(env(safe-area-inset-right, 0px), 0px);
 
   --radius-xs: 8px;
   --radius-sm: 14px;
@@ -119,17 +119,24 @@ html, body {
   100% { transform: translate(-20px, 20px) scale(0.95) rotate(-30deg); }
 }
 
-/* Phone Container - iPhone 14 Pro Max = 430 CSS px wide */
+/* Phone Container - iPhone 14 Pro Max & 16 Pro Max (430px - 440px wide) */
 #app {
   position: relative;
   width: 100%;
-  max-width: 430px;
+  max-width: 440px;
   height: 100dvh;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   z-index: 1;
   overflow: hidden;
+}
+
+@media (max-width: 500px) {
+  #app {
+    max-width: 100%;
+    width: 100vw;
+  }
 }
 
 /* Liquid Glass Card Base */
