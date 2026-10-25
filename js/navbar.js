@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         floatingOrb.classList.add('is-separating', 'is-visible');
         animTimer = setTimeout(() => {
           floatingOrb.classList.remove('is-separating');
-        }, 520);
+        }, 360);
       }
       floatingOrb.classList.add('is-playing');
     } else {
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (typeof isPlaying !== 'undefined' && !isPlaying) {
             floatingOrb.classList.remove('is-playing');
           }
-        }, 380);
+        }, 260);
       } else {
         floatingOrb.classList.remove('is-visible', 'is-merging');
         if (typeof isPlaying !== 'undefined' && !isPlaying) {
@@ -102,15 +102,44 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Control RAF loops: Pause heavy visualizer & lyrics loops when off music screen
+    if (targetTab === 'music') {
+      if (typeof isPlaying !== 'undefined' && isPlaying && typeof audio !== 'undefined' && !audio.paused) {
+        if (typeof currentCardView !== 'undefined' && currentCardView === 'artwork') {
+          startBeatVisualizer();
+        } else if (typeof currentCardView !== 'undefined' && currentCardView === 'lyrics') {
+          startSyncLoop();
+        }
+      }
+    } else {
+      stopBeatVisualizer();
+      stopSyncLoop();
+    }
+
     // Update floating companion orb visibility
     updateFloatingOrbVisibility();
   }
 
   // Find nearest tab button from a clientX coordinate
+  // Cache metrics during drag to prevent forced reflows
+  let cachedNavRect = null;
+  let cachedBtnMetrics = [];
+
   function getClosestTabBtn(clientX) {
+    if (cachedBtnMetrics && cachedBtnMetrics.length) {
+      let closest = cachedBtnMetrics[0].btn;
+      let minDistance = Infinity;
+      cachedBtnMetrics.forEach(item => {
+        const dist = Math.abs(clientX - item.center);
+        if (dist < minDistance) {
+          minDistance = dist;
+          closest = item.btn;
+        }
+      });
+      return closest;
+    }
     let closestBtn = tabBtns[0];
     let minDistance = Infinity;
-
     tabBtns.forEach(btn => {
       const rect = btn.getBoundingClientRect();
       const btnCenter = rect.left + rect.width / 2;
@@ -120,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closestBtn = btn;
       }
     });
-
     return closestBtn;
   }
 
@@ -131,32 +159,34 @@ document.addEventListener('DOMContentLoaded', () => {
   let activePointerId = null;
 
   function handleNavDragMove(clientX) {
-    if (!nav || !indicator) return;
-    const navRect = nav.getBoundingClientRect();
-    const padding = 5; // matching 5px navbar padding
+    if (!nav || !indicator || !cachedNavRect) return;
+    const padding = 5;
+    const indicatorWidth = indicator.offsetWidth || 70;
     const minLeft = padding;
-    const maxLeft = navRect.width - (indicator.offsetWidth || 70) - padding;
+    const maxLeft = cachedNavRect.width - indicatorWidth - padding;
 
-    // Center indicator under pointer
-    const indicatorHalfWidth = (indicator.offsetWidth || 70) / 2;
-    const desiredLeft = clientX - navRect.left - indicatorHalfWidth;
+    const indicatorHalfWidth = indicatorWidth / 2;
+    const desiredLeft = clientX - cachedNavRect.left - indicatorHalfWidth;
     const clampedLeft = Math.max(minLeft, Math.min(maxLeft, desiredLeft));
 
     indicator.style.left = `${clampedLeft}px`;
 
-    // Mac Dock Proximity Magnification while dragging
-    const closestBtn = getClosestTabBtn(clientX);
-    tabBtns.forEach(btn => {
-      const rect = btn.getBoundingClientRect();
-      const btnCenter = rect.left + rect.width / 2;
-      const dist = Math.abs(clientX - btnCenter);
+    // Mac Dock Proximity Magnification using cached metrics
+    let closestBtn = null;
+    let minDistance = Infinity;
+    cachedBtnMetrics.forEach(item => {
+      const dist = Math.abs(clientX - item.center);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestBtn = item.btn;
+      }
       const proximity = Math.max(0, 1 - dist / 90);
-      const label = btn.querySelector('.nav-tab-label');
+      const label = item.btn.querySelector('.nav-tab-label');
       if (label) {
         const scale = 1 + proximity * 0.12;
         label.style.transform = `scale(${scale.toFixed(3)})`;
       }
-      btn.classList.toggle('is-dock-magnified', btn === closestBtn);
+      item.btn.classList.toggle('is-dock-magnified', item.btn === closestBtn);
     });
   }
 
@@ -171,6 +201,13 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         nav.setPointerCapture(e.pointerId);
       } catch (err) {}
+
+      // Cache dimensions at start of drag to avoid layout thrashing during movement
+      cachedNavRect = nav.getBoundingClientRect();
+      cachedBtnMetrics = tabBtns.map(btn => {
+        const rect = btn.getBoundingClientRect();
+        return { btn, center: rect.left + rect.width / 2 };
+      });
 
       nav.classList.add('is-dragging');
       indicator.classList.add('is-pressed');
@@ -189,24 +226,25 @@ document.addEventListener('DOMContentLoaded', () => {
           handleNavDragMove(e.clientX);
         }
       } else {
-        // macOS Dock Proximity Magnification on regular hover
-        tabBtns.forEach(btn => {
-          const rect = btn.getBoundingClientRect();
-          const btnCenter = rect.left + rect.width / 2;
-          const dist = Math.abs(e.clientX - btnCenter);
-          const proximity = Math.max(0, 1 - dist / 80);
-          const label = btn.querySelector('.nav-tab-label');
-          if (label && !btn.classList.contains('active')) {
-            const scale = 1 + proximity * 0.10;
-            label.style.transform = `scale(${scale.toFixed(3)})`;
-          }
-        });
+        // macOS Dock Proximity Magnification only for precision mouse hover, not touch devices
+        if (e.pointerType === 'mouse') {
+          tabBtns.forEach(btn => {
+            const rect = btn.getBoundingClientRect();
+            const btnCenter = rect.left + rect.width / 2;
+            const dist = Math.abs(e.clientX - btnCenter);
+            const proximity = Math.max(0, 1 - dist / 80);
+            const label = btn.querySelector('.nav-tab-label');
+            if (label && !btn.classList.contains('active')) {
+              const scale = 1 + proximity * 0.10;
+              label.style.transform = `scale(${scale.toFixed(3)})`;
+            }
+          });
+        }
       }
     });
 
     const finishNavDrag = (e) => {
       if (!isNavDragging) return;
-      const wasQuickClick = !hasDragged;
       isNavDragging = false;
       nav.classList.remove('is-dragging');
       indicator.classList.remove('no-transition', 'is-dragging', 'is-pressed');
@@ -225,6 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Magnetically snap to closest tab
       const targetBtn = getClosestTabBtn(e.clientX);
+      cachedNavRect = null;
+      cachedBtnMetrics = [];
+
       if (targetBtn) {
         const targetTab = targetBtn.getAttribute('data-tab');
         switchPage(targetTab, targetBtn);
@@ -295,22 +336,14 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 1. Calculate exact viewport center coordinates of floating orb
-    const orbRect = floatingOrb.getBoundingClientRect();
-    const centerX = Math.round(orbRect.left + orbRect.width / 2);
-    const centerY = Math.round(orbRect.top + orbRect.height / 2);
-    const radius = Math.round(orbRect.width / 2);
-
-    // 2. Set dynamic CSS variables for circular clip-path expansion origin
-    musicScreen.style.setProperty('--launch-x', `${centerX}px`);
-    musicScreen.style.setProperty('--launch-y', `${centerY}px`);
-    musicScreen.style.setProperty('--launch-r', `${radius}px`);
-
-    // 3. Tactile click feedback on the floating orb
+    // 1. Tactile click feedback on the floating orb
     floatingOrb.classList.add('is-clicked-launching');
 
-    // 4. Trigger expanding luminous glass ring shockwave from exact origin
+    // 2. Trigger lightweight expanding ring shockwave
     if (launchRing) {
+      const orbRect = floatingOrb.getBoundingClientRect();
+      const centerX = Math.round(orbRect.left + orbRect.width / 2);
+      const centerY = Math.round(orbRect.top + orbRect.height / 2);
       launchRing.style.left = `${centerX}px`;
       launchRing.style.top = `${centerY}px`;
       if (typeof PLAYLIST !== 'undefined' && typeof currentTrackIndex !== 'undefined' && PLAYLIST[currentTrackIndex]) {
@@ -320,16 +353,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       launchRing.classList.remove('is-animating');
-      void launchRing.offsetWidth; // Force reflow to restart CSS animation cleanly
+      void launchRing.offsetWidth;
       launchRing.classList.add('is-animating');
     }
 
-    // 5. Background screen gently recedes in 3D (iOS wallpaper depth physics)
-    if (previousScreen && previousScreen !== musicScreen) {
-      previousScreen.classList.add('screen-launch-recede');
-    }
-
-    // 6. Navbar updates active tab & indicator smoothly
+    // 3. Navbar updates active tab & indicator smoothly
     currentTab = 'music';
     tabBtns.forEach(b => {
       b.classList.remove('active');
@@ -342,32 +370,40 @@ document.addEventListener('DOMContentLoaded', () => {
       updateIndicator(musicTab);
     }
 
-    // 7. Trigger the fluid launch morph expansion on musicScreen
+    // 4. Background screen cleanly recedes
+    if (previousScreen && previousScreen !== musicScreen) {
+      previousScreen.classList.add('screen-launch-recede');
+    }
+
+    // 5. Trigger GPU-accelerated fluid launch on musicScreen
     musicScreen.classList.remove('hidden');
     musicScreen.classList.add('is-launching-from-orb', 'active');
     musicScreen.scrollTop = 0;
 
-    // 8. Orb will smoothly hide since we are now in music section
+    // 6. Resume visualizers if playing
+    if (typeof isPlaying !== 'undefined' && isPlaying && typeof audio !== 'undefined' && !audio.paused) {
+      if (typeof currentCardView !== 'undefined' && currentCardView === 'artwork') {
+        startBeatVisualizer();
+      } else if (typeof currentCardView !== 'undefined' && currentCardView === 'lyrics') {
+        startSyncLoop();
+      }
+    }
+
+    // 7. Orb smoothly hides since we are now in music section
     updateFloatingOrbVisibility();
 
-    // 9. When 620ms animation finishes, cleanly settle into resting state
+    // 8. Snappy 320ms transition settlement
     setTimeout(() => {
       musicScreen.classList.remove('is-launching-from-orb');
-      musicScreen.style.removeProperty('--launch-x');
-      musicScreen.style.removeProperty('--launch-y');
-      musicScreen.style.removeProperty('--launch-r');
-
       if (previousScreen && previousScreen !== musicScreen) {
         previousScreen.classList.remove('screen-launch-recede', 'active');
       }
-
       if (launchRing) {
         launchRing.classList.remove('is-animating');
       }
-
       floatingOrb.classList.remove('is-clicked-launching');
       isLaunchingMusic = false;
-    }, 620);
+    }, 320);
   }
 
   // Floating Music Orb: Click to launch music section with iOS 27 fluid morph
@@ -936,7 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function beatVisualizerLoop() {
-    if (!isPlaying || audio.paused) {
+    if (!isPlaying || audio.paused || currentTab !== 'music' || currentCardView !== 'artwork') {
       stopBeatVisualizer();
       return;
     }
@@ -1115,15 +1151,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function syncLoop() {
-    if (isPlaying && !audio.paused) {
+    if (isPlaying && !audio.paused && currentTab === 'music' && currentCardView === 'lyrics') {
       updateSyncedLyrics(audio.currentTime);
       lyricsRafId = requestAnimationFrame(syncLoop);
+    } else {
+      stopSyncLoop();
     }
   }
 
   function startSyncLoop() {
     if (lyricsRafId) cancelAnimationFrame(lyricsRafId);
-    lyricsRafId = requestAnimationFrame(syncLoop);
+    if (isPlaying && !audio.paused && currentTab === 'music' && currentCardView === 'lyrics') {
+      lyricsRafId = requestAnimationFrame(syncLoop);
+    }
   }
 
   function stopSyncLoop() {
@@ -1136,8 +1176,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function setPlayPauseUI(playing) {
     isPlaying = playing;
     if (playing) {
-      startSyncLoop();
-      startBeatVisualizer();
+      if (currentTab === 'music') {
+        if (currentCardView === 'artwork') startBeatVisualizer();
+        if (currentCardView === 'lyrics') startSyncLoop();
+      }
     } else {
       stopSyncLoop();
       stopBeatVisualizer();
@@ -1167,39 +1209,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  let scrollAnimId = null;
-
-  // Silk Spring Glide: 0.55s fluid Apple-spring kinetic scroll
+  // Native smooth scrolling for lyrics without CPU animation tick overhead
   function smoothScrollLyricsTo(targetY) {
     if (!lyricsContent) return;
-    if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
-
-    const startY = lyricsContent.scrollTop;
-    const diff = targetY - startY;
-    if (Math.abs(diff) < 2) return;
-
-    const startTime = performance.now();
-    const duration = 550; // 0.55s fluid Apple-spring easing
-
-    // Apple fluid spring / quintic ease-out curve
-    function easeOutQuint(t) {
-      return 1 - Math.pow(1 - t, 5);
+    try {
+      lyricsContent.scrollTo({ top: targetY, behavior: 'smooth' });
+    } catch (e) {
+      lyricsContent.scrollTop = targetY;
     }
-
-    function step(now) {
-      const elapsed = now - startTime;
-      const progress = Math.min(1, elapsed / duration);
-      const ease = easeOutQuint(progress);
-      lyricsContent.scrollTop = startY + diff * ease;
-
-      if (progress < 1) {
-        scrollAnimId = requestAnimationFrame(step);
-      } else {
-        scrollAnimId = null;
-      }
-    }
-
-    scrollAnimId = requestAnimationFrame(step);
   }
 
   // Cancel programmatic scroll if user manually scrolls/touches
@@ -1212,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
   }
 
-  // View Switcher: Apple Music 3D Depth Morph Transition
+  // View Switcher: Apple Music Fast Hardware-Accelerated Panel Switch
   function setCardView(view) {
     currentCardView = view;
 
@@ -1225,6 +1242,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (view === 'lyrics') {
+      stopBeatVisualizer();
       if (artworkCard) artworkCard.classList.add('is-depth-bg');
       if (glassFrame) glassFrame.classList.add('is-depth-bg');
       if (songlistCard) songlistCard.classList.remove('is-revealed');
@@ -1233,7 +1251,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (songlistBtn) songlistBtn.classList.remove('active');
       if (modesRow) modesRow.classList.add('is-hidden');
       renderLyrics();
+      if (isPlaying && !audio.paused && currentTab === 'music') {
+        startSyncLoop();
+      }
     } else if (view === 'songlist') {
+      stopBeatVisualizer();
+      stopSyncLoop();
       if (artworkCard) artworkCard.classList.add('is-depth-bg');
       if (glassFrame) glassFrame.classList.add('is-depth-bg');
       if (lyricsCard) lyricsCard.classList.remove('is-revealed');
@@ -1243,6 +1266,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (modesRow) modesRow.classList.add('is-hidden');
       renderSongList();
     } else {
+      stopSyncLoop();
       // Default Artwork View (Depth spring return)
       if (artworkCard) artworkCard.classList.remove('is-depth-bg');
       if (glassFrame) glassFrame.classList.remove('is-depth-bg');
@@ -1251,6 +1275,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (lyricsBtn) lyricsBtn.classList.remove('active');
       if (songlistBtn) songlistBtn.classList.remove('active');
       if (modesRow) modesRow.classList.remove('is-hidden');
+      if (isPlaying && !audio.paused && currentTab === 'music') {
+        startBeatVisualizer();
+      }
     }
   }
 

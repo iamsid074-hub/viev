@@ -25,18 +25,14 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: 
-    opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 1.1s cubic-bezier(0.16, 1, 0.3, 1),
-    backdrop-filter 1.1s ease,
-    -webkit-backdrop-filter 1.1s ease;
-  will-change: opacity, transform, backdrop-filter;
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
 .apple-hello-splash.is-exiting {
   opacity: 0;
-  transform: scale(1.06);
-  backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
+  transform: scale(1.04);
   pointer-events: none;
 }
 
@@ -173,14 +169,14 @@
   flex-direction: column;
   padding: 0;
   z-index: 10;
-  transition: transform 0.4s var(--ease-apple), opacity 0.4s ease;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
   opacity: 0;
-  transform: scale(0.98) translateY(6px);
+  transform: scale(0.98);
+  will-change: opacity, transform;
 }
 
 .app-screen::-webkit-scrollbar {
@@ -200,11 +196,23 @@
   opacity: 1;
   transform: scale(1) translateY(0);
   pointer-events: auto;
+  animation: appScreenFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes appScreenFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.98) translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .app-screen.hidden {
+  display: none !important;
   opacity: 0;
-  transform: scale(0.95) translateY(-16px);
   pointer-events: none;
 }
 
@@ -1019,12 +1027,10 @@
   z-index: 25;
   visibility: hidden;
   opacity: 0;
-  transform: translateY(-50%) translateX(-44px) scale(0.82);
-  filter: blur(6px);
-  will-change: transform, opacity, filter;
-  transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(-50%) translateX(-36px) scale(0.82);
+  will-change: transform, opacity;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.26s ease;
 }
 
 /* Resting Visible State: Detached 12px to the right of navbar */
@@ -1033,37 +1039,30 @@
   opacity: 1;
   pointer-events: auto;
   transform: translateY(-50%) translateX(12px) scale(1);
-  filter: blur(0px);
 }
 
-/* Spatial Puck Separation: Butter-smooth glide out from inside dock + Elevation Lift */
+/* Spatial Puck Separation: Pure hardware-accelerated glide */
 .music-floating-orb.is-separating {
   visibility: visible !important;
   pointer-events: auto !important;
-  animation: visionOSPuckSeparate 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: visionOSPuckSeparate 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
-/* Spatial Puck Merge: Butter-smooth glide back into navbar edge + Elevation Drop */
+/* Spatial Puck Merge: Pure hardware-accelerated glide */
 .music-floating-orb.is-merging {
   visibility: visible !important;
   pointer-events: none !important;
-  animation: visionOSPuckMerge 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+  animation: visionOSPuckMerge 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
 }
 
 @keyframes visionOSPuckSeparate {
   0% {
-    transform: translateY(-50%) translateX(-44px) scale(0.80);
+    transform: translateY(-50%) translateX(-36px) scale(0.82);
     opacity: 0;
-    filter: blur(8px) brightness(1.25);
-  }
-  30% {
-    opacity: 0.85;
-    filter: blur(3px) brightness(1.10);
   }
   100% {
     transform: translateY(-50%) translateX(12px) scale(1);
     opacity: 1;
-    filter: blur(0px) brightness(1);
   }
 }
 
@@ -1071,16 +1070,10 @@
   0% {
     transform: translateY(-50%) translateX(12px) scale(1);
     opacity: 1;
-    filter: blur(0px);
-  }
-  50% {
-    opacity: 0.65;
-    filter: blur(4px);
   }
   100% {
-    transform: translateY(-50%) translateX(-44px) scale(0.80);
+    transform: translateY(-50%) translateX(-36px) scale(0.82);
     opacity: 0;
-    filter: blur(8px);
   }
 }
 
@@ -1272,72 +1265,52 @@
 
 /* =========================================================
    IOS 27 FLUID APP LAUNCH MORPH ENGINE (ORB -> FULL WINDOW)
-   Smooth fluid expansion originating from the circular orb coordinates
+   High-performance GPU composited launch
    ========================================================= */
 #music-screen.is-launching-from-orb {
   display: flex !important;
   opacity: 1 !important;
   z-index: 90 !important;
   pointer-events: auto !important;
-  animation: iosAppLaunchExpand 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: clip-path, transform, opacity;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.85);
+  animation: iosAppLaunchFluid 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform, opacity;
 }
 
 #music-screen.is-launching-from-orb .apple-now-playing-container {
-  animation: iosAppContentUnfold 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: transform, opacity, filter;
+  animation: iosAppContentFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform, opacity;
 }
 
-@keyframes iosAppLaunchExpand {
+@keyframes iosAppLaunchFluid {
   0% {
-    clip-path: circle(var(--launch-r, 24px) at var(--launch-x, 85%) var(--launch-y, 90%));
-    transform: scale(0.94);
-    opacity: 0.95;
-    border-radius: 48px;
-  }
-  30% {
-    border-radius: 36px;
-    opacity: 1;
-  }
-  70% {
-    border-radius: 16px;
-  }
-  100% {
-    clip-path: circle(150% at var(--launch-x, 85%) var(--launch-y, 90%));
-    transform: scale(1);
-    opacity: 1;
-    border-radius: 0px;
-  }
-}
-
-@keyframes iosAppContentUnfold {
-  0% {
-    transform: scale(0.86) translateY(36px);
-    opacity: 0.25;
-    filter: blur(10px);
-  }
-  40% {
-    opacity: 0.85;
-    filter: blur(3px);
+    transform: scale(0.94) translateY(18px);
+    opacity: 0;
   }
   100% {
     transform: scale(1) translateY(0);
     opacity: 1;
-    filter: blur(0px);
   }
 }
 
-/* Background screen recedes in 3D during app launch (Apple iOS depth physics) */
+@keyframes iosAppContentFadeIn {
+  0% {
+    transform: scale(0.96) translateY(10px);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Background screen recedes smoothly during launch */
 .app-screen.screen-launch-recede {
   display: flex !important;
-  opacity: 1 !important;
-  transform: scale(0.95) translateY(8px) !important;
-  filter: brightness(0.65) blur(6px) !important;
+  opacity: 0 !important;
+  transform: scale(0.96) translateY(-6px) !important;
   pointer-events: none !important;
-  transition: transform 0.62s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.62s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.62s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.24s ease !important;
 }
 
 /* Luminous Glass Portal Ring Shockwave */
@@ -1345,48 +1318,39 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   pointer-events: none;
   z-index: 105;
   opacity: 0;
-  margin-left: -26px;
-  margin-top: -26px;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 32px rgba(255, 255, 255, 0.8),
-              0 0 70px var(--song-active-color, #ff5e7e),
-              inset 0 0 16px rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  margin-left: -22px;
+  margin-top: -22px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 20px var(--song-active-color, #ff5e7e);
   will-change: transform, opacity;
 }
 
 .music-launch-portal-ring.is-animating {
-  animation: portalRingShockwave 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: portalRingShockwave 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes portalRingShockwave {
   0% {
     transform: scale(1);
-    opacity: 0.95;
-  }
-  40% {
-    opacity: 0.75;
+    opacity: 0.85;
   }
   100% {
-    transform: scale(36);
+    transform: scale(16);
     opacity: 0;
   }
 }
 
 .music-floating-orb.is-clicked-launching {
-  transform: translateY(-50%) translateX(12px) scale(0.86) !important;
+  transform: translateY(-50%) translateX(12px) scale(0.88) !important;
   opacity: 0 !important;
-  filter: blur(4px) !important;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.20s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.20s ease !important;
 }
 
 .apple-now-playing-container {
@@ -1416,24 +1380,24 @@
   position: relative;
   width: 100%;
   max-width: 380px;
-  aspect-ratio: 16 / 9;
-  margin: 0 auto 16px auto;
+  height: clamp(215px, 28vh, 255px);
+  margin: 0 auto 14px auto;
   display: flex;
   align-items: center;
   justify-content: center;
   perspective: 1000px;
-  transition: aspect-ratio 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: height 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Expanded panel mode for lyrics and song list */
 .apple-artwork-container.is-panel-mode {
-  width: 100%;
-  max-width: 380px;
-  height: clamp(250px, 32vh, 305px);
-  aspect-ratio: unset;
-  margin: 0 auto 12px auto;
+  height: clamp(245px, 32vh, 305px);
+}
+
+.apple-artwork-container.is-panel-mode .apple-artwork-glow {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* =========================================================
@@ -1589,10 +1553,10 @@
 }
 
 .apple-glass-frame.is-depth-bg {
-  transform: scale(0.85) translateY(-8px) !important;
-  opacity: 0.25;
-  filter: blur(10px);
-  pointer-events: none;
+  transform: scale(0.90) translateY(-6px) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 .apple-artwork-card {
@@ -1625,10 +1589,10 @@
 
 /* 3D Depth backdrop state when Lyrics or Song List is active */
 .apple-artwork-card.is-depth-bg {
-  transform: scale(0.85) translateY(-8px) !important;
-  opacity: 0.28;
-  filter: blur(14px);
-  pointer-events: none;
+  transform: scale(0.90) translateY(-6px) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Direct 16:9 poster display */
@@ -1751,25 +1715,25 @@
   transform: scale(1.05);
 }
 
-/* Lyrics Card View with Spring Motion */
+/* Lyrics Card View with Snappy Hardware Motion */
 .apple-lyrics-card {
   position: absolute;
   inset: 0;
   border-radius: 24px;
-  background: rgba(14, 14, 18, 0.88);
-  backdrop-filter: blur(36px) saturate(200%);
-  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  background: rgba(16, 16, 22, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   padding: 16px 14px 14px 16px;
   display: flex;
   flex-direction: column;
   z-index: 5;
   opacity: 0;
-  transform: scale(0.92) translateY(18px);
+  transform: scale(0.96) translateY(10px);
   pointer-events: none;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
 }
 
@@ -1782,14 +1746,12 @@
 .apple-lyrics-scroll-container {
   flex: 1;
   overflow-y: auto;
-  scroll-behavior: auto; /* controlled programmatically via Silk Spring Glide */
+  scroll-behavior: auto;
   padding: 85px 8px 125px 8px;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  /* Hide visible scrollbar slider while keeping full scroll functionality */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -1800,27 +1762,25 @@
   height: 0;
 }
 
-/* Silk Spring Glide for synced lyrics line switch */
+/* Synced lyrics line switch */
 .synced-lyric-line {
-  font-size: 15.5px;
+  font-size: 15px;
   line-height: 1.5;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.28);
   letter-spacing: -0.015em;
   padding: 8px 6px;
   cursor: pointer;
-  transition: color 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-              font-size 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-              text-shadow 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: color 0.22s ease,
+              opacity 0.22s ease,
+              transform 0.22s ease;
   transform-origin: left center;
   transform: scale(0.96);
   opacity: 0.30;
   user-select: none;
   background: transparent;
   border: none;
-  will-change: transform, color, opacity;
+  will-change: transform, opacity;
 }
 
 .synced-lyric-line:hover {
@@ -1828,16 +1788,16 @@
   opacity: 0.75;
 }
 
-/* Active Singing Line: ONLY the line text is pure red, bold & larger. NO box, NO background. */
+/* Active Singing Line */
 .synced-lyric-line.is-active {
-  font-size: 21px;
+  font-size: 16px;
   line-height: 1.45;
   font-weight: 750;
   color: #ff375f;
   opacity: 1;
   filter: none;
-  transform: scale(1.03);
-  text-shadow: 0 0 20px rgba(255, 55, 95, 0.45);
+  transform: scale(1.08);
+  text-shadow: 0 0 14px rgba(255, 55, 95, 0.4);
   background: transparent;
   border: none;
   padding: 8px 6px;
@@ -1848,25 +1808,25 @@
   opacity: 0.30;
 }
 
-/* Song List Card View with Spring Motion */
+/* Song List Card View with Snappy Hardware Motion */
 .apple-songlist-card {
   position: absolute;
   inset: 0;
   border-radius: 24px;
-  background: rgba(14, 14, 18, 0.88);
-  backdrop-filter: blur(36px) saturate(200%);
-  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  background: rgba(16, 16, 22, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   padding: 14px 12px;
   display: flex;
   flex-direction: column;
   z-index: 5;
   opacity: 0;
-  transform: scale(0.92) translateY(18px);
+  transform: scale(0.96) translateY(10px);
   pointer-events: none;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
 }
 
@@ -4868,15 +4828,12 @@
   .apple-artwork-container {
     width: 100%;
     max-width: 375px;
-    aspect-ratio: 16 / 9;
+    height: clamp(210px, 28vh, 250px);
     margin: 0 auto 12px auto;
   }
 
   .apple-artwork-container.is-panel-mode {
-    width: 100%;
-    max-width: 375px;
-    height: clamp(245px, 30vh, 295px) !important;
-    aspect-ratio: unset !important;
+    height: clamp(240px, 31vh, 295px) !important;
     margin: 0 auto 10px auto;
   }
 
