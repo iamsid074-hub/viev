@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       isLaunchingMusic = false;
-    }, 500);
+    }, 620);
   }
 
   // Floating Music Orb: Click to launch music section with iOS 27 fluid morph
