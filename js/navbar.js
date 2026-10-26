@@ -771,32 +771,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ]
     },
     {
-      title: 'Phir Bhi Tumko Chaahunga',
-      artist: 'Arijit Singh • Shashaa Tirupati',
-      src: 'song/Main Phir Bhi Tumko Chahunga - Padam Bajaj (Mr-Punjab.Com)-320kb.mp3',
-      cover: 'song/Screenshot 2026-10-25 152731.png',
-      color: '#0ea5e9',
-      glow: 'rgba(14, 165, 233, 0.88)',
-      glowSoft: 'rgba(14, 165, 233, 0.40)',
-      lyrics: [
-        { time: 19.5, text: "Tum mere ho iss pal mere ho," },
-        { time: 24.5, text: "Kal shayad yeh aalam na rahe" },
-        { time: 30.0, text: "Kuch aisa ho tum tum na raho," },
-        { time: 35.0, text: "Kuch aisa ho hum hum na rahein" },
-        { time: 40.5, text: "Yeh raaste chhoot jaayein," },
-        { time: 45.5, text: "Khwabon ke sab aashiyane toot jaayein" },
-        { time: 51.5, text: "Main phir bhi tumko chahunga," },
-        { time: 62.0, text: "Main phir bhi tumko chahunga..." },
-        { time: 73.0, text: "Iss chahat mein marr jaunga," },
-        { time: 83.5, text: "Main phir bhi tumko chahunga..." },
-        { time: 94.0, text: "Meri jaan mein har khushi teri," },
-        { time: 104.5, text: "Tujhko hi manga hai rab se meri" },
-        { time: 115.0, text: "Aasman roye ya zameen rooth jaaye," },
-        { time: 125.5, text: "Duniya ki saari kasmein toot jaayein," },
-        { time: 136.0, text: "Main phir bhi tumko chahunga..." }
-      ]
-    },
-    {
       title: 'Khairiyat',
       artist: 'Arijit Singh • Pritam',
       src: 'song/Khairiyat Chhichhore 320 Kbps.mp3',
@@ -843,6 +817,63 @@ document.addEventListener('DOMContentLoaded', () => {
         { time: 93.0, text: "Ishq ka nasha har ek adaa mein" },
         { time: 101.0, text: "Har lamha bekhudi ka silsila hai," },
         { time: 109.0, text: "Rooh ko meri tera sahara mila hai" }
+      ]
+    },
+    {
+      title: 'Jaiye Sajana',
+      artist: 'Satinder Sartaaj • Jasmine Sandlas',
+      src: 'song/Jaiye Sajana Dhurandhar The Revenge 320 Kbps.mp3',
+      cover: 'song/Screenshot 2026-10-26 101216.png',
+      color: '#e11d48',
+      glow: 'rgba(225, 29, 72, 0.88)',
+      glowSoft: 'rgba(225, 29, 72, 0.40)',
+      lyrics: [
+        { time: 8.0, text: "Pattalan chon digde hanjoo" },
+        { time: 14.0, text: "Akh meri phir vi roi na..." },
+        { time: 20.5, text: "Pattalan chon digde hanjoo" },
+        { time: 27.0, text: "Akh meri phir vi roi na" },
+        { time: 33.5, text: "Aisi preet la lai rabba" },
+        { time: 39.5, text: "Jaisi hor kade hoi na..." },
+        { time: 46.0, text: "Tere jaan ton main baad" },
+        { time: 51.5, text: "Ik din soi na" },
+        { time: 57.0, text: "Poora shehar begana" },
+        { time: 62.5, text: "Ethe mera koi na" },
+        { time: 68.5, text: "Phir preet kise de naal" },
+        { time: 74.5, text: "Kade hoi na" },
+        { time: 80.5, text: "Zamana zaalim taan vi roi na" },
+        { time: 87.0, text: "Saare rang vekh lae" },
+        { time: 92.5, text: "Hun koi dar nahi" },
+        { time: 98.0, text: "Jiundi rahun aashiki" },
+        { time: 103.5, text: "Eh kade na marni" },
+        { time: 109.0, text: "Saanu saariyan visar gaiyan raahvan ve" },
+        { time: 116.5, text: "Kede paase jaiye sajana..." },
+        { time: 124.0, text: "Saanu saariyan visar gaiyan raahvan ve" },
+        { time: 131.5, text: "Kede paase jaiye sajana..." }
+      ]
+    },
+    {
+      title: 'Time Zone',
+      artist: 'Kaka',
+      src: 'song/Time Zone - Kaka.mp3',
+      cover: 'song/Screenshot 2026-10-26 102009.png',
+      color: '#f97316',
+      glow: 'rgba(249, 115, 22, 0.88)',
+      glowSoft: 'rgba(249, 115, 22, 0.40)',
+      lyrics: [
+        { time: 4.5, text: "Ghari meri time dasse tere shehar da" },
+        { time: 9.5, text: "Aithe adhi raat te othe deed dupehr da" },
+        { time: 14.5, text: "Tere pichhe jaagne 'ch aa reha swaad" },
+        { time: 19.5, text: "Waise chheti mera dil taan kitte ni thehron da" },
+        { time: 25.0, text: "Dil kare aawan tere kol udd ke" },
+        { time: 29.5, text: "Lake de kinare baithan naal judd ke" },
+        { time: 34.5, text: "Hath phadd tera photo khichni dobara" },
+        { time: 39.0, text: "Par Insta te post ni paauni mud ke" },
+        { time: 44.0, text: "Aisi setting baithi ae apni" },
+        { time: 48.5, text: "Suiyan khadi diyan taan ni chhediyan" },
+        { time: 53.0, text: "Sacche pyaar 'chon nikalna main" },
+        { time: 57.5, text: "Mere dil diyan tod bediyan" },
+        { time: 62.0, text: "Mainu chat 'ch na bhej pappiyan" },
+        { time: 66.5, text: "Mainu paunda ae sauraana jhappiyan" }
       ]
     }
   ];
