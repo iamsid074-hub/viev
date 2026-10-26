@@ -2084,8 +2084,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
   // =========================================================
+  // RIGHT-ALIGNED MORPHING 3-DOTS GLASS CAPSULE CONTROLLER
+  // =========================================================
+  const utilityCapsule = document.getElementById('apple-utility-capsule');
+  const utilityDotsTrigger = document.getElementById('utility-dots-trigger');
+  const utilityActionButtons = document.querySelectorAll('.utility-actions-group .utility-btn');
+
+  function toggleUtilityCapsule(expand) {
+    if (!utilityCapsule) return;
+    const shouldExpand = expand !== undefined ? expand : !utilityCapsule.classList.contains('is-expanded');
+    utilityCapsule.classList.toggle('is-expanded', shouldExpand);
+  }
+
+  if (utilityDotsTrigger) {
+    utilityDotsTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleUtilityCapsule();
+    });
+  }
+
+  // Option A: Auto-collapse on selection
+  if (utilityActionButtons) {
+    utilityActionButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (utilityCapsule && utilityCapsule.classList.contains('is-expanded')) {
+          toggleUtilityCapsule(false);
+        }
+      });
+    });
+  }
+
+  // Outside click to collapse capsule
+  document.addEventListener('click', (e) => {
+    if (!utilityCapsule || !utilityCapsule.classList.contains('is-expanded')) return;
+    if (!utilityCapsule.contains(e.target)) {
+      toggleUtilityCapsule(false);
+    }
+  });
   // FEATURE 1: APPLE LOSSLESS & DOLBY ATMOS FIDELITY MODAL
   // =========================================================
   const fidelityModal = document.getElementById('apple-fidelity-modal');
