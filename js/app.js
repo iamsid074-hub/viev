@@ -329,33 +329,339 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================
-  // APPLE "VIEV" STARTUP INTRO CONTROLLER
-  // Pure single continuous line drawing (3.5s, zero flash, zero cloud)
+  // APPLE "VIEV" ACCESS GATEWAY & STARTUP INTRO CONTROLLER
+  // Only 2 people: Digi (3009) & You (1711)
+  // Flow: Unauthenticated -> Login Screen -> Correct Passcode -> Startup Intro -> Home
+  // Authenticated -> Directly Startup Intro -> Home
   // =========================================================
   const helloSplash = document.getElementById('apple-hello-splash');
+  const loginScreen = document.getElementById('login-screen');
+  const passcodeInput = document.getElementById('login-passcode-input');
+  const pinDisplay = document.getElementById('login-pin-display');
+  const pinCells = document.querySelectorAll('.pin-cell');
+  const loginFeedback = document.getElementById('login-feedback-msg');
+  const loginSubmitBtn = document.getElementById('login-submit-btn');
+  const signoutBtn = document.getElementById('settings-signout-btn');
+  const editNameBtn = document.getElementById('user-name-edit-btn');
+  const userNameEl = document.getElementById('user-display-name');
+  const userRoleBadge = document.getElementById('user-role-badge');
 
-  if (helloSplash) {
+  const VALID_USERS = {
+    '3009': { role: 'digi', defaultName: 'DIGI', badge: 'Princess Digi' },
+    '1711': { role: 'user', defaultName: 'ANSHU', badge: 'Co-Creator' }
+  };
+
+  let splashTimer = null;
+
+  function runStartupAnimation(callback) {
+    if (!helloSplash) {
+      if (callback) callback();
+      return;
+    }
+
     let hasDismissed = false;
+    helloSplash.classList.remove('is-hidden', 'is-exiting');
+
+    // Force restart SVG cursive drawing animation & ambient glow
+    const stroke = document.getElementById('viev-pure-line');
+    const dot = document.getElementById('viev-pure-dot');
+    const glow = helloSplash.querySelector('.hello-ambient-glow');
+    if (stroke) { stroke.style.animation = 'none'; stroke.offsetHeight; stroke.style.animation = ''; }
+    if (dot) { dot.style.animation = 'none'; dot.offsetHeight; dot.style.animation = ''; }
+    if (glow) { glow.style.animation = 'none'; glow.offsetHeight; glow.style.animation = ''; }
 
     function dismissHelloSplash() {
       if (hasDismissed) return;
       hasDismissed = true;
+      if (splashTimer) {
+        clearTimeout(splashTimer);
+        splashTimer = null;
+      }
 
       helloSplash.classList.add('is-exiting');
-
       setTimeout(() => {
         helloSplash.classList.add('is-hidden');
-      }, 1100);
+        if (callback) callback();
+      }, 700);
     }
 
-    // Peaceful hold after 3.5s cursive drawing finishes, then smooth dissolve (NO flash)
-    const splashTimer = setTimeout(dismissHelloSplash, 4800);
+    splashTimer = setTimeout(dismissHelloSplash, 4800);
 
-    // Tap anywhere to skip immediately
-    helloSplash.addEventListener('click', () => {
-      clearTimeout(splashTimer);
+    const onSplashClick = () => {
+      helloSplash.removeEventListener('click', onSplashClick);
       dismissHelloSplash();
+    };
+    helloSplash.addEventListener('click', onSplashClick, { once: true });
+  }
+
+  function getAuthSession() {
+    try {
+      const raw = localStorage.getItem('viev_auth_session');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function updateProfileUI(session) {
+    if (!session) return;
+    const config = VALID_USERS[session.code] || { role: session.role || 'user', defaultName: session.name || 'ANSHU', badge: 'Member' };
+    const savedCustomName = localStorage.getItem('viev_name_' + config.role);
+    const displayName = savedCustomName || session.name || config.defaultName;
+
+    if (userNameEl) {
+      userNameEl.textContent = displayName;
+    }
+    if (userRoleBadge) {
+      userRoleBadge.textContent = config.badge || 'Member';
+    }
+  }
+
+  function updatePinDisplay(val) {
+    pinCells.forEach((cell, idx) => {
+      if (idx < val.length) {
+        cell.classList.add('is-filled');
+        cell.classList.remove('is-focused');
+      } else if (idx === val.length) {
+        cell.classList.remove('is-filled');
+        cell.classList.add('is-focused');
+      } else {
+        cell.classList.remove('is-filled', 'is-focused');
+      }
     });
+  }
+
+  function executeLogin(code) {
+    const userConfig = VALID_USERS[code];
+
+    if (!userConfig) {
+      // Invalid passcode
+      if (pinDisplay) {
+        pinDisplay.classList.remove('shake');
+        void pinDisplay.offsetWidth; // Trigger reflow for re-animation
+        pinDisplay.classList.add('shake');
+      }
+
+      if (loginFeedback) {
+        loginFeedback.textContent = 'Incorrect Key • Try Again';
+        loginFeedback.classList.remove('success');
+        loginFeedback.classList.add('show');
+      }
+
+      setTimeout(() => {
+        if (passcodeInput) passcodeInput.value = '';
+        updatePinDisplay('');
+        if (passcodeInput) passcodeInput.focus();
+      }, 600);
+      return;
+    }
+
+    // Valid passcode
+    if (loginFeedback) {
+      loginFeedback.textContent = 'Access Granted';
+      loginFeedback.classList.add('show', 'success');
+    }
+
+    const savedCustomName = localStorage.getItem('viev_name_' + userConfig.role);
+    const finalName = savedCustomName || userConfig.defaultName;
+
+    const newSession = {
+      code,
+      role: userConfig.role,
+      name: finalName,
+      loggedInAt: Date.now()
+    };
+    localStorage.setItem('viev_auth_session', JSON.stringify(newSession));
+    updateProfileUI(newSession);
+
+    // Smooth transition from Login Screen to Startup Intro to Home
+    if (loginScreen) {
+      loginScreen.classList.add('is-exiting');
+    }
+
+    setTimeout(() => {
+      if (loginScreen) {
+        loginScreen.classList.remove('active', 'is-exiting');
+        loginScreen.classList.add('hidden');
+      }
+
+      if (welcomeScreen) {
+        welcomeScreen.classList.remove('hidden');
+        welcomeScreen.classList.add('active');
+      }
+
+      runStartupAnimation(() => {
+        if (window.setFloatingNavVisible) {
+          window.setFloatingNavVisible(true);
+        }
+      });
+    }, 420);
+  }
+
+  // Passcode Input & Display Synchronization
+  if (passcodeInput) {
+    passcodeInput.addEventListener('input', (e) => {
+      let val = e.target.value.replace(/\D/g, '').slice(0, 4);
+      e.target.value = val;
+      updatePinDisplay(val);
+
+      if (loginFeedback) {
+        loginFeedback.classList.remove('show');
+      }
+
+      if (val.length === 4) {
+        setTimeout(() => executeLogin(val), 100);
+      }
+    });
+
+    passcodeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (passcodeInput.value.length === 4) {
+          executeLogin(passcodeInput.value);
+        }
+      }
+    });
+  }
+
+  if (pinDisplay) {
+    pinDisplay.addEventListener('click', () => {
+      if (passcodeInput) passcodeInput.focus();
+    });
+  }
+
+  const loginHeroCard = document.getElementById('login-hero-card');
+  if (loginHeroCard) {
+    loginHeroCard.addEventListener('click', () => {
+      if (passcodeInput) passcodeInput.focus();
+    });
+  }
+
+  if (loginSubmitBtn) {
+    loginSubmitBtn.addEventListener('click', () => {
+      if (passcodeInput) {
+        if (passcodeInput.value.length === 4) {
+          executeLogin(passcodeInput.value);
+        } else {
+          passcodeInput.focus();
+          if (loginFeedback) {
+            loginFeedback.textContent = 'Enter 4-Digit Passcode';
+            loginFeedback.classList.add('show');
+          }
+        }
+      }
+    });
+  }
+
+  // Profile Display Name Editing in Settings
+  if (editNameBtn) {
+    editNameBtn.addEventListener('click', () => {
+      const session = getAuthSession() || { role: 'user', name: 'ANSHU' };
+      const currentName = (userNameEl ? userNameEl.textContent : '') || session.name;
+      const enteredName = prompt('Enter your Profile Name:', currentName);
+      if (enteredName && enteredName.trim()) {
+        const cleanName = enteredName.trim();
+        localStorage.setItem('viev_name_' + session.role, cleanName);
+        session.name = cleanName;
+        localStorage.setItem('viev_auth_session', JSON.stringify(session));
+        updateProfileUI(session);
+      }
+    });
+  }
+
+  // Apple-Grade Sign Out
+  if (signoutBtn) {
+    signoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('viev_auth_session');
+
+      if (window.setFloatingNavVisible) {
+        window.setFloatingNavVisible(false);
+      }
+
+      // Switch tab back to Home
+      const tabHome = document.getElementById('tab-home');
+      if (tabHome) {
+        tabHome.click();
+      }
+
+      // Hide all main pages
+      if (welcomeScreen) {
+        welcomeScreen.classList.remove('active');
+        welcomeScreen.classList.add('hidden');
+      }
+
+      const musicScreen = document.getElementById('music-screen');
+      if (musicScreen) {
+        musicScreen.classList.remove('active');
+        musicScreen.classList.add('hidden');
+      }
+
+      const settingsScreen = document.getElementById('settings-screen');
+      if (settingsScreen) {
+        settingsScreen.classList.remove('active');
+        settingsScreen.classList.add('hidden');
+      }
+
+      // Reset passcode input and display
+      if (passcodeInput) passcodeInput.value = '';
+      updatePinDisplay('');
+      if (loginFeedback) {
+        loginFeedback.textContent = '';
+        loginFeedback.classList.remove('show', 'success');
+      }
+
+      // Show login screen
+      if (loginScreen) {
+        loginScreen.classList.remove('hidden', 'is-exiting');
+        loginScreen.classList.add('active');
+        setTimeout(() => {
+          if (passcodeInput) passcodeInput.focus();
+        }, 250);
+      }
+    });
+  }
+
+  // Initial State Evaluation on DOM Load
+  const activeSession = getAuthSession();
+  if (activeSession && (activeSession.code === '3009' || activeSession.code === '1711')) {
+    // Already Logged In: Directly show Home Screen with Startup Intro
+    if (loginScreen) {
+      loginScreen.classList.remove('active');
+      loginScreen.classList.add('hidden');
+    }
+    if (welcomeScreen) {
+      welcomeScreen.classList.remove('hidden');
+      welcomeScreen.classList.add('active');
+    }
+    updateProfileUI(activeSession);
+    if (window.setFloatingNavVisible) {
+      window.setFloatingNavVisible(false);
+    }
+    runStartupAnimation(() => {
+      if (window.setFloatingNavVisible) {
+        window.setFloatingNavVisible(true);
+      }
+    });
+  } else {
+    // Not Logged In: Suppress startup splash and navbar, show Login Gateway
+    if (helloSplash) {
+      helloSplash.classList.add('is-hidden');
+    }
+    if (window.setFloatingNavVisible) {
+      window.setFloatingNavVisible(false);
+    }
+    if (welcomeScreen) {
+      welcomeScreen.classList.remove('active');
+      welcomeScreen.classList.add('hidden');
+    }
+    if (loginScreen) {
+      loginScreen.classList.remove('hidden');
+      loginScreen.classList.add('active');
+    }
+    updatePinDisplay('');
+    setTimeout(() => {
+      if (passcodeInput) passcodeInput.focus();
+    }, 300);
   }
 });
 
