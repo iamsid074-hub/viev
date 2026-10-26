@@ -341,20 +341,30 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 1. Calculate exact viewport center coordinates of floating orb for circular bloom
+    // 1. Temporarily pause beat visualizer during 380ms transition so GPU compositor is 100% free
+    if (typeof stopBeatVisualizer === 'function') {
+      stopBeatVisualizer();
+    }
+
+    // 2. Calculate exact viewport center coordinates of floating orb for circular bloom
     const orbRect = floatingOrb.getBoundingClientRect();
     const centerX = Math.round(orbRect.left + orbRect.width / 2);
     const centerY = Math.round(orbRect.top + orbRect.height / 2);
 
-    // 2. Set dynamic CSS variables & transform-origin for fluid morph expansion origin
+    // 3. Immediately blur background window (iOS wallpaper depth bokeh)
+    if (previousScreen && previousScreen !== musicScreen) {
+      previousScreen.classList.add('screen-launch-recede');
+    }
+
+    // 4. Set dynamic CSS variables & transform-origin for fluid morph expansion origin
     musicScreen.style.setProperty('--launch-x', `${centerX}px`);
     musicScreen.style.setProperty('--launch-y', `${centerY}px`);
     musicScreen.style.transformOrigin = `${centerX}px ${centerY}px`;
 
-    // 3. Tactile click feedback on the floating orb
+    // 5. Tactile click feedback on the floating orb
     floatingOrb.classList.add('is-clicked-launching');
 
-    // 4. Trigger subtle luminous glass ring shockwave from exact origin
+    // 6. Trigger subtle luminous glass ring shockwave from exact origin
     if (launchRing) {
       launchRing.style.left = `${centerX}px`;
       launchRing.style.top = `${centerY}px`;
@@ -365,16 +375,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       launchRing.classList.remove('is-animating');
-      void launchRing.offsetWidth; // Force reflow to restart CSS animation cleanly
-      launchRing.classList.add('is-animating');
+      requestAnimationFrame(() => {
+        if (launchRing) launchRing.classList.add('is-animating');
+      });
     }
 
-    // 5. Navbar updates active tab & indicator smoothly
+    // 7. Navbar updates active tab & indicator smoothly
     currentTab = 'music';
     tabBtns.forEach(b => {
-      b.classList.remove('active');
+      b.classList.remove('active', 'is-dock-magnified');
       b.setAttribute('aria-selected', 'false');
-      b.classList.remove('is-dock-magnified');
     });
     if (musicTab) {
       musicTab.classList.add('active');
@@ -382,20 +392,15 @@ document.addEventListener('DOMContentLoaded', () => {
       updateIndicator(musicTab);
     }
 
-    // 6. Background screen gently recedes in 3D (iOS wallpaper depth physics)
-    if (previousScreen && previousScreen !== musicScreen) {
-      previousScreen.classList.add('screen-launch-recede');
-    }
-
-    // 7. Trigger the fluid launch morph expansion blooming out of orb on musicScreen
+    // 8. Trigger the fluid launch morph expansion blooming out of orb on musicScreen
     musicScreen.classList.remove('hidden');
     musicScreen.classList.add('is-launching-from-orb', 'active');
     musicScreen.scrollTop = 0;
 
-    // 8. Orb will smoothly hide since we are now in music section
+    // 9. Orb will smoothly hide since we are now in music section
     updateFloatingOrbVisibility();
 
-    // 9. When 380ms Apple spring animation finishes, cleanly settle into resting state
+    // 10. When 380ms Apple spring animation finishes, cleanly settle into resting state
     setTimeout(() => {
       musicScreen.classList.remove('is-launching-from-orb');
       musicScreen.style.removeProperty('--launch-x');
@@ -412,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       floatingOrb.classList.remove('is-clicked-launching');
 
-      // Resume visualizers if playing in artwork mode
+      // Resume visualizers now that screen is smoothly settled
       if (typeof isPlaying !== 'undefined' && isPlaying && typeof audio !== 'undefined' && !audio.paused) {
         if (typeof currentCardView !== 'undefined' && currentCardView === 'artwork') {
           startBeatVisualizer();

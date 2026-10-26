@@ -1335,11 +1335,11 @@
   transform-origin: var(--launch-x, 85%) var(--launch-y, 90%);
   animation: iosFluidAppLaunch 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   will-change: transform, border-radius, opacity;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.85);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
   overflow: hidden;
+  contain: paint;
 }
 
 #music-screen.is-launching-from-orb .apple-now-playing-container {
@@ -1372,8 +1372,8 @@
 
 @keyframes iosFluidContentSettle {
   0% {
-    transform: scale(0.88);
-    opacity: 0.65;
+    transform: scale(0.92);
+    opacity: 0.75;
   }
   100% {
     transform: scale(1);
@@ -1381,16 +1381,21 @@
   }
 }
 
-/* Background screen gently recedes in 3D during app launch (Apple iOS depth physics) */
+/* Background screen gently recedes in 3D and blurs out (iOS depth bokeh physics) */
 .app-screen.screen-launch-recede {
   display: flex !important;
-  opacity: 0.50 !important;
+  opacity: 0.40 !important;
+  filter: blur(14px) !important;
+  -webkit-filter: blur(14px) !important;
   transform: scale(0.96) !important;
   pointer-events: none !important;
   transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+              opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              -webkit-filter 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  will-change: transform, opacity, filter;
 }
 
 /* Subtle Luminous Glass Ring Ripple */
@@ -1406,9 +1411,8 @@
   opacity: 0;
   margin-left: -26px;
   margin-top: -26px;
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.6),
-              0 0 35px var(--song-active-color, #ff5e7e);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.5);
   will-change: transform, opacity;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -1424,7 +1428,7 @@
     opacity: 0.75;
   }
   100% {
-    transform: scale(2.0);
+    transform: scale(1.8);
     opacity: 0;
   }
 }
