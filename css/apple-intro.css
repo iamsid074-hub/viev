@@ -1477,18 +1477,18 @@
   position: relative;
   width: 100%;
   max-width: 380px;
-  height: clamp(215px, 28vh, 255px);
+  height: clamp(230px, 30vh, 275px);
   margin: 0 auto 14px auto;
   display: flex;
   align-items: center;
   justify-content: center;
   perspective: 1000px;
-  transition: height 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2;
 }
 
-/* Expanded panel mode for lyrics and song list */
+/* Expanded panel mode maintains rock-solid container geometry to prevent layout reflow */
 .apple-artwork-container.is-panel-mode {
-  height: clamp(245px, 32vh, 305px);
+  height: clamp(230px, 30vh, 275px);
 }
 
 .apple-artwork-container.is-panel-mode .apple-artwork-glow {
@@ -1501,14 +1501,14 @@
    OPTION 1: APPLE TV / CINEMATIC "AMBILIGHT" PROJECTOR ENGINE
    Mirrors the actual 16:9 artwork behind the floating card with
    extreme high-chroma diffusion, projecting real atmospheric light
-   directly onto the pitch-black OLED background.
+   strictly underneath and behind the song metadata.
    ========================================================= */
 .apple-artwork-glow {
   position: absolute;
-  inset: -12px;
+  inset: -10px;
   border-radius: 28px;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1523,18 +1523,18 @@
 /* Mirrored high-saturation diffused projection */
 .ambilight-canvas {
   position: absolute;
-  inset: -16px;
-  width: calc(100% + 32px);
-  height: calc(100% + 32px);
+  inset: -14px;
+  width: calc(100% + 28px);
+  height: calc(100% + 28px);
   object-fit: cover;
   object-position: center;
   border-radius: 32px;
-  filter: blur(36px) saturate(240%) brightness(1.10);
-  -webkit-filter: blur(36px) saturate(240%) brightness(1.10);
-  transform: scale(1.18);
-  opacity: 0.88;
-  will-change: transform, opacity, filter;
-  transition: opacity 0.35s ease, filter 0.5s ease;
+  filter: blur(32px) saturate(220%) brightness(1.05);
+  -webkit-filter: blur(32px) saturate(220%) brightness(1.05);
+  transform: scale(1.10);
+  opacity: 0.85;
+  will-change: transform, opacity;
+  transition: opacity 0.35s ease;
 }
 
 /* Atmospheric bloom layer for soft feathering */
@@ -1650,14 +1650,17 @@
 }
 
 .apple-glass-frame.is-depth-bg {
-  transform: scale(0.90) translateY(-6px) !important;
+  transform: scale(0.92) translateY(6px) !important;
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .apple-artwork-card {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   border-radius: 20px;
@@ -1665,7 +1668,13 @@
   box-shadow: 0 16px 42px rgba(0, 0, 0, 0.85), 0 1px 3px rgba(255, 255, 255, 0.14);
   z-index: 3;
   background: #000000;
+  opacity: 1;
+  transform: scale(1) translateY(0);
   will-change: transform, opacity;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
 }
 
 /* Sapphire crystal glass reflection across poster surface */
@@ -1686,7 +1695,7 @@
 
 /* 3D Depth backdrop state when Lyrics or Song List is active */
 .apple-artwork-card.is-depth-bg {
-  transform: scale(0.90) translateY(-6px) !important;
+  transform: scale(0.92) translateY(6px) !important;
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -1816,10 +1825,8 @@
 .apple-lyrics-card {
   position: absolute;
   inset: 0;
-  border-radius: 24px;
-  background: rgba(16, 16, 22, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border-radius: 22px;
+  background: rgba(16, 16, 22, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   padding: 16px 14px 14px 16px;
@@ -1827,15 +1834,19 @@
   flex-direction: column;
   z-index: 5;
   opacity: 0;
-  transform: scale(0.96) translateY(10px);
+  visibility: hidden;
+  transform: scale(0.94) translateY(6px);
   pointer-events: none;
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
+  contain: layout paint;
 }
 
 .apple-lyrics-card.is-revealed {
   opacity: 1;
+  visibility: visible;
   transform: scale(1) translateY(0);
   pointer-events: auto;
 }
@@ -1909,10 +1920,8 @@
 .apple-songlist-card {
   position: absolute;
   inset: 0;
-  border-radius: 24px;
-  background: rgba(16, 16, 22, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border-radius: 22px;
+  background: rgba(16, 16, 22, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   padding: 14px 12px;
@@ -1920,15 +1929,19 @@
   flex-direction: column;
   z-index: 5;
   opacity: 0;
-  transform: scale(0.96) translateY(10px);
+  visibility: hidden;
+  transform: scale(0.94) translateY(6px);
   pointer-events: none;
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
+  contain: layout paint;
 }
 
 .apple-songlist-card.is-revealed {
   opacity: 1;
+  visibility: visible;
   transform: scale(1) translateY(0);
   pointer-events: auto;
 }
@@ -2053,8 +2066,10 @@
   }
 }
 
-/* Track Meta Info Row */
+/* Track Meta Info Row - Positioned strictly above ambient glow */
 .apple-track-info-row {
+  position: relative;
+  z-index: 10;
   width: 100%;
   display: flex;
   align-items: center;
@@ -2064,12 +2079,23 @@
 }
 
 .apple-track-meta {
+  position: relative;
+  z-index: 11;
   display: flex;
   flex-direction: column;
   text-align: left;
+  transform: translateY(0);
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* On song play: smoothly shift title and info slightly down */
+.apple-track-meta.is-playing {
+  transform: translateY(8px);
 }
 
 .apple-track-title {
+  position: relative;
+  z-index: 12;
   font-family: var(--font-main);
   font-size: 21px;
   font-weight: 700;
@@ -2077,15 +2103,19 @@
   color: #ffffff;
   margin: 0;
   line-height: 1.25;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.90);
 }
 
 .apple-track-artist {
+  position: relative;
+  z-index: 12;
   font-family: var(--font-main);
   font-size: 15px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.65);
   margin-top: 4px;
   line-height: 1.2;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
 }
 
 .apple-favorite-btn {
@@ -2211,11 +2241,8 @@
 .apple-modes-row.is-hidden {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-6px) scale(0.96);
-  height: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+  visibility: hidden;
+  transform: translateY(-4px) scale(0.98);
 }
 
 .mode-btn {
@@ -3342,6 +3369,23 @@
   align-items: center;
   gap: 6px;
   margin-top: 6px;
+  max-height: 28px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              margin-top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+/* On song play: hide Dolby Atmos and all audio badges */
+.apple-audio-badges.is-playing {
+  opacity: 0;
+  max-height: 0;
+  margin-top: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
 }
 
 .audio-badge {

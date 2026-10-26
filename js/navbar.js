@@ -1236,6 +1236,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateFloatingOrbVisibility();
 
+    // Toggle track meta and Dolby Atmos badges for playing state
+    const trackMeta = document.querySelector('.apple-track-meta');
+    if (trackMeta) {
+      trackMeta.classList.toggle('is-playing', playing);
+    }
+    const audioBadges = document.getElementById('music-audio-badges');
+    if (audioBadges) {
+      audioBadges.classList.toggle('is-playing', playing);
+    }
+
     if (musicPlayBtn) {
       const playIcon = musicPlayBtn.querySelector('.play-icon');
       const pauseIcon = musicPlayBtn.querySelector('.pause-icon');
@@ -1561,6 +1571,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }, minutes * 60 * 1000);
   }
 
+  // In-place ultra-fast active row indicator update (zero DOM reflow / zero destruction)
+  function updateSongListActiveRow() {
+    if (!songlistItems) return;
+    const rows = songlistItems.querySelectorAll('.song-list-item');
+    rows.forEach((row, idx) => {
+      const isActive = idx === currentTrackIndex;
+      row.classList.toggle('is-active', isActive);
+      row.classList.toggle('is-paused', isActive && !isPlaying);
+      let eq = row.querySelector('.song-item-eq');
+      if (isActive) {
+        if (!eq) {
+          eq = document.createElement('div');
+          eq.className = 'song-item-eq';
+          eq.innerHTML = '<span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>';
+          row.appendChild(eq);
+        }
+      } else if (eq) {
+        eq.remove();
+      }
+    });
+  }
+
   // Render All Songs in Song List
   function renderSongList() {
     if (!songlistItems) return;
@@ -1591,16 +1623,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     songlistItems.innerHTML = html;
 
-    // Attach click listeners to song rows
+    // Attach click listeners to song rows with instant feedback
     const rows = songlistItems.querySelectorAll('.song-list-item');
     rows.forEach(row => {
       row.addEventListener('click', () => {
         const idx = parseInt(row.getAttribute('data-index'), 10);
         if (idx === currentTrackIndex) {
           togglePlay();
+          updateSongListActiveRow();
         } else {
           loadTrack(idx, true);
-          renderSongList();
         }
       });
     });
@@ -1611,9 +1643,10 @@ document.addEventListener('DOMContentLoaded', () => {
     currentTrackIndex = index;
     const track = PLAYLIST[index];
 
-    // Load Audio Source
-    audio.src = track.src;
-    audio.load();
+    // Streamline Audio Source switch without socket dump
+    if (!audio.src || !audio.src.endsWith(encodeURI(track.src))) {
+      audio.src = track.src;
+    }
 
     // Update Metadata
     if (trackTitleEl) trackTitleEl.textContent = track.title;
@@ -1655,7 +1688,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentCardView === 'lyrics') {
       renderLyrics();
     } else if (currentCardView === 'songlist') {
-      renderSongList();
+      updateSongListActiveRow();
     }
 
     // Update Story Card if defined
@@ -1664,6 +1697,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (autoPlay) {
+      // Optimistic instant feedback: UI responds in 0ms!
+      setPlayPauseUI(true);
       playTrack();
     } else {
       setPlayPauseUI(false);
