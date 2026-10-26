@@ -1,9 +1,10 @@
 /* =========================================================
    DAILY NOTE FOR PRINCESS DIGI
    With Apple Bottom Sheet Verification Quiz
-   Single-Attempt Rule:
-   - 1 chance to answer.
-   - If answer is wrong: Note is permanently locked.
+   2-Attempts Rule:
+   - 2 chances to answer.
+   - If 1st answer is wrong: 1 more chance is given with gentle warning!
+   - If 2nd answer is also wrong: Note is permanently locked.
    - On click, displays small subtitle below: "no more attemps".
    ========================================================= */
 
@@ -12,7 +13,7 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "cute_word_2026_10",
+  questionId: "cute_word_2026_10_v2",
 
   // Note message jo unlock hone par dikhega:
   noteText: `akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  . 
@@ -22,6 +23,7 @@ const DAILY_NOTE_CONFIG = {
   quiz: {
     question: "Select the cute word which is Most unique  and favourite amoung all options .",
     correctOption: 2, // 2. Beta
+    maxAttempts: 2, // 2 chances to open!
     options: [
       { id: 1, text: "Kanna" },
       { id: 2, text: "Beta", correct: true },
@@ -40,6 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const qId = (DAILY_NOTE_CONFIG.questionId || DAILY_NOTE_CONFIG.quiz.question || 'daily')
     .toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 32);
   const STORAGE_KEY = `viev_note_status_${qId}`;
+  const ATTEMPTS_KEY = `viev_note_attempts_${qId}`;
+  const MAX_ATTEMPTS = (DAILY_NOTE_CONFIG.quiz && DAILY_NOTE_CONFIG.quiz.maxAttempts) || 2;
+
+  // Auto-clear legacy lock from previous 1-attempt question so Digi gets fresh chances
+  try {
+    const legacyKey = 'viev_note_status_cute_word_2026_10';
+    if (localStorage.getItem(legacyKey) === 'permanently_locked') {
+      localStorage.removeItem(legacyKey);
+    }
+  } catch(e) {}
+
+  let attemptsUsed = 0;
+  try {
+    attemptsUsed = parseInt(localStorage.getItem(ATTEMPTS_KEY) || '0', 10);
+    if (isNaN(attemptsUsed)) attemptsUsed = 0;
+  } catch(e) {
+    attemptsUsed = 0;
+  }
 
   // Daily Note Elements
   const noteCapsule = document.getElementById('daily-note-capsule');
@@ -58,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Quiz Bottom Sheet Elements
   const quizSheet = document.getElementById('apple-note-quiz-sheet');
+  const quizPanel = document.getElementById('quiz-panel');
   const quizBackdrop = document.getElementById('quiz-backdrop');
   const quizCloseBtn = document.getElementById('quiz-close-btn');
   const quizOptionBtns = document.querySelectorAll('.quiz-option-btn');
@@ -73,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.warn('localStorage not accessible:', err);
   }
 
-  let isPermanentlyLocked = (savedStatus === 'permanently_locked');
+  let isPermanentlyLocked = (savedStatus === 'permanently_locked' || attemptsUsed >= MAX_ATTEMPTS);
   let isNoteUnlocked = (savedStatus === 'unlocked');
 
   // SVG Icons for Toggle Button
@@ -247,8 +268,14 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.remove('is-correct', 'is-wrong');
       btn.disabled = false;
     });
+
+    const remaining = Math.max(0, MAX_ATTEMPTS - attemptsUsed);
     if (quizFeedbackMsg) {
-      quizFeedbackMsg.innerHTML = '';
+      if (attemptsUsed > 0 && remaining === 1) {
+        quizFeedbackMsg.innerHTML = '<span class="feedback-wrong" style="font-size:12px;">⚠️ 1 aakhri chance bacha hai, dhyan se chunna! 💌</span>';
+      } else {
+        quizFeedbackMsg.innerHTML = '';
+      }
     }
 
     quizSheet.classList.add('is-open');
@@ -334,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
     quizBackdrop.addEventListener('click', closeQuizSheet);
   }
 
-  // Quiz Options Click Handler (SINGLE ATTEMPT RULE)
+  // Quiz Options Click Handler (2 CHANCES ALLOWED)
   quizOptionBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       if (isPermanentlyLocked) return;
@@ -363,25 +390,50 @@ document.addEventListener('DOMContentLoaded', () => {
           }, 200);
         }, 650);
       } else {
-        // Wrong Answer Selected - Only 1 chance! Permanently Lock!
-        btn.classList.add('is-wrong');
-        quizOptionBtns.forEach(b => b.disabled = true);
-
+        // Wrong Answer Selected - Consume 1 Attempt
+        attemptsUsed++;
         try {
-          localStorage.setItem(STORAGE_KEY, 'permanently_locked');
+          localStorage.setItem(ATTEMPTS_KEY, String(attemptsUsed));
         } catch (e) {}
 
-        if (quizFeedbackMsg) {
-          quizFeedbackMsg.innerHTML = '<span class="feedback-wrong">Oops! Wrong answer 🥺 Locked...</span>';
-        }
+        btn.classList.add('is-wrong');
+        btn.disabled = true; // disable this wrong option
 
-        // Close bottom sheet and lock permanently
-        setTimeout(() => {
-          closeQuizSheet();
+        const remaining = Math.max(0, MAX_ATTEMPTS - attemptsUsed);
+
+        if (remaining > 0) {
+          // Still have 1 more chance!
+          if (quizPanel) {
+            quizPanel.classList.remove('note-shake');
+            void quizPanel.offsetWidth;
+            quizPanel.classList.add('note-shake');
+          }
+
+          if (quizFeedbackMsg) {
+            quizFeedbackMsg.innerHTML = '<span class="feedback-wrong">Oops! Yeh galat hai 🥺 Par 1 aakhri chance bacha hai... dhyan se chunna! 💖</span>';
+          }
+        } else {
+          // All attempts used up - Permanently Lock
+          isPermanentlyLocked = true;
+          quizOptionBtns.forEach(b => b.disabled = true);
+
+          try {
+            localStorage.setItem(STORAGE_KEY, 'permanently_locked');
+          } catch (e) {}
+
+          if (quizFeedbackMsg) {
+            quizFeedbackMsg.innerHTML = '<span class="feedback-wrong">Oops! Dono chances khatam ho gaye 🥺 Locked...</span>';
+          }
+
+          // Close bottom sheet and lock permanently
           setTimeout(() => {
-            setPermanentlyLockedState();
-          }, 200);
-        }, 750);
+            closeQuizSheet();
+            setTimeout(() => {
+              setPermanentlyLockedState();
+              triggerNoMoreAttemptsFeedback();
+            }, 200);
+          }, 850);
+        }
       }
     });
   });
@@ -399,6 +451,8 @@ document.addEventListener('DOMContentLoaded', () => {
   window.resetDailyNoteQuiz = () => {
     try {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(ATTEMPTS_KEY);
+      localStorage.removeItem('viev_note_status_cute_word_2026_10');
       console.log('Daily Note attempt reset!');
       location.reload();
     } catch (e) {
