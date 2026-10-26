@@ -287,6 +287,11 @@ document.addEventListener('DOMContentLoaded', () => {
         updateResultCard.style.display = 'flex';
       }
     }
+
+    // 8. Motion Graphics Ad vs Hero Photo Toggle
+    if (window.syncMotionAdWithVersion) {
+      window.syncMotionAdWithVersion();
+    }
   }
 
   // Software Update Loader & Card Simulation

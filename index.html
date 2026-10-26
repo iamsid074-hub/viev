@@ -151,10 +151,39 @@
       
 
 
-      <!-- Half-Screen Photo: Full length & width, bottom rounded corners -->
+      <!-- Half-Screen Photo / Keynote Ad: Full length & width, bottom rounded corners -->
       <div class="hero-photo-wrapper revealed" id="hero-photo-wrapper">
-        <img src="assets/digi.png" alt="Princess Digi" class="hero-photo-img" id="hero-photo-img">
-        <div class="hero-photo-bottom-glow" aria-hidden="true"></div>
+        <img src="assets/digi.png" alt="Princess Digi" class="hero-photo-img" id="hero-photo-img" style="display: none;">
+        <div class="hero-photo-bottom-glow" aria-hidden="true" style="display: none;"></div>
+
+        <!-- Apple Product Motion Typography Keynote Ad (Active while OS < 1.3) -->
+        <div class="apple-motion-ad-stage" id="apple-motion-ad-stage" aria-label="Digi OS 1.3 Announcement" role="region" style="display: flex;">
+          <!-- Top Row: Badge + Announcement indicator -->
+          <div class="ad-top-row">
+            <div class="ad-top-pill">
+              <span class="ad-top-dot"></span>
+              <span>Digi OS 1.3</span>
+            </div>
+            <span class="ad-badge-right">Keynote Preview</span>
+          </div>
+
+          <!-- Kinetic Typography Viewport -->
+          <div class="ad-viewport" id="ad-viewport"></div>
+
+          <!-- Bottom Row: Navigation Hint & Progress Timeline -->
+          <div class="ad-bottom-row">
+            <div class="ad-bottom-hint">
+              <span>Tap to update in Settings</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <div class="ad-progress-bar">
+            <div class="ad-progress-fill" id="ad-progress-fill"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Lower Content Flow (Centered along single vertical axis) -->
@@ -1426,6 +1455,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/daily-note.js?v=2.7"></script>
   <script src="js/navbar.js?v=2.4"></script>
   <script src="js/cinema.js"></script>
+  <script src="js/motion-ad.js?v=1.0"></script>
   <script src="js/app.js?v=3.6"></script>
 </body>
 </html>
