@@ -123,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Set Initial Locked State (Before attempt has been made)
   function setInitialLockedState() {
     isNoteOpen = false;
+    document.getElementById('welcome-screen')?.classList.remove('is-note-opened');
     if (noteCapsule) {
       noteCapsule.classList.add('is-revealed', 'is-locked');
       noteCapsule.classList.remove('is-permanently-locked');
@@ -163,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function setPermanentlyLockedState() {
     isPermanentlyLocked = true;
     isNoteOpen = false;
+    document.getElementById('welcome-screen')?.classList.remove('is-note-opened');
 
     if (noteCapsule) {
       noteCapsule.classList.add('is-revealed', 'is-locked', 'is-permanently-locked');
@@ -263,6 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reveal Note Content
   function revealNote() {
     isNoteOpen = true;
+    document.getElementById('welcome-screen')?.classList.add('is-note-opened');
     if (noteCapsule) {
       noteCapsule.classList.remove('is-locked', 'is-permanently-locked');
     }

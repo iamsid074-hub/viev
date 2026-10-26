@@ -186,8 +186,18 @@
 }
 
 #welcome-screen {
-  overflow-y: auto !important;
+  overflow: hidden !important;
+  overflow-y: hidden !important;
   overflow-x: hidden !important;
+  height: 100% !important;
+  max-height: 100dvh !important;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: auto;
+}
+
+#welcome-screen.is-note-opened {
+  overflow-y: auto !important;
+  touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -905,8 +915,9 @@
 
 /* ---- Note Control CTA Container (Open Note / Hide Note) ---- */
 .cta-container {
+  position: relative;
   width: 100%;
-  margin: 12px auto 0 auto;
+  margin: 10px auto 0 auto;
   padding-top: 0;
   display: flex;
   flex-direction: column;
@@ -914,14 +925,20 @@
 }
 
 .note-attempts-subtitle {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
   font-family: var(--font-main);
   font-size: 11.5px;
   font-weight: 500;
   letter-spacing: 0.3px;
-  color: rgba(248, 113, 113, 0.85);
-  margin-top: 8px;
+  color: rgba(248, 113, 113, 0.90);
   text-align: center;
+  white-space: nowrap;
   user-select: none;
+  pointer-events: none;
   animation: feedbackFadeIn 0.3s ease;
 }
 
@@ -4847,8 +4864,17 @@
 
   /* --- 1. WELCOME SCREEN AUDIT --- */
   #welcome-screen {
-    overflow-y: auto !important;
+    overflow: hidden !important;
+    overflow-y: hidden !important;
     overflow-x: hidden !important;
+    height: 100% !important;
+    max-height: 100dvh !important;
+    touch-action: pan-x;
+  }
+
+  #welcome-screen.is-note-opened {
+    overflow-y: auto !important;
+    touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
   }
 
