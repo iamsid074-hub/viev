@@ -124,6 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update floating companion orb visibility
     updateFloatingOrbVisibility();
+
+    // Toggle Apple Intelligence Bottom Edge Aura visibility (Home Screen only)
+    const edgeAura = document.getElementById('apple-intelligence-edge-aura');
+    if (edgeAura) {
+      edgeAura.classList.toggle('is-hidden', targetTab !== 'home');
+    }
   }
 
   // Find nearest tab button from a clientX coordinate
@@ -443,6 +449,14 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.classList.remove('nav-hidden');
       } else {
         nav.classList.add('nav-hidden');
+      }
+    }
+    const edgeAura = document.getElementById('apple-intelligence-edge-aura');
+    if (edgeAura) {
+      if (visible && currentTab === 'home') {
+        edgeAura.classList.remove('is-hidden');
+      } else {
+        edgeAura.classList.add('is-hidden');
       }
     }
   };

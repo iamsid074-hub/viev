@@ -272,14 +272,21 @@
    Crisp 1.5px glowing rim & soft diffused perimeter shimmer
    ========================================================= */
 .apple-intelligence-edge-aura {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   height: 60px;
   pointer-events: none;
-  z-index: 5;
+  z-index: 45;
   overflow: hidden;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-intelligence-edge-aura.is-hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Soft atmospheric diffused aura */
