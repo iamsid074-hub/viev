@@ -6266,6 +6266,68 @@
 }
 
 /* =========================================================
+   APPLE LETTER-BY-LETTER KINETIC TYPOGRAPHY ENGINE
+   Optical blur-to-sharp focus, spring glide, and smooth stagger
+   ========================================================= */
+.char-space {
+  display: inline-block;
+  width: 0.28em;
+}
+
+.char-anim,
+.char-hero,
+.char-sub,
+.char-label,
+.char-giant,
+.char-anchor,
+.char-phrase,
+.char-zoom,
+.char-music,
+.char-lead,
+.char-headline,
+.char-accent,
+.char-pure-os {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px) scale(0.92);
+  filter: blur(5px);
+  will-change: transform, opacity, filter;
+  animation: appleCharReveal 0.52s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes appleCharReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Extra punch for giant letters */
+.char-giant,
+.char-pure-os {
+  animation: appleGiantCharReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes appleGiantCharReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) scale(0.85);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* =========================================================
    SCENE 1: THE PORTAL JOURNEY
    1A: Digi, something special is here.
    1B: Multicolored warp tunnel zoom -> Meet OS 1.3
