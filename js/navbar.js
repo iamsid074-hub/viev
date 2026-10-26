@@ -898,6 +898,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dynamic active playlist synced to OS version (1.0 vs 1.1)
   const PLAYLIST = [];
 
+  let currentTrackIndex = 0;
+  let isPlaying = false;
+  let currentCardView = 'artwork'; // 'artwork' | 'lyrics' | 'songlist'
+  let currentLyricIndex = -1;
+  let lyricsRafId = null;
+
   function syncMusicPlaylistWithOS(version) {
     const v = parseFloat(version) || 1.0;
     PLAYLIST.length = 0;
@@ -930,13 +936,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return localStorage.getItem('viev_digi_os_version') || '1.0';
     }
   })();
-  syncMusicPlaylistWithOS(initialSavedOSVer);
 
-  let currentTrackIndex = 0;
-  let isPlaying = false;
-  let currentCardView = 'artwork'; // 'artwork' | 'lyrics' | 'songlist'
-  let currentLyricIndex = -1;
-  let lyricsRafId = null;
+  const initialV = parseFloat(initialSavedOSVer) || 1.0;
+  MASTER_PLAYLIST.forEach(song => {
+    if (!song.minOS || parseFloat(song.minOS) <= initialV) {
+      PLAYLIST.push(song);
+    }
+  });
+
+  window.PLAYLIST = PLAYLIST;
+  window.syncMusicPlaylistWithOS = syncMusicPlaylistWithOS;
 
   const audio = document.getElementById('apple-music-audio') || new Audio();
   const musicPlayBtn = document.getElementById('music-play-btn');
@@ -2714,6 +2723,9 @@ document.addEventListener('DOMContentLoaded', () => {
   setPlayPauseUI(false);
   updateSpatialUIState();
   updateStoryCardUI();
+  if (typeof renderSongList === 'function') {
+    renderSongList();
+  }
 
   // =========================================================
   // FEATURE 6: macOS FROSTED GLASS SHORTCUT HUD & KEYBOARD SHORTCUTS
