@@ -1,79 +1,223 @@
 /**
- * Digi OS 1.3 - Smooth Apple Keynote Kinetic Motion Typography Ad
- * Choreographed specifically for Princess Digi:
- * Smooth, elegant pacing (~18s loop), word-to-line expansion choreography,
- * dynamic ambient theme shifts per feature (Music, Synced Lyrics, Lock Screen, Haptics).
- * Active on the Home Hero screen while OS < 1.3.
+ * Digi OS 1.3 - Cinematic Apple Product Motion Graphics Video
+ * Directed specifically to Digi's visual journey:
+ * 1. Digi, something special is here -> Multi-color Warp Layers Journey -> Meet OS 1.3
+ * 2. "Every word" -> horizontal line unfold -> wipe -> Lyric Pill -> Zoom subline
+ * 3. "MUSIC" -> Morph to waveform -> Drag-in window -> "Even when your phone is locked" word zooms -> Actual Padlock snap!
+ * 4. Lock Screen floating glass widget -> Bluetooth wave -> Total Control
+ * 5. Outro: strictly "OS 1.3" + "Update Now"
  */
 
 (function() {
   'use strict';
 
-  const TOTAL_DURATION = 18000; // 18 seconds smooth, relaxing Apple loop
+  const TOTAL_DURATION = 19500; // 19.5s complete cinematic loop
 
-  const SCENES = [
+  const STAGES = [
+    // ----------------------------------------------------
+    // SCENE 1: THE PORTAL JOURNEY (0.0s - 4.2s)
+    // ----------------------------------------------------
     {
-      id: 'scene-intro',
+      id: 'scene-1a',
       start: 0,
-      end: 3600,
+      end: 2000,
       bg: '#ffffff',
       theme: 'light',
-      aura: 'radial-gradient(circle at 50% 35%, rgba(255, 182, 193, 0.35), transparent 70%)',
-      anchor: 'Digi.',
-      lead: 'Something special',
-      reveal: 'is here.',
-      sub: 'Meet Digi OS 1.3'
+      render: () => `
+        <div class="stage-scene scene-intro-text">
+          <span class="intro-anchor">Digi,</span>
+          <h2 class="intro-line">something special is here.</h2>
+        </div>
+      `
     },
     {
-      id: 'scene-music',
-      start: 3600,
-      end: 7200,
-      bg: '#0a0508',
-      theme: 'dark',
-      aura: 'radial-gradient(circle at 60% 40%, rgba(225, 29, 72, 0.42), rgba(139, 92, 246, 0.35), transparent 75%)',
-      anchor: 'Music.',
-      lead: 'plays',
-      reveal: 'non-stop.',
-      sub: 'Even when your phone is locked & screen is off.',
-      badge: 'Background Audio'
-    },
-    {
-      id: 'scene-lyrics',
-      start: 7200,
-      end: 10800,
-      bg: '#faf8f5',
-      theme: 'light',
-      aura: 'radial-gradient(circle at 40% 60%, rgba(245, 158, 11, 0.28), rgba(251, 191, 36, 0.15), transparent 70%)',
-      anchor: 'Every word.',
-      lead: 'in real-time',
-      reveal: 'karaoke sync.',
-      lyricPreview: '“Tere kolon mainu saah milde…”',
-      sub: 'Complete synchronized lyrics for all songs.'
-    },
-    {
-      id: 'scene-lockscreen',
-      start: 10800,
-      end: 14400,
-      bg: '#08080a',
-      theme: 'dark',
-      aura: 'radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.32), rgba(14, 165, 233, 0.2), transparent 75%)',
-      anchor: 'Lock Screen.',
-      lead: 'Total',
-      reveal: 'control.',
-      sub: 'Artwork, live slider, and Bluetooth buttons on lockscreen.',
-      badge: 'MediaSession'
-    },
-    {
-      id: 'scene-cta',
-      start: 14400,
-      end: 18000,
+      id: 'scene-1b',
+      start: 2000,
+      end: 4200,
       bg: '#000000',
       theme: 'dark',
-      aura: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15), rgba(236, 72, 153, 0.2), transparent 75%)',
-      isGrandOutro: true,
-      heroVer: 'Digi OS 1.3',
-      lead: 'Crafted for Digi.',
-      cta: 'Update in Settings →'
+      render: () => `
+        <div class="stage-scene scene-portal-arrival">
+          <!-- Multi-color Hyperspace Warp Layers -->
+          <div class="warp-tunnel-container" aria-hidden="true">
+            <div class="warp-layer warp-layer-cyan"></div>
+            <div class="warp-layer warp-layer-magenta"></div>
+            <div class="warp-layer warp-layer-purple"></div>
+            <div class="warp-layer warp-layer-amber"></div>
+          </div>
+          <div class="portal-arrival-text">
+            <span class="portal-meet-label">Meet</span>
+            <h1 class="portal-os-name">OS 1.3</h1>
+          </div>
+        </div>
+      `
+    },
+
+    // ----------------------------------------------------
+    // SCENE 2: LYRICS IN REAL-TIME SYNC (4.2s - 8.2s)
+    // ----------------------------------------------------
+    {
+      id: 'scene-2a',
+      start: 4200,
+      end: 6200,
+      bg: '#ffffff',
+      theme: 'light',
+      render: () => `
+        <div class="stage-scene scene-lyrics-horizontal">
+          <div class="horizontal-unfold-row">
+            <span class="unfold-anchor-word">Every word</span>
+            <span class="unfold-tail-phrase">in real-time sync.</span>
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 'scene-2b',
+      start: 6200,
+      end: 8200,
+      bg: '#faf8f5',
+      theme: 'light',
+      render: () => `
+        <div class="stage-scene scene-lyrics-pill-view">
+          <div class="lyrics-karaoke-pill">
+            <span class="karaoke-quote-mark">“</span>
+            <span class="karaoke-quote-text">Tere kolon mainu saah milde…</span>
+            <span class="karaoke-quote-mark">”</span>
+          </div>
+          <p class="lyrics-extra-zoom-sub">Complete synced lyrics.</p>
+        </div>
+      `
+    },
+
+    // ----------------------------------------------------
+    // SCENE 3: MUSIC -> WAVEFORM -> DRAG WINDOW -> LOCK (8.2s - 12.8s)
+    // ----------------------------------------------------
+    {
+      id: 'scene-3a',
+      start: 8200,
+      end: 10200,
+      bg: '#080407',
+      theme: 'dark',
+      aura: 'radial-gradient(circle at 50% 50%, rgba(244, 63, 94, 0.40), rgba(168, 85, 247, 0.30), transparent 75%)',
+      render: () => `
+        <div class="stage-scene scene-music-morph">
+          <div class="music-word-to-wave">
+            <span class="music-morph-word">MUSIC</span>
+            <div class="music-morph-bars" aria-hidden="true">
+              <span class="morph-bar"></span>
+              <span class="morph-bar"></span>
+              <span class="morph-bar"></span>
+              <span class="morph-bar"></span>
+              <span class="morph-bar"></span>
+              <span class="morph-bar"></span>
+              <span class="morph-bar"></span>
+            </div>
+          </div>
+          <h3 class="music-nonstop-text">Plays non-stop.</h3>
+        </div>
+      `
+    },
+    {
+      id: 'scene-3b',
+      start: 10200,
+      end: 12800,
+      bg: '#050507',
+      theme: 'dark',
+      render: () => `
+        <div class="stage-scene scene-drag-lock-window">
+          <!-- Dragged-in Glass Window Sheet -->
+          <div class="drag-sheet-card">
+            <!-- Word-by-word progressive zoom line -->
+            <div class="zoom-words-row" id="zoom-words-container">
+              <span class="zoom-word w1">Even</span>
+              <span class="zoom-word w2">when</span>
+              <span class="zoom-word w3">your</span>
+              <span class="zoom-word w4">phone</span>
+              <span class="zoom-word w5">is</span>
+              <span class="zoom-word w6">locked.</span>
+            </div>
+
+            <!-- Morphing Animated Padlock SVG -->
+            <div class="padlock-animation-wrap" id="padlock-wrap">
+              <svg class="padlock-svg" viewBox="0 0 80 90" width="64" height="72">
+                <!-- Semicircular Shackle dropping down -->
+                <path class="padlock-shackle" d="M 24 45 L 24 24 C 24 12, 56 12, 56 24 L 56 45" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+                <!-- Solid rectangular body -->
+                <rect class="padlock-body" x="12" y="42" width="56" height="42" rx="10" fill="#ffffff"/>
+                <!-- Keyhole -->
+                <circle cx="40" cy="58" r="4.5" fill="#000000"/>
+                <path d="M 38 60 L 42 60 L 41 72 L 39 72 Z" fill="#000000"/>
+              </svg>
+              <span class="padlock-status-badge">LOCKED</span>
+            </div>
+          </div>
+        </div>
+      `
+    },
+
+    // ----------------------------------------------------
+    // SCENE 4: LOCK SCREEN FLOATING WIDGET (12.8s - 16.2s)
+    // ----------------------------------------------------
+    {
+      id: 'scene-4',
+      start: 12800,
+      end: 16200,
+      bg: '#09090c',
+      theme: 'dark',
+      aura: 'radial-gradient(circle at 60% 40%, rgba(59, 130, 246, 0.35), rgba(14, 165, 233, 0.2), transparent 75%)',
+      render: () => `
+        <div class="stage-scene scene-lock-widget">
+          <!-- Floating Apple Lock Screen Glass Card -->
+          <div class="mini-lock-card">
+            <div class="mini-lock-top">
+              <div class="mini-art-squircle">
+                <img src="song/Screenshot 2026-10-24 224431.png" alt="Cover" class="mini-art-img">
+              </div>
+              <div class="mini-meta">
+                <span class="mini-title">Lock Screen Player</span>
+                <span class="mini-artist">Bluetooth & MediaSession</span>
+              </div>
+              <div class="mini-bt-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5">
+                  <polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"></polyline>
+                </svg>
+              </div>
+            </div>
+            <!-- Live Active Scrubber Bar -->
+            <div class="mini-scrubber-track">
+              <div class="mini-scrubber-fill"></div>
+            </div>
+          </div>
+
+          <div class="lock-widget-bottom-text">
+            <h2 class="lock-headline-bold">Lock Screen.</h2>
+            <span class="lock-sub-lead">Total Control.</span>
+          </div>
+        </div>
+      `
+    },
+
+    // ----------------------------------------------------
+    // SCENE 5: PURE MINIMAL OUTRO (16.2s - 19.5s)
+    // Strictly: OS 1.3 + Update Now (No fluff!)
+    // ----------------------------------------------------
+    {
+      id: 'scene-5',
+      start: 16200,
+      end: 19500,
+      bg: '#000000',
+      theme: 'dark',
+      render: () => `
+        <div class="stage-scene scene-pure-outro">
+          <h1 class="outro-pure-os">OS 1.3</h1>
+          <button type="button" class="outro-update-now-btn" id="outro-update-btn">
+            <span>Update Now</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      `
     }
   ];
 
@@ -84,8 +228,7 @@
   let isRunning = false;
   let startTime = null;
   let animId = null;
-  let currentSceneIndex = -1;
-  let sceneHasExpanded = false;
+  let currentStageIndex = -1;
 
   function initMotionAd() {
     adStageEl = document.getElementById('apple-motion-ad-stage');
@@ -95,7 +238,7 @@
     ambientAuraEl = document.getElementById('ad-ambient-aura');
     progressFillEl = document.getElementById('ad-progress-fill');
 
-    // Tapping on the motion ad smoothly navigates to Settings -> Software Update
+    // Tapping anywhere on the motion ad smoothly navigates to Settings -> Software Update
     adStageEl.addEventListener('click', (e) => {
       e.stopPropagation();
       if (window.triggerHaptic) window.triggerHaptic('medium');
@@ -122,8 +265,7 @@
     isRunning = true;
     adStageEl.style.display = 'flex';
     startTime = performance.now();
-    currentSceneIndex = -1;
-    sceneHasExpanded = false;
+    currentStageIndex = -1;
     animId = requestAnimationFrame(renderLoop);
   }
 
@@ -138,69 +280,6 @@
     }
   }
 
-  function renderSceneDOM(scene) {
-    if (scene.isGrandOutro) {
-      return `
-        <div class="ad-scene ad-scene-outro" id="active-ad-scene">
-          <span class="ad-kicker">Special Viev Edition</span>
-          <h2 class="ad-grand-title">${scene.heroVer}</h2>
-          <p class="ad-grand-lead">${scene.lead}</p>
-          <div class="ad-grand-cta-btn">
-            <span>${scene.cta}</span>
-          </div>
-        </div>
-      `;
-    }
-
-    let extraVisuals = '';
-    if (scene.id === 'scene-music') {
-      extraVisuals = `
-        <div class="ad-music-wave-row" aria-hidden="true">
-          <span class="wave-stick"></span>
-          <span class="wave-stick"></span>
-          <span class="wave-stick"></span>
-          <span class="wave-stick"></span>
-          <span class="wave-stick"></span>
-        </div>
-      `;
-    } else if (scene.lyricPreview) {
-      extraVisuals = `
-        <div class="ad-karaoke-strip">
-          <span class="karaoke-text">${scene.lyricPreview}</span>
-        </div>
-      `;
-    } else if (scene.id === 'scene-lockscreen') {
-      extraVisuals = `
-        <div class="ad-lockscreen-pill">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-          <span>Native Lock Screen Controls</span>
-        </div>
-      `;
-    }
-
-    return `
-      <div class="ad-scene ad-scene-kinetic" id="active-ad-scene">
-        <!-- Anchor Word that begins medium, then smoothly scales down and moves -->
-        <div class="ad-anchor-wrap">
-          <span class="ad-anchor-word" id="ad-anchor-word">${scene.anchor}</span>
-        </div>
-
-        <!-- The line that fluidly unfolds as camera tracks with it -->
-        <div class="ad-unfolding-container" id="ad-unfolding-container">
-          <h2 class="ad-kinetic-line">
-            <span class="line-part-lead">${scene.lead}</span>
-            <span class="line-part-reveal">${scene.reveal}</span>
-          </h2>
-          ${extraVisuals}
-          <p class="ad-sub-explanation">${scene.sub}</p>
-        </div>
-      </div>
-    `;
-  }
-
   function renderLoop(now) {
     if (!isRunning || !adStageEl) return;
 
@@ -213,42 +292,30 @@
       progressFillEl.style.width = (loopProgress * 100).toFixed(1) + '%';
     }
 
-    // Identify active scene
+    // Identify active stage
     let activeIdx = 0;
-    for (let i = 0; i < SCENES.length; i++) {
-      if (elapsed >= SCENES[i].start && elapsed < SCENES[i].end) {
+    for (let i = 0; i < STAGES.length; i++) {
+      if (elapsed >= STAGES[i].start && elapsed < STAGES[i].end) {
         activeIdx = i;
         break;
       }
     }
 
-    const scene = SCENES[activeIdx];
-    const sceneElapsed = elapsed - scene.start;
+    const stage = STAGES[activeIdx];
 
-    // On Scene Switch
-    if (activeIdx !== currentSceneIndex) {
-      currentSceneIndex = activeIdx;
-      sceneHasExpanded = false;
+    // On Stage Switch
+    if (activeIdx !== currentStageIndex) {
+      currentStageIndex = activeIdx;
 
       // Update background & ambient aura
-      adStageEl.style.backgroundColor = scene.bg;
-      adStageEl.setAttribute('data-theme', scene.theme);
+      adStageEl.style.backgroundColor = stage.bg;
+      adStageEl.setAttribute('data-theme', stage.theme);
       if (ambientAuraEl) {
-        ambientAuraEl.style.background = scene.aura;
+        ambientAuraEl.style.background = stage.aura || 'transparent';
       }
 
       if (viewportEl) {
-        viewportEl.innerHTML = renderSceneDOM(scene);
-      }
-    }
-
-    // Choreographed expansion: After ~800ms of reading the anchor word,
-    // smoothly shrink anchor and expand the unfolding phrase!
-    if (!sceneHasExpanded && sceneElapsed > 750) {
-      sceneHasExpanded = true;
-      const activeSceneEl = document.getElementById('active-ad-scene');
-      if (activeSceneEl) {
-        activeSceneEl.classList.add('is-expanded');
+        viewportEl.innerHTML = stage.render();
       }
     }
 
@@ -275,7 +342,7 @@
     }
 
     if (parseFloat(ver) < 1.3) {
-      // OS 1.1: Direct replacement of image with Apple Kinetic Motion Typography
+      // OS 1.1: Direct replacement of image with Apple Motion Graphics Ad
       if (heroImg) heroImg.style.display = 'none';
       if (heroGlow) heroGlow.style.display = 'none';
       startMotionAd();
