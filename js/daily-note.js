@@ -13,22 +13,30 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "cute_word_2026_10_v2",
+  questionId: "digi_virat_fav_body_part_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  . 
-" are  Khuda Ko bhi laga tha samay tujhe bnane me , jis kitab me tu likhi thi "`,
+  noteText: `Baby , sometimes you know we love each others body to just know that itne time tak hmnr sirf pyar dekha 
+                                                                             Arz Kiya Hai 
+tu choo bhi le mai dekhun bhi nah 
+kase chle vyapar tera .
+
+tu choo bhi le mai dekhun bhi nah 
+kase chle vyapar tera 
+
+mai uljan me bhi sulzan dhundu 
+tu h digi meri mai hu pyar tera .`,
 
   // Verification Quiz:
   quiz: {
-    question: "Select the cute word which is Most unique  and favourite amoung all options .",
-    correctOption: 2, // 2. Beta
+    question: "Digi ka konsa body part virat ko sbse jyada pasand hai ?",
+    correctOption: 4, // 4. Protein Wale BOOBS
     maxAttempts: 2, // 2 chances to open!
     options: [
-      { id: 1, text: "Kanna" },
-      { id: 2, text: "Beta", correct: true },
-      { id: 3, text: "Digi" },
-      { id: 4, text: "Bachaa" }
+      { id: 1, text: "Ras-malai jasi IceCreeam" },
+      { id: 2, text: "Soft & Sexy Lips" },
+      { id: 3, text: "Boom digi-digi Boom Boom" },
+      { id: 4, text: "Protein Wale BOOBS", correct: true }
     ]
   },
 
