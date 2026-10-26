@@ -181,33 +181,39 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // =========================================================
-  // DIGI OS VERSION & FIRMWARE UPDATE ENGINE (OS 1.0 -> OS 1.1)
-  // Digi starts at OS 1.0 (matching user request)
-  // Upgrades via Apple 60s installation sequence to OS 1.1
+  // DIGI OS VERSION & FIRMWARE UPDATE ENGINE (OS 1.1 -> OS 1.3)
+  // Strict Account Isolation:
+  // Digi (3009) -> viev_digi_os_version
+  // User/Anshu (1711) -> viev_user_os_version
+  // Neither account updates the other automatically!
+  // Default on deploy is OS 1.1. OS 1.3 unlocks via Settings.
   // =========================================================
   function getSystemVersion(role) {
-    // 1. Check global system version (shared across all accounts & survives deploys)
-    const globalVer = localStorage.getItem('viev_global_os_version');
-    if (globalVer) return globalVer;
-
-    // 2. Check if either digi or user account had updated to 1.1
-    const digiVer = localStorage.getItem('viev_digi_os_version');
-    const userVer = localStorage.getItem('viev_user_os_version');
-    if (digiVer === '1.1' || userVer === '1.1') {
-      localStorage.setItem('viev_global_os_version', '1.1');
-      return '1.1';
+    if (!role) {
+      try {
+        const session = getAuthSession();
+        role = session ? session.role : 'digi';
+      } catch (e) {
+        role = 'digi';
+      }
     }
-    if (role === 'digi' && digiVer) return digiVer;
-    if (role === 'user' && userVer) return userVer;
+    // Purge any legacy global key to enforce per-profile isolation
+    try {
+      localStorage.removeItem('viev_global_os_version');
+    } catch (e) {}
 
-    // 3. Default to latest released version (1.1) so users never have to re-update after deploy/refresh!
-    return '1.1';
+    const key = 'viev_' + role + '_os_version';
+    const stored = localStorage.getItem(key);
+    if (stored === '1.3') return '1.3';
+    if (stored === '1.0') return '1.0';
+    return '1.1'; // Strict default on deploy
   }
 
   function getPreviousVersion(currentVer) {
     const cur = parseFloat(currentVer);
-    if (isNaN(cur) || cur <= 1.0) return '1.0';
-    return (cur - 0.1).toFixed(1);
+    if (cur >= 1.3) return '1.1';
+    if (cur >= 1.1) return '1.0';
+    return '1.0';
   }
 
   function applySystemVersion(version) {
@@ -217,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Settings Menu Red Notification Badge
     const updateBadge = document.getElementById('settings-update-badge');
     if (updateBadge) {
-      updateBadge.style.display = (version === '1.0') ? 'inline-flex' : 'none';
+      updateBadge.style.display = (parseFloat(version) < 1.3) ? 'inline-flex' : 'none';
     }
 
     // 2. Hub Screen Badge Button & Document Title
@@ -266,14 +272,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. Image 2 (Update Available Screen) Updates
     const availCurrentSection = document.getElementById('avail-current-section');
     if (availCurrentSection) {
-      availCurrentSection.style.display = (version === '1.0') ? 'block' : 'none';
+      availCurrentSection.style.display = (parseFloat(version) < 1.3) ? 'block' : 'none';
     }
 
     // 7. Software Update Subpage view toggle
     const updateAvailCard = document.getElementById('software-update-available');
     const updateResultCard = document.getElementById('software-result');
     if (updateAvailCard && updateResultCard) {
-      if (version === '1.0') {
+      if (parseFloat(version) < 1.3) {
         updateAvailCard.style.display = 'block';
         updateResultCard.style.display = 'none';
       } else {
@@ -299,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       loader.style.display = 'none';
-      if (ver === '1.0') {
+      if (parseFloat(ver) < 1.3) {
         updateCard.style.display = 'block';
         resultCard.style.display = 'none';
       } else {
@@ -379,11 +385,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function completeFirmwareUpdate() {
-      // 1. Upgrade globally across all profiles to OS 1.1
-      localStorage.setItem('viev_global_os_version', '1.1');
-      localStorage.setItem('viev_digi_os_version', '1.1');
-      localStorage.setItem('viev_user_os_version', '1.1');
-      applySystemVersion('1.1');
+      const session = getAuthSession();
+      const role = session ? session.role : 'digi';
+
+      // 1. Upgrade ONLY the active logged-in profile to OS 1.3 (strict isolation)
+      localStorage.setItem('viev_' + role + '_os_version', '1.3');
+      applySystemVersion('1.3');
 
       // 2. Smooth fade out of black update screen
       overlay.classList.add('is-fading');
@@ -590,7 +597,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateTonightBtn = document.getElementById('apple-update-tonight-btn');
   if (updateTonightBtn) {
     updateTonightBtn.addEventListener('click', () => {
-      alert('Digi OS 1.1 will automatically install tonight when connected to power and Wi-Fi.');
+      if (window.triggerHaptic) window.triggerHaptic('light');
+      alert('Digi OS 1.3 will automatically install tonight when connected to power and Wi-Fi.');
       if (typeof closeSubpage === 'function') {
         closeSubpage();
       }
@@ -609,10 +617,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (curVer === prevVer) return;
 
-      // Rollback globally across all profiles
-      localStorage.setItem('viev_global_os_version', prevVer);
-      localStorage.setItem('viev_digi_os_version', prevVer);
-      localStorage.setItem('viev_user_os_version', prevVer);
+      // Rollback ONLY the active logged-in profile (strict isolation)
+      localStorage.setItem('viev_' + role + '_os_version', prevVer);
 
       applySystemVersion(prevVer);
       triggerSoftwareUpdateCheck();
@@ -735,6 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!userConfig) {
       // Invalid passcode
+      if (window.triggerHaptic) window.triggerHaptic('error');
       if (pinDisplay) {
         pinDisplay.classList.remove('shake');
         void pinDisplay.offsetWidth; // Trigger reflow for re-animation
@@ -756,6 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Valid passcode
+    if (window.triggerHaptic) window.triggerHaptic('success');
     if (loginFeedback) {
       loginFeedback.textContent = 'Access Granted';
       loginFeedback.classList.add('show', 'success');

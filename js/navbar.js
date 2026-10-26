@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function switchPage(targetTab, clickedBtn) {
     if (!clickedBtn) return;
+    if (typeof triggerHaptic === 'function') triggerHaptic('light');
     currentTab = targetTab;
 
     // Update active tab buttons
@@ -462,8 +463,172 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // =========================================================
+  // APPLE TACTILE HAPTICS ENGINE
+  // =========================================================
+  function triggerHaptic(type = 'light') {
+    if (!('vibrate' in navigator)) return;
+    try {
+      if (type === 'light') navigator.vibrate(10);
+      else if (type === 'medium') navigator.vibrate(22);
+      else if (type === 'heavy') navigator.vibrate(40);
+      else if (type === 'success') navigator.vibrate([15, 45, 20]);
+      else if (type === 'lock' || type === 'error') navigator.vibrate([30, 40, 30]);
+    } catch(e) {}
+  }
+  window.triggerHaptic = triggerHaptic;
+
+  // =========================================================
+  // STREAMING LRC PARSER & CACHE ENGINE
+  // Dynamic streaming of complete full-song synchronized lyrics
+  // =========================================================
+  const lrcCache = new Map();
+
+  function parseLRC(text) {
+    if (!text) return [];
+    const lines = text.split('\n');
+    const result = [];
+    const timeRegex = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g;
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('[ti:') || line.startsWith('[ar:') || line.startsWith('[al:') || line.startsWith('[by:') || line.startsWith('[offset:')) continue;
+      
+      const textPart = line.replace(timeRegex, '').trim();
+      let match;
+      timeRegex.lastIndex = 0;
+      while ((match = timeRegex.exec(line)) !== null) {
+        const min = parseInt(match[1], 10);
+        const sec = parseInt(match[2], 10);
+        const ms = match[3] ? (match[3].length === 2 ? parseInt(match[3], 10) * 10 : parseInt(match[3], 10)) : 0;
+        const totalSec = min * 60 + sec + (ms / 1000);
+        if (textPart) {
+          result.push({ time: parseFloat(totalSec.toFixed(2)), text: textPart });
+        }
+      }
+    }
+    result.sort((a, b) => a.time - b.time);
+    return result;
+  }
+
+  function loadTrackLyrics(track) {
+    if (!track || !track.lrcFile || track._lrcLoaded) return;
+    if (!isOS13Active()) {
+      // OS 1.3 feature: do not load full .lrc streaming lyrics until updated to 1.3
+      return;
+    }
+    if (lrcCache.has(track.lrcFile)) {
+      track.lyrics = lrcCache.get(track.lrcFile);
+      track._lrcLoaded = true;
+      if (currentCardView === 'lyrics' && PLAYLIST[currentTrackIndex] === track) {
+        renderLyrics();
+      }
+      return;
+    }
+
+    fetch(encodeURI(track.lrcFile))
+      .then(r => {
+        if (!r.ok) throw new Error('Failed to fetch LRC');
+        return r.text();
+      })
+      .then(txt => {
+        const parsed = parseLRC(txt);
+        if (parsed && parsed.length > 0) {
+          lrcCache.set(track.lrcFile, parsed);
+          track.lyrics = parsed;
+          track._lrcLoaded = true;
+          if (currentCardView === 'lyrics' && PLAYLIST[currentTrackIndex] === track) {
+            renderLyrics();
+          }
+        }
+      })
+      .catch(e => {
+        console.warn('LRC load skipped for ' + track.title + ':', e);
+      });
+  }
+
+  // =========================================================
+  // APPLE NATIVE MEDIASESSION & LOCK SCREEN ENGINE
+  // Full lock screen art, Bluetooth controls & seek sync
+  // =========================================================
+  function updateMediaSession(track) {
+    if (!('mediaSession' in navigator) || !track) return;
+    if (!isOS13Active()) {
+      try { navigator.mediaSession.metadata = null; } catch(e) {}
+      return;
+    }
+    try {
+      const coverUrl = new URL(track.cover, window.location.href).href;
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: track.artist || 'Digi Viev',
+        album: 'Digi OS 1.3 • Special Viev',
+        artwork: [
+          { src: coverUrl, sizes: '512x512', type: 'image/png' },
+          { src: coverUrl, sizes: '256x256', type: 'image/png' },
+          { src: coverUrl, sizes: '128x128', type: 'image/png' },
+          { src: coverUrl, sizes: '96x96', type: 'image/png' }
+        ]
+      });
+
+      navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+
+      if (!window._mediaSessionHandlersAttached) {
+        window._mediaSessionHandlersAttached = true;
+        navigator.mediaSession.setActionHandler('play', () => {
+          userExplicitPause = false;
+          if (typeof triggerHaptic === 'function') triggerHaptic('medium');
+          playTrack();
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+          userExplicitPause = true;
+          if (typeof triggerHaptic === 'function') triggerHaptic('medium');
+          pauseTrack();
+        });
+        navigator.mediaSession.setActionHandler('previoustrack', () => {
+          if (typeof triggerHaptic === 'function') triggerHaptic('light');
+          prevTrack();
+        });
+        navigator.mediaSession.setActionHandler('nexttrack', () => {
+          if (typeof triggerHaptic === 'function') triggerHaptic('light');
+          nextTrack();
+        });
+        navigator.mediaSession.setActionHandler('seekto', (details) => {
+          if (details.seekTime !== null && !isNaN(details.seekTime)) {
+            audio.currentTime = details.seekTime;
+            updateMediaSessionPosition();
+          }
+        });
+        navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+          const skip = details.seekOffset || 10;
+          audio.currentTime = Math.max(0, audio.currentTime - skip);
+          updateMediaSessionPosition();
+        });
+        navigator.mediaSession.setActionHandler('seekforward', (details) => {
+          const skip = details.seekOffset || 10;
+          audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + skip);
+          updateMediaSessionPosition();
+        });
+      }
+      updateMediaSessionPosition();
+    } catch (e) {
+      console.warn('MediaSession metadata error:', e);
+    }
+  }
+
+  function updateMediaSessionPosition() {
+    if (!('mediaSession' in navigator) || !navigator.mediaSession.setPositionState) return;
+    try {
+      if (audio.duration && !isNaN(audio.duration) && isFinite(audio.duration)) {
+        navigator.mediaSession.setPositionState({
+          duration: audio.duration,
+          playbackRate: audio.playbackRate || 1.0,
+          position: Math.min(audio.currentTime, audio.duration)
+        });
+      }
+    } catch (e) {}
+  }
+
+  // =========================================================
   // APPLE MUSIC: REAL AUDIO PLAYLIST & PLAYBACK ENGINE
-  // (Songs are filtered by active OS version: 1.0 vs 1.1)
   // =========================================================
   const MASTER_PLAYLIST = [
     {
@@ -471,6 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Danny • Avvy Sra',
       bpm: 90,
       src: 'song/Ve Haaniyaan.mp3',
+      lrcFile: 'song/Ve Haaniyaan.lrc',
       cover: 'song/Screenshot 2026-10-24 224431.png',
       color: '#ff5e7e',
       glow: 'rgba(255, 94, 126, 0.88)',
@@ -515,6 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Arijit Singh • Shreya Ghoshal',
       bpm: 76,
       src: 'song/Samjhawan Humpty Sharma Ki Dulhania 320 Kbps.mp3',
+      lrcFile: 'song/Samjhawan.lrc',
       cover: 'song/Screenshot 2026-10-24 224416.png',
       color: '#ff9f24',
       glow: 'rgba(255, 159, 36, 0.88)',
@@ -553,6 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Vishal Bhardwaj • Arijit Singh',
       bpm: 104,
       src: 'song/Ishq Ka Fever O Romeo 320 Kbps.mp3',
+      lrcFile: 'song/Ishq Ka Fever.lrc',
       cover: 'song/Screenshot 2026-10-24 224355.png',
       color: '#d946ef',
       glow: 'rgba(217, 70, 239, 0.88)',
@@ -579,6 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Arijit Singh • Pritam',
       bpm: 72,
       src: 'song/Phir Le Aya Dil (Reprise) - Arijit Singh (DJJOhAL.Com).mp3',
+      lrcFile: 'song/Phir Le Aya Dil (Reprise).lrc',
       cover: 'song/Screenshot 2026-10-24 224316.png',
       color: '#f59e0b',
       glow: 'rgba(245, 158, 11, 0.88)',
@@ -607,6 +776,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Kishore Kumar • Asha Bhosle',
       bpm: 124,
       src: 'song/Tu tu hai wohi dilne jise apna kaha_320(KoshalWorld.Com).mp3',
+      lrcFile: 'song/Tu Tu Hai Wohi.lrc',
       cover: 'song/Screenshot 2026-10-24 224447.png',
       color: '#10b981',
       glow: 'rgba(16, 185, 129, 0.88)',
@@ -668,6 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Keane',
       bpm: 86,
       src: 'song/Keane_-_Somewhere_Only_We_Know_CeeNaija.com_.mp3',
+      lrcFile: 'song/Somewhere Only We Know.lrc',
       cover: 'song/Screenshot 2026-10-25 070356.png',
       color: '#f472b6',
       glow: 'rgba(244, 114, 182, 0.88)',
@@ -710,6 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Papon • Sunidhi Chauhan',
       bpm: 84,
       src: 'song/Papon_Sunidhi_Chauhan_-_Kyun_na_hum_tum_(mp3.pm).mp3',
+      lrcFile: 'song/Kyon.lrc',
       cover: 'song/Screenshot 2026-10-25 134729.png',
       color: '#38bdf8',
       glow: 'rgba(56, 189, 248, 0.88)',
@@ -745,6 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Arijit Singh • Mithoon',
       bpm: 92,
       src: 'song/Tum Hi Ho Aashiqui 2 320 Kbps.mp3',
+      lrcFile: 'song/Tum Hi Ho.lrc',
       cover: 'song/Screenshot 2026-10-25 152246.png',
       color: '#f59e0b',
       glow: 'rgba(245, 158, 11, 0.88)',
@@ -775,6 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Arijit Singh • Jeet Gannguli',
       bpm: 80,
       src: 'song/Aasan Nahin Yahan Aashiqui 2 320 Kbps.mp3',
+      lrcFile: 'song/Aasan Nahin Yahan.lrc',
       cover: 'song/Screenshot 2026-10-25 152454.png',
       color: '#c084fc',
       glow: 'rgba(192, 132, 252, 0.88)',
@@ -800,6 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Arijit Singh • Pritam',
       bpm: 76,
       src: 'song/Khairiyat Chhichhore 320 Kbps.mp3',
+      lrcFile: 'song/Khairiyat.lrc',
       cover: 'song/Screenshot 2026-10-25 152805.png',
       color: '#38bdf8',
       glow: 'rgba(56, 189, 248, 0.88)',
@@ -826,6 +1001,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Arijit Singh • Sanjay Leela Bhansali',
       bpm: 98,
       src: 'song/Binte Dil Padmaavat 320 Kbps.mp3',
+      lrcFile: 'song/Binte Dil.lrc',
       cover: 'song/Screenshot 2026-10-25 152930.png',
       color: '#eab308',
       glow: 'rgba(234, 179, 8, 0.88)',
@@ -851,6 +1027,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Satinder Sartaaj • Jasmine Sandlas',
       bpm: 108,
       src: 'song/Jaiye Sajana Dhurandhar The Revenge 320 Kbps.mp3',
+      lrcFile: 'song/Jaiye Sajana.lrc',
       cover: 'song/Screenshot 2026-10-26 101216.png',
       color: '#e11d48',
       glow: 'rgba(225, 29, 72, 0.88)',
@@ -885,6 +1062,7 @@ document.addEventListener('DOMContentLoaded', () => {
       artist: 'Kaka',
       bpm: 96,
       src: 'song/Time Zone - Kaka.mp3',
+      lrcFile: 'song/Time Zone.lrc',
       cover: 'song/Screenshot 2026-10-26 102009.png',
       color: '#f97316',
       glow: 'rgba(249, 115, 22, 0.88)',
@@ -918,8 +1096,26 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentLyricIndex = -1;
   let lyricsRafId = null;
 
+  function getActiveOSVersion() {
+    if (window.CURRENT_OS_VERSION) return window.CURRENT_OS_VERSION;
+    try {
+      const sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
+      const role = sess.role || 'digi';
+      const stored = localStorage.getItem('viev_' + role + '_os_version');
+      if (stored === '1.3') return '1.3';
+      if (stored === '1.0') return '1.0';
+      return '1.1';
+    } catch(e) {
+      return '1.1';
+    }
+  }
+
+  function isOS13Active() {
+    return parseFloat(getActiveOSVersion()) >= 1.3;
+  }
+
   function syncMusicPlaylistWithOS(version) {
-    const v = parseFloat(version) || 1.0;
+    const v = parseFloat(version) || 1.1;
     PLAYLIST.length = 0;
     MASTER_PLAYLIST.forEach(song => {
       if (!song.minOS || parseFloat(song.minOS) <= v) {
@@ -929,8 +1125,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.PLAYLIST = PLAYLIST;
     if (typeof currentTrackIndex !== 'undefined' && currentTrackIndex >= PLAYLIST.length) {
       currentTrackIndex = 0;
-      if (typeof loadTrack === 'function') {
-        loadTrack(0, false);
+    }
+    const currentSong = PLAYLIST[currentTrackIndex];
+    if (currentSong) {
+      if (v >= 1.3) {
+        updateMediaSession(currentSong);
+        loadTrackLyrics(currentSong);
+      } else {
+        if ('mediaSession' in navigator) {
+          try { navigator.mediaSession.metadata = null; } catch(e) {}
+        }
       }
     }
     if (typeof renderSongList === 'function') {
@@ -938,24 +1142,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Initial population from stored version
-  const initialSavedOSVer = (function() {
-    try {
-      const globalVer = localStorage.getItem('viev_global_os_version');
-      if (globalVer) return globalVer;
-      const digiVer = localStorage.getItem('viev_digi_os_version');
-      const userVer = localStorage.getItem('viev_user_os_version');
-      if (digiVer === '1.1' || userVer === '1.1') return '1.1';
-      const sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
-      if (sess && sess.role === 'digi' && digiVer) return digiVer;
-      if (sess && sess.role === 'user' && userVer) return userVer;
-      return '1.1';
-    } catch(e) {
-      return '1.1';
-    }
-  })();
-
-  const initialV = parseFloat(initialSavedOSVer) || 1.0;
+  // Initial population from stored version (scoped per active role, defaults to 1.1 on deploy)
+  const initialSavedOSVer = getActiveOSVersion();
+  const initialV = parseFloat(initialSavedOSVer) || 1.1;
   MASTER_PLAYLIST.forEach(song => {
     if (!song.minOS || parseFloat(song.minOS) <= initialV) {
       PLAYLIST.push(song);
@@ -966,6 +1155,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.syncMusicPlaylistWithOS = syncMusicPlaylistWithOS;
 
   const audio = document.getElementById('apple-music-audio') || new Audio();
+  audio.setAttribute('playsinline', '');
+  audio.setAttribute('webkit-playsinline', '');
+  audio.playsInline = true;
   const musicPlayBtn = document.getElementById('music-play-btn');
   const prevBtn = document.getElementById('music-prev-btn');
   const nextBtn = document.getElementById('music-next-btn');
@@ -1039,36 +1231,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initAudioVisualizer() {
-    if (audioCtx) return;
-    try {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-      audioCtx = new AudioContextClass();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 512; // 256 frequency bins (~43Hz per bin) for true sub-bass & kick isolation
-      analyser.smoothingTimeConstant = 0.35; // Snappy transient punch
-
-      audioSourceNode = audioCtx.createMediaElementSource(audio);
-      audioSourceNode.connect(analyser);
-
-      // Connect Spatial Audio & Reverb Chain
-      dryGainNode = audioCtx.createGain();
-      wetGainNode = audioCtx.createGain();
-      convolverNode = audioCtx.createConvolver();
-
-      updateSpatialAudioEngine();
-
-      // Dry path: Analyser -> Dry Gain -> Destination
-      analyser.connect(dryGainNode);
-      dryGainNode.connect(audioCtx.destination);
-
-      // Wet Spatial path: Analyser -> Convolver -> Wet Gain -> Destination
-      analyser.connect(convolverNode);
-      convolverNode.connect(wetGainNode);
-      wetGainNode.connect(audioCtx.destination);
-    } catch (e) {
-      console.warn('Web Audio API initialized or already connected:', e);
-    }
+    // Preserves native hardware audio decoder for true background playback on mobile:
+    // Audio will never mute or freeze when the phone is locked, display is turned off,
+    // or when switching between apps!
   }
 
   function startBeatVisualizer() {
@@ -1323,6 +1488,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setPlayPauseUI(playing) {
     isPlaying = playing;
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
+    }
     if (playing) {
       if (currentTab === 'music') {
         if (currentCardView === 'artwork') startBeatVisualizer();
@@ -1806,6 +1974,12 @@ document.addEventListener('DOMContentLoaded', () => {
       updateStoryCardUI();
     }
 
+    // Native Lock Screen & Bluetooth Controller
+    updateMediaSession(track);
+
+    // Full Synchronized Lyrics streaming
+    loadTrackLyrics(track);
+
     if (autoPlay) {
       // Optimistic instant feedback: UI responds in 0ms!
       setPlayPauseUI(true);
@@ -1815,14 +1989,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function playTrack() {
-    initAudioVisualizer();
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
+  // =========================================================
+  // TRUE BACKGROUND AUDIO & PERSISTENCE ENGINE
+  // Survives phone lock, screen turn off, tab switch & app minimize
+  // =========================================================
+  let userExplicitPause = false;
+  let wasPlayingBeforeHidden = false;
+
+  function persistPlaybackState() {
+    if (!isOS13Active()) return;
+    try {
+      localStorage.setItem('viev_last_track_index', String(currentTrackIndex));
+      localStorage.setItem('viev_last_track_time', String(Math.floor(audio.currentTime || 0)));
+      localStorage.setItem('viev_bg_playing', isPlaying ? 'true' : 'false');
+    } catch(e) {}
+  }
+
+  // Handle mobile screen lock / sleep mode / tab backgrounding (OS 1.3 feature)
+  document.addEventListener('visibilitychange', () => {
+    if (!isOS13Active()) return;
+    if (document.hidden) {
+      if (isPlaying && !audio.paused) {
+        wasPlayingBeforeHidden = true;
+      }
+    } else {
+      if (wasPlayingBeforeHidden && isPlaying && audio.paused && !userExplicitPause) {
+        audio.play().catch(() => {});
+      }
+      wasPlayingBeforeHidden = false;
+      updateSyncedLyrics(audio.currentTime, true);
     }
+  });
+
+  // Guard against mobile browser synthetic pause on screen lock (OS 1.3 feature)
+  audio.addEventListener('pause', () => {
+    persistPlaybackState();
+    if (!isOS13Active()) return;
+    if (document.hidden && isPlaying && !userExplicitPause) {
+      // Screen was locked while playing: continue background playback smoothly!
+      audio.play().catch(() => {});
+    }
+  });
+
+  audio.addEventListener('play', () => {
+    userExplicitPause = false;
+    persistPlaybackState();
+  });
+
+  function playTrack() {
+    userExplicitPause = false;
+    initAudioVisualizer();
     audio.play().then(() => {
       setPlayPauseUI(true);
       startBeatVisualizer();
+      persistPlaybackState();
     }).catch(err => {
       console.warn('Playback prevented by browser autoplay policy:', err);
       setPlayPauseUI(false);
@@ -1830,8 +2050,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function pauseTrack() {
+    userExplicitPause = true;
     audio.pause();
     setPlayPauseUI(false);
+    persistPlaybackState();
   }
 
   function togglePlay() {
@@ -1924,12 +2146,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Live update synced lyrics line and auto-scroll
     updateSyncedLyrics(cur);
+
+    if (Math.floor(cur) % 2 === 0) {
+      updateMediaSessionPosition();
+    }
   });
 
   audio.addEventListener('loadedmetadata', () => {
     if (remTimeEl && audio.duration) {
       remTimeEl.textContent = `-${formatTime(audio.duration)}`;
     }
+    updateMediaSessionPosition();
   });
 
   audio.addEventListener('ended', () => {
@@ -1962,32 +2189,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Controls Event Listeners
   if (musicPlayBtn) {
-    musicPlayBtn.addEventListener('click', togglePlay);
+    musicPlayBtn.addEventListener('click', () => {
+      triggerHaptic('medium');
+      togglePlay();
+    });
   }
 
   if (nextBtn) {
-    nextBtn.addEventListener('click', nextTrack);
+    nextBtn.addEventListener('click', () => {
+      triggerHaptic('light');
+      nextTrack();
+    });
   }
 
   if (prevBtn) {
-    prevBtn.addEventListener('click', prevTrack);
+    prevBtn.addEventListener('click', () => {
+      triggerHaptic('light');
+      prevTrack();
+    });
   }
 
   // Playback Modes Event Listeners
   if (shuffleBtn) {
-    shuffleBtn.addEventListener('click', toggleShuffle);
+    shuffleBtn.addEventListener('click', () => {
+      triggerHaptic('light');
+      toggleShuffle();
+    });
   }
 
   if (repeatBtn) {
-    repeatBtn.addEventListener('click', toggleRepeat);
+    repeatBtn.addEventListener('click', () => {
+      triggerHaptic('light');
+      toggleRepeat();
+    });
   }
 
   if (speedBtn) {
-    speedBtn.addEventListener('click', toggleSpeed);
+    speedBtn.addEventListener('click', () => {
+      triggerHaptic('light');
+      toggleSpeed();
+    });
   }
 
   if (sleepBtn) {
-    sleepBtn.addEventListener('click', openSleepTimerSheet);
+    sleepBtn.addEventListener('click', () => {
+      triggerHaptic('light');
+      openSleepTimerSheet();
+    });
   }
 
   if (timerCloseBtn) {
@@ -2552,7 +2800,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.font = '700 32px -apple-system, BlinkMacSystemFont, "Outfit", sans-serif';
     ctx.fillText(`Together ${diff2} Days • Met on 31 Jan 2026`, W / 2, H - 240);
 
-    const activeVer = window.CURRENT_OS_VERSION || (localStorage.getItem('viev_digi_os_version') || '1.1');
+    const activeVer = window.CURRENT_OS_VERSION || getActiveOSVersion();
     ctx.fillText(`DIGI OS ${activeVer} • SPECIAL VIEV`, W / 2, H - 190);
   }
 
@@ -2735,8 +2983,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initial Setup
-  loadTrack(0, false);
+  // Initial Setup: Restore previous track & position if user is on OS 1.3
+  const savedTrackIdx = isOS13Active() ? parseInt(localStorage.getItem('viev_last_track_index') || '0', 10) : 0;
+  const initialIdx = (!isNaN(savedTrackIdx) && savedTrackIdx >= 0 && savedTrackIdx < PLAYLIST.length) ? savedTrackIdx : 0;
+  loadTrack(initialIdx, false);
+  if (isOS13Active()) {
+    const savedTime = parseFloat(localStorage.getItem('viev_last_track_time') || '0');
+    if (!isNaN(savedTime) && savedTime > 0) {
+      audio.currentTime = savedTime;
+    }
+  }
   setPlayPauseUI(false);
   updateSpatialUIState();
   updateStoryCardUI();

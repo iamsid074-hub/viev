@@ -236,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Trigger Small Subtitle & Shake when Locked Note is Clicked
   function triggerNoMoreAttemptsFeedback() {
+    if (window.triggerHaptic) window.triggerHaptic('lock');
     // Show small subtitle below the button
     if (noteAttemptsSubtitle) {
       noteAttemptsSubtitle.style.display = 'block';
@@ -386,6 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (isCorrect) {
         // Correct Answer Selected!
+        if (window.triggerHaptic) window.triggerHaptic('success');
         btn.classList.add('is-correct');
         quizOptionBtns.forEach(b => b.disabled = true);
 
@@ -420,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (remaining > 0) {
           // Still have 1 more chance!
+          if (window.triggerHaptic) window.triggerHaptic('light');
           if (quizPanel) {
             quizPanel.classList.remove('note-shake');
             void quizPanel.offsetWidth;
@@ -431,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } else {
           // All attempts used up - Permanently Lock
+          if (window.triggerHaptic) window.triggerHaptic('lock');
           isPermanentlyLocked = true;
           quizOptionBtns.forEach(b => b.disabled = true);
 

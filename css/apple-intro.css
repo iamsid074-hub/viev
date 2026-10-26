@@ -6186,4 +6186,9 @@
 
 
 
-
+/* Safe area insets for iPhone Dynamic Island & Home indicator */
+@supports (padding: max(0px)) {
+  .apple-floating-dock {
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+}

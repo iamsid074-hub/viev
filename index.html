@@ -250,8 +250,8 @@ tu h digi meri mai hu pyar tera .
         
 
 
-        <!-- Real Audio Engine for Apple Music Player -->
-        <audio id="apple-music-audio" preload="auto"></audio>
+        <!-- Real Audio Engine for Apple Music Player (Background Audio Enabled) -->
+        <audio id="apple-music-audio" preload="auto" playsinline webkit-playsinline></audio>
 
         <!-- Big Floating Album Artwork / Lyrics / Song List Area -->
         <div class="apple-artwork-container" id="apple-artwork-container">
@@ -684,7 +684,7 @@ tu h digi meri mai hu pyar tera .
               <button class="settings-nav-pill" data-target="subpage-software" type="button">
                 <span class="pill-nav-title">Software Update</span>
                 <div class="pill-nav-right">
-                  <span class="settings-update-badge" id="settings-update-badge" style="display: none;">1</span>
+                  <span class="settings-update-badge" id="settings-update-badge">1</span>
                   <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
@@ -899,24 +899,24 @@ tu h digi meri mai hu pyar tera .
               <div class="apple-update-card">
                 <div class="update-card-top-row">
                   <div class="update-icon-squircle">
-                    <span class="update-icon-ver">1.1</span>
+                    <span class="update-icon-ver" id="avail-update-ver-icon">1.3</span>
                   </div>
                   <div class="update-meta-wrap">
-                    <h3 class="update-os-title">Digi OS 1.1</h3>
+                    <h3 class="update-os-title" id="avail-update-title">Digi OS 1.3</h3>
                     <span class="update-company-line">VIEV Inc.</span>
-                    <span class="update-size-line">124.8 MB</span>
+                    <span class="update-size-line" id="avail-update-size">186.4 MB</span>
                   </div>
                 </div>
 
                 <div class="update-card-body">
-                  <p class="update-lead-text">
-                    This update provides important bug fixes, romantic additions, and 2 new songs for Digi.
+                  <p class="update-lead-text" id="avail-update-lead">
+                    Digi OS 1.3 introduces native MediaSession Lock Screen integration, full synchronized song lyrics streaming, Apple tactile haptics, and true background audio playback.
                   </p>
                   
                   <p class="update-sub-text">
                     For information on the private features of Digi OS updates, please visit this website:
                   </p>
-                  <a href="https://viev.digi.space/os-1.1" target="_blank" class="update-website-link">https://viev.digi.space/os-1.1</a>
+                  <a href="https://viev.digi.space/os-1.3" target="_blank" class="update-website-link">https://viev.digi.space/os-1.3</a>
                 </div>
 
                 <div class="update-card-actions">
@@ -939,10 +939,10 @@ tu h digi meri mai hu pyar tera .
                 <span class="also-available-kicker">ALSO AVAILABLE</span>
                 <div class="also-available-card current-version-card">
                   <div class="also-avail-squircle os-1-squircle">
-                    <span class="also-avail-squircle-ver">1.0</span>
+                    <span class="also-avail-squircle-ver">1.1</span>
                   </div>
                   <div class="also-avail-meta">
-                    <span class="also-avail-title">OS 1.0</span>
+                    <span class="also-avail-title">OS 1.1</span>
                   </div>
                   <svg class="also-avail-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
@@ -960,23 +960,23 @@ tu h digi meri mai hu pyar tera .
                   </svg>
                 </div>
                 <h3 class="uptodate-title-text">Digi OS is up to date</h3>
-                <div class="uptodate-ver-sub" id="uptodate-ver-sub">Digi OS 1.1</div>
+                <div class="uptodate-ver-sub" id="uptodate-ver-sub">Digi OS 1.3</div>
                 <button type="button" class="uptodate-more-btn" id="uptodate-more-btn">More Details</button>
               </div>
 
               <!-- Collapsible More Details Sheet / Box -->
               <div class="uptodate-details-drawer" id="uptodate-details-drawer" style="display: none;">
                 <div class="uptodate-details-header">
-                  <span class="details-drawer-title">What's in Digi OS 1.1</span>
+                  <span class="details-drawer-title">What's in Digi OS 1.3</span>
                   <button type="button" class="details-close-btn" id="details-close-btn">Done</button>
                 </div>
                 <div class="uptodate-details-content">
-                  <p class="details-lead">Digi OS 1.1 brings thoughtful enhancements, acoustic music refinements, and romantic additions designed specifically for Digi.</p>
+                  <p class="details-lead">Digi OS 1.3 brings native iOS/Android lock screen controls, complete synchronized lyrics, tactile feedback engine, and true background audio playback.</p>
                   <ul class="details-list">
-                    <li><strong>2 New Handpicked Songs:</strong> "Jaiye Sajana" (Satinder Sartaaj) and "Time Zone" (Kaka) in Apple Music.</li>
-                    <li><strong>Sub-Bass Visualizer:</strong> Live transient beat visualizer with acoustic pulse reaction.</li>
-                    <li><strong>Secret Daily Note Quiz:</strong> Single-attempt verification lock with personalized security.</li>
-                    <li><strong>Fluid 120fps Animations:</strong> GPU-composited glass sheet transitions and responsive controls.</li>
+                    <li><strong>Native Lock Screen & Bluetooth (MediaSession):</strong> Full artwork, song titles, live playback slider, and controls on iPhone lock screen and Bluetooth devices.</li>
+                    <li><strong>Complete Synced Lyrics:</strong> Real-time streaming .lrc parsing with seamless auto-scroll across all 12 songs.</li>
+                    <li><strong>Apple Tactile Haptics:</strong> Gentle physical micro-vibrations across clock flips, music toggles, and quiz interactions.</li>
+                    <li><strong>True Background Audio Engine:</strong> Seamless non-stop music playback when your phone is locked, display is off, or switching between apps.</li>
                   </ul>
                 </div>
               </div>
@@ -986,10 +986,10 @@ tu h digi meri mai hu pyar tera .
                 <span class="also-available-kicker">ALSO AVAILABLE</span>
                 <div class="also-available-card revert-card" id="apple-revert-btn">
                   <div class="also-avail-squircle os-1-squircle">
-                    <span class="also-avail-squircle-ver" id="revert-btn-ver">1.0</span>
+                    <span class="also-avail-squircle-ver" id="revert-btn-ver">1.1</span>
                   </div>
                   <div class="also-avail-meta">
-                    <span class="also-avail-title" id="revert-btn-label">OS 1.0</span>
+                    <span class="also-avail-title" id="revert-btn-label">OS 1.1</span>
                   </div>
                   <svg class="also-avail-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
@@ -1423,9 +1423,9 @@ tu h digi meri mai hu pyar tera .
   </div>
 
   <script src="js/apple-welcome.js"></script>
-  <script src="js/daily-note.js?v=2.6"></script>
-  <script src="js/navbar.js?v=2.2"></script>
+  <script src="js/daily-note.js?v=2.7"></script>
+  <script src="js/navbar.js?v=2.4"></script>
   <script src="js/cinema.js"></script>
-  <script src="js/app.js?v=3.4"></script>
+  <script src="js/app.js?v=3.6"></script>
 </body>
 </html>
