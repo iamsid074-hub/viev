@@ -192,7 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return localStorage.getItem('viev_user_os_version') || '1.1';
   }
 
+  function getPreviousVersion(currentVer) {
+    const cur = parseFloat(currentVer);
+    if (isNaN(cur) || cur <= 1.0) return '1.0';
+    return (cur - 0.1).toFixed(1);
+  }
+
   function applySystemVersion(version) {
+    const prevVersion = getPreviousVersion(version);
+
     // 1. Settings Menu Red Notification Badge
     const updateBadge = document.getElementById('settings-update-badge');
     if (updateBadge) {
@@ -214,13 +222,28 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 4. Software Result Version Label
-    const verLabel = document.getElementById('software-current-ver-label');
-    if (verLabel) {
-      verLabel.textContent = 'OS ' + version;
+    // 4. Authentic Apple Up-To-Date Screen updates
+    const uptodateSquircleVer = document.getElementById('uptodate-squircle-ver');
+    if (uptodateSquircleVer) {
+      uptodateSquircleVer.textContent = version;
+    }
+    const uptodateHeading = document.getElementById('uptodate-os-heading');
+    if (uptodateHeading) {
+      uptodateHeading.textContent = 'Digi OS ' + version;
     }
 
-    // 5. Software Update Subpage view toggle
+    // 5. Dynamic Apple Revert Button
+    const revertBtn = document.getElementById('apple-revert-btn');
+    if (revertBtn) {
+      if (parseFloat(version) > 1.0) {
+        revertBtn.style.display = 'flex';
+        revertBtn.textContent = 'Revert to Digi OS ' + prevVersion;
+      } else {
+        revertBtn.style.display = 'none';
+      }
+    }
+
+    // 6. Software Update Subpage view toggle
     const updateAvailCard = document.getElementById('software-update-available');
     const updateResultCard = document.getElementById('software-result');
     if (updateAvailCard && updateResultCard) {
@@ -510,6 +533,28 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof closeSubpage === 'function') {
         closeSubpage();
       }
+    });
+  }
+
+  // Dynamic Apple Revert / Downgrade Button Handler
+  const revertBtn = document.getElementById('apple-revert-btn');
+  if (revertBtn) {
+    revertBtn.addEventListener('click', () => {
+      const session = getAuthSession();
+      const role = session ? session.role : 'digi';
+      const curVer = getSystemVersion(role);
+      const prevVer = getPreviousVersion(curVer);
+
+      if (curVer === prevVer) return;
+
+      if (role === 'digi') {
+        localStorage.setItem('viev_digi_os_version', prevVer);
+      } else {
+        localStorage.setItem('viev_user_os_version', prevVer);
+      }
+
+      applySystemVersion(prevVer);
+      triggerSoftwareUpdateCheck();
     });
   }
 

@@ -18,7 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/liquid-glass.css">
-  <link rel="stylesheet" href="css/apple-intro.css?v=3.3">
+  <link rel="stylesheet" href="css/apple-intro.css?v=3.4">
   <link rel="stylesheet" href="css/cinema-player.css">
 </head>
 <body>
@@ -939,17 +939,27 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
               </div>
             </div>
 
-            <!-- Software Update Result (Already Up To Date Card) -->
-            <div class="settings-group-card software-uptodate-card" id="software-result" style="display: none;" title="Tap to check again">
-              <div class="software-uptodate-body">
-                <div class="software-uptodate-icon-wrap">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="9 12 11.5 14.5 15.5 9.5"></polyline>
-                  </svg>
+            <!-- Software Update Result (Authentic Apple iOS Up-To-Date Screen) -->
+            <div class="apple-uptodate-card" id="software-result" style="display: none;">
+              <div class="uptodate-hero-wrap">
+                <div class="uptodate-squircle" id="uptodate-squircle">
+                  <span class="uptodate-squircle-ver" id="uptodate-squircle-ver">1.1</span>
                 </div>
-                <h3 class="software-uptodate-title">Digi OS is up to date</h3>
-                <span class="software-uptodate-ver" id="software-current-ver-label">OS 1.1</span>
+                <h3 class="uptodate-os-heading" id="uptodate-os-heading">Digi OS 1.1</h3>
+                <div class="uptodate-status-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Digi OS is up to date</span>
+                </div>
+                <span class="uptodate-timestamp" id="uptodate-timestamp">Checked today</span>
+              </div>
+
+              <!-- Apple-Style Revert / Downgrade Button (Dynamic) -->
+              <div class="uptodate-actions-wrap">
+                <button type="button" class="apple-revert-btn" id="apple-revert-btn">
+                  Revert to Digi OS 1.0
+                </button>
               </div>
             </div>
           </div>
@@ -1375,6 +1385,6 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
   <script src="js/daily-note.js?v=2.2"></script>
   <script src="js/navbar.js?v=1.8"></script>
   <script src="js/cinema.js"></script>
-  <script src="js/app.js?v=3.1"></script>
+  <script src="js/app.js?v=3.2"></script>
 </body>
 </html>

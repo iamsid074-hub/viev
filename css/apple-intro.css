@@ -2760,7 +2760,7 @@
   transform: translateX(100%);
   opacity: 0;
   pointer-events: none;
-  padding-top: calc(var(--sat) + 16px);
+  padding-top: calc(var(--sat) + 2px);
   padding-bottom: calc(var(--sab) + 120px);
   box-sizing: border-box;
 }
@@ -2926,7 +2926,8 @@
   justify-content: flex-start;
   width: 100%;
   padding: 0 4px;
-  margin-bottom: 24px;
+  margin-top: -6px;
+  margin-bottom: 10px;
 }
 
 .subpage-back-btn {
@@ -2941,7 +2942,7 @@
   gap: 3px;
   cursor: pointer;
   outline: none;
-  padding: 6px 12px 6px 0;
+  padding: 4px 10px 4px 0;
   margin-left: -4px;
   transition: opacity 0.2s ease, transform 0.15s ease;
   -webkit-tap-highlight-color: transparent;
@@ -2964,7 +2965,7 @@
   letter-spacing: -0.7px;
   color: #ffffff;
   text-align: left;
-  margin: 0 0 22px 4px;
+  margin: 0 0 14px 4px;
 }
 
 .settings-group-card {
@@ -3217,60 +3218,107 @@
   letter-spacing: -0.15px;
 }
 
-/* ---- Software Update Section (Clean iOS 27 Style) ---- */
-.software-uptodate-card {
-  text-align: center;
-  padding: 38px 20px 34px 20px;
-  cursor: pointer;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
-  user-select: none;
-}
-
-.software-uptodate-card:hover {
+/* ---- Software Update Section (Authentic Apple iOS Up-to-Date Screen) ---- */
+.apple-uptodate-card {
+  width: 100%;
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.16);
-}
-
-.software-uptodate-card:active {
-  transform: scale(0.985);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.software-uptodate-body {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  padding: 26px 20px 20px;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  margin-top: 10px;
 }
 
-.software-uptodate-icon-wrap {
+.uptodate-hero-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.uptodate-squircle {
   width: 66px;
   height: 66px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(52, 199, 89, 0.22) 0%, rgba(52, 199, 89, 0.06) 80%);
-  border: 1.5px solid rgba(52, 199, 89, 0.45);
-  box-shadow: 0 0 28px rgba(52, 199, 89, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0264d6 0%, #1c7cd6 30%, #5856d6 65%, #ff2d55 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  margin-bottom: 14px;
 }
 
-.software-uptodate-title {
-  font-family: var(--font-main);
-  font-size: 18.5px;
+.uptodate-squircle-ver {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 26px;
+  font-weight: 850;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.uptodate-os-heading {
+  font-size: 21px;
   font-weight: 700;
   color: #ffffff;
-  margin: 0 0 6px 0;
   letter-spacing: -0.3px;
+  margin: 0 0 8px 0;
 }
 
-.software-uptodate-ver {
-  font-family: var(--font-main);
-  font-size: 13.5px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.52);
-  letter-spacing: -0.1px;
+.uptodate-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(52, 199, 89, 0.12);
+  border: 1px solid rgba(52, 199, 89, 0.28);
+  color: #30d158;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.uptodate-timestamp {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 22px;
+}
+
+.uptodate-actions-wrap {
+  width: 100%;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.apple-revert-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 999px;
+  background: #0071e3;
+  color: #ffffff;
+  font-size: 15.5px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 113, 227, 0.4);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.apple-revert-btn:hover {
+  background: #0077ed;
+}
+
+.apple-revert-btn:active {
+  transform: scale(0.98);
 }
 
 /* ---- Favorite Songs Section (Settings Subpage) ---- */
@@ -5165,7 +5213,7 @@
   }
 
   .settings-subpage-pane {
-    padding-top: calc(var(--sat) + 12px) !important;
+    padding-top: calc(var(--sat) + 2px) !important;
     padding-bottom: calc(var(--sab) + 110px) !important;
   }
 
