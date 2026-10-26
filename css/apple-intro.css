@@ -2919,22 +2919,26 @@
   color: #ffffff;
 }
 
-/* Subpage Top Navigation Bar (< Settings) */
+/* Subpage Top Navigation Bar (< Settings | Center Title) */
 .subpage-top-bar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
   padding: 0 4px;
   margin-top: -6px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  min-height: 40px;
 }
 
 .subpage-back-btn {
+  position: relative;
+  z-index: 2;
   background: transparent;
   border: none;
   color: #0a84ff;
-  font-family: var(--font-main);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
   font-size: 17px;
   font-weight: 500;
   display: inline-flex;
@@ -2951,6 +2955,22 @@
 .subpage-back-btn:active {
   opacity: 0.55;
   transform: scale(0.97);
+}
+
+.subpage-nav-center-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .subpage-center-header,
@@ -6047,12 +6067,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.07);
+  padding: 13px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   gap: 14px;
 }
 
@@ -6062,32 +6082,38 @@
 }
 
 .also-available-card.revert-card:hover {
-  background: rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .also-available-card.revert-card:active {
   transform: scale(0.98);
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .also-avail-squircle {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #007aff 0%, #5856d6 50%, #af52de 100%);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 14px rgba(88, 86, 214, 0.42);
+}
+
+.also-avail-squircle.os-1-squircle {
+  background: linear-gradient(135deg, #007aff 0%, #5856d6 50%, #af52de 100%);
+  box-shadow: 0 4px 14px rgba(88, 86, 214, 0.42);
 }
 
 .also-avail-squircle-ver {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  font-size: 16px;
-  font-weight: 750;
+  font-size: 16.5px;
+  font-weight: 800;
   color: #ffffff;
+  letter-spacing: -0.3px;
 }
 
 .also-avail-meta {
@@ -6099,7 +6125,7 @@
 
 .also-avail-title {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: #ffffff;
   letter-spacing: -0.2px;
@@ -6113,7 +6139,7 @@
 }
 
 .also-avail-chevron {
-  color: #8e8e93;
+  color: rgba(255, 255, 255, 0.35);
   flex-shrink: 0;
 }
 

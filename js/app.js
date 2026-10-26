@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (parseFloat(version) > 1.0) {
         uptodateRevertSection.style.display = 'block';
         if (revertBtnVer) revertBtnVer.textContent = prevVersion;
-        if (revertBtnLabel) revertBtnLabel.textContent = 'Revert to Digi OS ' + prevVersion;
+        if (revertBtnLabel) revertBtnLabel.textContent = 'OS ' + prevVersion;
       } else {
         uptodateRevertSection.style.display = 'none';
       }
@@ -479,6 +479,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function openSubpage(targetId) {
     if (!settingsViewport) return;
 
+    // Set top bar center title (e.g. Software Update)
+    const navCenterTitle = document.getElementById('subpage-nav-center-title');
+    if (navCenterTitle) {
+      if (targetId === 'subpage-software') {
+        navCenterTitle.textContent = 'Software Update';
+        navCenterTitle.style.display = 'block';
+      } else {
+        navCenterTitle.textContent = '';
+        navCenterTitle.style.display = 'none';
+      }
+    }
+
     // Hide all subpages first
     subpagePanels.forEach(p => p.style.display = 'none');
 
@@ -506,6 +518,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeSubpage() {
     if (!settingsViewport) return;
     settingsViewport.classList.remove('is-subpage-open');
+    const navCenterTitle = document.getElementById('subpage-nav-center-title');
+    if (navCenterTitle) {
+      navCenterTitle.textContent = '';
+      navCenterTitle.style.display = 'none';
+    }
   }
 
   navPills.forEach(pill => {

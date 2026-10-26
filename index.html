@@ -695,7 +695,7 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
              VIEW 2: SLIDING SUB-PAGE (SLIDES IN FROM RIGHT LIKE IPHONE)
              ========================================================= -->
         <div class="settings-view-pane settings-subpage-pane" id="settings-subpage-pane">
-          <!-- Native iPhone Navigation Bar (< Settings) -->
+          <!-- Native iPhone Navigation Bar (< Settings | Center Title) -->
           <div class="subpage-top-bar">
             <button class="subpage-back-btn" id="settings-back-btn" type="button" aria-label="Back to Settings">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
@@ -703,6 +703,7 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
               </svg>
               <span>Settings</span>
             </button>
+            <span class="subpage-nav-center-title" id="subpage-nav-center-title"></span>
           </div>
 
           <!-- SUBPAGE 1: DISPLAY & AMBIENT GLOW -->
@@ -871,8 +872,6 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
 
           <!-- SUBPAGE 4: SOFTWARE UPDATE (DIGI OS) -->
           <div class="subpage-body-container" id="subpage-software" style="display: none;">
-            <h2 class="subpage-large-heading">Software Update</h2>
-
             <!-- Apple iOS Loader State (Centered) -->
             <div class="apple-loader-container" id="software-loader">
               <div class="apple-ios-spinner">
@@ -936,14 +935,15 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
               <div class="also-available-section" id="avail-current-section">
                 <span class="also-available-kicker">ALSO AVAILABLE</span>
                 <div class="also-available-card current-version-card">
-                  <div class="also-avail-squircle current-squircle">
+                  <div class="also-avail-squircle os-1-squircle">
                     <span class="also-avail-squircle-ver">1.0</span>
                   </div>
                   <div class="also-avail-meta">
-                    <span class="also-avail-title">Digi OS 1.0</span>
-                    <span class="also-avail-sub">Installed (Current Version)</span>
+                    <span class="also-avail-title">OS 1.0</span>
                   </div>
-                  <span class="also-avail-badge">Installed</span>
+                  <svg class="also-avail-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
                 </div>
               </div>
             </div>
@@ -982,12 +982,11 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
               <div class="also-available-section" id="uptodate-revert-section">
                 <span class="also-available-kicker">ALSO AVAILABLE</span>
                 <div class="also-available-card revert-card" id="apple-revert-btn">
-                  <div class="also-avail-squircle revert-squircle">
+                  <div class="also-avail-squircle os-1-squircle">
                     <span class="also-avail-squircle-ver" id="revert-btn-ver">1.0</span>
                   </div>
                   <div class="also-avail-meta">
-                    <span class="also-avail-title" id="revert-btn-label">Revert to Digi OS 1.0</span>
-                    <span class="also-avail-sub">VIEV Inc. • Rollback to OS 1.0</span>
+                    <span class="also-avail-title" id="revert-btn-label">OS 1.0</span>
                   </div>
                   <svg class="also-avail-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
