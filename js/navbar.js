@@ -2534,9 +2534,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.font = '700 32px -apple-system, BlinkMacSystemFont, "Outfit", sans-serif';
     ctx.fillText(`Together ${diff2} Days • Met on 31 Jan 2026`, W / 2, H - 240);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.50)';
-    ctx.font = '600 24px -apple-system, BlinkMacSystemFont, "Outfit", sans-serif';
-    ctx.fillText('DIGI OS 1.1 • SPECIAL VIEV', W / 2, H - 190);
+    const activeVer = window.CURRENT_OS_VERSION || (localStorage.getItem('viev_digi_os_version') || '1.1');
+    ctx.fillText(`DIGI OS ${activeVer} • SPECIAL VIEV`, W / 2, H - 190);
   }
 
   function triggerPngDownload(canvas, filename) {
