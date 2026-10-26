@@ -345,17 +345,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const orbRect = floatingOrb.getBoundingClientRect();
     const centerX = Math.round(orbRect.left + orbRect.width / 2);
     const centerY = Math.round(orbRect.top + orbRect.height / 2);
-    const radius = Math.round(orbRect.width / 2);
 
-    // 2. Set dynamic CSS variables for circular morph expansion origin
+    // 2. Set dynamic CSS variables & transform-origin for fluid morph expansion origin
     musicScreen.style.setProperty('--launch-x', `${centerX}px`);
     musicScreen.style.setProperty('--launch-y', `${centerY}px`);
-    musicScreen.style.setProperty('--launch-r', `${radius}px`);
+    musicScreen.style.transformOrigin = `${centerX}px ${centerY}px`;
 
     // 3. Tactile click feedback on the floating orb
     floatingOrb.classList.add('is-clicked-launching');
 
-    // 4. Trigger expanding luminous glass ring shockwave from exact origin
+    // 4. Trigger subtle luminous glass ring shockwave from exact origin
     if (launchRing) {
       launchRing.style.left = `${centerX}px`;
       launchRing.style.top = `${centerY}px`;
@@ -396,12 +395,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 8. Orb will smoothly hide since we are now in music section
     updateFloatingOrbVisibility();
 
-    // 9. When 500ms animation finishes, cleanly settle into resting state
+    // 9. When 380ms Apple spring animation finishes, cleanly settle into resting state
     setTimeout(() => {
       musicScreen.classList.remove('is-launching-from-orb');
       musicScreen.style.removeProperty('--launch-x');
       musicScreen.style.removeProperty('--launch-y');
-      musicScreen.style.removeProperty('--launch-r');
+      musicScreen.style.transformOrigin = '';
 
       if (previousScreen && previousScreen !== musicScreen) {
         previousScreen.classList.remove('screen-launch-recede', 'active');
@@ -423,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       isLaunchingMusic = false;
-    }, 620);
+    }, 400);
   }
 
   // Floating Music Orb: Click to launch music section with iOS 27 fluid morph
