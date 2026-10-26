@@ -5595,5 +5595,286 @@
   transform: scale(0.98);
 }
 
+/* =========================================================
+   APPLE "V" OS FIRMWARE UPDATE INSTALLATION SCREEN (Image 2)
+   Pitch Black Screen + Bold White "V" + Apple Progress Bar (60s)
+   ========================================================= */
+.apple-os-update-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000000;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.apple-os-update-overlay.active {
+  display: flex !important;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.apple-os-update-overlay.is-fading {
+  opacity: 0 !important;
+  pointer-events: none;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.os-update-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.os-update-logo {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 68px;
+  font-weight: 850;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  cursor: pointer;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.os-update-logo:active {
+  transform: scale(0.96);
+}
+
+.os-update-progress-track {
+  width: 220px;
+  height: 3.5px;
+  background: #323235;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.os-update-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+  transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* =========================================================
+   APPLE iOS 18 SOFTWARE UPDATE AVAILABLE CARD (Image 1)
+   Matching Apple Cupertino HIG grouped update screen
+   ========================================================= */
+.apple-update-avail-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  padding: 22px 18px 16px;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  text-align: left;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.update-card-top-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.update-icon-squircle {
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #0264d6 0%, #1c7cd6 30%, #5856d6 65%, #ff2d55 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.update-icon-ver {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 24px;
+  font-weight: 850;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.update-meta-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.update-os-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.update-os-size {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 3px;
+}
+
+.update-card-body {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.update-lead-text {
+  margin: 0 0 12px 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.update-features-box {
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.update-features-title {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 8px;
+}
+
+.update-features-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.update-sub-text {
+  margin: 0 0 4px 0;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.update-website-link {
+  display: block;
+  font-size: 13px;
+  color: #2997ff;
+  margin-bottom: 8px;
+  word-break: break-all;
+}
+
+.update-learn-more-link {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2997ff;
+  text-decoration: none;
+  margin-bottom: 18px;
+  cursor: pointer;
+}
+
+.update-learn-more-link:hover {
+  text-decoration: underline;
+}
+
+.update-actions-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.apple-update-now-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 999px;
+  background: #0071e3;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 113, 227, 0.4);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.apple-update-now-btn:hover {
+  background: #0077ed;
+}
+
+.apple-update-now-btn:active {
+  transform: scale(0.98);
+}
+
+.apple-update-tonight-btn {
+  width: 100%;
+  height: 38px;
+  background: transparent;
+  border: none;
+  color: #2997ff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.18s ease;
+}
+
+.apple-update-tonight-btn:hover {
+  text-decoration: underline;
+}
+
+.apple-update-tonight-btn:active {
+  opacity: 0.7;
+}
+
+/* Red Settings Notification Badge */
+.settings-update-badge {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ff3b30;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  margin-right: 8px;
+  box-shadow: 0 2px 6px rgba(255, 59, 48, 0.45);
+}
+
+.pill-nav-right {
+  display: flex;
+  align-items: center;
+}
+
+
 
 

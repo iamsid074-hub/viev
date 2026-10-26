@@ -180,19 +180,179 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   ];
 
-  // Software Update Loader Simulation
+  // =========================================================
+  // DIGI OS VERSION & FIRMWARE UPDATE ENGINE (OS 1.0 -> OS 1.1)
+  // Digi starts at OS 1.0 (matching user request)
+  // Upgrades via Apple 60s installation sequence to OS 1.1
+  // =========================================================
+  function getSystemVersion(role) {
+    if (role === 'digi') {
+      return localStorage.getItem('viev_digi_os_version') || '1.0';
+    }
+    return localStorage.getItem('viev_user_os_version') || '1.1';
+  }
+
+  function applySystemVersion(version) {
+    // 1. Settings Menu Red Notification Badge
+    const updateBadge = document.getElementById('settings-update-badge');
+    if (updateBadge) {
+      updateBadge.style.display = (version === '1.0') ? 'inline-flex' : 'none';
+    }
+
+    // 2. Hub Screen Badge Button
+    document.querySelectorAll('.os-badge-text').forEach(el => {
+      el.textContent = 'OS ' + version;
+    });
+
+    // 3. Settings Modal Sheet Titles
+    document.querySelectorAll('.os-version-title').forEach(el => {
+      el.textContent = 'Digi OS ' + version;
+    });
+    document.querySelectorAll('.spec-val').forEach(el => {
+      if (el.textContent.includes('OS 1.')) {
+        el.textContent = 'OS ' + version + ' (Official)';
+      }
+    });
+
+    // 4. Software Result Version Label
+    const verLabel = document.getElementById('software-current-ver-label');
+    if (verLabel) {
+      verLabel.textContent = 'OS ' + version;
+    }
+
+    // 5. Software Update Subpage view toggle
+    const updateAvailCard = document.getElementById('software-update-available');
+    const updateResultCard = document.getElementById('software-result');
+    if (updateAvailCard && updateResultCard) {
+      if (version === '1.0') {
+        updateAvailCard.style.display = 'block';
+        updateResultCard.style.display = 'none';
+      } else {
+        updateAvailCard.style.display = 'none';
+        updateResultCard.style.display = 'block';
+      }
+    }
+  }
+
+  // Software Update Loader & Card Simulation
   function triggerSoftwareUpdateCheck() {
     const loader = document.getElementById('software-loader');
-    const result = document.getElementById('software-result');
-    if (!loader || !result) return;
+    const updateCard = document.getElementById('software-update-available');
+    const resultCard = document.getElementById('software-result');
+    if (!loader || !updateCard || !resultCard) return;
+
+    const session = getAuthSession();
+    const ver = getSystemVersion(session ? session.role : 'digi');
 
     loader.style.display = 'flex';
-    result.style.display = 'none';
+    updateCard.style.display = 'none';
+    resultCard.style.display = 'none';
 
     setTimeout(() => {
       loader.style.display = 'none';
-      result.style.display = 'block';
-    }, 1400);
+      if (ver === '1.0') {
+        updateCard.style.display = 'block';
+        resultCard.style.display = 'none';
+      } else {
+        updateCard.style.display = 'none';
+        resultCard.style.display = 'block';
+      }
+    }, 1200);
+  }
+
+  // Apple Firmware Update Progress Controller (Image 2)
+  function startFirmwareUpdate() {
+    const overlay = document.getElementById('apple-os-update-overlay');
+    const fillBar = document.getElementById('os-update-progress-fill');
+    const logo = document.getElementById('os-update-logo');
+    if (!overlay || !fillBar) return;
+
+    // Close any open settings subpage
+    if (typeof closeSubpage === 'function') {
+      closeSubpage();
+    }
+    if (window.setFloatingNavVisible) {
+      window.setFloatingNavVisible(false);
+    }
+
+    fillBar.style.width = '0%';
+    overlay.style.display = 'flex';
+    void overlay.offsetWidth;
+    overlay.classList.remove('is-fading');
+    overlay.classList.add('active');
+
+    const TOTAL_DURATION = 60000; // 60 seconds (1 minute)
+    const startTime = performance.now();
+    let isFastForward = false;
+    let animId = null;
+
+    // Secret tap on V logo to fast-forward during testing
+    if (logo) {
+      logo.onclick = () => {
+        isFastForward = true;
+      };
+    }
+
+    function calculateProgress(elapsed) {
+      const frac = Math.min(1, elapsed / TOTAL_DURATION);
+      if (frac < 0.10) {
+        return (frac / 0.10) * 8; // 0 to 8% in first 6s
+      } else if (frac < 0.28) {
+        return 8 + ((frac - 0.10) / 0.18) * 18; // 8 to 26%
+      } else if (frac < 0.44) {
+        return 26 + ((frac - 0.28) / 0.16) * 18; // 26 to 44%
+      } else if (frac < 0.54) {
+        return 44 + ((frac - 0.44) / 0.10) * 3; // 44 to 47% (realistic firmware pause!)
+      } else if (frac < 0.74) {
+        return 47 + ((frac - 0.54) / 0.20) * 31; // 47 to 78% (surge)
+      } else if (frac < 0.90) {
+        return 78 + ((frac - 0.74) / 0.16) * 15; // 78 to 93%
+      } else {
+        return 93 + ((frac - 0.90) / 0.10) * 7; // 93 to 100%
+      }
+    }
+
+    function updateStep(now) {
+      let elapsed = now - startTime;
+      if (isFastForward) {
+        elapsed = Math.max(elapsed, TOTAL_DURATION - 1800);
+      }
+
+      const pct = Math.min(100, calculateProgress(elapsed));
+      fillBar.style.width = pct.toFixed(1) + '%';
+
+      if (elapsed < TOTAL_DURATION && pct < 100) {
+        animId = requestAnimationFrame(updateStep);
+      } else {
+        fillBar.style.width = '100%';
+        setTimeout(completeFirmwareUpdate, 1200);
+      }
+    }
+
+    function completeFirmwareUpdate() {
+      // 1. Upgrade Digi to OS 1.1
+      localStorage.setItem('viev_digi_os_version', '1.1');
+      applySystemVersion('1.1');
+
+      // 2. Smooth fade out of black update screen
+      overlay.classList.add('is-fading');
+      setTimeout(() => {
+        overlay.classList.remove('active', 'is-fading');
+        overlay.style.display = 'none';
+        fillBar.style.width = '0%';
+      }, 750);
+
+      // 3. Trigger Apple Cursive "viev" Startup Animation
+      runStartupAnimation(() => {
+        if (window.setFloatingNavVisible) {
+          window.setFloatingNavVisible(true);
+        }
+        const tabHome = document.getElementById('tab-home');
+        if (tabHome) tabHome.click();
+      });
+    }
+
+    animId = requestAnimationFrame(updateStep);
   }
 
   // Favorite Songs Loader & Rendering Simulation
@@ -326,6 +486,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const softwareResultCard = document.getElementById('software-result');
   if (softwareResultCard) {
     softwareResultCard.addEventListener('click', triggerSoftwareUpdateCheck);
+
+    // Demo / Reset Shortcut: Double click when up to date to re-test the update flow
+    softwareResultCard.addEventListener('dblclick', () => {
+      if (confirm('Re-test Digi OS 1.1 Update (revert to OS 1.0)?')) {
+        localStorage.removeItem('viev_digi_os_version');
+        applySystemVersion('1.0');
+        triggerSoftwareUpdateCheck();
+      }
+    });
+  }
+
+  // Apple-Style Software Update Actions
+  const updateNowBtn = document.getElementById('apple-update-now-btn');
+  if (updateNowBtn) {
+    updateNowBtn.addEventListener('click', startFirmwareUpdate);
+  }
+
+  const updateTonightBtn = document.getElementById('apple-update-tonight-btn');
+  if (updateTonightBtn) {
+    updateTonightBtn.addEventListener('click', () => {
+      alert('Digi OS 1.1 will automatically install tonight when connected to power and Wi-Fi.');
+      if (typeof closeSubpage === 'function') {
+        closeSubpage();
+      }
+    });
   }
 
   // =========================================================
@@ -415,6 +600,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (userRoleBadge) {
       userRoleBadge.textContent = config.badge || 'Member';
     }
+
+    // Synchronize OS Version based on active role
+    applySystemVersion(getSystemVersion(config.role));
   }
 
   function updatePinDisplay(val) {
@@ -578,6 +766,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.setFloatingNavVisible(false);
       }
 
+      applySystemVersion('1.0');
+
       // Switch tab back to Home
       const tabHome = document.getElementById('tab-home');
       if (tabHome) {
@@ -634,6 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
       welcomeScreen.classList.add('active');
     }
     updateProfileUI(activeSession);
+    applySystemVersion(getSystemVersion(activeSession.role));
     if (window.setFloatingNavVisible) {
       window.setFloatingNavVisible(false);
     }
@@ -644,6 +835,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   } else {
     // Not Logged In: Suppress startup splash and navbar, show Login Gateway
+    applySystemVersion('1.0');
     if (helloSplash) {
       helloSplash.classList.add('is-hidden');
     }

@@ -18,7 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/liquid-glass.css">
-  <link rel="stylesheet" href="css/apple-intro.css?v=3.2">
+  <link rel="stylesheet" href="css/apple-intro.css?v=3.3">
   <link rel="stylesheet" href="css/cinema-player.css">
 </head>
 <body>
@@ -63,6 +63,19 @@
     <button class="hello-skip-btn" id="hello-skip-btn" type="button" aria-label="Skip Intro">
       <span>Tap anywhere to skip</span>
     </button>
+  </aside>
+
+  <!-- =========================================================
+       APPLE "V" OS FIRMWARE UPDATE INSTALLATION SCREEN (Image 2)
+       Pure Pitch Black Screen + Bold White "V" + Apple Progress Bar (60s)
+       ========================================================= -->
+  <aside class="apple-os-update-overlay" id="apple-os-update-overlay" aria-label="Installing Digi OS Update" style="display: none;">
+    <div class="os-update-stage">
+      <div class="os-update-logo" id="os-update-logo" title="Tap to speed up">V</div>
+      <div class="os-update-progress-track">
+        <div class="os-update-progress-fill" id="os-update-progress-fill"></div>
+      </div>
+    </div>
   </aside>
 
   <!-- Fluid Liquid Ambient Light Meshes -->
@@ -667,9 +680,12 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
 
               <button class="settings-nav-pill" data-target="subpage-software" type="button">
                 <span class="pill-nav-title">Software Update</span>
-                <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
+                <div class="pill-nav-right">
+                  <span class="settings-update-badge" id="settings-update-badge" style="display: none;">1</span>
+                  <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
               </button>
             </div>
           </div>
@@ -876,7 +892,54 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
               <span class="apple-loader-label">Looking for Update…</span>
             </div>
 
-            <!-- Software Update Result (Clean Minimal Apple Card) -->
+            <!-- Software Update Available Card (Exact Apple iOS 18.7 Style - Image 1) -->
+            <div class="apple-update-avail-card" id="software-update-available" style="display: none;">
+              <div class="update-card-top-row">
+                <div class="update-icon-squircle">
+                  <span class="update-icon-ver">1.1</span>
+                </div>
+                <div class="update-meta-wrap">
+                  <h3 class="update-os-title">Digi OS 1.1</h3>
+                  <span class="update-os-size">124.8 MB</span>
+                </div>
+              </div>
+
+              <div class="update-card-body">
+                <p class="update-lead-text">
+                  This update provides important bug fixes, romantic additions, and is recommended for Digi.
+                </p>
+                
+                <div class="update-features-box">
+                  <span class="update-features-title">What's in Digi OS 1.1:</span>
+                  <ul class="update-features-list">
+                    <li>All-new Floating Liquid Glass Dock & Navigation</li>
+                    <li>Dynamic Sub-Bass & Acoustic Beat Visualizer</li>
+                    <li>2 New Handpicked Songs added to Playlist</li>
+                    <li>Single-Attempt Secret Daily Note Quiz</li>
+                    <li>Apple Watch Fluid Live Time Together Engine</li>
+                    <li>120fps GPU Sheet Animation & Performance Tweaks</li>
+                  </ul>
+                </div>
+
+                <p class="update-sub-text">
+                  For information on the private features of Digi OS updates, please visit this website:
+                </p>
+                <span class="update-website-link">https://viev.digi.space/os-1.1</span>
+
+                <a href="#" class="update-learn-more-link" id="update-learn-more-btn" onclick="return false;">Learn more…</a>
+              </div>
+
+              <div class="update-actions-wrap">
+                <button type="button" class="apple-update-now-btn" id="apple-update-now-btn">
+                  Update Now
+                </button>
+                <button type="button" class="apple-update-tonight-btn" id="apple-update-tonight-btn">
+                  Update Tonight
+                </button>
+              </div>
+            </div>
+
+            <!-- Software Update Result (Already Up To Date Card) -->
             <div class="settings-group-card software-uptodate-card" id="software-result" style="display: none;" title="Tap to check again">
               <div class="software-uptodate-body">
                 <div class="software-uptodate-icon-wrap">
@@ -886,7 +949,7 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
                   </svg>
                 </div>
                 <h3 class="software-uptodate-title">Digi OS is up to date</h3>
-                <span class="software-uptodate-ver">OS 1.1</span>
+                <span class="software-uptodate-ver" id="software-current-ver-label">OS 1.1</span>
               </div>
             </div>
           </div>
@@ -1312,6 +1375,6 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
   <script src="js/daily-note.js?v=2.2"></script>
   <script src="js/navbar.js?v=1.8"></script>
   <script src="js/cinema.js"></script>
-  <script src="js/app.js?v=3.0"></script>
+  <script src="js/app.js?v=3.1"></script>
 </body>
 </html>
