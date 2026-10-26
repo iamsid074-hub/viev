@@ -902,6 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const musicPlayBtn = document.getElementById('music-play-btn');
   const prevBtn = document.getElementById('music-prev-btn');
   const nextBtn = document.getElementById('music-next-btn');
+  const nowPlayingWrap = document.querySelector('.apple-now-playing-container');
   const artworkContainer = document.getElementById('apple-artwork-container');
   const artworkCard = document.getElementById('music-artwork-card');
   const artworkImg = document.getElementById('music-artwork-img');
@@ -1328,6 +1329,14 @@ document.addEventListener('DOMContentLoaded', () => {
         artworkContainer.classList.add('is-panel-mode');
       } else {
         artworkContainer.classList.remove('is-panel-mode');
+      }
+    }
+
+    if (nowPlayingWrap) {
+      if (view === 'lyrics' || view === 'songlist') {
+        nowPlayingWrap.classList.add('is-panel-open');
+      } else {
+        nowPlayingWrap.classList.remove('is-panel-open');
       }
     }
 
