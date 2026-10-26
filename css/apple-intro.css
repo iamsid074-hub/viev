@@ -198,7 +198,7 @@
   pointer-events: auto;
 }
 
-.app-screen.active:not(.is-launching-from-orb) {
+.app-screen.active.tab-fade-in {
   animation: appScreenFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -1322,61 +1322,54 @@
 }
 
 /* =========================================================
-   IOS 27 FLUID APP LAUNCH MORPH ENGINE (ORB -> FULL WINDOW)
-   High-performance GPU compositor morph: starts as a small rounded
-   capsule at the exact orb origin and expands smoothly to full screen.
-   Zero clip-path, zero repaints, continuous living ambilight glow!
+   APPLE MUSIC NATIVE FLUID SHEET SLIDE (IOS 27 ENGINE)
+   100% GPU Compositor Acceleration (transform: translate3d)
+   Zero clip-path, zero paint churn, zero blink glitch!
    ========================================================= */
-#music-screen.is-launching-from-orb {
+#music-screen.is-launching-sheet {
   display: flex !important;
   opacity: 1 !important;
-  z-index: 90 !important;
+  z-index: 95 !important;
   pointer-events: auto !important;
-  transform-origin: var(--launch-x, 85%) var(--launch-y, 90%);
-  animation: iosFluidAppLaunch 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-  will-change: transform, border-radius, opacity;
+  animation: iosMusicSheetSlideUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
   overflow: hidden;
   contain: paint;
+  box-shadow: 0 -16px 54px rgba(0, 0, 0, 0.85);
 }
 
-#music-screen.is-launching-from-orb .apple-now-playing-container {
-  animation: iosFluidContentSettle 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+@keyframes iosMusicSheetSlideUp {
+  0% {
+    transform: translate3d(0, 100%, 0);
+    border-radius: 40px 40px 0 0;
+  }
+  65% {
+    border-radius: 24px 24px 0 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    border-radius: 0 0 0 0;
+  }
+}
+
+#music-screen.is-launching-sheet .apple-now-playing-container {
+  animation: iosMusicSheetContentFade 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   will-change: transform, opacity;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
 }
 
-@keyframes iosFluidAppLaunch {
+@keyframes iosMusicSheetContentFade {
   0% {
-    transform: scale(0.14);
-    border-radius: 9999px;
-    opacity: 0.85;
-  }
-  35% {
-    border-radius: 54px;
-    opacity: 1;
-  }
-  75% {
-    border-radius: 24px;
+    transform: translate3d(0, 28px, 0);
+    opacity: 0.65;
   }
   100% {
-    transform: scale(1);
-    border-radius: 0px;
-    opacity: 1;
-  }
-}
-
-@keyframes iosFluidContentSettle {
-  0% {
-    transform: scale(0.92);
-    opacity: 0.75;
-  }
-  100% {
-    transform: scale(1);
+    transform: translate3d(0, 0, 0);
     opacity: 1;
   }
 }
@@ -1385,14 +1378,16 @@
 .app-screen.screen-launch-recede {
   display: flex !important;
   opacity: 0.40 !important;
-  filter: blur(14px) !important;
-  -webkit-filter: blur(14px) !important;
-  transform: scale(0.96) !important;
+  filter: blur(16px) !important;
+  -webkit-filter: blur(16px) !important;
+  transform: scale(0.94) translateY(-10px) !important;
+  border-radius: 28px 28px 0 0 !important;
   pointer-events: none !important;
   transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
               opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
               filter 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              -webkit-filter 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+              -webkit-filter 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              border-radius 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   will-change: transform, opacity, filter;

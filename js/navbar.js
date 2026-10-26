@@ -99,11 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const screen = pageScreens[key];
       if (!screen) return;
       if (key === targetTab) {
-        screen.classList.add('active');
+        screen.classList.add('active', 'tab-fade-in');
         screen.classList.remove('hidden');
         screen.scrollTop = 0;
+        setTimeout(() => screen.classList.remove('tab-fade-in'), 260);
       } else {
-        screen.classList.remove('active');
+        screen.classList.remove('active', 'tab-fade-in');
       }
     });
 
@@ -346,26 +347,19 @@ document.addEventListener('DOMContentLoaded', () => {
       stopBeatVisualizer();
     }
 
-    // 2. Calculate exact viewport center coordinates of floating orb for circular bloom
-    const orbRect = floatingOrb.getBoundingClientRect();
-    const centerX = Math.round(orbRect.left + orbRect.width / 2);
-    const centerY = Math.round(orbRect.top + orbRect.height / 2);
-
-    // 3. Immediately blur background window (iOS wallpaper depth bokeh)
+    // 2. Immediately blur background window (iOS wallpaper depth bokeh)
     if (previousScreen && previousScreen !== musicScreen) {
       previousScreen.classList.add('screen-launch-recede');
     }
 
-    // 4. Set dynamic CSS variables & transform-origin for fluid morph expansion origin
-    musicScreen.style.setProperty('--launch-x', `${centerX}px`);
-    musicScreen.style.setProperty('--launch-y', `${centerY}px`);
-    musicScreen.style.transformOrigin = `${centerX}px ${centerY}px`;
-
-    // 5. Tactile click feedback on the floating orb
+    // 3. Tactile click feedback on the floating orb
     floatingOrb.classList.add('is-clicked-launching');
 
-    // 6. Trigger subtle luminous glass ring shockwave from exact origin
+    // 4. Trigger subtle luminous glass ring shockwave from exact origin
     if (launchRing) {
+      const orbRect = floatingOrb.getBoundingClientRect();
+      const centerX = Math.round(orbRect.left + orbRect.width / 2);
+      const centerY = Math.round(orbRect.top + orbRect.height / 2);
       launchRing.style.left = `${centerX}px`;
       launchRing.style.top = `${centerY}px`;
       if (typeof PLAYLIST !== 'undefined' && typeof currentTrackIndex !== 'undefined' && PLAYLIST[currentTrackIndex]) {
@@ -380,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // 7. Navbar updates active tab & indicator smoothly
+    // 5. Navbar updates active tab & indicator smoothly
     currentTab = 'music';
     tabBtns.forEach(b => {
       b.classList.remove('active', 'is-dock-magnified');
@@ -392,20 +386,17 @@ document.addEventListener('DOMContentLoaded', () => {
       updateIndicator(musicTab);
     }
 
-    // 8. Trigger the fluid launch morph expansion blooming out of orb on musicScreen
-    musicScreen.classList.remove('hidden');
-    musicScreen.classList.add('is-launching-from-orb', 'active');
+    // 6. Trigger native Apple Music fluid sheet slide-up
+    musicScreen.classList.remove('hidden', 'tab-fade-in');
+    musicScreen.classList.add('is-launching-sheet', 'active');
     musicScreen.scrollTop = 0;
 
-    // 9. Orb will smoothly hide since we are now in music section
+    // 7. Orb will smoothly hide since we are now in music section
     updateFloatingOrbVisibility();
 
-    // 10. When 380ms Apple spring animation finishes, cleanly settle into resting state
+    // 8. When 380ms Apple spring animation finishes, cleanly settle with zero blink
     setTimeout(() => {
-      musicScreen.classList.remove('is-launching-from-orb');
-      musicScreen.style.removeProperty('--launch-x');
-      musicScreen.style.removeProperty('--launch-y');
-      musicScreen.style.transformOrigin = '';
+      musicScreen.classList.remove('is-launching-sheet');
 
       if (previousScreen && previousScreen !== musicScreen) {
         previousScreen.classList.remove('screen-launch-recede', 'active');
