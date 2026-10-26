@@ -5962,6 +5962,51 @@
 .update-lead-text {
   margin: 0 0 10px 0;
   color: rgba(255, 255, 255, 0.9);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.update-features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 14px 0;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+}
+
+.update-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.feature-bullet-icon {
+  font-size: 15px;
+  line-height: 1.35;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.feature-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.feature-text-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.15px;
+}
+
+.feature-text-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .update-sub-text {
