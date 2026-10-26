@@ -941,13 +941,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial population from stored version
   const initialSavedOSVer = (function() {
     try {
+      const globalVer = localStorage.getItem('viev_global_os_version');
+      if (globalVer) return globalVer;
+      const digiVer = localStorage.getItem('viev_digi_os_version');
+      const userVer = localStorage.getItem('viev_user_os_version');
+      if (digiVer === '1.1' || userVer === '1.1') return '1.1';
       const sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
-      if (sess && sess.role === 'digi') {
-        return localStorage.getItem('viev_digi_os_version') || '1.0';
-      }
-      return localStorage.getItem('viev_user_os_version') || '1.0';
+      if (sess && sess.role === 'digi' && digiVer) return digiVer;
+      if (sess && sess.role === 'user' && userVer) return userVer;
+      return '1.1';
     } catch(e) {
-      return localStorage.getItem('viev_digi_os_version') || '1.0';
+      return '1.1';
     }
   })();
 

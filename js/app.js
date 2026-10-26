@@ -186,10 +186,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // Upgrades via Apple 60s installation sequence to OS 1.1
   // =========================================================
   function getSystemVersion(role) {
-    if (role === 'digi') {
-      return localStorage.getItem('viev_digi_os_version') || '1.0';
+    // 1. Check global system version (shared across all accounts & survives deploys)
+    const globalVer = localStorage.getItem('viev_global_os_version');
+    if (globalVer) return globalVer;
+
+    // 2. Check if either digi or user account had updated to 1.1
+    const digiVer = localStorage.getItem('viev_digi_os_version');
+    const userVer = localStorage.getItem('viev_user_os_version');
+    if (digiVer === '1.1' || userVer === '1.1') {
+      localStorage.setItem('viev_global_os_version', '1.1');
+      return '1.1';
     }
-    return localStorage.getItem('viev_user_os_version') || '1.1';
+    if (role === 'digi' && digiVer) return digiVer;
+    if (role === 'user' && userVer) return userVer;
+
+    // 3. Default to latest released version (1.1) so users never have to re-update after deploy/refresh!
+    return '1.1';
   }
 
   function getPreviousVersion(currentVer) {
@@ -367,8 +379,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function completeFirmwareUpdate() {
-      // 1. Upgrade Digi to OS 1.1
+      // 1. Upgrade globally across all profiles to OS 1.1
+      localStorage.setItem('viev_global_os_version', '1.1');
       localStorage.setItem('viev_digi_os_version', '1.1');
+      localStorage.setItem('viev_user_os_version', '1.1');
       applySystemVersion('1.1');
 
       // 2. Smooth fade out of black update screen
@@ -595,11 +609,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (curVer === prevVer) return;
 
-      if (role === 'digi') {
-        localStorage.setItem('viev_digi_os_version', prevVer);
-      } else {
-        localStorage.setItem('viev_user_os_version', prevVer);
-      }
+      // Rollback globally across all profiles
+      localStorage.setItem('viev_global_os_version', prevVer);
+      localStorage.setItem('viev_digi_os_version', prevVer);
+      localStorage.setItem('viev_user_os_version', prevVer);
 
       applySystemVersion(prevVer);
       triggerSoftwareUpdateCheck();
@@ -859,7 +872,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.setFloatingNavVisible(false);
       }
 
-      applySystemVersion('1.0');
+      // Maintain active persisted OS version on sign out (do NOT reset to 1.0)
+      const currentVer = getSystemVersion();
+      applySystemVersion(currentVer);
 
       // Switch tab back to Home
       const tabHome = document.getElementById('tab-home');
@@ -927,8 +942,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   } else {
-    // Not Logged In: Suppress startup splash and navbar, show Login Gateway
-    applySystemVersion('1.0');
+    // Not Logged In: Maintain active system version, suppress startup splash and navbar, show Login Gateway
+    const currentVer = getSystemVersion();
+    applySystemVersion(currentVer);
     if (helloSplash) {
       helloSplash.classList.add('is-hidden');
     }
