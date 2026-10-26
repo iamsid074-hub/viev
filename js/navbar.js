@@ -2104,6 +2104,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!utilityCapsule) return;
     const shouldExpand = expand !== undefined ? expand : !utilityCapsule.classList.contains('is-expanded');
     utilityCapsule.classList.toggle('is-expanded', shouldExpand);
+    if (utilityDotsTrigger) {
+      utilityDotsTrigger.classList.toggle('is-active', shouldExpand);
+    }
   }
 
   if (utilityDotsTrigger) {
