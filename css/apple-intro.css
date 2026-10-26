@@ -1011,7 +1011,8 @@
   justify-content: center;
   z-index: 50;
   pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.3s ease, transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
 }
 
 .apple-floating-dock.nav-hidden {
@@ -1024,6 +1025,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   padding: 5px;
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -1063,18 +1065,17 @@
 
 /* =========================================================
    DETACHED COMPANION CIRCULAR ALBUM ORB (MINI-PLAYER)
-   Option 1: VisionOS Spatial Glass Puck (Elevated 3D Layering)
-   - Zero bounce: Pure critically damped Apple fluid curve (0.16, 1, 0.3, 1)
-   - Real 3D Layering: Emerges from inside the dock, lifts in Z-elevation
-   - Anchored Navbar: Navbar stays 100% centered, 0 shake, 0 jiggle
+   Option 2: Auto-Centering Spring Balance System
+   - Flow child of .apple-floating-dock: expands smoothly to 48px + 12px gap
+   - The entire Dock (Navbar + Orb) maintains perfect 50% screen center
+   - Smooth critically damped Apple fluid curve (0.16, 1, 0.3, 1)
    ========================================================= */
 .music-floating-orb {
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  width: 48px;
+  position: relative;
+  width: 0;
   height: 48px;
   margin: 0;
+  margin-left: 0;
   padding: 0;
   border: none;
   background: transparent;
@@ -1085,58 +1086,32 @@
   z-index: 25;
   visibility: hidden;
   opacity: 0;
-  transform: translateY(-50%) translateX(-36px) scale(0.82);
-  will-change: transform, opacity;
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.26s ease;
+  flex-shrink: 0;
+  will-change: width, margin-left, opacity;
+  transition: width 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+              margin-left 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.30s ease,
+              visibility 0.42s;
 }
 
-/* Resting Visible State: Detached 12px to the right of navbar */
+/* Resting Visible State: Expands to 48px with 12px margin, auto-centering the entire dock */
 .music-floating-orb.is-visible {
+  width: 48px;
+  margin-left: 12px;
   visibility: visible;
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(-50%) translateX(12px) scale(1);
 }
 
-/* Spatial Puck Separation: Pure hardware-accelerated glide */
-.music-floating-orb.is-separating {
-  visibility: visible !important;
-  pointer-events: auto !important;
-  animation: visionOSPuckSeparate 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-}
-
-/* Spatial Puck Merge: Pure hardware-accelerated glide */
-.music-floating-orb.is-merging {
-  visibility: visible !important;
+.music-floating-orb.is-clicked-launching {
+  opacity: 0 !important;
   pointer-events: none !important;
-  animation: visionOSPuckMerge 0.24s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-@keyframes visionOSPuckSeparate {
-  0% {
-    transform: translateY(-50%) translateX(-36px) scale(0.82);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(-50%) translateX(12px) scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes visionOSPuckMerge {
-  0% {
-    transform: translateY(-50%) translateX(12px) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-50%) translateX(-36px) scale(0.82);
-    opacity: 0;
-  }
-}
-
-.music-floating-orb:active {
-  transform: translateY(-50%) translateX(12px) scale(0.92) !important;
+.music-floating-orb.is-clicked-launching .orb-disc-wrapper {
+  transform: scale(0.86) !important;
+  opacity: 0 !important;
 }
 
 /* Pure Circular Album Artwork Frame with VisionOS Elevated Glass */
@@ -1155,8 +1130,24 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.28s ease;
-  will-change: transform, box-shadow;
+  transform: scale(0.60);
+  opacity: 0;
+  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.32s ease,
+              box-shadow 0.28s ease,
+              border-color 0.28s ease;
+  will-change: transform, opacity, box-shadow;
+}
+
+.music-floating-orb.is-visible .orb-disc-wrapper,
+.music-floating-orb.is-separating .orb-disc-wrapper {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.music-floating-orb.is-merging .orb-disc-wrapper {
+  transform: scale(0.60);
+  opacity: 0;
 }
 
 /* VisionOS Glass Lens Specular Reflection (Curved Crystal Sheen) */
@@ -1177,7 +1168,7 @@
 }
 
 .music-floating-orb:active .orb-disc-wrapper {
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 
 .orb-cover-img {
@@ -1186,6 +1177,15 @@
   border-radius: 50%;
   object-fit: cover;
   display: block;
+}
+
+.music-floating-orb.is-playing .orb-cover-img {
+  animation: orbDiscSpin 14s linear infinite;
+}
+
+@keyframes orbDiscSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* Small Active Indicator Pill (Strictly Bounded Inside Big Navbar) */
@@ -5105,8 +5105,12 @@
   }
 
   .music-floating-orb {
-    width: 44px;
     height: 44px;
+  }
+
+  .music-floating-orb.is-visible {
+    width: 44px;
+    margin-left: 10px;
   }
 
   .orb-disc-wrapper {

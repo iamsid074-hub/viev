@@ -34,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!floatingOrb) return;
     const shouldShow = (typeof isPlaying !== 'undefined' ? isPlaying : false) && (currentTab !== 'music');
 
+    if (floatingDock) {
+      floatingDock.classList.toggle('has-music-orb', shouldShow);
+    }
+
     if (shouldShow) {
       if (animTimer) {
         clearTimeout(animTimer);
@@ -46,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         floatingOrb.classList.add('is-separating', 'is-visible');
         animTimer = setTimeout(() => {
           floatingOrb.classList.remove('is-separating');
-        }, 360);
+        }, 420);
       }
       floatingOrb.classList.add('is-playing');
     } else {
@@ -58,12 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (floatingOrb.classList.contains('is-visible')) {
         floatingOrb.classList.add('is-merging');
+        floatingOrb.classList.remove('is-visible');
         animTimer = setTimeout(() => {
-          floatingOrb.classList.remove('is-visible', 'is-merging');
+          floatingOrb.classList.remove('is-merging');
           if (typeof isPlaying !== 'undefined' && !isPlaying) {
             floatingOrb.classList.remove('is-playing');
           }
-        }, 260);
+        }, 340);
       } else {
         floatingOrb.classList.remove('is-visible', 'is-merging');
         if (typeof isPlaying !== 'undefined' && !isPlaying) {
