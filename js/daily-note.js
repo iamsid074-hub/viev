@@ -13,7 +13,7 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_virat_fav_body_part_2026",
+  questionId: "digi_fav_part_2026_relocked",
 
   // Note message jo unlock hone par dikhega:
   noteText: `Baby , sometimes you know we love each others body to just know that itne time tak hmnr sirf pyar dekha 
@@ -61,6 +61,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const qId = (DAILY_NOTE_CONFIG.questionId || DAILY_NOTE_CONFIG.quiz.question || 'daily')
     .toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 32);
   const MAX_ATTEMPTS = (DAILY_NOTE_CONFIG.quiz && DAILY_NOTE_CONFIG.quiz.maxAttempts) || 2;
+
+  // Clear previous accidental answers across both digi & user roles
+  try {
+    ['digi', 'user'].forEach(r => {
+      localStorage.removeItem(`viev_note_status_${r}_digi_virat_fav_body_part_2026`);
+      localStorage.removeItem(`viev_note_attempts_${r}_digi_virat_fav_body_part_2026`);
+    });
+    localStorage.removeItem('viev_note_status_digi_virat_fav_body_part_2026');
+    localStorage.removeItem('viev_note_attempts_digi_virat_fav_body_part_2026');
+  } catch (e) {}
 
   let activeRole = getActiveUserRole();
   let STORAGE_KEY = `viev_note_status_${activeRole}_${qId}`;
