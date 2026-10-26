@@ -10,17 +10,18 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Note message jo unlock hone par dikhega:
-  noteText: "My Dear Digi , Tujhe sochne par jamana bhull jata hu , or jamane ko yaad karu to sirf tu nazar ati hai !!",
+  noteText: `akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  . 
+" are  Khuda Ko bhi laga tha samay tujhe bnane me , jis kitab me tu likhi thi "`,
 
   // Verification Quiz:
   quiz: {
-    question: "Virat kya jyada pasand karta hai ?",
-    correctOption: 2, // 2. Diwali ki mithaiyan
+    question: "Select the cute word which is Most unique  and favourite amoung all options .",
+    correctOption: 2, // 2. Beta
     options: [
-      { id: 1, text: "Diwali ke patakhe" },
-      { id: 2, text: "Diwali ki mithaiyan", correct: true },
-      { id: 3, text: "Diwali ki rangoliyan" },
-      { id: 4, text: "Diwali ki decoration" }
+      { id: 1, text: "Kanna" },
+      { id: 2, text: "Beta", correct: true },
+      { id: 3, text: "Digi" },
+      { id: 4, text: "Bachaa" }
     ]
   },
 
@@ -72,6 +73,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (noteTextEl && DAILY_NOTE_CONFIG.noteText) {
     noteTextEl.textContent = DAILY_NOTE_CONFIG.noteText;
+  }
+
+  // Initialize Quiz Question & Options from Config
+  const questionTitleEl = document.querySelector('.quiz-question-title');
+  if (questionTitleEl && DAILY_NOTE_CONFIG.quiz && DAILY_NOTE_CONFIG.quiz.question) {
+    questionTitleEl.textContent = DAILY_NOTE_CONFIG.quiz.question;
+  }
+  if (DAILY_NOTE_CONFIG.quiz && DAILY_NOTE_CONFIG.quiz.options) {
+    quizOptionBtns.forEach((btn, idx) => {
+      const opt = DAILY_NOTE_CONFIG.quiz.options[idx];
+      if (opt) {
+        btn.setAttribute('data-option', String(opt.id));
+        if (opt.correct) {
+          btn.setAttribute('data-correct', 'true');
+        } else {
+          btn.removeAttribute('data-correct');
+        }
+        const textSpan = btn.querySelector('.option-text');
+        if (textSpan) textSpan.textContent = opt.text;
+      }
+    });
   }
 
   // Set Initial Locked State (Card remains visible for visual balance)
