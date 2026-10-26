@@ -5718,47 +5718,184 @@
 }
 
 /* =========================================================
-   APPLE iOS 18 SOFTWARE UPDATE AVAILABLE CARD (Image 1)
-   Matching Apple Cupertino HIG grouped update screen
+   AUTHENTIC APPLE iOS SOFTWARE UPDATE SCREENS
+   Image 1: Up-to-Date Clean Screen (Centered Slate Checkmark)
+   Image 2: Update Available Card + Footnote + Also Available Section
    ========================================================= */
-.apple-update-avail-card {
-  background: rgba(255, 255, 255, 0.06);
+
+/* --- Image 1: Up to Date Screen --- */
+.apple-uptodate-screen {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 0 24px;
+}
+
+.uptodate-hero-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  padding: 24px 10px 10px;
+}
+
+.uptodate-check-circle {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #73757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+
+.uptodate-title-text {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 23px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.4px;
+  margin: 0 0 4px 0;
+}
+
+.uptodate-ver-sub {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 15px;
+  color: #8e8e93;
+  font-weight: 400;
+  margin-bottom: 14px;
+}
+
+.uptodate-more-btn {
+  background: none;
+  border: none;
+  color: #0071e3;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 15.5px;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 4px 10px;
+  transition: opacity 0.15s ease;
+}
+
+.uptodate-more-btn:hover {
+  text-decoration: underline;
+  opacity: 0.9;
+}
+
+.uptodate-more-btn:active {
+  opacity: 0.6;
+}
+
+/* Collapsible Details Drawer */
+.uptodate-details-drawer {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 22px;
-  padding: 22px 18px 16px;
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-top: 18px;
+  text-align: left;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  animation: detailsFadeDown 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes detailsFadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.uptodate-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.details-drawer-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.details-close-btn {
+  background: none;
+  border: none;
+  color: #0071e3;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.details-lead {
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 10px 0;
+}
+
+.details-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* --- Image 2: Update Available Screen --- */
+.apple-update-avail-screen {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0 24px;
+}
+
+.apple-update-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 18px 18px 14px;
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
   text-align: left;
-  width: 100%;
-  margin-top: 10px;
 }
 
 .update-card-top-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
 .update-icon-squircle {
-  width: 60px;
-  height: 60px;
-  border-radius: 15px;
-  background: linear-gradient(135deg, #0264d6 0%, #1c7cd6 30%, #5856d6 65%, #ff2d55 100%);
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ff3b30 0%, #ff2d55 50%, #af52de 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 18px rgba(255, 45, 85, 0.35);
   flex-shrink: 0;
 }
 
 .update-icon-ver {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  font-size: 24px;
-  font-weight: 850;
+  font-size: 22px;
+  font-weight: 800;
   color: #ffffff;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
 }
 
 .update-meta-wrap {
@@ -5767,90 +5904,64 @@
 }
 
 .update-os-title {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.3px;
   margin: 0;
 }
 
-.update-os-size {
+.update-company-line {
   font-size: 13px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
-  margin-top: 3px;
+  font-weight: 400;
+  color: #8e8e93;
+  margin-top: 2px;
+}
+
+.update-size-line {
+  font-size: 13px;
+  font-weight: 400;
+  color: #8e8e93;
+  margin-top: 1px;
 }
 
 .update-card-body {
   font-size: 13.5px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.45;
+  color: #dedede;
+  margin-bottom: 16px;
 }
 
 .update-lead-text {
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
   color: rgba(255, 255, 255, 0.9);
-}
-
-.update-features-box {
-  background: rgba(0, 0, 0, 0.22);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.update-features-title {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.55);
-  margin-bottom: 8px;
-}
-
-.update-features-list {
-  margin: 0;
-  padding-left: 18px;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.82);
 }
 
 .update-sub-text {
   margin: 0 0 4px 0;
   font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.7);
+  color: #8e8e93;
 }
 
 .update-website-link {
-  display: block;
-  font-size: 13px;
-  color: #2997ff;
-  margin-bottom: 8px;
-  word-break: break-all;
-}
-
-.update-learn-more-link {
   display: inline-block;
-  font-size: 14px;
-  font-weight: 500;
-  color: #2997ff;
+  font-size: 13px;
+  color: #0071e3;
+  word-break: break-all;
   text-decoration: none;
-  margin-bottom: 18px;
-  cursor: pointer;
 }
 
-.update-learn-more-link:hover {
+.update-website-link:hover {
   text-decoration: underline;
 }
 
-.update-actions-wrap {
+.update-card-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 14px;
 }
 
 .apple-update-now-btn {
@@ -5859,6 +5970,7 @@
   border-radius: 999px;
   background: #0071e3;
   color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   font-size: 16px;
   font-weight: 600;
   border: none;
@@ -5866,8 +5978,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(0, 113, 227, 0.4);
-  transition: transform 0.18s ease, background 0.18s ease;
+  box-shadow: 0 4px 14px rgba(0, 113, 227, 0.4);
+  transition: transform 0.16s ease, background 0.16s ease;
 }
 
 .apple-update-now-btn:hover {
@@ -5883,14 +5995,15 @@
   height: 38px;
   background: transparent;
   border: none;
-  color: #2997ff;
-  font-size: 15px;
+  color: #0071e3;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 15.5px;
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.18s ease;
+  transition: opacity 0.16s ease;
 }
 
 .apple-update-tonight-btn:hover {
@@ -5898,7 +6011,122 @@
 }
 
 .apple-update-tonight-btn:active {
-  opacity: 0.7;
+  opacity: 0.6;
+}
+
+.update-footnote-text {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #8e8e93;
+  margin: 12px 14px 22px;
+  text-align: left;
+}
+
+/* --- Common: ALSO AVAILABLE Section (Images 1 & 2) --- */
+.also-available-section {
+  width: 100%;
+  margin-top: 18px;
+  text-align: left;
+}
+
+.also-available-kicker {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8e8e93;
+  margin-bottom: 8px;
+  padding-left: 6px;
+}
+
+.also-available-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  gap: 14px;
+}
+
+.also-available-card.revert-card {
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.also-available-card.revert-card:hover {
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.also-available-card.revert-card:active {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.also-avail-squircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
+
+.also-avail-squircle-ver {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 16px;
+  font-weight: 750;
+  color: #ffffff;
+}
+
+.also-avail-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.also-avail-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.also-avail-sub {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 12px;
+  color: #8e8e93;
+  margin-top: 1px;
+}
+
+.also-avail-chevron {
+  color: #8e8e93;
+  flex-shrink: 0;
+}
+
+.also-avail-badge {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #8e8e93;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 
 /* Red Settings Notification Badge */

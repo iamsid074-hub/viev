@@ -200,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applySystemVersion(version) {
     const prevVersion = getPreviousVersion(version);
+    window.CURRENT_OS_VERSION = version;
 
     // 1. Settings Menu Red Notification Badge
     const updateBadge = document.getElementById('settings-update-badge');
@@ -207,14 +208,18 @@ document.addEventListener('DOMContentLoaded', () => {
       updateBadge.style.display = (version === '1.0') ? 'inline-flex' : 'none';
     }
 
-    // 2. Hub Screen Badge Button
+    // 2. Hub Screen Badge Button & Document Title
     document.querySelectorAll('.os-badge-text').forEach(el => {
       el.textContent = 'OS ' + version;
     });
+    document.title = 'Digi OS ' + version + ' - Special Viev';
 
-    // 3. Settings Modal Sheet Titles
+    // 3. Settings Modal Sheet Titles & Story Branding
     document.querySelectorAll('.os-version-title').forEach(el => {
       el.textContent = 'Digi OS ' + version;
+    });
+    document.querySelectorAll('.story-branding').forEach(el => {
+      el.textContent = 'Digi OS ' + version + ' • Special Viev';
     });
     document.querySelectorAll('.spec-val').forEach(el => {
       if (el.textContent.includes('OS 1.')) {
@@ -222,28 +227,37 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 4. Authentic Apple Up-To-Date Screen updates
-    const uptodateSquircleVer = document.getElementById('uptodate-squircle-ver');
-    if (uptodateSquircleVer) {
-      uptodateSquircleVer.textContent = version;
-    }
-    const uptodateHeading = document.getElementById('uptodate-os-heading');
-    if (uptodateHeading) {
-      uptodateHeading.textContent = 'Digi OS ' + version;
+    // 4. Synchronize Audio Playlist strictly to OS version (1.0 = 10 songs, 1.1 = 12 songs)
+    if (window.syncMusicPlaylistWithOS) {
+      window.syncMusicPlaylistWithOS(version);
     }
 
-    // 5. Dynamic Apple Revert Button
-    const revertBtn = document.getElementById('apple-revert-btn');
-    if (revertBtn) {
+    // 5. Image 1 (Up-to-Date Screen) Updates
+    const uptodateVerSub = document.getElementById('uptodate-ver-sub');
+    if (uptodateVerSub) {
+      uptodateVerSub.textContent = 'Digi OS ' + version;
+    }
+
+    const uptodateRevertSection = document.getElementById('uptodate-revert-section');
+    const revertBtnVer = document.getElementById('revert-btn-ver');
+    const revertBtnLabel = document.getElementById('revert-btn-label');
+    if (uptodateRevertSection) {
       if (parseFloat(version) > 1.0) {
-        revertBtn.style.display = 'flex';
-        revertBtn.textContent = 'Revert to Digi OS ' + prevVersion;
+        uptodateRevertSection.style.display = 'block';
+        if (revertBtnVer) revertBtnVer.textContent = prevVersion;
+        if (revertBtnLabel) revertBtnLabel.textContent = 'Revert to Digi OS ' + prevVersion;
       } else {
-        revertBtn.style.display = 'none';
+        uptodateRevertSection.style.display = 'none';
       }
     }
 
-    // 6. Software Update Subpage view toggle
+    // 6. Image 2 (Update Available Screen) Updates
+    const availCurrentSection = document.getElementById('avail-current-section');
+    if (availCurrentSection) {
+      availCurrentSection.style.display = (version === '1.0') ? 'block' : 'none';
+    }
+
+    // 7. Software Update Subpage view toggle
     const updateAvailCard = document.getElementById('software-update-available');
     const updateResultCard = document.getElementById('software-result');
     if (updateAvailCard && updateResultCard) {
@@ -252,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateResultCard.style.display = 'none';
       } else {
         updateAvailCard.style.display = 'none';
-        updateResultCard.style.display = 'block';
+        updateResultCard.style.display = 'flex';
       }
     }
   }
@@ -278,9 +292,9 @@ document.addEventListener('DOMContentLoaded', () => {
         resultCard.style.display = 'none';
       } else {
         updateCard.style.display = 'none';
-        resultCard.style.display = 'block';
+        resultCard.style.display = 'flex';
       }
-    }, 1200);
+    }, 1000);
   }
 
   // Apple Firmware Update Progress Controller (Image 2)
@@ -505,18 +519,34 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsBackBtn.addEventListener('click', closeSubpage);
   }
 
-  // Tap Software Result Card to re-trigger check
-  const softwareResultCard = document.getElementById('software-result');
-  if (softwareResultCard) {
-    softwareResultCard.addEventListener('click', triggerSoftwareUpdateCheck);
+  // Software Update Actions (Image 1 & Image 2)
+  const moreDetailsBtn = document.getElementById('uptodate-more-btn');
+  const detailsDrawer = document.getElementById('uptodate-details-drawer');
+  const detailsCloseBtn = document.getElementById('details-close-btn');
 
-    // Demo / Reset Shortcut: Double click when up to date to re-test the update flow
-    softwareResultCard.addEventListener('dblclick', () => {
-      if (confirm('Re-test Digi OS 1.1 Update (revert to OS 1.0)?')) {
-        localStorage.removeItem('viev_digi_os_version');
-        applySystemVersion('1.0');
-        triggerSoftwareUpdateCheck();
-      }
+  if (moreDetailsBtn && detailsDrawer) {
+    moreDetailsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = detailsDrawer.style.display !== 'none';
+      detailsDrawer.style.display = isVisible ? 'none' : 'block';
+      moreDetailsBtn.textContent = isVisible ? 'More Details' : 'Hide Details';
+    });
+  }
+
+  if (detailsCloseBtn && detailsDrawer) {
+    detailsCloseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      detailsDrawer.style.display = 'none';
+      if (moreDetailsBtn) moreDetailsBtn.textContent = 'More Details';
+    });
+  }
+
+  // Tap slate checkmark circle on Up to Date screen to re-check
+  const checkCircle = document.querySelector('.uptodate-check-circle');
+  if (checkCircle) {
+    checkCircle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerSoftwareUpdateCheck();
     });
   }
 
@@ -539,7 +569,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dynamic Apple Revert / Downgrade Button Handler
   const revertBtn = document.getElementById('apple-revert-btn');
   if (revertBtn) {
-    revertBtn.addEventListener('click', () => {
+    revertBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       const session = getAuthSession();
       const role = session ? session.role : 'digi';
       const curVer = getSystemVersion(role);

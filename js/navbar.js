@@ -449,8 +449,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // =========================================================
   // APPLE MUSIC: REAL AUDIO PLAYLIST & PLAYBACK ENGINE
+  // (Songs are filtered by active OS version: 1.0 vs 1.1)
   // =========================================================
-  const PLAYLIST = [
+  const MASTER_PLAYLIST = [
     {
       title: 'Ve Haaniyaan',
       artist: 'Danny • Avvy Sra',
@@ -840,6 +841,7 @@ document.addEventListener('DOMContentLoaded', () => {
       color: '#e11d48',
       glow: 'rgba(225, 29, 72, 0.88)',
       glowSoft: 'rgba(225, 29, 72, 0.40)',
+      minOS: '1.1',
       lyrics: [
         { time: 8.0, text: "Pattalan chon digde hanjoo" },
         { time: 14.0, text: "Akh meri phir vi roi na..." },
@@ -873,6 +875,7 @@ document.addEventListener('DOMContentLoaded', () => {
       color: '#f97316',
       glow: 'rgba(249, 115, 22, 0.88)',
       glowSoft: 'rgba(249, 115, 22, 0.40)',
+      minOS: '1.1',
       lyrics: [
         { time: 4.5, text: "Ghari meri time dasse tere shehar da" },
         { time: 9.5, text: "Aithe adhi raat te othe deed dupehr da" },
@@ -891,6 +894,43 @@ document.addEventListener('DOMContentLoaded', () => {
       ]
     }
   ];
+
+  // Dynamic active playlist synced to OS version (1.0 vs 1.1)
+  const PLAYLIST = [];
+
+  function syncMusicPlaylistWithOS(version) {
+    const v = parseFloat(version) || 1.0;
+    PLAYLIST.length = 0;
+    MASTER_PLAYLIST.forEach(song => {
+      if (!song.minOS || parseFloat(song.minOS) <= v) {
+        PLAYLIST.push(song);
+      }
+    });
+    window.PLAYLIST = PLAYLIST;
+    if (typeof currentTrackIndex !== 'undefined' && currentTrackIndex >= PLAYLIST.length) {
+      currentTrackIndex = 0;
+      if (typeof loadTrack === 'function') {
+        loadTrack(0, false);
+      }
+    }
+    if (typeof renderSongList === 'function') {
+      renderSongList();
+    }
+  }
+
+  // Initial population from stored version
+  const initialSavedOSVer = (function() {
+    try {
+      const sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
+      if (sess && sess.role === 'digi') {
+        return localStorage.getItem('viev_digi_os_version') || '1.0';
+      }
+      return localStorage.getItem('viev_user_os_version') || '1.0';
+    } catch(e) {
+      return localStorage.getItem('viev_digi_os_version') || '1.0';
+    }
+  })();
+  syncMusicPlaylistWithOS(initialSavedOSVer);
 
   let currentTrackIndex = 0;
   let isPlaying = false;
@@ -2799,8 +2839,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Expose Playlist and loadTrack globally for Favorite Songs in Settings
+  // Expose Playlist, syncMusicPlaylistWithOS, and loadTrack globally
   window.PLAYLIST = PLAYLIST;
+  window.syncMusicPlaylistWithOS = syncMusicPlaylistWithOS;
   window.loadTrackByIndex = function(idx) {
     if (typeof loadTrack === 'function') {
       loadTrack(idx, true);

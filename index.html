@@ -892,74 +892,107 @@ akhir mai kaise samaj jata tujhe phli nazar me jab tu dikhi thi  .
               <span class="apple-loader-label">Looking for Update…</span>
             </div>
 
-            <!-- Software Update Available Card (Exact Apple iOS 18.7 Style - Image 1) -->
-            <div class="apple-update-avail-card" id="software-update-available" style="display: none;">
-              <div class="update-card-top-row">
-                <div class="update-icon-squircle">
-                  <span class="update-icon-ver">1.1</span>
+            <!-- Software Update Available Screen (Exact Image 2 Style) -->
+            <div class="apple-update-avail-screen" id="software-update-available" style="display: none;">
+              <div class="apple-update-card">
+                <div class="update-card-top-row">
+                  <div class="update-icon-squircle">
+                    <span class="update-icon-ver">1.1</span>
+                  </div>
+                  <div class="update-meta-wrap">
+                    <h3 class="update-os-title">Digi OS 1.1</h3>
+                    <span class="update-company-line">VIEV Inc.</span>
+                    <span class="update-size-line">124.8 MB</span>
+                  </div>
                 </div>
-                <div class="update-meta-wrap">
-                  <h3 class="update-os-title">Digi OS 1.1</h3>
-                  <span class="update-os-size">124.8 MB</span>
+
+                <div class="update-card-body">
+                  <p class="update-lead-text">
+                    This update provides important bug fixes, romantic additions, and 2 new songs for Digi.
+                  </p>
+                  
+                  <p class="update-sub-text">
+                    For information on the private features of Digi OS updates, please visit this website:
+                  </p>
+                  <a href="https://viev.digi.space/os-1.1" target="_blank" class="update-website-link">https://viev.digi.space/os-1.1</a>
+                </div>
+
+                <div class="update-card-actions">
+                  <button type="button" class="apple-update-now-btn" id="apple-update-now-btn">
+                    Update Now
+                  </button>
+                  <button type="button" class="apple-update-tonight-btn" id="apple-update-tonight-btn">
+                    Update Tonight
+                  </button>
                 </div>
               </div>
 
-              <div class="update-card-body">
-                <p class="update-lead-text">
-                  This update provides important bug fixes, romantic additions, and is recommended for Digi.
-                </p>
-                
-                <div class="update-features-box">
-                  <span class="update-features-title">What's in Digi OS 1.1:</span>
-                  <ul class="update-features-list">
-                    <li>All-new Floating Liquid Glass Dock & Navigation</li>
-                    <li>Dynamic Sub-Bass & Acoustic Beat Visualizer</li>
-                    <li>2 New Handpicked Songs added to Playlist</li>
-                    <li>Single-Attempt Secret Daily Note Quiz</li>
-                    <li>Apple Watch Fluid Live Time Together Engine</li>
-                    <li>120fps GPU Sheet Animation & Performance Tweaks</li>
-                  </ul>
+              <!-- Footnote Text matching Image 2 -->
+              <p class="update-footnote-text">
+                If you select Update Tonight, VIEV will try to update when the device is locked and the battery has enough charge.
+              </p>
+
+              <!-- ALSO AVAILABLE Section matching Image 2 with last version -->
+              <div class="also-available-section" id="avail-current-section">
+                <span class="also-available-kicker">ALSO AVAILABLE</span>
+                <div class="also-available-card current-version-card">
+                  <div class="also-avail-squircle current-squircle">
+                    <span class="also-avail-squircle-ver">1.0</span>
+                  </div>
+                  <div class="also-avail-meta">
+                    <span class="also-avail-title">Digi OS 1.0</span>
+                    <span class="also-avail-sub">Installed (Current Version)</span>
+                  </div>
+                  <span class="also-avail-badge">Installed</span>
                 </div>
-
-                <p class="update-sub-text">
-                  For information on the private features of Digi OS updates, please visit this website:
-                </p>
-                <span class="update-website-link">https://viev.digi.space/os-1.1</span>
-
-                <a href="#" class="update-learn-more-link" id="update-learn-more-btn" onclick="return false;">Learn more…</a>
-              </div>
-
-              <div class="update-actions-wrap">
-                <button type="button" class="apple-update-now-btn" id="apple-update-now-btn">
-                  Update Now
-                </button>
-                <button type="button" class="apple-update-tonight-btn" id="apple-update-tonight-btn">
-                  Update Tonight
-                </button>
               </div>
             </div>
 
-            <!-- Software Update Result (Authentic Apple iOS Up-To-Date Screen) -->
-            <div class="apple-uptodate-card" id="software-result" style="display: none;">
-              <div class="uptodate-hero-wrap">
-                <div class="uptodate-squircle" id="uptodate-squircle">
-                  <span class="uptodate-squircle-ver" id="uptodate-squircle-ver">1.1</span>
-                </div>
-                <h3 class="uptodate-os-heading" id="uptodate-os-heading">Digi OS 1.1</h3>
-                <div class="uptodate-status-pill">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Software Update Result (Exact Image 1 Style - Up To Date) -->
+            <div class="apple-uptodate-screen" id="software-result" style="display: none;">
+              <div class="uptodate-hero-center">
+                <div class="uptodate-check-circle">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  <span>Digi OS is up to date</span>
                 </div>
-                <span class="uptodate-timestamp" id="uptodate-timestamp">Checked today</span>
+                <h3 class="uptodate-title-text">Digi OS is up to date</h3>
+                <div class="uptodate-ver-sub" id="uptodate-ver-sub">Digi OS 1.1</div>
+                <button type="button" class="uptodate-more-btn" id="uptodate-more-btn">More Details</button>
               </div>
 
-              <!-- Apple-Style Revert / Downgrade Button (Dynamic) -->
-              <div class="uptodate-actions-wrap">
-                <button type="button" class="apple-revert-btn" id="apple-revert-btn">
-                  Revert to Digi OS 1.0
-                </button>
+              <!-- Collapsible More Details Sheet / Box -->
+              <div class="uptodate-details-drawer" id="uptodate-details-drawer" style="display: none;">
+                <div class="uptodate-details-header">
+                  <span class="details-drawer-title">What's in Digi OS 1.1</span>
+                  <button type="button" class="details-close-btn" id="details-close-btn">Done</button>
+                </div>
+                <div class="uptodate-details-content">
+                  <p class="details-lead">Digi OS 1.1 brings thoughtful enhancements, acoustic music refinements, and romantic additions designed specifically for Digi.</p>
+                  <ul class="details-list">
+                    <li><strong>2 New Handpicked Songs:</strong> "Jaiye Sajana" (Satinder Sartaaj) and "Time Zone" (Kaka) in Apple Music.</li>
+                    <li><strong>Sub-Bass Visualizer:</strong> Live transient beat visualizer with acoustic pulse reaction.</li>
+                    <li><strong>Secret Daily Note Quiz:</strong> Single-attempt verification lock with personalized security.</li>
+                    <li><strong>Fluid 120fps Animations:</strong> GPU-composited glass sheet transitions and responsive controls.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- ALSO AVAILABLE Section on Up-To-Date Screen (for Revert) -->
+              <div class="also-available-section" id="uptodate-revert-section">
+                <span class="also-available-kicker">ALSO AVAILABLE</span>
+                <div class="also-available-card revert-card" id="apple-revert-btn">
+                  <div class="also-avail-squircle revert-squircle">
+                    <span class="also-avail-squircle-ver" id="revert-btn-ver">1.0</span>
+                  </div>
+                  <div class="also-avail-meta">
+                    <span class="also-avail-title" id="revert-btn-label">Revert to Digi OS 1.0</span>
+                    <span class="also-avail-sub">VIEV Inc. • Rollback to OS 1.0</span>
+                  </div>
+                  <svg class="also-avail-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
