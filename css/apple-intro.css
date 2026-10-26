@@ -1322,51 +1322,45 @@
 }
 
 /* =========================================================
-   APPLE MUSIC NATIVE FLUID SHEET SLIDE (IOS 27 ENGINE)
-   100% GPU Compositor Acceleration (transform: translate3d)
-   Zero clip-path, zero paint churn, zero blink glitch!
+   APPLE MUSIC NATIVE FLUID SHEET SLIDE (120 FPS PURE GPU)
+   - Zero filter:blur animation (causes frame drops on mobile)
+   - Zero border-radius animation (causes layer re-tessellation)
+   - Pure translate3d on compositor layer
+   - Isolated hardware texture via will-change: transform
    ========================================================= */
 #music-screen.is-launching-sheet {
   display: flex !important;
   opacity: 1 !important;
   z-index: 95 !important;
   pointer-events: auto !important;
-  animation: iosMusicSheetSlideUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: iosMusicSheetSlideUp 0.34s cubic-bezier(0.2, 0.9, 0.2, 1) forwards !important;
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  transform: translateZ(0);
-  overflow: hidden;
-  contain: paint;
-  box-shadow: 0 -16px 54px rgba(0, 0, 0, 0.85);
+  transform: translate3d(0, 100%, 0);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 @keyframes iosMusicSheetSlideUp {
   0% {
     transform: translate3d(0, 100%, 0);
-    border-radius: 40px 40px 0 0;
-  }
-  65% {
-    border-radius: 24px 24px 0 0;
   }
   100% {
     transform: translate3d(0, 0, 0);
-    border-radius: 0 0 0 0;
   }
 }
 
 #music-screen.is-launching-sheet .apple-now-playing-container {
-  animation: iosMusicSheetContentFade 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   will-change: transform, opacity;
+  animation: iosMusicSheetContentFade 0.34s cubic-bezier(0.2, 0.9, 0.2, 1) forwards !important;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 @keyframes iosMusicSheetContentFade {
   0% {
-    transform: translate3d(0, 28px, 0);
-    opacity: 0.65;
+    transform: translate3d(0, 24px, 0);
+    opacity: 0.8;
   }
   100% {
     transform: translate3d(0, 0, 0);
@@ -1374,23 +1368,17 @@
   }
 }
 
-/* Background screen gently recedes in 3D and blurs out (iOS depth bokeh physics) */
+/* Background screen gently recedes in 3D (Pure GPU Transform & Opacity, NO blur animation) */
 .app-screen.screen-launch-recede {
   display: flex !important;
-  opacity: 0.40 !important;
-  filter: blur(16px) !important;
-  -webkit-filter: blur(16px) !important;
-  transform: scale(0.94) translateY(-10px) !important;
-  border-radius: 28px 28px 0 0 !important;
+  opacity: 0.36 !important;
+  transform: scale(0.95) translate3d(0, -8px, 0) !important;
   pointer-events: none !important;
-  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              -webkit-filter 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              border-radius 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.34s cubic-bezier(0.2, 0.9, 0.2, 1),
+              opacity 0.34s cubic-bezier(0.2, 0.9, 0.2, 1) !important;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
 }
 
 /* Subtle Luminous Glass Ring Ripple */
@@ -1414,7 +1402,7 @@
 }
 
 .music-launch-portal-ring.is-animating {
-  animation: portalRingShockwave 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: portalRingShockwave 0.34s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
 }
 
 @keyframes portalRingShockwave {

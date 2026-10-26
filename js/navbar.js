@@ -386,15 +386,15 @@ document.addEventListener('DOMContentLoaded', () => {
       updateIndicator(musicTab);
     }
 
-    // 6. Trigger native Apple Music fluid sheet slide-up
+    // 6. Trigger native Apple Music fluid sheet slide-up (pure GPU translate3d)
+    if (musicScreen.scrollTop !== 0) musicScreen.scrollTop = 0;
     musicScreen.classList.remove('hidden', 'tab-fade-in');
     musicScreen.classList.add('is-launching-sheet', 'active');
-    musicScreen.scrollTop = 0;
 
     // 7. Orb will smoothly hide since we are now in music section
     updateFloatingOrbVisibility();
 
-    // 8. When 380ms Apple spring animation finishes, cleanly settle with zero blink
+    // 8. When 340ms Apple spring animation finishes, cleanly settle with zero blink
     setTimeout(() => {
       musicScreen.classList.remove('is-launching-sheet');
 
@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       isLaunchingMusic = false;
-    }, 400);
+    }, 350);
   }
 
   // Floating Music Orb: Click to launch music section with iOS 27 fluid morph
