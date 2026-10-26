@@ -46,28 +46,31 @@ tu h digi meri mai hu pyar tera .`,
 // =========================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Storage Key tied to questionId
+  // Get Active User Role ('digi' for 3009 vs 'user' for 1711)
+  function getActiveUserRole() {
+    try {
+      const sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
+      if (sess && (sess.code === '3009' || sess.role === 'digi')) return 'digi';
+      if (sess && (sess.code === '1711' || sess.role === 'user')) return 'user';
+      if (sess && sess.role) return sess.role;
+    } catch(e) {}
+    return 'digi';
+  }
+
+  // Storage Key tied strictly to active user role AND questionId
   const qId = (DAILY_NOTE_CONFIG.questionId || DAILY_NOTE_CONFIG.quiz.question || 'daily')
     .toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 32);
-  const STORAGE_KEY = `viev_note_status_${qId}`;
-  const ATTEMPTS_KEY = `viev_note_attempts_${qId}`;
   const MAX_ATTEMPTS = (DAILY_NOTE_CONFIG.quiz && DAILY_NOTE_CONFIG.quiz.maxAttempts) || 2;
 
-  // Auto-clear legacy lock from previous 1-attempt question so Digi gets fresh chances
-  try {
-    const legacyKey = 'viev_note_status_cute_word_2026_10';
-    if (localStorage.getItem(legacyKey) === 'permanently_locked') {
-      localStorage.removeItem(legacyKey);
-    }
-  } catch(e) {}
+  let activeRole = getActiveUserRole();
+  let STORAGE_KEY = `viev_note_status_${activeRole}_${qId}`;
+  let ATTEMPTS_KEY = `viev_note_attempts_${activeRole}_${qId}`;
 
   let attemptsUsed = 0;
-  try {
-    attemptsUsed = parseInt(localStorage.getItem(ATTEMPTS_KEY) || '0', 10);
-    if (isNaN(attemptsUsed)) attemptsUsed = 0;
-  } catch(e) {
-    attemptsUsed = 0;
-  }
+  let savedStatus = null;
+  let isPermanentlyLocked = false;
+  let isNoteUnlocked = false;
+  let isNoteOpen = false;
 
   // Daily Note Elements
   const noteCapsule = document.getElementById('daily-note-capsule');
@@ -91,19 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const quizCloseBtn = document.getElementById('quiz-close-btn');
   const quizOptionBtns = document.querySelectorAll('.quiz-option-btn');
   const quizFeedbackMsg = document.getElementById('quiz-feedback-msg');
-
-  let isNoteOpen = false;
-
-  // Retrieve previous attempt state ('permanently_locked' | 'unlocked' | null)
-  let savedStatus = null;
-  try {
-    savedStatus = localStorage.getItem(STORAGE_KEY);
-  } catch (err) {
-    console.warn('localStorage not accessible:', err);
-  }
-
-  let isPermanentlyLocked = (savedStatus === 'permanently_locked' || attemptsUsed >= MAX_ATTEMPTS);
-  let isNoteUnlocked = (savedStatus === 'unlocked');
 
   // SVG Icons for Toggle Button
   const ICON_LOCK = `
@@ -164,13 +154,15 @@ document.addEventListener('DOMContentLoaded', () => {
       lockedStateEl.style.display = 'flex';
     }
     if (lockedLabelEl) {
-      lockedLabelEl.textContent = 'LOCKED • TAP OPEN NOTE TO REVEAL';
+      lockedLabelEl.textContent = isNoteUnlocked 
+        ? 'UNLOCKED • TAP OPEN NOTE TO READ' 
+        : 'LOCKED • TAP OPEN NOTE TO REVEAL';
     }
     if (lockedSubEl) {
       lockedSubEl.style.display = 'none';
     }
     if (noteTagEl) {
-      noteTagEl.textContent = 'LOCKED';
+      noteTagEl.textContent = isNoteUnlocked ? 'UNLOCKED' : 'LOCKED';
       noteTagEl.classList.add('is-locked');
       noteTagEl.classList.remove('is-opened', 'is-permanently-locked');
     }
@@ -345,7 +337,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNoteOpen) {
       hideNote();
     } else {
-      openQuizSheet();
+      if (isNoteUnlocked) {
+        // Already verified with correct answer! Direct show without asking quiz again!
+        revealNote();
+      } else {
+        openQuizSheet();
+      }
     }
   }
 
@@ -385,6 +382,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           localStorage.setItem(STORAGE_KEY, 'unlocked');
         } catch (e) {}
+
+        isNoteUnlocked = true;
 
         if (quizFeedbackMsg) {
           quizFeedbackMsg.innerHTML = '<span class="feedback-success">✨ Sahi jawab! Unlocking note... 💌</span>';
@@ -446,22 +445,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Apply Initial State based on persistent history
-  if (isPermanentlyLocked) {
-    setPermanentlyLockedState();
-  } else if (isNoteUnlocked) {
-    revealNote();
-  } else {
-    setInitialLockedState();
+  // Synchronize Note state strictly for active user (digi vs user)
+  function syncDailyNoteWithActiveUser() {
+    activeRole = getActiveUserRole();
+    STORAGE_KEY = `viev_note_status_${activeRole}_${qId}`;
+    ATTEMPTS_KEY = `viev_note_attempts_${activeRole}_${qId}`;
+
+    savedStatus = null;
+    try {
+      savedStatus = localStorage.getItem(STORAGE_KEY);
+    } catch (e) {}
+
+    attemptsUsed = 0;
+    try {
+      attemptsUsed = parseInt(localStorage.getItem(ATTEMPTS_KEY) || '0', 10);
+      if (isNaN(attemptsUsed)) attemptsUsed = 0;
+    } catch (e) {
+      attemptsUsed = 0;
+    }
+
+    isPermanentlyLocked = (savedStatus === 'permanently_locked' || attemptsUsed >= MAX_ATTEMPTS);
+    isNoteUnlocked = (savedStatus === 'unlocked');
+    isNoteOpen = false;
+
+    // On page load/refresh/reopen: ALWAYS start in collapsed/hidden state!
+    if (isPermanentlyLocked) {
+      setPermanentlyLockedState();
+    } else {
+      setInitialLockedState();
+    }
   }
+
+  // Expose synchronization function globally for app.js login/signout hooks
+  window.syncDailyNoteWithActiveUser = syncDailyNoteWithActiveUser;
+
+  // Run initial state setup
+  syncDailyNoteWithActiveUser();
 
   // Testing & Reset helper (accessible via Developer Console if needed)
   window.resetDailyNoteQuiz = () => {
     try {
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(ATTEMPTS_KEY);
-      localStorage.removeItem('viev_note_status_cute_word_2026_10');
-      console.log('Daily Note attempt reset!');
+      console.log('Daily Note attempt reset for', activeRole);
       location.reload();
     } catch (e) {
       console.error(e);

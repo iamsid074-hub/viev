@@ -709,6 +709,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Synchronize OS Version based on active role
     applySystemVersion(getSystemVersion(config.role));
+
+    // Synchronize Daily Note state strictly for active role
+    if (window.syncDailyNoteWithActiveUser) {
+      window.syncDailyNoteWithActiveUser();
+    }
   }
 
   function updatePinDisplay(val) {
@@ -875,6 +880,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Maintain active persisted OS version on sign out (do NOT reset to 1.0)
       const currentVer = getSystemVersion();
       applySystemVersion(currentVer);
+
+      // Reset Daily Note view on sign out
+      if (window.syncDailyNoteWithActiveUser) {
+        window.syncDailyNoteWithActiveUser();
+      }
 
       // Switch tab back to Home
       const tabHome = document.getElementById('tab-home');
