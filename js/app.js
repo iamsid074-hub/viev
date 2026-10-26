@@ -1,5 +1,5 @@
 /* =========================================================
-   APP CONTROLLER & LIQUID OS 1.0 NAVIGATION
+   APP CONTROLLER & LIQUID OS 1.1 NAVIGATION
    No clock, no dynamic island. Clean.
    ========================================================= */
 

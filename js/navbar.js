@@ -454,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Ve Haaniyaan',
       artist: 'Danny • Avvy Sra',
+      bpm: 90,
       src: 'song/Ve Haaniyaan.mp3',
       cover: 'song/Screenshot 2026-10-24 224431.png',
       color: '#ff5e7e',
@@ -497,6 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Samjhawan',
       artist: 'Arijit Singh • Shreya Ghoshal',
+      bpm: 76,
       src: 'song/Samjhawan Humpty Sharma Ki Dulhania 320 Kbps.mp3',
       cover: 'song/Screenshot 2026-10-24 224416.png',
       color: '#ff9f24',
@@ -534,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Ishq Ka Fever',
       artist: 'Vishal Bhardwaj • Arijit Singh',
+      bpm: 104,
       src: 'song/Ishq Ka Fever O Romeo 320 Kbps.mp3',
       cover: 'song/Screenshot 2026-10-24 224355.png',
       color: '#d946ef',
@@ -559,6 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Phir Le Aya Dil (Reprise)',
       artist: 'Arijit Singh • Pritam',
+      bpm: 72,
       src: 'song/Phir Le Aya Dil (Reprise) - Arijit Singh (DJJOhAL.Com).mp3',
       cover: 'song/Screenshot 2026-10-24 224316.png',
       color: '#f59e0b',
@@ -586,6 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Tu Tu Hai Wohi',
       artist: 'Kishore Kumar • Asha Bhosle',
+      bpm: 124,
       src: 'song/Tu tu hai wohi dilne jise apna kaha_320(KoshalWorld.Com).mp3',
       cover: 'song/Screenshot 2026-10-24 224447.png',
       color: '#10b981',
@@ -618,6 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Abhi Na Jao Chhod Kar',
       artist: 'Mohammed Rafi • Asha Bhosle',
+      bpm: 78,
       src: 'song/Abhi Na Jao Chhod Kar Hum Dono 320 Kbps.mp3',
       cover: 'song/Screenshot 2026-10-25 065342.png',
       color: '#94a3b8',
@@ -645,6 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Somewhere Only We Know',
       artist: 'Keane',
+      bpm: 86,
       src: 'song/Keane_-_Somewhere_Only_We_Know_CeeNaija.com_.mp3',
       cover: 'song/Screenshot 2026-10-25 070356.png',
       color: '#f472b6',
@@ -686,6 +693,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Kyon',
       artist: 'Papon • Sunidhi Chauhan',
+      bpm: 84,
       src: 'song/Papon_Sunidhi_Chauhan_-_Kyun_na_hum_tum_(mp3.pm).mp3',
       cover: 'song/Screenshot 2026-10-25 134729.png',
       color: '#38bdf8',
@@ -720,6 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Tum Hi Ho',
       artist: 'Arijit Singh • Mithoon',
+      bpm: 92,
       src: 'song/Tum Hi Ho Aashiqui 2 320 Kbps.mp3',
       cover: 'song/Screenshot 2026-10-25 152246.png',
       color: '#f59e0b',
@@ -749,6 +758,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Aasan Nahin Yahan',
       artist: 'Arijit Singh • Jeet Gannguli',
+      bpm: 80,
       src: 'song/Aasan Nahin Yahan Aashiqui 2 320 Kbps.mp3',
       cover: 'song/Screenshot 2026-10-25 152454.png',
       color: '#c084fc',
@@ -773,6 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Khairiyat',
       artist: 'Arijit Singh • Pritam',
+      bpm: 76,
       src: 'song/Khairiyat Chhichhore 320 Kbps.mp3',
       cover: 'song/Screenshot 2026-10-25 152805.png',
       color: '#38bdf8',
@@ -798,6 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Binte Dil',
       artist: 'Arijit Singh • Sanjay Leela Bhansali',
+      bpm: 98,
       src: 'song/Binte Dil Padmaavat 320 Kbps.mp3',
       cover: 'song/Screenshot 2026-10-25 152930.png',
       color: '#eab308',
@@ -822,6 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Jaiye Sajana',
       artist: 'Satinder Sartaaj • Jasmine Sandlas',
+      bpm: 108,
       src: 'song/Jaiye Sajana Dhurandhar The Revenge 320 Kbps.mp3',
       cover: 'song/Screenshot 2026-10-26 101216.png',
       color: '#e11d48',
@@ -854,6 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       title: 'Time Zone',
       artist: 'Kaka',
+      bpm: 96,
       src: 'song/Time Zone - Kaka.mp3',
       cover: 'song/Screenshot 2026-10-26 102009.png',
       color: '#f97316',
@@ -907,6 +921,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let beatVisualizerRafId = null;
   let currentPulse = 0;
   let prevBassEnergy = 0;
+  let rollingBassAvg = 0.15;
   let gleamAngle = 45;
 
   // Feature 6: Spatial Audio & Binaural Acoustics Nodes
@@ -962,8 +977,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!AudioContextClass) return;
       audioCtx = new AudioContextClass();
       analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 128; // 64 frequency bins, ultra-fast kick transient detection
-      analyser.smoothingTimeConstant = 0.50; // Snappy beat punch
+      analyser.fftSize = 512; // 256 frequency bins (~43Hz per bin) for true sub-bass & kick isolation
+      analyser.smoothingTimeConstant = 0.35; // Snappy transient punch
 
       audioSourceNode = audioCtx.createMediaElementSource(audio);
       audioSourceNode.connect(analyser);
@@ -1001,11 +1016,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     currentPulse = 0;
     prevBassEnergy = 0;
-    // Release inline style overrides so the CSS 0.65s Apple-spring curve
-    // smoothly glides the card to resting scale(0.93) and glass frame to resting state
+    rollingBassAvg = 0.15;
     if (artworkGlow) {
       artworkGlow.style.transform = '';
       artworkGlow.style.opacity = '';
+    }
+    if (ambilightImg) {
+      ambilightImg.style.filter = '';
     }
     if (glassFrame) {
       glassFrame.style.transform = '';
@@ -1034,58 +1051,75 @@ document.addEventListener('DOMContentLoaded', () => {
       const freqData = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(freqData);
 
-      let sum = 0;
-      for (let i = 0; i < 6; i++) {
-        sum += freqData[i];
+      // Check if real audio data is flowing through bins
+      let signalSum = 0;
+      for (let i = 0; i < 16; i++) {
+        signalSum += freqData[i];
       }
 
-      if (sum > 6) {
+      if (signalSum > 8) {
         hasSignal = true;
-        // Kick drum energy (Bins 0 and 1)
-        const bass = (freqData[0] * 1.8 + freqData[1] * 1.2) / (3.0 * 255);
-        const kickDelta = Math.max(0, bass - prevBassEnergy);
-        prevBassEnergy = bass;
+        // Bins 0-1 (~0-90Hz): Sub-bass / 808
+        // Bins 2-4 (~90-220Hz): Kick drum transient & punch
+        // Bins 5-7 (~220-350Hz): Low-mid acoustic body
+        const subBass = (freqData[0] * 1.6 + freqData[1] * 2.2) / (3.8 * 255);
+        const kick = (freqData[2] * 2.4 + freqData[3] * 1.8 + freqData[4] * 1.2) / (5.4 * 255);
+        const rawBass = Math.max(subBass, kick * 1.2);
 
-        // Snappy, energetic kick punch
-        targetEnergy = Math.min(1, Math.pow(bass, 1.1) * 1.25 + kickDelta * 3.5);
+        // Dynamic Moving Average Peak Detection (adapts to song volume automatically)
+        rollingBassAvg = rollingBassAvg * 0.92 + rawBass * 0.08;
+        const transientDelta = Math.max(0, rawBass - rollingBassAvg * 1.15);
+
+        // Immediate punchy target energy
+        targetEnergy = Math.min(1.0, rawBass * 0.55 + transientDelta * 4.2);
       }
     }
 
-    // Lively fallback pulse if audio context has 0 data (synced to 120 BPM rhythm)
+    // Song-Specific Real BPM Fallback if audio context is locked / silent
     if (!hasSignal) {
-      const t = (performance.now() / 1000) * (120 / 60) * Math.PI;
-      const beatPulse = Math.pow(Math.max(0, Math.sin(t)), 4);
-      targetEnergy = 0.25 + beatPulse * 0.75;
+      const currentTrack = PLAYLIST[currentTrackIndex];
+      const songBpm = (currentTrack && currentTrack.bpm) ? currentTrack.bpm : 92;
+      const t = (performance.now() / 1000) * (songBpm / 60) * Math.PI;
+      // Organic heartbeat-style pulse
+      const primaryBeat = Math.pow(Math.max(0, Math.sin(t)), 4);
+      const secondaryBeat = Math.pow(Math.max(0, Math.sin(t - Math.PI * 0.3)), 6) * 0.4;
+      targetEnergy = Math.min(1.0, 0.20 + (primaryBeat + secondaryBeat) * 0.80);
     }
 
-    // Snappy attack on kick hits, smooth natural release
-    const attack = targetEnergy > currentPulse ? 0.50 : 0.15;
+    // Snappy attack on kick hits, organic decay
+    const attack = targetEnergy > currentPulse ? 0.65 : 0.16;
     currentPulse += (targetEnergy - currentPulse) * attack;
 
-    // Option 1: Apple TV / Cinematic Ambilight Projector Engine
-    // On bass/kick hits, the diffused background projection expands (+15%) and flares in luminosity (from 0.65 to 1.0)
+    // Multi-Attribute Dynamic Glow Flare:
     if (artworkGlow) {
-      const ambilightScale = 1.0 + currentPulse * 0.15;
-      const ambilightOpacity = 0.65 + currentPulse * 0.35;
+      const ambilightScale = 1.0 + currentPulse * 0.18; // +18% explosive expansion
+      const ambilightOpacity = 0.70 + currentPulse * 0.30;
       artworkGlow.style.transform = `scale(${ambilightScale.toFixed(3)})`;
       artworkGlow.style.opacity = ambilightOpacity.toFixed(3);
     }
 
-    // Option 4: Apple Vision Pro Liquid Glass Refraction Frame with Traveling Specular Rim Prism
-    gleamAngle = (gleamAngle + 0.95) % 360;
+    if (ambilightImg) {
+      // Dynamic blur and brightness flare with kick punch
+      const dynamicBlur = 28 + currentPulse * 14;
+      const dynamicBrightness = 1.05 + currentPulse * 0.35;
+      ambilightImg.style.filter = `blur(${dynamicBlur.toFixed(1)}px) saturate(220%) brightness(${dynamicBrightness.toFixed(2)})`;
+    }
+
+    // Option 4: Apple Vision Pro Rim Prism acceleration & specular gleam
+    gleamAngle = (gleamAngle + 0.95 + currentPulse * 2.8) % 360;
     if (glassFrame) {
       glassFrame.style.setProperty('--glass-gleam-angle', gleamAngle.toFixed(1) + 'deg');
-      const glassScale = 1.0 + currentPulse * 0.04; // subtle +4% refraction expansion
-      const gleamOpacity = 0.75 + currentPulse * 0.25; // crisp specular gleam flare
+      const glassScale = 1.0 + currentPulse * 0.045;
+      const gleamOpacity = 0.75 + currentPulse * 0.25;
       glassFrame.style.transform = `scale(${glassScale.toFixed(3)})`;
       if (glowOuter) {
         glowOuter.style.opacity = gleamOpacity.toFixed(3);
       }
     }
 
-    // Visible, tactile speaker thump on the 16:9 poster card:
+    // Acoustic Subwoofer Thump on 16:9 poster card:
     if (artworkCard && !artworkCard.classList.contains('is-depth-bg')) {
-      const artScale = 1.0 + currentPulse * 0.025; // +2.5% crisp bass thump!
+      const artScale = 1.0 + currentPulse * 0.032; // +3.2% tactile punch!
       artworkCard.style.transform = `scale(${artScale.toFixed(3)})`;
     }
 
@@ -2405,7 +2439,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.50)';
     ctx.font = '600 24px -apple-system, BlinkMacSystemFont, "Outfit", sans-serif';
-    ctx.fillText('DIGI OS 1.0 • SPECIAL VIEV', W / 2, H - 190);
+    ctx.fillText('DIGI OS 1.1 • SPECIAL VIEV', W / 2, H - 190);
   }
 
   function triggerPngDownload(canvas, filename) {
