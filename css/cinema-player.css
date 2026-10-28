@@ -3040,6 +3040,7 @@
   border-radius: 21px;
   filter: none !important;
   -webkit-filter: none !important;
+  pointer-events: none !important; /* CRITICAL: Stops YouTube native titles/logos from ever appearing */
 }
 
 .cinema-card-reflection {
@@ -3056,9 +3057,10 @@
   z-index: 10;
   cursor: grab;
   touch-action: none;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.001); /* CRITICAL: ensures iOS & Android touch hits surface reliably */
   user-select: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cinema-player-drag-surface:active {
@@ -3089,10 +3091,17 @@
     rgba(0, 0, 0, 0.1) 60%,
     rgba(0, 0, 0, 0.75) 100%
   );
-  pointer-events: auto;
+  pointer-events: none; /* Let drag and tap pass through to dragSurface! */
   opacity: 1;
   transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
   visibility: visible;
+}
+
+.cinema-custom-player-controls .cinema-ctrl-icon-btn,
+.cinema-custom-player-controls .cinema-ctrl-play-btn,
+.cinema-custom-player-controls .cinema-ctrl-fullscreen-btn,
+.cinema-custom-player-controls .cinema-ctrl-scrub-container {
+  pointer-events: auto; /* Only buttons intercept touches */
 }
 
 .cinema-custom-player-controls.is-hidden {
