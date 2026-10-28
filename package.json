@@ -1,0 +1,22 @@
+{
+  "name": "viev-app",
+  "version": "2.0.0",
+  "description": "VIEVS Music & Cinema Liquid OS",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "serve": "node serve.js",
+    "dev": "electron ."
+  },
+  "keywords": [
+    "music",
+    "cinema",
+    "youtube",
+    "electron"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^45.1.0"
+  }
+}

@@ -1,6 +1,8 @@
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 
 const PORT = 3000;
 const MIME_TYPES = {
@@ -20,8 +22,307 @@ const MIME_TYPES = {
   '.webp': 'image/webp'
 };
 
+// In-memory cache for ultra-fast YouTube searches
+const searchCache = new Map();
+
+function fetchYouTubeVideos(query, callback) {
+  const cleanQ = (query || '').trim();
+  if (!cleanQ) return callback(null, []);
+
+  const cached = searchCache.get(cleanQ);
+  if (cached && (Date.now() - cached.time < 1000 * 60 * 15)) {
+    return callback(null, cached.data);
+  }
+
+  const reqUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanQ)}`;
+  const options = {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'
+    }
+  };
+
+  https.get(reqUrl, options, (res) => {
+    let raw = '';
+    res.on('data', chunk => raw += chunk);
+    res.on('end', () => {
+      try {
+        const match = raw.match(/var ytInitialData = ({.*?});<\/script>/);
+        if (!match) {
+          return callback(null, []);
+        }
+
+        const json = JSON.parse(match[1]);
+        const contents = json.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents || [];
+        const videos = [];
+
+        for (const section of contents) {
+          const items = section.itemSectionRenderer?.contents || [];
+          for (const item of items) {
+            if (item.videoRenderer) {
+              const vr = item.videoRenderer;
+              const videoId = vr.videoId;
+              const title = vr.title?.runs?.map(r => r.text).join('') || vr.title?.simpleText || 'YouTube Video';
+              const channel = vr.ownerText?.runs?.[0]?.text || vr.shortBylineText?.runs?.[0]?.text || 'Channel';
+              const avatar = vr.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.thumbnail?.thumbnails?.[0]?.url || '';
+              const pub = vr.publishedTimeText?.simpleText || '';
+              const shortViews = vr.shortViewCountText?.simpleText || (vr.viewCountText?.simpleText ? `${vr.viewCountText.simpleText} views` : '');
+              const duration = vr.lengthText?.simpleText || 'Video';
+              const thumbs = vr.thumbnail?.thumbnails || [];
+              const thumb = thumbs.length ? thumbs[thumbs.length - 1].url : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+              const isVerified = Boolean(vr.ownerBadges);
+
+              if (videoId && title) {
+                videos.push({
+                  id: videoId,
+                  title,
+                  channel,
+                  views: shortViews,
+                  pub,
+                  duration,
+                  thumb,
+                  avatar,
+                  isVerified
+                });
+              }
+            }
+          }
+        }
+
+        searchCache.set(cleanQ, { time: Date.now(), data: videos });
+        callback(null, videos);
+      } catch (err) {
+        callback(err, []);
+      }
+    });
+  }).on('error', (err) => {
+    callback(err, []);
+  });
+}
+
+const { exec } = require('child_process');
+
+// In-memory cache for personal feed & search
+let myFeedCache = null;
+let lastFeedFetch = 0;
+
+function getUserPersonalFeed(forceRefresh, callback) {
+  if (typeof forceRefresh === 'function') {
+    callback = forceRefresh;
+    forceRefresh = false;
+  }
+  if (!forceRefresh && myFeedCache && (Date.now() - lastFeedFetch < 1000 * 60 * 5)) {
+    return callback(null, myFeedCache);
+  }
+  const scriptPath = path.join(__dirname, 'scripts', 'get_user_feed.py');
+  const refreshArg = forceRefresh ? ' --refresh' : '';
+  exec(`python "${scriptPath}"${refreshArg}`, { maxBuffer: 1024 * 1024 * 10 }, (err, stdout) => {
+    if (err || !stdout) {
+      return callback(err, myFeedCache || []);
+    }
+    try {
+      const videos = JSON.parse(stdout.trim());
+      myFeedCache = videos;
+      lastFeedFetch = Date.now();
+      callback(null, videos);
+    } catch (e) {
+      callback(e, myFeedCache || []);
+    }
+  });
+}
+
+let digiFeedCache = null;
+let lastDigiFeedFetch = 0;
+
+function getDigiPersonalFeed(forceRefresh, callback) {
+  if (typeof forceRefresh === 'function') {
+    callback = forceRefresh;
+    forceRefresh = false;
+  }
+  if (!forceRefresh && digiFeedCache && (Date.now() - lastDigiFeedFetch < 1000 * 60 * 15)) {
+    return callback(null, digiFeedCache);
+  }
+
+  fetchYouTubeVideos('Ve Haaniyaan Romantic Songs Arijit Singh', (err, fetchedVideos) => {
+    const digiFavorites = [
+      {
+        id: 'BddP6PYo2gs',
+        title: 'Ve Kamleya (Full Video) | Arijit Singh, Shreya Ghoshal | Alia, Ranveer',
+        channel: 'Sony Music India',
+        views: '185M views',
+        pub: '1y ago',
+        duration: '♪ 4:06',
+        thumb: 'https://i.ytimg.com/vi/BddP6PYo2gs/hqdefault.jpg',
+        avatar: 'https://yt3.ggpht.com/42o3XIW1j5zmzsFeZs3ND4QwaXXrnpK9vqftcEuEdbgNhPbltXRktcSmyJ12-gSRqKch93Ir=s176-c-k-c0x00ffffff-no-rj',
+        isVerified: true
+      },
+      {
+        id: 'r1I5NJtIGWA',
+        title: "O'Romeo: Ishq Ka Fever (Lyrical) | Shahid K, Triptii D | Arijit Singh",
+        channel: 'T-Series',
+        views: '45M views',
+        pub: '2w ago',
+        duration: '♪ 3:30',
+        thumb: 'https://i.ytimg.com/vi/r1I5NJtIGWA/hqdefault.jpg',
+        avatar: 'https://yt3.ggpht.com/VunTf0NzCeboiPjbesBdnQuxaF3Lja7UGRbBGQAWRJgMSTj9TTLO3pS1X9qPOJGCNnmPrXeY=s176-c-k-c0x00ffffff-no-rj',
+        isVerified: true
+      },
+      {
+        id: 'cUmUOb7j3dc',
+        title: 'Dhun Song | Saiyaara | Ahaan Panday, Aneet Padda | Arijit Singh',
+        channel: 'YRF Music',
+        views: '32M views',
+        pub: '1mo ago',
+        duration: '♪ 4:12',
+        thumb: 'https://i.ytimg.com/vi/cUmUOb7j3dc/hqdefault.jpg',
+        avatar: 'https://yt3.ggpht.com/ukiLOR2xcRjb4vEfv_DvcTU-5WgGyhwL3w1jQxvTBVdMbBlrtDopxKwg8Scs66C8nFgXu-cl=s176-c-k-c0x00ffffff-no-rj',
+        isVerified: true
+      },
+      {
+        id: 'WWXm39leYew',
+        title: 'LYRICAL: Kaise Hua | Kabir Singh | Shahid K, Kiara A | Vishal Mishra',
+        channel: 'T-Series',
+        views: '290M views',
+        pub: '5y ago',
+        duration: '♪ 3:55',
+        thumb: 'https://i.ytimg.com/vi/WWXm39leYew/hqdefault.jpg',
+        avatar: 'https://yt3.ggpht.com/VunTf0NzCeboiPjbesBdnQuxaF3Lja7UGRbBGQAWRJgMSTj9TTLO3pS1X9qPOJGCNnmPrXeY=s176-c-k-c0x00ffffff-no-rj',
+        isVerified: true
+      },
+      {
+        id: 'LMnJp_dSdnw',
+        title: 'DARKHAAST Full Video Song | SHIVAAY | Arijit Singh & Sunidhi Chauhan',
+        channel: 'T-Series',
+        views: '210M views',
+        pub: '7y ago',
+        duration: '♪ 6:14',
+        thumb: 'https://i.ytimg.com/vi/LMnJp_dSdnw/hqdefault.jpg',
+        avatar: 'https://yt3.ggpht.com/VunTf0NzCeboiPjbesBdnQuxaF3Lja7UGRbBGQAWRJgMSTj9TTLO3pS1X9qPOJGCNnmPrXeY=s176-c-k-c0x00ffffff-no-rj',
+        isVerified: true
+      },
+      {
+        id: 'W_1taX0Pvh4',
+        title: 'PYAAR AATA HAI - Rito Riba & Shreya Ghoshal | Ishaan Khatter & Tara Sutaria',
+        channel: 'Play DMF',
+        views: '68M views',
+        pub: '1y ago',
+        duration: '♪ 4:20',
+        thumb: 'https://i.ytimg.com/vi/W_1taX0Pvh4/hqdefault.jpg',
+        avatar: 'https://yt3.ggpht.com/RpG4CbkasYMbM7IOBbGVnt4LwR31duDssSC2qMMzlEnL01JVbLaAADGzia8Glw2u-oTPe0MY=s176-c-k-c0x00ffffff-no-rj',
+        isVerified: true
+      },
+      {
+        id: 'nDjloeIB3Pc',
+        title: 'Sitaare | Ikkis | Arijit Singh, Amitabh Bhattacharya',
+        channel: 'Sony Music India',
+        views: '18M views',
+        pub: '3w ago',
+        duration: '♪ 3:50',
+        thumb: 'https://i.ytimg.com/vi/nDjloeIB3Pc/hqdefault.jpg',
+        avatar: 'https://yt3.ggpht.com/42o3XIW1j5zmzsFeZs3ND4QwaXXrnpK9vqftcEuEdbgNhPbltXRktcSmyJ12-gSRqKch93Ir=s176-c-k-c0x00ffffff-no-rj',
+        isVerified: true
+      }
+    ];
+
+    const combined = digiFavorites.concat((fetchedVideos || []).slice(0, 15));
+    digiFeedCache = combined;
+    lastDigiFeedFetch = Date.now();
+    callback(null, combined);
+  });
+}
+
 const server = http.createServer((req, res) => {
-  const cleanUrl = decodeURIComponent(req.url.split('?')[0]);
+  const parsedUrl = url.parse(req.url, true);
+  const pathname = parsedUrl.pathname;
+  const forceRefresh = parsedUrl.query.refresh === '1' || parsedUrl.query.reload === '1';
+
+  // 1. User Personal Feed Endpoint (Exact personal account feed: 3011 Digi vs 1711 Virat)
+  if (pathname === '/api/youtube/my-feed') {
+    const user = parsedUrl.query.user || parsedUrl.query.code || '1711';
+
+    if (user === '3011' || user === '3009' || user === 'digi') {
+      getDigiPersonalFeed(forceRefresh, (err, videos) => {
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-cache'
+        });
+        res.end(JSON.stringify({
+          success: !err,
+          account: 'DIGI (@avneetsaini7070)',
+          email: 'avneetsaini7070@gmail.com',
+          avatar: 'song/Screenshot 2026-10-24 224431.png',
+          role: 'digi',
+          count: videos.length,
+          videos
+        }));
+      });
+      return;
+    }
+
+    getUserPersonalFeed(forceRefresh, (err, videos) => {
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-cache'
+      });
+      res.end(JSON.stringify({
+        success: !err,
+        account: 'VIRAT PLAYS (@viratplaystdm)',
+        email: 'iamsid074@gmail.com',
+        avatar: 'song/virat_plays_avatar.png',
+        role: 'user',
+        count: videos.length,
+        videos
+      }));
+    });
+    return;
+  }
+
+  // 2. YouTube Search / Feed API Endpoint
+  if (pathname === '/api/youtube/search' || pathname === '/api/youtube/feed') {
+    const query = parsedUrl.query.q || parsedUrl.query.category || '';
+    const user = parsedUrl.query.user || parsedUrl.query.code || '1711';
+
+    if (!query || query === 'All' || query === 'Personal') {
+      const feedFetcher = (user === '3011' || user === '3009' || user === 'digi')
+        ? getDigiPersonalFeed
+        : getUserPersonalFeed;
+
+      feedFetcher((err, videos) => {
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-cache'
+        });
+        res.end(JSON.stringify({
+          success: !err,
+          query: 'My Feed',
+          count: videos.length,
+          videos
+        }));
+      });
+      return;
+    }
+
+    fetchYouTubeVideos(query, (err, videos) => {
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-cache'
+      });
+      res.end(JSON.stringify({
+        success: !err,
+        query,
+        count: videos.length,
+        videos
+      }));
+    });
+    return;
+  }
+
+  // 2. Static File Serving
+  const cleanUrl = decodeURIComponent(pathname);
   let filePath = path.join(__dirname, cleanUrl === '/' ? 'index.html' : cleanUrl);
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';

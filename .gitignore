@@ -1,5 +1,8 @@
 node_modules/
 .vercel
 scratch/
+.temp/
+__pycache__/
+*.pyc
 .DS_Store
 Thumbs.db

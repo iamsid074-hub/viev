@@ -181,35 +181,45 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // =========================================================
-  // DIGI OS VERSION & FIRMWARE UPDATE ENGINE (OS 1.1 -> OS 1.3)
+  // OS VERSION & FIRMWARE UPDATE ENGINE (OS 1.1 -> OS 1.3 / OS 2.0 BETA)
   // Strict Account Isolation:
-  // Digi (3009) -> viev_digi_os_version
-  // User/Anshu (1711) -> viev_user_os_version
-  // Neither account updates the other automatically!
-  // Default on deploy is OS 1.1. OS 1.3 unlocks via Settings.
+  // Digi (3009 / 3011) -> viev_digi_os_version (OS 1.1 / OS 1.3, ZERO BETA LEAK)
+  // Virat / You (1711) -> viev_user_os_version (OS 1.1 -> OS 2.0 BETA Testing)
+  // Default on deploy is OS 1.1. OS 2.0 BETA only available for Virat 1711.
   // =========================================================
   function getSystemVersion(role) {
+    let session = null;
+    try {
+      session = getAuthSession();
+    } catch (e) {}
+
     if (!role) {
-      try {
-        const session = getAuthSession();
-        role = session ? session.role : 'digi';
-      } catch (e) {
-        role = 'digi';
-      }
+      role = session ? session.role : 'digi';
     }
     // Purge any legacy global key to enforce per-profile isolation
     try {
       localStorage.removeItem('viev_global_os_version');
     } catch (e) {}
 
-    const key = 'viev_' + role + '_os_version';
+    const isVirat = (session && (session.code === '1711' || session.role === 'user')) || (role === 'user');
+    const key = 'viev_' + (isVirat ? 'user' : 'digi') + '_os_version';
     const stored = localStorage.getItem(key);
+
+    if (isVirat) {
+      if (stored === '2.0 BETA') return '2.0 BETA';
+      if (stored === '1.3') return '1.3';
+      if (stored === '1.0') return '1.0';
+      return stored || '1.1'; // Strict default on deploy
+    }
+
+    // Digi (3009 / 3011) strictly stays on 1.1 or 1.3 (Zero beta leak!)
     if (stored === '1.3') return '1.3';
     if (stored === '1.0') return '1.0';
     return '1.1'; // Strict default on deploy
   }
 
   function getPreviousVersion(currentVer) {
+    if (currentVer === '2.0 BETA') return '1.1';
     const cur = parseFloat(currentVer);
     if (cur >= 1.3) return '1.1';
     if (cur >= 1.1) return '1.0';
@@ -217,50 +227,64 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function applySystemVersion(version) {
+    const session = getAuthSession();
+    const isVirat = session && (session.code === '1711' || session.role === 'user');
     const prevVersion = getPreviousVersion(version);
     window.CURRENT_OS_VERSION = version;
 
     // 1. Settings Menu Red Notification Badge
     const updateBadge = document.getElementById('settings-update-badge');
     if (updateBadge) {
-      updateBadge.style.display = (parseFloat(version) < 1.3) ? 'inline-flex' : 'none';
+      if (isVirat) {
+        // Virat sees update badge if not yet updated to OS 2.0 BETA
+        updateBadge.style.display = (version !== '2.0 BETA') ? 'inline-flex' : 'none';
+      } else {
+        // Digi sees update badge only if below 1.3
+        updateBadge.style.display = (parseFloat(version) < 1.3) ? 'inline-flex' : 'none';
+      }
     }
 
     // 2. Hub Screen Badge Button & Document Title
+    const osTitlePrefix = isVirat ? 'OS ' : 'Digi OS ';
     document.querySelectorAll('.os-badge-text').forEach(el => {
       el.textContent = 'OS ' + version;
     });
-    document.title = 'Digi OS ' + version + ' - Special Viev';
+    document.title = (isVirat && version === '2.0 BETA') ? 'OS 2.0 BETA - Special Viev' : (osTitlePrefix + version + ' - Special Viev');
 
     // 3. Settings Modal Sheet Titles & Story Branding
     document.querySelectorAll('.os-version-title').forEach(el => {
-      el.textContent = 'Digi OS ' + version;
+      el.textContent = osTitlePrefix + version;
     });
     document.querySelectorAll('.story-branding').forEach(el => {
-      el.textContent = 'Digi OS ' + version + ' • Special Viev';
+      el.textContent = osTitlePrefix + version + ' • Special Viev';
     });
     document.querySelectorAll('.spec-val').forEach(el => {
-      if (el.textContent.includes('OS 1.')) {
-        el.textContent = 'OS ' + version + ' (Official)';
+      if (el.textContent.includes('OS 1.') || el.textContent.includes('OS 2.')) {
+        el.textContent = (isVirat && version === '2.0 BETA') ? 'OS 2.0 BETA (Testing)' : ('OS ' + version + ' (Official)');
       }
     });
 
-    // 4. Synchronize Audio Playlist strictly to OS version (1.0 = 10 songs, 1.1 = 12 songs)
+    // 4. Synchronize Audio Playlist strictly to OS version
     if (window.syncMusicPlaylistWithOS) {
       window.syncMusicPlaylistWithOS(version);
     }
 
     // 5. Image 1 (Up-to-Date Screen) Updates
+    const uptodateTitleText = document.querySelector('.uptodate-title-text');
+    if (uptodateTitleText) {
+      uptodateTitleText.textContent = isVirat ? 'OS is up to date' : 'Digi OS is up to date';
+    }
     const uptodateVerSub = document.getElementById('uptodate-ver-sub');
     if (uptodateVerSub) {
-      uptodateVerSub.textContent = 'Digi OS ' + version;
+      uptodateVerSub.textContent = osTitlePrefix + version;
     }
 
     const uptodateRevertSection = document.getElementById('uptodate-revert-section');
     const revertBtnVer = document.getElementById('revert-btn-ver');
     const revertBtnLabel = document.getElementById('revert-btn-label');
     if (uptodateRevertSection) {
-      if (parseFloat(version) > 1.0) {
+      const canRevert = isVirat ? (version === '2.0 BETA') : (parseFloat(version) > 1.0);
+      if (canRevert) {
         uptodateRevertSection.style.display = 'block';
         if (revertBtnVer) revertBtnVer.textContent = prevVersion;
         if (revertBtnLabel) revertBtnLabel.textContent = 'OS ' + prevVersion;
@@ -272,14 +296,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. Image 2 (Update Available Screen) Updates
     const availCurrentSection = document.getElementById('avail-current-section');
     if (availCurrentSection) {
-      availCurrentSection.style.display = (parseFloat(version) < 1.3) ? 'block' : 'none';
+      const hasUpdate = isVirat ? (version !== '2.0 BETA') : (parseFloat(version) < 1.3);
+      availCurrentSection.style.display = hasUpdate ? 'block' : 'none';
     }
 
     // 7. Software Update Subpage view toggle
     const updateAvailCard = document.getElementById('software-update-available');
     const updateResultCard = document.getElementById('software-result');
     if (updateAvailCard && updateResultCard) {
-      if (parseFloat(version) < 1.3) {
+      const isUpToDate = isVirat ? (version === '2.0 BETA') : (parseFloat(version) >= 1.3);
+      if (!isUpToDate) {
         updateAvailCard.style.display = 'block';
         updateResultCard.style.display = 'none';
       } else {
@@ -292,6 +318,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.syncMotionAdWithVersion) {
       window.syncMotionAdWithVersion();
     }
+
+    // 9. Sync Cinema Tab Visibility (Strictly Virat ID 1711 on OS 2.0 BETA)
+    if (window.syncCinemaTabVisibility) {
+      window.syncCinemaTabVisibility();
+    }
   }
 
   // Software Update Loader & Card Simulation
@@ -302,15 +333,146 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!loader || !updateCard || !resultCard) return;
 
     const session = getAuthSession();
-    const ver = getSystemVersion(session ? session.role : 'digi');
+    const isVirat = session && (session.code === '1711' || session.role === 'user');
+    const role = isVirat ? 'user' : (session ? session.role : 'digi');
+    const ver = getSystemVersion(role);
 
     loader.style.display = 'flex';
     updateCard.style.display = 'none';
     resultCard.style.display = 'none';
 
+    // Populate the card dynamically according to who is logged in
+    const availVerIcon = document.getElementById('avail-update-ver-icon');
+    const availTitle = document.getElementById('avail-update-title');
+    const availSize = document.getElementById('avail-update-size');
+    const availLead = document.getElementById('avail-update-lead');
+    const featuresList = document.querySelector('.update-features-list');
+    const subTextLink = document.querySelector('.update-website-link');
+    const currentVerBadge = document.querySelector('.also-avail-squircle-ver');
+    const currentVerTitle = document.querySelector('.also-avail-title');
+    const uptodateTitleText = document.querySelector('.uptodate-title-text');
+    const uptodateVerSub = document.getElementById('uptodate-ver-sub');
+    const detailsDrawerTitle = document.querySelector('.details-drawer-title');
+    const detailsLead = document.querySelector('.details-lead');
+    const detailsList = document.querySelector('.details-list');
+
+    if (isVirat) {
+      if (availVerIcon) availVerIcon.textContent = '2.0';
+      if (availTitle) availTitle.textContent = 'OS 2.0 BETA';
+      if (availSize) availSize.textContent = '248.5 MB';
+      if (availLead) availLead.textContent = 'Testing Beta Update strictly for Virat (ID 1711). Includes Cinema & YouTube Lounge, gesture PiP mini-player, custom controls & settings:';
+      if (featuresList) {
+        featuresList.innerHTML = `
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">🍿</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Cinema & YouTube Lounge</strong>
+              <span class="feature-text-desc">Direct in-app YouTube browsing, smart trending feed & customized channel logos/avatars.</span>
+            </div>
+          </div>
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">🔽</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Gesture Drag-to-Miniplayer</strong>
+              <span class="feature-text-desc">Full video player ko neeche drag karke compact corner mini-player me seamlessly convert karein.</span>
+            </div>
+          </div>
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">🎛️</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Clean Custom Player Controls</strong>
+              <span class="feature-text-desc">Zero clutter: clean play/pause button, smooth auto-fading overlays aur clean duration scrub line.</span>
+            </div>
+          </div>
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">⚙️</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Playback Speed & Quality Menu</strong>
+              <span class="feature-text-desc">Apple bottom-sheet se speed (0.25x - 2.0x) aur quality (1080p, 720p, 480p) easily customize karein.</span>
+            </div>
+          </div>
+        `;
+      }
+      if (subTextLink) {
+        subTextLink.href = 'https://viev.digi.space/os-2.0-beta';
+        subTextLink.textContent = 'https://viev.digi.space/os-2.0-beta';
+      }
+      if (currentVerBadge) currentVerBadge.textContent = '1.1';
+      if (currentVerTitle) currentVerTitle.textContent = 'OS 1.1';
+      if (uptodateTitleText) uptodateTitleText.textContent = 'OS is up to date';
+      if (uptodateVerSub) uptodateVerSub.textContent = 'OS ' + ver;
+      if (detailsDrawerTitle) detailsDrawerTitle.textContent = "What's in OS 2.0 BETA";
+      if (detailsLead) detailsLead.textContent = 'What was updated in OS 2.0 BETA:';
+      if (detailsList) {
+        detailsList.innerHTML = `
+          <li><strong>Cinema & Lounge:</strong> In-app YouTube lounge with real video search & trending feeds.</li>
+          <li><strong>Gesture Miniplayer:</strong> Drag video downwards to pop into floating Picture-in-Picture.</li>
+          <li><strong>Custom Controls:</strong> Focused Play/Pause, hide overlays on tap, clean duration scrub.</li>
+          <li><strong>Speed & Quality:</strong> 0.25x to 2.0x speeds and up to 1080p HD stream selection.</li>
+        `;
+      }
+    } else {
+      // Digi (3009 / 3011) strictly sees Digi OS 1.3
+      if (availVerIcon) availVerIcon.textContent = '1.3';
+      if (availTitle) availTitle.textContent = 'Digi OS 1.3';
+      if (availSize) availSize.textContent = '186.4 MB';
+      if (availLead) availLead.textContent = 'This update includes major new features, smoother performance, and background improvements:';
+      if (featuresList) {
+        featuresList.innerHTML = `
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">🎵</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Background Music Playback</strong>
+              <span class="feature-text-desc">Phone lock hone ya app band hone par bhi gaane non-stop play honge.</span>
+            </div>
+          </div>
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">📱</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Lock Screen & Bluetooth Player</strong>
+              <span class="feature-text-desc">Phone ke lock screen aur car/earphones par album poster, song title aur controls show honge.</span>
+            </div>
+          </div>
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">🎤</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Real-Time Synced Lyrics</strong>
+              <span class="feature-text-desc">Gaane ke har beat ke sath lyrics real-time me Apple Music style me auto-scroll honge.</span>
+            </div>
+          </div>
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">✨</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Apple Smooth Animations & Haptics</strong>
+              <span class="feature-text-desc">Puri app me fluid transitions, gentle touch vibration aur faster response time.</span>
+            </div>
+          </div>
+        `;
+      }
+      if (subTextLink) {
+        subTextLink.href = 'https://viev.digi.space/os-1.3';
+        subTextLink.textContent = 'https://viev.digi.space/os-1.3';
+      }
+      if (currentVerBadge) currentVerBadge.textContent = '1.1';
+      if (currentVerTitle) currentVerTitle.textContent = 'OS 1.1';
+      if (uptodateTitleText) uptodateTitleText.textContent = 'Digi OS is up to date';
+      if (uptodateVerSub) uptodateVerSub.textContent = 'Digi OS ' + ver;
+      if (detailsDrawerTitle) detailsDrawerTitle.textContent = "What's in Digi OS 1.3";
+      if (detailsLead) detailsLead.textContent = 'What was updated in Digi OS 1.3:';
+      if (detailsList) {
+        detailsList.innerHTML = `
+          <li><strong>Background Music:</strong> Phone lock hone aur app switch karne par bhi gaane non-stop play hote hain.</li>
+          <li><strong>Lock Screen & Bluetooth:</strong> Lock screen par full album poster, music slider aur controls.</li>
+          <li><strong>Synced Lyrics:</strong> Har beat ke sath real-time line-by-line auto-scroll lyrics.</li>
+          <li><strong>Apple Tactile & Speed:</strong> Smooth fluid animations aur gentle haptic vibration touch response.</li>
+        `;
+      }
+    }
+
     setTimeout(() => {
       loader.style.display = 'none';
-      if (parseFloat(ver) < 1.3) {
+      const isUpToDate = isVirat ? (ver === '2.0 BETA') : (parseFloat(ver) >= 1.3);
+      if (!isUpToDate) {
         updateCard.style.display = 'block';
         resultCard.style.display = 'none';
       } else {
@@ -391,11 +553,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function completeFirmwareUpdate() {
       const session = getAuthSession();
-      const role = session ? session.role : 'digi';
+      const isVirat = session && (session.code === '1711' || session.role === 'user');
+      const role = isVirat ? 'user' : (session ? session.role : 'digi');
 
-      // 1. Upgrade ONLY the active logged-in profile to OS 1.3 (strict isolation)
-      localStorage.setItem('viev_' + role + '_os_version', '1.3');
-      applySystemVersion('1.3');
+      if (isVirat) {
+        // Upgrade Virat (1711) strictly to OS 2.0 BETA (Testing update)
+        localStorage.setItem('viev_user_os_version', '2.0 BETA');
+        applySystemVersion('2.0 BETA');
+      } else {
+        // Upgrade Digi (3009) strictly to OS 1.3 (Zero beta leak)
+        localStorage.setItem('viev_digi_os_version', '1.3');
+        applySystemVersion('1.3');
+      }
 
       // 2. Smooth fade out of black update screen
       overlay.classList.add('is-fading');
@@ -603,7 +772,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (updateTonightBtn) {
     updateTonightBtn.addEventListener('click', () => {
       if (window.triggerHaptic) window.triggerHaptic('light');
-      alert('Digi OS 1.3 will automatically install tonight when connected to power and Wi-Fi.');
+      const session = getAuthSession();
+      const isVirat = session && (session.code === '1711' || session.role === 'user');
+      const updateName = isVirat ? 'OS 2.0 BETA' : 'Digi OS 1.3';
+      alert(`${updateName} will automatically install tonight when connected to power and Wi-Fi.`);
       if (typeof closeSubpage === 'function') {
         closeSubpage();
       }
@@ -616,7 +788,8 @@ document.addEventListener('DOMContentLoaded', () => {
     revertBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const session = getAuthSession();
-      const role = session ? session.role : 'digi';
+      const isVirat = session && (session.code === '1711' || session.role === 'user');
+      const role = isVirat ? 'user' : (session ? session.role : 'digi');
       const curVer = getSystemVersion(role);
       const prevVer = getPreviousVersion(curVer);
 
@@ -649,8 +822,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const userRoleBadge = document.getElementById('user-role-badge');
 
   const VALID_USERS = {
-    '3009': { role: 'digi', defaultName: 'DIGI', badge: 'Princess Digi' },
-    '1711': { role: 'user', defaultName: 'ANSHU', badge: 'Co-Creator' }
+    '3009': { role: 'digi', defaultName: 'DIGI', badge: 'Princess Digi', email: 'avneetsaini7070@gmail.com' },
+    '3011': { role: 'digi', defaultName: 'DIGI', badge: 'Princess Digi', email: 'avneetsaini7070@gmail.com' },
+    '1711': { role: 'user', defaultName: 'VIRAT', badge: 'Co-Creator', email: 'iamsid074@gmail.com' }
   };
 
   let splashTimer = null;
@@ -724,6 +898,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Synchronize Daily Note state strictly for active role
     if (window.syncDailyNoteWithActiveUser) {
       window.syncDailyNoteWithActiveUser();
+    }
+
+    // Synchronize YouTube Profile & Feed (3011 Digi vs 1711 Virat)
+    if (window.syncYouTubeUser) {
+      window.syncYouTubeUser();
+    }
+
+    // Synchronize Cinema Tab visibility (Strictly Virat ID 1711 with OS 2.0 BETA)
+    if (window.syncCinemaTabVisibility) {
+      window.syncCinemaTabVisibility();
     }
   }
 
@@ -923,6 +1107,16 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsScreen.classList.add('hidden');
       }
 
+      const cinemaScreen = document.getElementById('cinema-screen');
+      if (cinemaScreen) {
+        cinemaScreen.classList.remove('active');
+        cinemaScreen.classList.add('hidden');
+      }
+
+      if (window.syncCinemaTabVisibility) {
+        window.syncCinemaTabVisibility();
+      }
+
       // Reset passcode input and display
       if (passcodeInput) passcodeInput.value = '';
       updatePinDisplay('');
@@ -944,7 +1138,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial State Evaluation on DOM Load
   const activeSession = getAuthSession();
-  if (activeSession && (activeSession.code === '3009' || activeSession.code === '1711')) {
+  if (activeSession && (activeSession.code === '3009' || activeSession.code === '3011' || activeSession.code === '1711')) {
     // Already Logged In: Directly show Home Screen with Startup Intro
     if (loginScreen) {
       loginScreen.classList.remove('active');

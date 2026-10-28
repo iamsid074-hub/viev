@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function getActiveUserRole() {
     try {
       const sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
-      if (sess && (sess.code === '3009' || sess.role === 'digi')) return 'digi';
+      if (sess && (sess.code === '3009' || sess.code === '3011' || sess.role === 'digi')) return 'digi';
       if (sess && (sess.code === '1711' || sess.role === 'user')) return 'user';
       if (sess && sess.role) return sess.role;
     } catch(e) {}

@@ -623,7 +623,473 @@ tu h digi meri mai hu pyar tera .
       </div>
     </section>
 
-    <!-- SCREEN 3: DEDICATED FULL PAGE - SETTINGS -->
+    <!-- SCREEN 3: DEDICATED FULL PAGE - CINEMA & YOUTUBE LOUNGE (DIGI OS 2.0) -->
+    <section id="cinema-screen" class="app-screen" aria-label="Cinema & YouTube Lounge">
+      
+      <!-- VIEW 1: LUXURY LAUNCHER HUB -->
+      <div class="cinema-launcher-viewport" id="cinema-launcher-view">
+        
+        <!-- Apple Vision Pro Hero Card -->
+        <div class="cinema-hero-card">
+          <div class="yt-hero-icon-glow"></div>
+          <div class="yt-hero-badge">
+            <svg class="yt-hero-logo" viewBox="0 0 90 20" height="22" aria-label="YouTube">
+              <rect width="28.8" height="20" rx="6" fill="#ff0000"/>
+              <polygon points="11.5,5.5 19.5,10 11.5,14.5" fill="#ffffff"/>
+              <text x="34" y="15" fill="#ffffff" font-family="'Outfit', sans-serif" font-size="16" font-weight="800" letter-spacing="-0.5">YouTube</text>
+            </svg>
+          </div>
+
+          <h2 class="cinema-hero-title">Real YouTube Experience</h2>
+          <p class="cinema-hero-desc">
+            Stream directly inside VIEV with zero popups and zero new tabs.
+          </p>
+
+          <!-- Primary 1-Tap In-App Launcher -->
+          <button type="button" class="cinema-launch-main-btn" id="cinema-launch-yt-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span>Play Real YouTube in VIEV ▶</span>
+          </button>
+        </div>
+
+        <!-- Quick Destinations Grid -->
+        <div class="cinema-shortcuts-grid">
+          <button type="button" class="cinema-shortcut-card" data-video="kJQP7kiw5Fk" data-title="Trending India • All Hits">
+            <div class="shortcut-icon-circle" style="background: rgba(255, 68, 68, 0.15); color: #ff4444;">🔥</div>
+            <div class="shortcut-meta">
+              <h4>Trending India</h4>
+              <span>Viral music & videos</span>
+            </div>
+            <div class="shortcut-arrow">▶</div>
+          </button>
+
+          <button type="button" class="cinema-shortcut-card" data-video="BddP6PYo2gs" data-title="Ve Kamleya • Bollywood Hits">
+            <div class="shortcut-icon-circle" style="background: rgba(66, 133, 244, 0.15); color: #4285f4;">🎵</div>
+            <div class="shortcut-meta">
+              <h4>Music & Hits</h4>
+              <span>Bollywood & pop mixes</span>
+            </div>
+            <div class="shortcut-arrow">▶</div>
+          </button>
+
+          <button type="button" class="cinema-shortcut-card" data-video="JfVOs4VSpmA" data-title="Lofi Hip Hop • Chill & Study">
+            <div class="shortcut-icon-circle" style="background: rgba(52, 168, 83, 0.15); color: #34a853;">💖</div>
+            <div class="shortcut-meta">
+              <h4>Lo-Fi Chill Beats</h4>
+              <span>Relaxing stream</span>
+            </div>
+            <div class="shortcut-arrow">▶</div>
+          </button>
+
+          <button type="button" class="cinema-shortcut-card" data-video="kJQP7kiw5Fk" data-title="All Time Romantic Hits">
+            <div class="shortcut-icon-circle" style="background: rgba(251, 188, 5, 0.15); color: #fbbc05;">🎬</div>
+            <div class="shortcut-meta">
+              <h4>Romantic Mashup</h4>
+              <span>Favorite love songs</span>
+            </div>
+            <div class="shortcut-arrow">▶</div>
+          </button>
+        </div>
+
+        <!-- Privacy & Device Info Note -->
+        <div class="cinema-info-footnote">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>Plays seamlessly inside VIEV with Apple Vision Pro ambient glow.</span>
+        </div>
+
+      </div>
+
+      <!-- VIEW 2: IN-APP FULL YOUTUBE EXPERIENCE -->
+      <div class="cinema-player-viewport" id="cinema-player-view" style="display: none;">
+        
+        <!-- REAL YOUTUBE MOBILE APP TOP HEADER (IMAGE 1 REPLICA) -->
+        <header class="yt-mobile-app-header">
+          <!-- Top Row: Back + YouTube Logo + Cast + Bell 9+ + Search + Avatar -->
+          <div class="yt-header-main-row">
+            <div class="yt-header-brand-group">
+              <!-- Official YouTube Brand Logo (Tap to Reload Feed) -->
+              <button type="button" class="yt-official-logo-wrap" id="yt-official-logo-btn" title="Tap to Reload YouTube Feed" aria-label="Reload YouTube Feed">
+                <svg viewBox="0 0 102 22" height="20" aria-label="YouTube">
+                  <!-- YouTube Red Icon -->
+                  <path d="M28.5 3.2c-.34-1.25-1.32-2.24-2.57-2.58C23.66 0 14.56 0 14.56 0S5.47 0 3.2.62C1.94.96.96 1.95.62 3.2 0 5.48 0 10.2 0 10.2s0 4.72.62 7c.34 1.25 1.32 2.24 2.58 2.58 2.27.62 11.36.62 11.36.62s9.1 0 11.37-.62c1.25-.34 2.23-1.33 2.57-2.58.62-2.28.62-7 .62-7s0-4.72-.62-7z" fill="#FF0000"/>
+                  <polygon points="11.6,7.2 19.3,11 11.6,14.8" fill="#FFFFFF"/>
+                  <!-- Official YouTube Text Wordmark -->
+                  <text x="33" y="16.2" fill="#FFFFFF" font-family="'YouTube Sans', -apple-system, Roboto, 'Outfit', sans-serif" font-weight="700" font-size="16.5" letter-spacing="-0.5px">YouTube</text>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Right Action Icons: Cast, Notification Bell (9+), Search, Avatar (Image 1) -->
+            <div class="yt-header-actions-group">
+              <!-- Cast Icon -->
+              <button type="button" class="yt-header-icon-btn" title="Cast to screen" aria-label="Cast">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8A13 13 0 0 1 14 20M2 20h.01M22 6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2h2V6h16v12h-4v2h4a2 2 0 0 0 2-2V6z"></path>
+                </svg>
+              </button>
+
+              <!-- Notification Bell with Red Badge 9+ -->
+              <button type="button" class="yt-header-icon-btn yt-bell-btn" title="Notifications" aria-label="Notifications">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="yt-notif-badge">9+</span>
+              </button>
+
+              <!-- Search Toggle Icon -->
+              <button type="button" class="yt-header-icon-btn" id="yt-header-search-toggle" title="Search" aria-label="Search">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </button>
+
+              <!-- Profile Avatar (Image 1 & 2: VIRAT PLAYS) -->
+              <div class="yt-header-avatar-btn" id="yt-header-avatar-btn" title="Account (VIRAT PLAYS)">
+                <img src="song/virat_plays_avatar.png" alt="VIRAT PLAYS" class="yt-user-avatar-img">
+              </div>
+            </div>
+          </div>
+
+          <!-- YouTube Real Account Drawer / Menu (Exact Image 2 Replica) -->
+          <div class="yt-account-menu-popover" id="yt-account-menu-popover" style="display: none;">
+            <!-- Header User Profile Info -->
+            <div class="yt-account-user-card">
+              <img src="song/virat_plays_avatar.png" alt="VIRAT PLAYS" class="yt-account-card-avatar">
+              <div class="yt-account-user-info">
+                <div class="yt-account-name">VIRAT PLAYS</div>
+                <div class="yt-account-handle">@viratplaystdm</div>
+                <div class="yt-account-email">iamsid074@gmail.com</div>
+                <a href="https://www.youtube.com/@viratplaystdm" target="_blank" rel="noopener noreferrer" class="yt-account-view-channel">View your channel</a>
+              </div>
+            </div>
+
+            <div class="yt-account-divider"></div>
+
+            <!-- Account Menu Actions (Image 2) -->
+            <div class="yt-account-items-list">
+              <button type="button" class="yt-account-item" id="yt-load-my-channel-btn">
+                <svg class="yt-account-item-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span>Feed: Load My Videos (@viratplaystdm)</span>
+              </button>
+
+              <a href="https://myaccount.google.com" target="_blank" rel="noopener noreferrer" class="yt-account-item">
+                <svg class="yt-account-item-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="10" r="3"></circle>
+                  <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path>
+                </svg>
+                <span>Google Account</span>
+              </a>
+
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="yt-account-item">
+                <svg class="yt-account-item-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>Open in Chrome (Logged-In Account)</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- YouTube Mobile Search Bar Strip (Expandable) -->
+          <div class="yt-mobile-search-strip" id="yt-mobile-search-strip" style="display: none;">
+            <div class="yt-search-input-box">
+              <svg class="yt-search-glass-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="cinema-inapp-url-input" class="yt-search-field" placeholder="Search YouTube" autocomplete="off">
+              <button type="button" class="yt-search-action-btn" id="cinema-inapp-play-custom-btn" title="Search">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+              </button>
+              <button type="button" class="yt-search-close-btn" id="yt-search-close-btn" title="Close Search" aria-label="Close search">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Filter Pills Bar (Exact Image 1 Spec) -->
+          <div class="yt-category-pills-scroll" id="cinema-category-chips">
+            <!-- Explore / Compass Button on Far Left (Image 1) -->
+            <button type="button" class="yt-explore-pill-btn" id="yt-explore-btn" title="Explore" aria-label="Explore">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+              </svg>
+            </button>
+
+            <!-- Pill Buttons (Exact personal feed & user topics) -->
+            <button type="button" class="cinema-inapp-chip active-chip" data-query="All">All</button>
+            <button type="button" class="cinema-inapp-chip" data-query="Godlike BGMI Gaming GTA 6">Gaming</button>
+            <button type="button" class="cinema-inapp-chip" data-query="BB Ki Vines Bhuvan Bam">BB Ki Vines</button>
+            <button type="button" class="cinema-inapp-chip" data-query="Beamng drive accidents hindi">BeamNG</button>
+            <button type="button" class="cinema-inapp-chip" data-query="Arijit Singh Best Songs">Arijit Singh</button>
+            <button type="button" class="cinema-inapp-chip" data-query="Free Fire India Trending">Free Fire</button>
+            <button type="button" class="cinema-inapp-chip" data-query="Indias Got Latent episodes">Latent</button>
+            <button type="button" class="cinema-inapp-chip" data-query="Apple MacBook Pro tech">Tech</button>
+          </div>
+        </header>
+
+        <!-- ACTIVE VIDEO THEATER: APPLE VISION PRO GLASS FRAME + AMBILIGHT (MATCHING MUSIC SECTION) -->
+        <div class="cinema-theater-stage" id="cinema-theater-stage" style="display: none;">
+          <!-- 16:9 Artwork & Video Stage Container -->
+          <div class="cinema-player-artwork-container">
+            <!-- Ambilight Projection Canvas Layer (Mirrors video thumbnail behind the card with high diffusion) -->
+            <div class="cinema-artwork-glow" id="cinema-art-glow" aria-hidden="true">
+              <img src="" alt="" class="cinema-ambilight-canvas" id="cinema-ambilight-canvas">
+              <div class="cinema-ambilight-bloom"></div>
+            </div>
+
+            <!-- Apple Vision Pro Liquid Glass Refraction Frame with Specular Rim -->
+            <div class="cinema-glass-frame" aria-hidden="true">
+              <div class="cinema-glass-aura"></div>
+            </div>
+
+            <!-- Video Player Stage Card -->
+            <div class="cinema-video-card-stage" id="cinema-video-card-stage">
+              <iframe id="cinema-inapp-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <div class="cinema-card-reflection" aria-hidden="true"></div>
+
+              <!-- Full Video Drag & Tap Gesture Surface (Drag to minimize, Tap to toggle controls) -->
+              <div class="cinema-player-drag-surface" id="cinema-player-drag-surface"></div>
+
+              <!-- Custom Video Player Controls Overlay (Matches YouTube Mobile without clutter) -->
+              <div class="cinema-custom-player-controls" id="cinema-custom-player-controls">
+                <!-- Top Actions Bar (Audio Mute, CC, Settings Gear - Title/Avatar Removed) -->
+                <div class="cinema-ctrl-top-bar">
+                  <div class="cinema-ctrl-top-spacer"></div>
+                  <div class="cinema-ctrl-top-actions">
+                    <button type="button" class="cinema-ctrl-icon-btn" id="cinema-ctrl-mute-btn" title="Mute/Unmute" aria-label="Mute">
+                      <svg id="cinema-ctrl-volume-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                      </svg>
+                    </button>
+                    <button type="button" class="cinema-ctrl-icon-btn cinema-ctrl-cc-btn" id="cinema-ctrl-cc-btn" title="Subtitles/CC" aria-label="Subtitles">
+                      <span class="cinema-cc-badge">CC</span>
+                    </button>
+                    <button type="button" class="cinema-ctrl-icon-btn" id="cinema-ctrl-settings-btn" title="Settings" aria-label="Settings">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Center Play/Pause Button (Only tapping here toggles playback) -->
+                <div class="cinema-ctrl-center-play">
+                  <button type="button" class="cinema-ctrl-play-btn" id="cinema-ctrl-play-btn" title="Play/Pause" aria-label="Play/Pause">
+                    <svg id="cinema-ctrl-play-icon" width="38" height="38" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Bottom Duration & Scrubber (Moved to bottom; Link & YouTube logo removed) -->
+                <div class="cinema-ctrl-bottom-bar">
+                  <div class="cinema-ctrl-bottom-row">
+                    <span class="cinema-ctrl-time" id="cinema-ctrl-time">0:01 / 10:49</span>
+                    <button type="button" class="cinema-ctrl-fullscreen-btn" id="cinema-ctrl-fullscreen-btn" title="Fullscreen" aria-label="Fullscreen">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <polyline points="9 21 3 21 3 15"></polyline>
+                        <polyline points="21 15 21 21 15 21"></polyline>
+                        <polyline points="3 9 3 3 9 3"></polyline>
+                      </svg>
+                    </button>
+                  </div>
+                  <!-- Red Scrubber Progress Line with Knob -->
+                  <div class="cinema-ctrl-scrub-container" id="cinema-ctrl-scrub-container">
+                    <div class="cinema-ctrl-scrub-track">
+                      <div class="cinema-ctrl-scrub-progress" id="cinema-ctrl-scrub-progress"></div>
+                    </div>
+                    <div class="cinema-ctrl-scrub-thumb" id="cinema-ctrl-scrub-thumb"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Miniplayer Controls Overlay (Clean: ONLY Center Enlarge Button + Top-Right Close Cross) -->
+              <div class="cinema-miniplayer-controls" id="cinema-miniplayer-controls">
+                <button type="button" class="cinema-mini-btn cinema-mini-expand-btn" id="cinema-miniplayer-expand-btn" title="Enlarge Video" aria-label="Enlarge Video">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <polyline points="9 21 3 21 3 15"></polyline>
+                    <line x1="21" y1="3" x2="14" y2="10"></line>
+                    <line x1="3" y1="21" x2="10" y2="14"></line>
+                  </svg>
+                </button>
+                <button type="button" class="cinema-mini-btn cinema-mini-close-btn" id="cinema-miniplayer-dismiss-btn" title="Close Video" aria-label="Close Video">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- YouTube Official Video Meta & Actions Bar (Exact Replica of Image 1) -->
+          <div class="cinema-theater-yt-bar">
+            <!-- Video Title -->
+            <h2 class="cinema-yt-bar-title" id="cinema-theater-title">Playing Video</h2>
+
+            <!-- Channel & Actions Control Bar -->
+            <div class="cinema-yt-bar-actions-row">
+              <!-- Left: Channel Info & Subscribe -->
+              <div class="cinema-yt-channel-group">
+                <div class="cinema-yt-avatar-wrap" id="cinema-theater-avatar-wrap">
+                  <img src="song/Screenshot 2026-10-24 224431.png" alt="Channel" class="cinema-yt-channel-avatar" id="cinema-theater-avatar">
+                </div>
+                <div class="cinema-yt-channel-meta">
+                  <div class="cinema-yt-channel-name-row">
+                    <span class="cinema-yt-channel-name" id="cinema-theater-channel">YouTube</span>
+                    <svg class="cinema-yt-verified-icon" id="cinema-theater-verified" viewBox="0 0 24 24" width="13" height="13" fill="#aaaaaa">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                  <span class="cinema-yt-subs-count" id="cinema-theater-subs">21.1M subscribers</span>
+                </div>
+                <button type="button" class="cinema-yt-sub-btn" id="cinema-theater-sub-btn">Subscribe</button>
+              </div>
+
+              <!-- Right: Action Pills (Like/Dislike + Share) -->
+              <div class="cinema-yt-action-pills">
+                <!-- Segmented Like / Dislike -->
+                <div class="cinema-yt-pill-segmented">
+                  <button type="button" class="cinema-yt-like-btn" id="cinema-theater-like-btn" title="Like">
+                    <svg class="cinema-yt-like-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                    </svg>
+                    <span class="cinema-yt-like-count" id="cinema-theater-like-count">50K</span>
+                  </button>
+                  <span class="cinema-yt-pill-divider"></span>
+                  <button type="button" class="cinema-yt-dislike-btn" id="cinema-theater-dislike-btn" title="Dislike">
+                    <svg class="cinema-yt-dislike-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Share Pill (Icon Only, Fixed to Right Side) -->
+                <button type="button" class="cinema-yt-share-btn" id="cinema-theater-share-btn" title="Share video" aria-label="Share video">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15 8v-4l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real YouTube Mobile Video Feed -->
+        <div class="cinema-feed-section">
+          <!-- Video Cards Container (Image 1 YouTube Mobile Replica) -->
+          <div class="cinema-video-feed-grid" id="cinema-video-feed-grid">
+            <!-- Dynamic video cards rendered here via JavaScript -->
+          </div>
+        </div>
+
+        <!-- YouTube Video Settings Bottom Sheet Modal (Image 5 Replica) -->
+        <div class="cinema-settings-modal-backdrop" id="cinema-settings-modal" style="display: none;">
+          <div class="cinema-settings-sheet" id="cinema-settings-sheet">
+            <div class="cinema-settings-pill-handle"></div>
+
+            <!-- Main Settings View -->
+            <div class="cinema-settings-main-view" id="cinema-settings-main-view">
+              <!-- Option 1: Playback Speed -->
+              <button type="button" class="cinema-settings-row-btn" id="cinema-settings-speed-row">
+                <div class="cinema-settings-row-left">
+                  <svg class="cinema-settings-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span class="cinema-settings-row-label">Playback speed</span>
+                </div>
+                <div class="cinema-settings-row-right">
+                  <span class="cinema-settings-row-val" id="cinema-curr-speed-val">Normal</span>
+                  <svg class="cinema-settings-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </button>
+
+              <!-- Option 2: Quality -->
+              <button type="button" class="cinema-settings-row-btn" id="cinema-settings-quality-row">
+                <div class="cinema-settings-row-left">
+                  <svg class="cinema-settings-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                  </svg>
+                  <span class="cinema-settings-row-label">Quality</span>
+                </div>
+                <div class="cinema-settings-row-right">
+                  <span class="cinema-settings-row-val" id="cinema-curr-quality-val">Auto (1080p <sup class="cinema-hd-tag">HD</sup>)</span>
+                  <svg class="cinema-settings-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </button>
+            </div>
+
+            <!-- Submenu: Playback Speed Options -->
+            <div class="cinema-settings-submenu" id="cinema-settings-speed-submenu" style="display: none;">
+              <div class="cinema-settings-sub-header">
+                <button type="button" class="cinema-settings-sub-back-btn" id="cinema-speed-back-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <span class="cinema-settings-sub-title">Playback speed</span>
+              </div>
+              <div class="cinema-settings-options-list">
+                <button type="button" class="cinema-sub-opt" data-speed="0.25">0.25x</button>
+                <button type="button" class="cinema-sub-opt" data-speed="0.5">0.5x</button>
+                <button type="button" class="cinema-sub-opt" data-speed="0.75">0.75x</button>
+                <button type="button" class="cinema-sub-opt is-selected" data-speed="1">Normal</button>
+                <button type="button" class="cinema-sub-opt" data-speed="1.25">1.25x</button>
+                <button type="button" class="cinema-sub-opt" data-speed="1.5">1.5x</button>
+                <button type="button" class="cinema-sub-opt" data-speed="1.75">1.75x</button>
+                <button type="button" class="cinema-sub-opt" data-speed="2">2.0x</button>
+              </div>
+            </div>
+
+            <!-- Submenu: Quality Options -->
+            <div class="cinema-settings-submenu" id="cinema-settings-quality-submenu" style="display: none;">
+              <div class="cinema-settings-sub-header">
+                <button type="button" class="cinema-settings-sub-back-btn" id="cinema-quality-back-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <span class="cinema-settings-sub-title">Quality for current video</span>
+              </div>
+              <div class="cinema-settings-options-list">
+                <button type="button" class="cinema-sub-opt is-selected" data-quality="auto">Auto (1080p HD)</button>
+                <button type="button" class="cinema-sub-opt" data-quality="hd1080">1080p HD</button>
+                <button type="button" class="cinema-sub-opt" data-quality="hd720">720p</button>
+                <button type="button" class="cinema-sub-opt" data-quality="large">480p</button>
+                <button type="button" class="cinema-sub-opt" data-quality="medium">360p</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SCREEN 4: DEDICATED FULL PAGE - SETTINGS -->
     <section id="settings-screen" class="app-screen" aria-label="Settings">
       <div class="dedicated-screen-container settings-nav-viewport" id="settings-nav-viewport">
         
@@ -1073,6 +1539,9 @@ tu h digi meri mai hu pyar tera .
         <button class="nav-tab-btn" data-tab="music" id="tab-music" aria-selected="false">
           <span class="nav-tab-label">Music</span>
         </button>
+        <button class="nav-tab-btn" data-tab="cinema" id="tab-cinema" aria-selected="false" style="display: none;">
+          <span class="nav-tab-label">Cinema</span>
+        </button>
         <button class="nav-tab-btn" data-tab="settings" id="tab-settings" aria-selected="false">
           <span class="nav-tab-label">Settings</span>
         </button>
@@ -1083,6 +1552,28 @@ tu h digi meri mai hu pyar tera .
         <div class="orb-disc-wrapper">
           <img src="song/Screenshot 2026-10-24 224431.png" alt="Song Poster" class="orb-cover-img" id="orb-cover-img">
         </div>
+      </button>
+    </div>
+
+    <!-- Floating Picture-in-Picture Mini Cinema Player (Digi OS 2.0) -->
+    <div class="cinema-mini-pip" id="cinema-mini-pip" aria-label="Mini Cinema Player">
+      <div class="cinema-mini-thumb-wrap">
+        <img src="https://img.youtube.com/vi/9f06QndGiU4/hqdefault.jpg" alt="" class="cinema-mini-thumb" id="cinema-mini-thumb">
+      </div>
+      <div class="cinema-mini-meta" id="cinema-mini-expand-btn">
+        <div class="cinema-mini-kicker">CINEMA • 2.0</div>
+        <div class="cinema-mini-title" id="cinema-mini-title">Ve Haaniyaan</div>
+      </div>
+      <button type="button" class="cinema-mini-btn" id="cinema-mini-play-btn" aria-label="Play/Pause">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="6 4 20 12 6 20 6 4"></polygon>
+        </svg>
+      </button>
+      <button type="button" class="cinema-mini-btn" id="cinema-mini-close-btn" aria-label="Close Mini Player">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
       </button>
     </div>
 
@@ -1473,6 +1964,33 @@ tu h digi meri mai hu pyar tera .
 
         <div class="quiz-feedback" id="quiz-feedback-msg" aria-live="polite"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD YOUTUBE VIDEO TO WATCHLIST (DIGI OS 2.0) -->
+  <div class="cinema-modal-backdrop" id="cinema-add-modal" role="dialog" aria-modal="true">
+    <div class="cinema-modal-sheet">
+      <div class="cinema-modal-header">
+        <h3 class="cinema-modal-title">Add YouTube Video</h3>
+        <button type="button" class="cinema-modal-close" id="cinema-close-add-btn">✕</button>
+      </div>
+      
+      <div class="cinema-form-group">
+        <label class="cinema-form-label">YouTube URL or Video ID</label>
+        <input type="text" id="cinema-new-url" class="cinema-form-input" placeholder="https://youtu.be/... or video ID">
+      </div>
+
+      <div class="cinema-form-group">
+        <label class="cinema-form-label">Video Title (Optional)</label>
+        <input type="text" id="cinema-new-title" class="cinema-form-input" placeholder="e.g. Favorite Vlog / Cute Song">
+      </div>
+
+      <div class="cinema-form-group">
+        <label class="cinema-form-label">Personal Note for Digi (Optional)</label>
+        <input type="text" id="cinema-new-note" class="cinema-form-input" placeholder="e.g. Watch this at 05:20 ❤️">
+      </div>
+
+      <button type="button" class="cinema-submit-btn" id="cinema-save-add-btn">Add to Watchlist</button>
     </div>
   </div>
 

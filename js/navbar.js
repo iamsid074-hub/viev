@@ -13,11 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const orbCoverImg = document.getElementById('orb-cover-img');
 
   let currentTab = 'home';
+  window.getCurrentTab = () => currentTab;
 
   // Full-Page Screens
   const pageScreens = {
     home: document.getElementById('welcome-screen'),
     music: document.getElementById('music-screen'),
+    cinema: document.getElementById('cinema-screen'),
     settings: document.getElementById('settings-screen')
   };
 
@@ -27,6 +29,45 @@ document.addEventListener('DOMContentLoaded', () => {
     indicator.style.left = `${activeBtn.offsetLeft}px`;
     indicator.style.width = `${activeBtn.offsetWidth}px`;
   }
+
+  window.syncCinemaTabVisibility = function() {
+    let isVirat = false;
+    try {
+      const raw = localStorage.getItem('viev_auth_session');
+      const sess = raw ? JSON.parse(raw) : null;
+      if (sess) {
+        isVirat = (sess.code === '1711' || sess.role === 'user');
+      }
+    } catch (_) {}
+
+    const userVer = localStorage.getItem('viev_user_os_version');
+    const is2Beta = isVirat && userVer === '2.0 BETA';
+
+    const cinemaTab = document.getElementById('tab-cinema');
+    if (cinemaTab) {
+      cinemaTab.style.display = is2Beta ? 'flex' : 'none';
+    }
+
+    const cinemaSettingsPill = document.querySelector('.settings-nav-pill[data-target="subpage-cinema"]');
+    if (cinemaSettingsPill) {
+      cinemaSettingsPill.style.display = is2Beta ? 'flex' : 'none';
+    }
+
+    // If currently on cinema tab but cinema is now hidden, redirect to home tab
+    if (!is2Beta && currentTab === 'cinema') {
+      const homeTab = document.getElementById('tab-home');
+      if (homeTab) switchPage('home', homeTab);
+    }
+
+    // Refresh active indicator position
+    setTimeout(() => {
+      const activeBtn = document.querySelector('.nav-tab-btn.active');
+      if (activeBtn) updateIndicator(activeBtn);
+    }, 50);
+  };
+
+  // Run initial visibility check
+  window.syncCinemaTabVisibility();
 
   let animTimer = null;
 
@@ -130,6 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const edgeAura = document.getElementById('apple-intelligence-edge-aura');
     if (edgeAura) {
       edgeAura.classList.toggle('is-hidden', targetTab !== 'home');
+    }
+
+    // Update Cinema Mini PiP visibility
+    if (window.vievCinema && typeof window.vievCinema.updateMiniPlayerVisibility === 'function') {
+      window.vievCinema.updateMiniPlayerVisibility(targetTab);
     }
   }
 
