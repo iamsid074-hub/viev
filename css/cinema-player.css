@@ -3378,15 +3378,88 @@
   display: none !important;
 }
 
-/* Clean Miniplayer Controls Overlay */
+/* =========================================================
+   DOUBLE-TAP SEEK RIPPLE ANIMATION (10s Left / Right)
+   Exact replica of official YouTube Mobile seek animation
+   ========================================================= */
+.cinema-seek-ripple-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  pointer-events: none;
+  display: flex;
+  overflow: hidden;
+  border-radius: 21px;
+}
+
+.seek-ripple-half {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.seek-ripple-half.is-active {
+  animation: seekRippleFlash 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.seek-ripple-left.is-active {
+  background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 55%, transparent 75%);
+}
+
+.seek-ripple-right.is-active {
+  background: radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 55%, transparent 75%);
+}
+
+.seek-ripple-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.seek-chevrons {
+  animation: seekChevronPulse 0.5s ease infinite alternate;
+}
+
+.seek-ripple-text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: lowercase;
+}
+
+@keyframes seekRippleFlash {
+  0% { opacity: 0; transform: scale(0.85); }
+  25% { opacity: 1; transform: scale(1.05); }
+  75% { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes seekChevronPulse {
+  from { transform: translateX(0); opacity: 0.75; }
+  to { transform: translateX(4px); opacity: 1; }
+}
+
+/* =========================================================
+   FLOATING MINIPLAYER MODE & CONTROLS
+   Controls: Play/Pause + Enlarge + Close Cross
+   ========================================================= */
 .cinema-miniplayer-controls {
   display: none;
   position: absolute;
   inset: 0;
   z-index: 25;
-  background: rgba(0, 0, 0, 0.22);
+  background: rgba(0, 0, 0, 0.38);
   align-items: center;
   justify-content: center;
+  gap: 10px;
   pointer-events: auto;
 }
 
@@ -3394,33 +3467,31 @@
   display: flex !important;
 }
 
-/* Center: Enlarge Button */
-.cinema-mini-expand-btn {
-  width: 40px;
-  height: 40px;
+.cinema-mini-btn {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.68);
-  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: rgba(18, 18, 22, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.36);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), background 0.18s ease;
   -webkit-tap-highlight-color: transparent;
   padding: 0;
   margin: 0;
 }
 
-.cinema-mini-expand-btn:hover {
-  transform: scale(1.12);
-  background: rgba(0, 0, 0, 0.88);
-  border-color: rgba(255, 255, 255, 0.7);
+.cinema-mini-btn:hover {
+  transform: scale(1.1);
+  background: rgba(0, 0, 0, 0.92);
 }
 
-.cinema-mini-expand-btn:active {
-  transform: scale(0.92);
+.cinema-mini-btn:active {
+  transform: scale(0.9);
 }
 
 /* Top-Right: Small Close Cross Button */
@@ -3431,7 +3502,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.72);
+  background: rgba(0, 0, 0, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.32);
   color: #ffffff;
   font-size: 11px;

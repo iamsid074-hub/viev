@@ -41,6 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const dragSurface = document.getElementById('cinema-player-drag-surface');
   const miniExpandBtn = document.getElementById('cinema-miniplayer-expand-btn');
   const miniDismissBtn = document.getElementById('cinema-miniplayer-dismiss-btn');
+  const miniPlayBtn = document.getElementById('cinema-miniplayer-play-btn');
+  const miniPlayIcon = document.getElementById('cinema-mini-play-icon');
+  const seekRippleLeft = document.getElementById('seek-ripple-left');
+  const seekRippleRight = document.getElementById('seek-ripple-right');
   const customControls = document.getElementById('cinema-custom-player-controls');
   const ctrlPlayBtn = document.getElementById('cinema-ctrl-play-btn');
   const ctrlPlayIcon = document.getElementById('cinema-ctrl-play-icon');
@@ -291,6 +295,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ctrlPlayIcon) {
         ctrlPlayIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
       }
+      if (miniPlayIcon) {
+        miniPlayIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+      }
       if (ctrlPlayBtn) ctrlPlayBtn.classList.remove('is-paused');
       startPlaybackTicker();
       scheduleControlsAutoHide();
@@ -299,9 +306,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ctrlPlayIcon) {
         ctrlPlayIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
       }
+      if (miniPlayIcon) {
+        miniPlayIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+      }
       if (ctrlPlayBtn) ctrlPlayBtn.classList.add('is-paused');
       stopPlaybackTicker();
-      // Keep controls visible when paused so user can tap play
+      // Keep controls visible when paused: NEVER auto-hide while paused
       showCustomControls();
       clearTimeout(controlsAutoHideTimer);
     }
@@ -309,6 +319,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function togglePlayPause() {
     setVideoPlaybackState(!isVideoPlaying);
+  }
+
+  function seekVideoBy(deltaSeconds) {
+    videoCurrentSeconds = Math.max(0, Math.min(videoTotalSeconds, videoCurrentSeconds + deltaSeconds));
+    updateScrubberUI();
+    sendIframeCommand('seekTo', [videoCurrentSeconds, true]);
+    if (typeof window.triggerHaptic === 'function') window.triggerHaptic('medium');
+    if (isVideoPlaying) {
+      scheduleControlsAutoHide();
+    }
+  }
+
+  let seekRippleTimerLeft = null;
+  let seekRippleTimerRight = null;
+
+  function triggerSeekRipple(side, seconds = 10) {
+    const el = side === 'left' ? seekRippleLeft : seekRippleRight;
+    if (!el) return;
+
+    el.classList.remove('is-active');
+    void el.offsetWidth; // Force CSS reflow to re-trigger keyframe animation
+    el.classList.add('is-active');
+
+    if (side === 'left') {
+      clearTimeout(seekRippleTimerLeft);
+      seekRippleTimerLeft = setTimeout(() => {
+        el.classList.remove('is-active');
+      }, 700);
+    } else {
+      clearTimeout(seekRippleTimerRight);
+      seekRippleTimerRight = setTimeout(() => {
+        el.classList.remove('is-active');
+      }, 700);
+    }
   }
 
   function startPlaybackTicker() {
@@ -336,6 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
     customControls.classList.remove('is-hidden');
     if (isVideoPlaying) {
       scheduleControlsAutoHide();
+    } else {
+      clearTimeout(controlsAutoHideTimer);
     }
   }
 
@@ -356,11 +402,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function scheduleControlsAutoHide() {
     clearTimeout(controlsAutoHideTimer);
+    if (!isVideoPlaying) return; // Strict: NEVER auto-hide if paused!
     controlsAutoHideTimer = setTimeout(() => {
       if (isVideoPlaying && theaterStage && !theaterStage.classList.contains('is-miniplayer')) {
         hideCustomControls();
       }
-    }, 3200);
+    }, 3000); // 3 seconds countdown
   }
 
   function enterMiniplayer() {
@@ -389,8 +436,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     hideCustomControls();
     clearTimeout(controlsAutoHideTimer);
-    stopPlaybackTicker();
     closeSettingsSheet();
+
+    // Synchronize miniplayer play/pause icon
+    if (miniPlayIcon) {
+      if (isVideoPlaying) {
+        miniPlayIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+      } else {
+        miniPlayIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+      }
+    }
 
     theaterStage.classList.add('is-miniplayer');
     if (playerView) {
@@ -461,12 +516,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function initDragToMiniplayer() {
     if (!theaterStage) return;
 
+    let dragStartTarget = null;
+    let lastTapTime = 0;
+    let lastTapSide = null;
+
     function onDragStart(clientY, clientX, target) {
       if (theaterStage.classList.contains('is-miniplayer')) return;
       if (target && (target.closest('button') || target.closest('a') || target.closest('.cinema-ctrl-scrub-container'))) return;
 
       isDragging = true;
       hasDragged = false;
+      dragStartTarget = target;
       startY = clientY;
       startX = clientX;
       currentDeltaY = 0;
@@ -531,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 600);
 
         // Dragged down past threshold: seamlessly settle into bottom-right miniplayer!
-        if (currentDeltaY > 40) {
+        if (currentDeltaY > 35) {
           enterMiniplayer();
         } else {
           // Snap back up to full theater mode smoothly
@@ -559,10 +619,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         hasDragged = false;
       } else {
-        // PURE SINGLE TAP: instantaneous toggle with 0ms lag!
+        // TAP ON VIDEO GESTURE SURFACE
         const elapsed = Date.now() - dragStartTime;
-        if (elapsed < 350 && Math.abs(currentDeltaY) < 10) {
-          toggleCustomControls();
+        if (elapsed < 350 && Math.abs(currentDeltaY) < 12 && Math.abs(currentDeltaX) < 12) {
+          const videoStageCard = document.getElementById('cinema-video-card-stage');
+          const isVideoTouch = dragSurface && (
+            dragStartTarget === dragSurface ||
+            dragSurface.contains(dragStartTarget) ||
+            (videoStageCard && videoStageCard.contains(dragStartTarget))
+          );
+
+          if (isVideoTouch) {
+            const rect = dragSurface.getBoundingClientRect();
+            const tapX = startX - rect.left;
+            const width = rect.width || 1;
+            const pct = tapX / width;
+            const side = pct < 0.38 ? 'left' : (pct > 0.62 ? 'right' : 'center');
+            const now = Date.now();
+
+            if (side !== 'center' && (now - lastTapTime < 320) && (lastTapSide === side)) {
+              // DOUBLE-TAP: Seek 10 seconds with chevron ripple animation
+              lastTapTime = 0;
+              lastTapSide = null;
+              if (side === 'left') {
+                seekVideoBy(-10);
+                triggerSeekRipple('left', 10);
+              } else {
+                seekVideoBy(10);
+                triggerSeekRipple('right', 10);
+              }
+            } else {
+              // SINGLE TAP: Instant 0ms toggle reaction!
+              lastTapTime = now;
+              lastTapSide = side;
+              toggleCustomControls();
+              if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
+            }
+          }
         }
       }
     }
@@ -812,6 +905,18 @@ document.addEventListener('DOMContentLoaded', () => {
         closeSettingsSheet();
       });
     });
+
+    // Miniplayer Play/Pause toggle button
+    if (miniPlayBtn) {
+      const handleMiniPlay = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePlayPause();
+        if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
+      };
+      miniPlayBtn.addEventListener('click', handleMiniPlay);
+      miniPlayBtn.addEventListener('touchend', handleMiniPlay, { passive: false });
+    }
 
     // Center enlarge button on miniplayer: ONLY this expands back!
     if (miniExpandBtn) {
