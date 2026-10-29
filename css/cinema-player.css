@@ -2922,7 +2922,7 @@
    1. Remove top header bar (.yt-mobile-app-header)
    2. Move player right to the top (compact safe-area padding)
    3. Keep player fixed/sticky at the top during scrolling
-   4. Videos below scroll underneath with smooth fade
+   4. Clear boundary line set just below channel icon (YouTube style)
    ========================================================= */
 .cinema-player-viewport.theater-active:not(.miniplayer-mode) {
   padding-top: 0 !important;
@@ -2934,7 +2934,7 @@
   display: none !important;
 }
 
-/* Fixed/Sticky Player Stage at Top */
+/* Fixed/Sticky Player Stage at Top (Exact YouTube Mobile UI) */
 .cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-theater-stage {
   position: sticky !important;
   top: 0 !important;
@@ -2951,27 +2951,16 @@
   width: calc(100% + 32px) !important;
   box-sizing: border-box !important;
   transform: none !important;
-  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.98) !important;
+  /* YouTube boundary divider line right below channel icon / actions row */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
 }
 
-/* Smooth ambient gradient fade below sticky player so scrolling videos fade underneath */
-.cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-theater-stage::after {
-  content: '';
-  position: absolute;
-  bottom: -32px;
-  left: 0;
-  right: 0;
-  height: 32px;
-  background: linear-gradient(to bottom, #000000 0%, rgba(0, 0, 0, 0.85) 35%, rgba(0, 0, 0, 0.25) 75%, transparent 100%);
-  pointer-events: none;
-  z-index: 85;
-}
-
-/* Feed section positioning under sticky player */
+/* Feed section positioning under sticky player: scrolls freely right up to boundary line */
 .cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-feed-section {
   position: relative !important;
   z-index: 10 !important;
-  padding-top: 16px !important;
+  padding-top: 14px !important;
 }
 
 /* In miniplayer mode, the home screen and top bar are fully visible */
@@ -3457,8 +3446,7 @@
   pointer-events: none !important;
 }
 
-/* Hide ambilight, glass frame, metadata bar, drag surface, custom controls AND sticky fade in miniplayer */
-.cinema-theater-stage.is-miniplayer::after,
+/* Hide ambilight, glass frame, metadata bar, drag surface AND custom controls in miniplayer */
 .cinema-theater-stage.is-miniplayer .cinema-artwork-glow,
 .cinema-theater-stage.is-miniplayer .cinema-glass-frame,
 .cinema-theater-stage.is-miniplayer .cinema-theater-yt-bar,
@@ -3948,10 +3936,7 @@
   padding: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform, filter;
+  transition: opacity 0.2s ease, transform 0.2s ease;
   box-sizing: border-box;
 }
 
