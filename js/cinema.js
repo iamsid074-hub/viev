@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const seekRippleRight = document.getElementById('seek-ripple-right');
   const customControls = document.getElementById('cinema-custom-player-controls');
   const ctrlMinimizeBtn = document.getElementById('cinema-ctrl-minimize-btn');
+  let justEnteredMiniplayerAt = 0;
+  let dragJustFinished = false;
+  let ignoreNextMiniplayerClick = false;
   const openAddModalBtn = document.getElementById('cinema-open-add-btn');
   const addModal = document.getElementById('cinema-add-modal');
   const closeAddModalBtn = document.getElementById('cinema-close-add-btn');
@@ -485,10 +488,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.triggerHaptic === 'function') window.triggerHaptic('medium');
 
     dragJustFinished = true;
+    ignoreNextMiniplayerClick = true;
+    justEnteredMiniplayerAt = Date.now();
 
-    // Smoothly fade out the metadata (Title, Channel logo/avatar, subscriber count, likes)
+    // Smoothly fade out metadata
     if (theaterYtBar) {
-      theaterYtBar.style.transition = 'opacity 0.22s ease';
+      theaterYtBar.style.transition = 'opacity 0.2s ease';
       theaterYtBar.style.opacity = '0';
     }
     if (customControls) {
@@ -496,29 +501,48 @@ document.addEventListener('DOMContentLoaded', () => {
       customControls.style.opacity = '0';
     }
 
-    // Smoothly scale & glide video card toward the bottom-right corner
-    theaterStage.style.transition = 'transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.3s ease';
-    theaterStage.style.transformOrigin = 'bottom right';
-    theaterStage.style.transform = 'translate(-12px, 340px) scale(0.48)';
+    // Only the video player artwork container moves and shrinks
+    if (artworkContainer) {
+      artworkContainer.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease';
+      artworkContainer.style.transformOrigin = 'bottom right';
+      artworkContainer.style.transform = 'translate(60px, 320px) scale(0.48)';
+    }
 
     setTimeout(() => {
       enterMiniplayer();
-      dragJustFinished = false;
-    }, 300);
+      if (artworkContainer) {
+        artworkContainer.style.transform = '';
+        artworkContainer.style.transformOrigin = '';
+        artworkContainer.style.transition = '';
+        artworkContainer.style.boxShadow = '';
+        artworkContainer.style.borderRadius = '';
+        artworkContainer.style.zIndex = '';
+      }
+      setTimeout(() => {
+        ignoreNextMiniplayerClick = false;
+        dragJustFinished = false;
+      }, 500);
+    }, 260);
   }
 
   function enterMiniplayer() {
     if (!theaterStage) return;
     dragJustFinished = true;
+    ignoreNextMiniplayerClick = true;
     justEnteredMiniplayerAt = Date.now();
-    setTimeout(() => {
-      dragJustFinished = false;
-    }, 500);
 
     theaterStage.style.transition = '';
     theaterStage.style.transform = '';
     theaterStage.style.transformOrigin = '';
     theaterStage.style.boxShadow = '';
+    if (artworkContainer) {
+      artworkContainer.style.transform = '';
+      artworkContainer.style.transformOrigin = '';
+      artworkContainer.style.transition = '';
+      artworkContainer.style.boxShadow = '';
+      artworkContainer.style.borderRadius = '';
+      artworkContainer.style.zIndex = '';
+    }
     if (theaterYtBar) {
       theaterYtBar.style.opacity = '';
       theaterYtBar.style.transition = '';
@@ -542,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
       playerView.classList.remove('theater-active');
     }
 
-    // Now in miniplayer mode: smoothly fade in the feed & app header so user can browse
+    // Smoothly fade in the feed & app header so user can browse
     if (feedSection) {
       feedSection.style.transition = 'opacity 0.28s ease';
       feedSection.style.opacity = '1';
@@ -562,6 +586,14 @@ document.addEventListener('DOMContentLoaded', () => {
     theaterStage.style.transformOrigin = '';
     theaterStage.style.transition = '';
     theaterStage.style.boxShadow = '';
+    if (artworkContainer) {
+      artworkContainer.style.transform = '';
+      artworkContainer.style.transformOrigin = '';
+      artworkContainer.style.transition = '';
+      artworkContainer.style.boxShadow = '';
+      artworkContainer.style.borderRadius = '';
+      artworkContainer.style.zIndex = '';
+    }
     if (playerView) {
       playerView.classList.remove('miniplayer-mode');
       playerView.classList.add('theater-active');
@@ -595,6 +627,14 @@ document.addEventListener('DOMContentLoaded', () => {
       theaterStage.style.transform = '';
       theaterStage.style.transformOrigin = '';
       theaterStage.style.transition = '';
+    }
+    if (artworkContainer) {
+      artworkContainer.style.transform = '';
+      artworkContainer.style.transformOrigin = '';
+      artworkContainer.style.transition = '';
+      artworkContainer.style.boxShadow = '';
+      artworkContainer.style.borderRadius = '';
+      artworkContainer.style.zIndex = '';
     }
     if (playerView) {
       playerView.classList.remove('theater-active');
@@ -657,18 +697,27 @@ document.addEventListener('DOMContentLoaded', () => {
         currentDeltaY = deltaY;
         currentDeltaX = deltaX;
 
-        const progress = Math.min(Math.max(deltaY / 180, 0), 1);
-        const scale = 1 - (progress * 0.45);
-        const transX = Math.min(Math.max(deltaX * 0.25, -60), 40);
+        const progress = Math.min(Math.max(deltaY / 220, 0), 1);
+        const scale = 1 - (progress * 0.46);
+        const transX = Math.min(Math.max((deltaX * 0.3) + (progress * 40), -40), 90);
+        const transY = deltaY * 0.88;
 
-        theaterStage.style.transition = 'none';
-        theaterStage.style.transformOrigin = 'bottom right';
-        theaterStage.style.transform = `translate(${transX}px, ${deltaY * 0.85}px) scale(${scale})`;
+        // ONLY transform the player shape (artworkContainer)! The channel/metadata stays stationary!
+        if (artworkContainer) {
+          artworkContainer.style.transition = 'none';
+          artworkContainer.style.transformOrigin = 'bottom right';
+          artworkContainer.style.transform = `translate(${transX}px, ${transY}px) scale(${scale})`;
+          artworkContainer.style.boxShadow = `0 16px 36px rgba(0, 0, 0, ${0.4 + progress * 0.45})`;
+          artworkContainer.style.borderRadius = `${14 + (1 - progress) * 8}px`;
+          artworkContainer.style.zIndex = '120';
+        }
 
-        if (customControls) customControls.style.opacity = Math.max(1 - progress * 2.8, 0);
+        if (customControls) {
+          customControls.style.opacity = Math.max(1 - progress * 2.8, 0);
+        }
         if (theaterYtBar) {
           theaterYtBar.style.transition = 'none';
-          theaterYtBar.style.opacity = Math.max(1 - progress * 1.6, 0);
+          theaterYtBar.style.opacity = Math.max(1 - progress * 1.8, 0);
         }
       }
     }
@@ -682,17 +731,52 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (_) {}
 
       if (hasDragged) {
-        if (currentDeltaY > 40) {
-          enterMiniplayer();
+        if (currentDeltaY > 35) {
+          // Drag successfully completed into miniplayer
+          ignoreNextMiniplayerClick = true;
+          dragJustFinished = true;
+          justEnteredMiniplayerAt = Date.now();
+
+          if (artworkContainer) {
+            artworkContainer.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease';
+            artworkContainer.style.transformOrigin = 'bottom right';
+            artworkContainer.style.transform = 'translate(60px, 320px) scale(0.48)';
+          }
+
+          setTimeout(() => {
+            enterMiniplayer();
+            if (artworkContainer) {
+              artworkContainer.style.transform = '';
+              artworkContainer.style.transformOrigin = '';
+              artworkContainer.style.transition = '';
+              artworkContainer.style.boxShadow = '';
+              artworkContainer.style.borderRadius = '';
+              artworkContainer.style.zIndex = '';
+            }
+            setTimeout(() => {
+              ignoreNextMiniplayerClick = false;
+              dragJustFinished = false;
+            }, 500);
+          }, 200);
         } else {
-          theaterStage.style.transition = 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease';
-          theaterStage.style.transform = '';
-          theaterStage.style.transformOrigin = '';
+          // Drag aborted: restore player shape smoothly
+          if (artworkContainer) {
+            artworkContainer.style.transition = 'transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease';
+            artworkContainer.style.transform = '';
+            artworkContainer.style.transformOrigin = '';
+            artworkContainer.style.boxShadow = '';
+            artworkContainer.style.borderRadius = '';
+            artworkContainer.style.zIndex = '';
+          }
           if (customControls) customControls.style.opacity = '';
           if (theaterYtBar) {
             theaterYtBar.style.transition = 'opacity 0.25s ease';
             theaterYtBar.style.opacity = '1';
           }
+          setTimeout(() => {
+            ignoreNextMiniplayerClick = false;
+            dragJustFinished = false;
+          }, 300);
         }
         hasDragged = false;
       } else {
@@ -726,7 +810,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    const dragTargets = [dragSurface, artworkContainer, theaterYtBar].filter(Boolean);
+    // ONLY the video player shape itself (artworkContainer / dragSurface) is draggable
+    const dragTargets = [dragSurface, artworkContainer].filter(Boolean);
     dragTargets.forEach(target => {
       target.addEventListener('pointerdown', handlePointerDown);
       target.addEventListener('pointermove', handlePointerMove);
@@ -734,12 +819,43 @@ document.addEventListener('DOMContentLoaded', () => {
       target.addEventListener('pointercancel', handlePointerUp);
     });
 
-    // Tap on miniplayer to expand back to full player
+    // Tap on miniplayer body to expand back to full player (IGNORES synthetic clicks from drag-finish)
     if (theaterStage) {
       theaterStage.addEventListener('click', (e) => {
         if (!theaterStage.classList.contains('is-miniplayer')) return;
+        if (ignoreNextMiniplayerClick || dragJustFinished || (Date.now() - justEnteredMiniplayerAt < 600)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
         if (e.target && e.target.closest('.cinema-mini-btn')) return;
         exitMiniplayer();
+      });
+    }
+
+    // Miniplayer controls explicit handlers
+    if (miniPlayBtn) {
+      miniPlayBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePlayPause();
+        if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
+      });
+    }
+
+    if (miniExpandBtn) {
+      miniExpandBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        exitMiniplayer();
+      });
+    }
+
+    if (miniDismissBtn) {
+      miniDismissBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeVideoCompletely();
       });
     }
 
