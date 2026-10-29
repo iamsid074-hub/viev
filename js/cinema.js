@@ -1069,6 +1069,8 @@ document.addEventListener('DOMContentLoaded', () => {
           btnText: "Feed: Load Digi's Favorites",
           topics: [
             { label: 'All', query: 'All' },
+            { label: '🔴 Live', query: 'live stream hindi news gaming live' },
+            { label: 'Trending Music', query: 'latest trending bollywood songs' },
             { label: 'Romantic Hits', query: 'Romantic Hindi Songs Love Arijit Singh' },
             { label: 'Arijit Singh', query: 'Arijit Singh Latest Best Songs' },
             { label: 'Ve Haaniyaan', query: 'Ve Haaniyaan Songs' },
@@ -1092,6 +1094,8 @@ document.addEventListener('DOMContentLoaded', () => {
       btnText: 'Feed: Load My Videos (@viratplaystdm)',
       topics: [
         { label: 'All', query: 'All' },
+        { label: '🔴 Live', query: 'live stream hindi news gaming live' },
+        { label: 'Music', query: 'latest trending bollywood songs 2026' },
         { label: 'Gaming', query: 'Godlike BGMI Gaming GTA 6' },
         { label: 'BB Ki Vines', query: 'BB Ki Vines Bhuvan Bam' },
         { label: 'BeamNG', query: 'Beamng drive accidents hindi' },
@@ -1256,10 +1260,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (safeViews) metaParts.push(`<span class="yt-dot">•</span><span class="yt-views-count"><span class="yt-play-triangle">▷</span> ${safeViews}</span>`);
         if (safePub) metaParts.push(`<span class="yt-dot">•</span><span class="yt-pub-time">${safePub}</span>`);
 
+        const isLiveNow = (safeDuration && safeDuration.toLowerCase().includes('live')) || (safePub && safePub.toLowerCase().includes('live')) || (safeViews && safeViews.toLowerCase().includes('watching'));
+        const durationHtml = isLiveNow
+          ? `<span class="yt-mobile-duration yt-live-badge">🔴 LIVE</span>`
+          : `<span class="yt-mobile-duration">♪ ${safeDuration}</span>`;
+
         card.innerHTML = `
           <div class="yt-mobile-thumb-wrap">
             <img src="${vid.thumb}" alt="${safeTitle}" class="yt-mobile-thumb" loading="lazy">
-            <span class="yt-mobile-duration">♪ ${safeDuration}</span>
+            ${durationHtml}
           </div>
           <div class="yt-mobile-card-details">
             <div class="yt-mobile-avatar-wrap">

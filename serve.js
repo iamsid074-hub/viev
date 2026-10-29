@@ -25,79 +25,77 @@ const MIME_TYPES = {
 // In-memory cache for ultra-fast YouTube searches
 const searchCache = new Map();
 
-function fetchYouTubeVideos(query, callback) {
-  const cleanQ = (query || '').trim();
-  if (!cleanQ) return callback(null, []);
-
+async function fetchYouTubeVideos(query, callback) {
+  const cleanQ = (query || '').trim() || 'trending india';
   const cached = searchCache.get(cleanQ);
-  if (cached && (Date.now() - cached.time < 1000 * 60 * 15)) {
+  if (cached && (Date.now() - cached.time < 1000 * 60 * 10)) {
     return callback(null, cached.data);
   }
 
-  const reqUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanQ)}`;
-  const options = {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8'
-    }
-  };
-
-  https.get(reqUrl, options, (res) => {
-    let raw = '';
-    res.on('data', chunk => raw += chunk);
-    res.on('end', () => {
-      try {
-        const match = raw.match(/var ytInitialData = ({.*?});<\/script>/);
-        if (!match) {
-          return callback(null, []);
-        }
-
-        const json = JSON.parse(match[1]);
-        const contents = json.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents || [];
-        const videos = [];
-
-        for (const section of contents) {
-          const items = section.itemSectionRenderer?.contents || [];
-          for (const item of items) {
-            if (item.videoRenderer) {
-              const vr = item.videoRenderer;
-              const videoId = vr.videoId;
-              const title = vr.title?.runs?.map(r => r.text).join('') || vr.title?.simpleText || 'YouTube Video';
-              const channel = vr.ownerText?.runs?.[0]?.text || vr.shortBylineText?.runs?.[0]?.text || 'Channel';
-              const avatar = vr.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.thumbnail?.thumbnails?.[0]?.url || '';
-              const pub = vr.publishedTimeText?.simpleText || '';
-              const shortViews = vr.shortViewCountText?.simpleText || (vr.viewCountText?.simpleText ? `${vr.viewCountText.simpleText} views` : '');
-              const duration = vr.lengthText?.simpleText || 'Video';
-              const thumbs = vr.thumbnail?.thumbnails || [];
-              const thumb = thumbs.length ? thumbs[thumbs.length - 1].url : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-              const isVerified = Boolean(vr.ownerBadges);
-
-              if (videoId && title) {
-                videos.push({
-                  id: videoId,
-                  title,
-                  channel,
-                  views: shortViews,
-                  pub,
-                  duration,
-                  thumb,
-                  avatar,
-                  isVerified
-                });
-              }
-            }
+  try {
+    const res = await fetch('https://www.youtube.com/youtubei/v1/search?prettyPrint=false', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
+      body: JSON.stringify({
+        context: {
+          client: {
+            hl: 'en',
+            gl: 'IN',
+            clientName: 'WEB',
+            clientVersion: '2.20240101.00.00'
           }
-        }
-
-        searchCache.set(cleanQ, { time: Date.now(), data: videos });
-        callback(null, videos);
-      } catch (err) {
-        callback(err, []);
-      }
+        },
+        query: cleanQ
+      })
     });
-  }).on('error', (err) => {
+
+    if (!res.ok) throw new Error('Innertube status ' + res.status);
+    const data = await res.json();
+    const videos = [];
+
+    function extractVideos(obj) {
+      if (!obj || typeof obj !== 'object') return;
+      if (obj.videoRenderer) {
+        const vr = obj.videoRenderer;
+        if (vr.videoId && vr.title) {
+          const title = vr.title?.runs?.map(r => r.text).join('') || vr.title?.simpleText || 'YouTube Video';
+          const channel = vr.ownerText?.runs?.[0]?.text || vr.shortBylineText?.runs?.[0]?.text || 'Channel';
+          const avatar = vr.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.thumbnail?.thumbnails?.[0]?.url || '';
+          const pub = vr.publishedTimeText?.simpleText || '';
+          const views = vr.shortViewCountText?.simpleText || (vr.viewCountText?.simpleText ? vr.viewCountText.simpleText : '100K views');
+          const duration = vr.lengthText?.simpleText || '♪ Video';
+          const thumbs = vr.thumbnail?.thumbnails || [];
+          const thumb = thumbs.length ? thumbs[thumbs.length - 1].url : `https://img.youtube.com/vi/${vr.videoId}/hqdefault.jpg`;
+          const isVerified = Boolean(vr.ownerBadges);
+
+          videos.push({
+            id: vr.videoId,
+            title,
+            channel,
+            views,
+            pub,
+            duration,
+            thumb,
+            avatar,
+            isVerified
+          });
+        }
+      }
+      for (const k of Object.keys(obj)) {
+        extractVideos(obj[k]);
+      }
+    }
+
+    extractVideos(data);
+    searchCache.set(cleanQ, { time: Date.now(), data: videos });
+    callback(null, videos);
+  } catch (err) {
+    console.error('Innertube fetch error:', err.message);
     callback(err, []);
-  });
+  }
 }
 
 const { exec } = require('child_process');
@@ -117,16 +115,20 @@ function getUserPersonalFeed(forceRefresh, callback) {
   const scriptPath = path.join(__dirname, 'scripts', 'get_user_feed.py');
   const refreshArg = forceRefresh ? ' --refresh' : '';
   exec(`python "${scriptPath}"${refreshArg}`, { maxBuffer: 1024 * 1024 * 10 }, (err, stdout) => {
-    if (err || !stdout) {
-      return callback(err, myFeedCache || []);
+    if (err || !stdout || stdout.trim() === '[]') {
+      return fetchYouTubeVideos('trending videos india latest', callback);
     }
     try {
       const videos = JSON.parse(stdout.trim());
-      myFeedCache = videos;
-      lastFeedFetch = Date.now();
-      callback(null, videos);
+      if (Array.isArray(videos) && videos.length > 0) {
+        myFeedCache = videos;
+        lastFeedFetch = Date.now();
+        callback(null, videos);
+      } else {
+        fetchYouTubeVideos('trending videos india latest', callback);
+      }
     } catch (e) {
-      callback(e, myFeedCache || []);
+      fetchYouTubeVideos('trending videos india latest', callback);
     }
   });
 }

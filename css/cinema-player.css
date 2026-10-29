@@ -4032,6 +4032,22 @@
   pointer-events: none;
 }
 
+.yt-mobile-duration.yt-live-badge {
+  background: #cc0000;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  box-shadow: 0 2px 8px rgba(204, 0, 0, 0.5);
+  animation: ytLivePulse 2s infinite ease-in-out;
+}
+
+@keyframes ytLivePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(0.97); }
+}
+
 .yt-mobile-card-details {
   display: flex;
   align-items: flex-start;
