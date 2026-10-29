@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const seekRippleRight = document.getElementById('seek-ripple-right');
   const customControls = document.getElementById('cinema-custom-player-controls');
   const ctrlMinimizeBtn = document.getElementById('cinema-ctrl-minimize-btn');
+  const ctrlCloseBtn = document.getElementById('cinema-ctrl-close-btn');
   const openAddModalBtn = document.getElementById('cinema-open-add-btn');
   const addModal = document.getElementById('cinema-add-modal');
   const closeAddModalBtn = document.getElementById('cinema-close-add-btn');
@@ -548,6 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
       playerView.classList.add('miniplayer-mode');
       playerView.classList.remove('theater-active');
     }
+    resetFeedCardsFade();
     if (typeof window.triggerHaptic === 'function') window.triggerHaptic('medium');
   }
 
@@ -567,6 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cinemaScreen = document.getElementById('cinema-screen');
     if (cinemaScreen) cinemaScreen.scrollTo({ top: 0, behavior: 'smooth' });
     if (playerView) playerView.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(updateScrollFade, 60);
     if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
   }
 
@@ -593,7 +596,82 @@ document.addEventListener('DOMContentLoaded', () => {
       appHeader.style.display = '';
       appHeader.style.opacity = '';
     }
+    resetFeedCardsFade();
     if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
+  }
+
+  // =========================================================
+  // SMOOTH SCROLL FADE ENGINE FOR VIDEOS BELOW FIXED PLAYER
+  // As feed videos scroll up towards/under the fixed player,
+  // they fade out smoothly with subtle scale and soft blur.
+  // =========================================================
+  function resetFeedCardsFade() {
+    if (!feedGrid) return;
+    const cards = feedGrid.querySelectorAll('.cinema-video-card');
+    cards.forEach(card => {
+      card.style.opacity = '';
+      card.style.transform = '';
+      card.style.filter = '';
+    });
+  }
+
+  function updateScrollFade() {
+    if (!playerView || !playerView.classList.contains('theater-active') || playerView.classList.contains('miniplayer-mode')) {
+      resetFeedCardsFade();
+      return;
+    }
+    if (!theaterStage || !feedGrid) return;
+
+    const stageRect = theaterStage.getBoundingClientRect();
+    const stageBottom = stageRect.bottom;
+    const cards = feedGrid.querySelectorAll('.cinema-video-card');
+    if (!cards || cards.length === 0) return;
+
+    const fadeZone = 140; // 140px smooth fade transition zone
+
+    cards.forEach(card => {
+      const cardRect = card.getBoundingClientRect();
+      const cardTop = cardRect.top;
+      const diff = cardTop - stageBottom;
+
+      if (diff < fadeZone && diff > -cardRect.height) {
+        // Card is in the fade zone as it approaches or passes under the fixed player
+        const progress = Math.max(0, Math.min(1, diff / fadeZone));
+        const opacity = Math.pow(progress, 1.25);
+        card.style.opacity = opacity.toFixed(2);
+        card.style.transform = `scale(${(0.96 + 0.04 * progress).toFixed(3)})`;
+        card.style.filter = opacity < 0.88 ? `blur(${((1 - opacity) * 3).toFixed(1)}px)` : 'none';
+      } else if (diff <= -cardRect.height) {
+        // Completely behind fixed player
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.95)';
+        card.style.filter = 'blur(4px)';
+      } else {
+        // Fully visible below fixed player
+        card.style.opacity = '1';
+        card.style.transform = 'scale(1)';
+        card.style.filter = 'none';
+      }
+    });
+  }
+
+  let isScrollFadingTicking = false;
+  function handleScrollFade() {
+    if (!isScrollFadingTicking) {
+      window.requestAnimationFrame(() => {
+        updateScrollFade();
+        isScrollFadingTicking = false;
+      });
+      isScrollFadingTicking = true;
+    }
+  }
+
+  const cinemaScreenScrollEl = document.getElementById('cinema-screen');
+  if (cinemaScreenScrollEl) {
+    cinemaScreenScrollEl.addEventListener('scroll', handleScrollFade, { passive: true });
+  }
+  if (playerView) {
+    playerView.addEventListener('scroll', handleScrollFade, { passive: true });
   }
 
   // Smooth Pointer Drag-to-Miniplayer & Tap Engine
@@ -736,6 +814,15 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         e.stopPropagation();
         animateAutoDragToMiniplayer();
+      });
+    }
+
+    // Top-right Close button on custom controls: Closes video completely
+    if (ctrlCloseBtn) {
+      ctrlCloseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeVideoCompletely();
       });
     }
 
@@ -1042,6 +1129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cinemaScreen = document.getElementById('cinema-screen');
     if (cinemaScreen) cinemaScreen.scrollTo({ top: 0, behavior: 'smooth' });
     playerView.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(updateScrollFade, 70);
 
     if (theaterTitle) theaterTitle.textContent = title;
     if (theaterChannel) theaterChannel.textContent = channel;
@@ -1354,6 +1442,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         feedGrid.appendChild(card);
       });
+      setTimeout(updateScrollFade, 60);
 
       if (autoPlayFirst && videos.length > 0) {
         const first = videos[0];

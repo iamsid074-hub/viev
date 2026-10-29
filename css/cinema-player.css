@@ -2917,20 +2917,61 @@
    ACTIVE VIDEO THEATER: APPLE VISION PRO GLASS + AMBILIGHT
    Exact replica of VIEVS Music Player Card (Image 2)
    ========================================================= */
-/* In theater mode, keep the top bar accessible with Back button, Logo, and Search */
-.cinema-player-viewport.theater-active:not(.miniplayer-mode) .yt-mobile-app-header {
-  display: flex !important;
-  position: sticky;
-  top: 0;
-  z-index: 60;
-  background: rgba(0, 0, 0, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+/* =========================================================
+   WHEN VIDEO PLAYER IS ACTIVE:
+   1. Remove top header bar (.yt-mobile-app-header)
+   2. Move player right to the top (compact safe-area padding)
+   3. Keep player fixed/sticky at the top during scrolling
+   4. Videos below scroll underneath with smooth fade
+   ========================================================= */
+.cinema-player-viewport.theater-active:not(.miniplayer-mode) {
+  padding-top: 0 !important;
+  gap: 0 !important;
 }
 
+/* Remove top bar completely when video player is on */
+.cinema-player-viewport.theater-active:not(.miniplayer-mode) .yt-mobile-app-header {
+  display: none !important;
+}
+
+/* Fixed/Sticky Player Stage at Top */
 .cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-theater-stage {
-  margin-top: 4px;
-  padding-top: 0;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 80 !important;
+  background: #000000 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: calc(var(--sat, 12px) + 6px) !important;
+  padding-bottom: 12px !important;
+  margin-left: -16px !important;
+  margin-right: -16px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  width: calc(100% + 32px) !important;
+  box-sizing: border-box !important;
+  transform: none !important;
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.98) !important;
+}
+
+/* Smooth ambient gradient fade below sticky player so scrolling videos fade underneath */
+.cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-theater-stage::after {
+  content: '';
+  position: absolute;
+  bottom: -32px;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: linear-gradient(to bottom, #000000 0%, rgba(0, 0, 0, 0.85) 35%, rgba(0, 0, 0, 0.25) 75%, transparent 100%);
+  pointer-events: none;
+  z-index: 85;
+}
+
+/* Feed section positioning under sticky player */
+.cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-feed-section {
+  position: relative !important;
+  z-index: 10 !important;
+  padding-top: 16px !important;
 }
 
 /* In miniplayer mode, the home screen and top bar are fully visible */
@@ -3416,7 +3457,8 @@
   pointer-events: none !important;
 }
 
-/* Hide ambilight, glass frame, metadata bar, drag surface AND custom controls in miniplayer */
+/* Hide ambilight, glass frame, metadata bar, drag surface, custom controls AND sticky fade in miniplayer */
+.cinema-theater-stage.is-miniplayer::after,
 .cinema-theater-stage.is-miniplayer .cinema-artwork-glow,
 .cinema-theater-stage.is-miniplayer .cinema-glass-frame,
 .cinema-theater-stage.is-miniplayer .cinema-theater-yt-bar,
@@ -3906,7 +3948,10 @@
   padding: 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
   box-sizing: border-box;
 }
 
