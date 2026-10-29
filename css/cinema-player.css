@@ -3123,16 +3123,12 @@
   position: absolute;
   inset: 0;
   z-index: 10;
-  cursor: grab;
-  touch-action: none;
-  background: rgba(0, 0, 0, 0.001); /* CRITICAL: ensures iOS & Android touch hits surface reliably */
+  cursor: pointer;
+  touch-action: manipulation;
+  background: rgba(0, 0, 0, 0.001); /* ensures iOS & Android touch hits surface reliably */
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-.cinema-player-drag-surface:active {
-  cursor: grabbing;
 }
 
 /* =========================================================

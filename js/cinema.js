@@ -46,10 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const seekRippleLeft = document.getElementById('seek-ripple-left');
   const seekRippleRight = document.getElementById('seek-ripple-right');
   const customControls = document.getElementById('cinema-custom-player-controls');
-  const ctrlMinimizeBtn = document.getElementById('cinema-ctrl-minimize-btn');
-  let justEnteredMiniplayerAt = 0;
-  let dragJustFinished = false;
-  let ignoreNextMiniplayerClick = false;
+  const ctrlBackBtn = document.getElementById('cinema-ctrl-back-btn') || document.getElementById('cinema-ctrl-minimize-btn');
   const openAddModalBtn = document.getElementById('cinema-open-add-btn');
   const addModal = document.getElementById('cinema-add-modal');
   const closeAddModalBtn = document.getElementById('cinema-close-add-btn');
@@ -483,47 +480,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function animateAutoDragToMiniplayer() {
-    if (!theaterStage || theaterStage.classList.contains('is-miniplayer')) return;
-    if (typeof window.triggerHaptic === 'function') window.triggerHaptic('medium');
-
-    dragJustFinished = true;
-    ignoreNextMiniplayerClick = true;
-    justEnteredMiniplayerAt = Date.now();
-
-    // Smoothly fade out metadata
-    if (theaterYtBar) {
-      theaterYtBar.style.transition = 'opacity 0.2s ease';
-      theaterYtBar.style.opacity = '0';
-    }
-    if (customControls) {
-      customControls.style.transition = 'opacity 0.15s ease';
-      customControls.style.opacity = '0';
-    }
-
-    // Only the video player artwork container moves and shrinks
-    if (artworkContainer) {
-      artworkContainer.style.transition = 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease';
-      artworkContainer.style.transformOrigin = 'bottom right';
-      artworkContainer.style.transform = 'translate(60px, 320px) scale(0.48)';
-    }
-
-    setTimeout(() => {
-      enterMiniplayer();
-      if (artworkContainer) {
-        artworkContainer.style.transform = '';
-        artworkContainer.style.transformOrigin = '';
-        artworkContainer.style.transition = '';
-        artworkContainer.style.boxShadow = '';
-        artworkContainer.style.borderRadius = '';
-        artworkContainer.style.zIndex = '';
-      }
-      setTimeout(() => {
-        ignoreNextMiniplayerClick = false;
-        dragJustFinished = false;
-      }, 500);
-    }, 260);
-  }
 
   function enterMiniplayer() {
     if (!theaterStage) return;
@@ -649,222 +605,55 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
   }
 
-  // Smooth Pointer Drag-to-Miniplayer & Tap Engine
-  function initDragToMiniplayer() {
+  // Video Controls & Tap Gestures (Drag feature completely removed)
+  function initVideoControlsAndGestures() {
     if (!theaterStage) return;
 
-    let isPointerDown = false;
-    let hasDragged = false;
-    let startY = 0;
-    let startX = 0;
-    let currentDeltaY = 0;
-    let currentDeltaX = 0;
-    let dragStartTime = 0;
-    let lastTapTime = 0;
-    let lastTapSide = null;
+    // Tap on Video: Toggle controls overlay
+    // Double Tap (Left/Right): Seek +/- 10s with ripple
+    const targetSurface = dragSurface || artworkContainer;
+    if (targetSurface) {
+      let lastTapTime = 0;
+      let lastTapSide = null;
 
-    function handlePointerDown(e) {
-      if (theaterStage.classList.contains('is-miniplayer')) return;
-      const target = e.target;
-      if (target && (target.closest('button') || target.closest('a') || target.closest('.cinema-ctrl-scrub-container') || target.closest('.cinema-settings-modal-backdrop'))) {
-        return;
-      }
-
-      isPointerDown = true;
-      hasDragged = false;
-      startY = e.clientY;
-      startX = e.clientX;
-      currentDeltaY = 0;
-      currentDeltaX = 0;
-      dragStartTime = Date.now();
-
-      try {
-        e.currentTarget.setPointerCapture(e.pointerId);
-      } catch (_) {}
-    }
-
-    function handlePointerMove(e) {
-      if (!isPointerDown) return;
-      if (theaterStage.classList.contains('is-miniplayer')) return;
-
-      const deltaY = e.clientY - startY;
-      const deltaX = e.clientX - startX;
-
-      // Only engage drag if pulled downwards > 6px
-      if (deltaY > 6) {
-        if (e.cancelable) e.preventDefault();
-        hasDragged = true;
-        currentDeltaY = deltaY;
-        currentDeltaX = deltaX;
-
-        const progress = Math.min(Math.max(deltaY / 220, 0), 1);
-        const scale = 1 - (progress * 0.46);
-        const transX = Math.min(Math.max((deltaX * 0.3) + (progress * 40), -40), 90);
-        const transY = deltaY * 0.88;
-
-        // ONLY transform the player shape (artworkContainer)! The channel/metadata stays stationary!
-        if (artworkContainer) {
-          artworkContainer.style.transition = 'none';
-          artworkContainer.style.transformOrigin = 'bottom right';
-          artworkContainer.style.transform = `translate(${transX}px, ${transY}px) scale(${scale})`;
-          artworkContainer.style.boxShadow = `0 16px 36px rgba(0, 0, 0, ${0.4 + progress * 0.45})`;
-          artworkContainer.style.borderRadius = `${14 + (1 - progress) * 8}px`;
-          artworkContainer.style.zIndex = '120';
-        }
-
-        if (customControls) {
-          customControls.style.opacity = Math.max(1 - progress * 2.8, 0);
-        }
-        if (theaterYtBar) {
-          theaterYtBar.style.transition = 'none';
-          theaterYtBar.style.opacity = Math.max(1 - progress * 1.8, 0);
-        }
-      }
-    }
-
-    function handlePointerUp(e) {
-      if (!isPointerDown) return;
-      isPointerDown = false;
-
-      try {
-        e.currentTarget.releasePointerCapture(e.pointerId);
-      } catch (_) {}
-
-      if (hasDragged) {
-        if (currentDeltaY > 35) {
-          // Drag successfully completed into miniplayer
-          ignoreNextMiniplayerClick = true;
-          dragJustFinished = true;
-          justEnteredMiniplayerAt = Date.now();
-
-          if (artworkContainer) {
-            artworkContainer.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease';
-            artworkContainer.style.transformOrigin = 'bottom right';
-            artworkContainer.style.transform = 'translate(60px, 320px) scale(0.48)';
-          }
-
-          setTimeout(() => {
-            enterMiniplayer();
-            if (artworkContainer) {
-              artworkContainer.style.transform = '';
-              artworkContainer.style.transformOrigin = '';
-              artworkContainer.style.transition = '';
-              artworkContainer.style.boxShadow = '';
-              artworkContainer.style.borderRadius = '';
-              artworkContainer.style.zIndex = '';
-            }
-            setTimeout(() => {
-              ignoreNextMiniplayerClick = false;
-              dragJustFinished = false;
-            }, 500);
-          }, 200);
-        } else {
-          // Drag aborted: restore player shape smoothly
-          if (artworkContainer) {
-            artworkContainer.style.transition = 'transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease';
-            artworkContainer.style.transform = '';
-            artworkContainer.style.transformOrigin = '';
-            artworkContainer.style.boxShadow = '';
-            artworkContainer.style.borderRadius = '';
-            artworkContainer.style.zIndex = '';
-          }
-          if (customControls) customControls.style.opacity = '';
-          if (theaterYtBar) {
-            theaterYtBar.style.transition = 'opacity 0.25s ease';
-            theaterYtBar.style.opacity = '1';
-          }
-          setTimeout(() => {
-            ignoreNextMiniplayerClick = false;
-            dragJustFinished = false;
-          }, 300);
-        }
-        hasDragged = false;
-      } else {
-        // Quick tap on video surface
-        const elapsed = Date.now() - dragStartTime;
-        if (elapsed < 350 && Math.abs(currentDeltaY) < 12 && Math.abs(currentDeltaX) < 12) {
-          const rect = dragSurface ? dragSurface.getBoundingClientRect() : e.currentTarget.getBoundingClientRect();
-          const tapX = startX - rect.left;
-          const width = rect.width || 1;
-          const pct = tapX / width;
-          const side = pct < 0.35 ? 'left' : (pct > 0.65 ? 'right' : 'center');
-          const now = Date.now();
-
-          if (side !== 'center' && (now - lastTapTime < 320) && (lastTapSide === side)) {
-            lastTapTime = 0;
-            lastTapSide = null;
-            if (side === 'left') {
-              seekVideoBy(-10);
-              triggerSeekRipple('left', 10);
-            } else {
-              seekVideoBy(10);
-              triggerSeekRipple('right', 10);
-            }
-          } else {
-            lastTapTime = now;
-            lastTapSide = side;
-            toggleCustomControls();
-            if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
-          }
-        }
-      }
-    }
-
-    // ONLY the video player shape itself (artworkContainer / dragSurface) is draggable
-    const dragTargets = [dragSurface, artworkContainer].filter(Boolean);
-    dragTargets.forEach(target => {
-      target.addEventListener('pointerdown', handlePointerDown);
-      target.addEventListener('pointermove', handlePointerMove);
-      target.addEventListener('pointerup', handlePointerUp);
-      target.addEventListener('pointercancel', handlePointerUp);
-    });
-
-    // Tap on miniplayer body to expand back to full player (IGNORES synthetic clicks from drag-finish)
-    if (theaterStage) {
-      theaterStage.addEventListener('click', (e) => {
-        if (!theaterStage.classList.contains('is-miniplayer')) return;
-        if (ignoreNextMiniplayerClick || dragJustFinished || (Date.now() - justEnteredMiniplayerAt < 600)) {
-          e.preventDefault();
-          e.stopPropagation();
+      targetSurface.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target && (target.closest('button') || target.closest('a') || target.closest('.cinema-ctrl-scrub-container') || target.closest('.cinema-settings-modal-backdrop'))) {
           return;
         }
-        if (e.target && e.target.closest('.cinema-mini-btn')) return;
-        exitMiniplayer();
+
+        const rect = targetSurface.getBoundingClientRect();
+        const tapX = e.clientX - rect.left;
+        const width = rect.width || 1;
+        const pct = tapX / width;
+        const side = pct < 0.35 ? 'left' : (pct > 0.65 ? 'right' : 'center');
+        const now = Date.now();
+
+        if (side !== 'center' && (now - lastTapTime < 320) && (lastTapSide === side)) {
+          lastTapTime = 0;
+          lastTapSide = null;
+          if (side === 'left') {
+            seekVideoBy(-10);
+            triggerSeekRipple('left', 10);
+          } else {
+            seekVideoBy(10);
+            triggerSeekRipple('right', 10);
+          }
+        } else {
+          lastTapTime = now;
+          lastTapSide = side;
+          toggleCustomControls();
+          if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
+        }
       });
     }
 
-    // Miniplayer controls explicit handlers
-    if (miniPlayBtn) {
-      miniPlayBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        togglePlayPause();
-        if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
-      });
-    }
-
-    if (miniExpandBtn) {
-      miniExpandBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        exitMiniplayer();
-      });
-    }
-
-    if (miniDismissBtn) {
-      miniDismissBtn.addEventListener('click', (e) => {
+    // Top-left Back Arrow button on video controls: Closes video player cleanly and returns to feed
+    if (ctrlBackBtn) {
+      ctrlBackBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         closeVideoCompletely();
-      });
-    }
-
-    // Top-left Minimize button on custom controls: Auto-drags down to miniplayer
-    if (ctrlMinimizeBtn) {
-      ctrlMinimizeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        animateAutoDragToMiniplayer();
       });
     }
 
@@ -1122,8 +911,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Initialize Drag-to-Miniplayer engine
-  initDragToMiniplayer();
+  // Initialize Video Controls & Tap Gestures engine (Drag removed)
+  initVideoControlsAndGestures();
 
   // Play a specific video in the Apple Vision Pro glass theater
   function playVideoInTheater(
