@@ -875,8 +875,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function getAuthSession() {
     try {
+      const tabRaw = sessionStorage.getItem('viev_auth_session');
+      if (tabRaw) {
+        const parsed = JSON.parse(tabRaw);
+        window.__vievActiveSession = parsed;
+        return parsed;
+      }
       const raw = localStorage.getItem('viev_auth_session');
-      return raw ? JSON.parse(raw) : null;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        try { sessionStorage.setItem('viev_auth_session', raw); } catch (_) {}
+        window.__vievActiveSession = parsed;
+        return parsed;
+      }
+      return null;
     } catch (e) {
       return null;
     }
@@ -970,6 +982,10 @@ document.addEventListener('DOMContentLoaded', () => {
       name: finalName,
       loggedInAt: Date.now()
     };
+    try {
+      sessionStorage.setItem('viev_auth_session', JSON.stringify(newSession));
+    } catch (_) {}
+    window.__vievActiveSession = newSession;
     localStorage.setItem('viev_auth_session', JSON.stringify(newSession));
     updateProfileUI(newSession);
 
@@ -1071,6 +1087,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Apple-Grade Sign Out
   if (signoutBtn) {
     signoutBtn.addEventListener('click', () => {
+      try { sessionStorage.removeItem('viev_auth_session'); } catch (_) {}
+      window.__vievActiveSession = null;
       localStorage.removeItem('viev_auth_session');
 
       if (window.setFloatingNavVisible) {

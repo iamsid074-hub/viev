@@ -1,10 +1,14 @@
 /* =========================================================
-   VIEVS 2.0 AIRCAST • REAL-TIME YOUTUBE MIRROR & SOUND ENGINE
-   Bidirectional BroadcastChannel • Server-Sent Events (SSE) • Fullscreen Live Mirror
+   VIEVS 2.0 AIRCAST • REAL-TIME SCREEN & SOUND MIRROR ENGINE
+   Multi-Transport Signaling: BroadcastChannel • Storage Events • SSE • Smart Polling
+   Works anywhere: Home, Music, Cinema/YouTube, Settings, Modals
    ========================================================= */
 
 (function() {
   'use strict';
+
+  // Unique Tab ID to prevent self-loopback across multi-tab testing
+  const TAB_ID = 'tab_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
 
   // Audio Chime Synthesizer using Web Audio API
   let audioCtx = null;
@@ -14,7 +18,7 @@
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       }
       if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+        audioCtx.resume().catch(() => {});
       }
       const now = audioCtx.currentTime;
       const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
@@ -25,7 +29,7 @@
         osc.frequency.setValueAtTime(freq, now + idx * 0.08);
 
         gain.gain.setValueAtTime(0, now + idx * 0.08);
-        gain.gain.linearRampToValueAtTime(0.22, now + idx * 0.08 + 0.02);
+        gain.gain.linearRampToValueAtTime(0.25, now + idx * 0.08 + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 0.6);
 
         osc.connect(gain);
@@ -37,19 +41,21 @@
     } catch (_) {}
   }
 
-  // Active User & Companion Profiles
+  // Active User & Companion Profiles (Supports multi-tab isolation via sessionStorage)
   function getProfiles() {
     let sess = null;
     try {
-      sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
+      sess = window.__vievActiveSession 
+        || JSON.parse(sessionStorage.getItem('viev_auth_session') || 'null')
+        || JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
     } catch (_) {}
 
-    const isDigi = sess && (sess.code === '3011' || sess.code === '3009' || sess.role === 'digi');
+    const isDigi = !!(sess && (sess.code === '3011' || sess.code === '3009' || sess.role === 'digi'));
 
     const digiProfile = {
       role: 'digi',
-      code: '3011',
-      name: 'Digi',
+      code: (sess && sess.code === '3009') ? '3009' : '3011',
+      name: (sess && isDigi && sess.name) ? sess.name : 'Digi',
       channelName: 'DIGI (Avneet)',
       handle: '@avneetsaini7070',
       avatar: 'song/Screenshot 2026-10-24 224431.png'
@@ -58,7 +64,7 @@
     const viratProfile = {
       role: 'user',
       code: '1711',
-      name: 'Virat',
+      name: (sess && !isDigi && sess.name) ? sess.name : 'Virat',
       channelName: 'VIRAT PLAYS',
       handle: '@viratplaystdm',
       avatar: 'song/virat_plays_avatar.png'
@@ -78,7 +84,8 @@
     caster: null,
     lastSyncedVideoId: null,
     lastSyncedTime: 0,
-    lastSyncTimestamp: 0
+    lastSyncTimestamp: 0,
+    mySentInviteId: null
   };
 
   // Broadcast Channels & Server SSE Connection
@@ -88,19 +95,27 @@
   }
 
   function emitCastEvent(action, payload) {
-    const data = Object.assign({ action, timestamp: Date.now() }, payload);
+    const data = Object.assign({
+      action,
+      tabId: TAB_ID,
+      senderTabId: TAB_ID,
+      timestamp: Date.now()
+    }, payload);
 
-    // 1. Local Broadcast Channel (instant multi-tab)
+    // 1. Local Broadcast Channel (instant multi-tab in same browser)
     if (broadcastChannel) {
       try { broadcastChannel.postMessage(data); } catch (_) {}
     }
 
-    // 2. localStorage Event fallback
+    // 2. localStorage Event fallback (instant cross-tab storage event)
     try {
       localStorage.setItem('viev_aircast_event', JSON.stringify(data));
+      setTimeout(() => {
+        try { localStorage.removeItem('viev_aircast_event'); } catch (_) {}
+      }, 80);
     } catch (_) {}
 
-    // 3. Server HTTP POST for cross-device WiFi sync
+    // 3. Server HTTP POST for cross-device / WiFi / Cloud sync
     fetch('/api/cast/action', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -108,58 +123,95 @@
     }).catch(() => {});
   }
 
-  // Handle incoming cast events from any source
+  // Handle incoming cast events from any source (BroadcastChannel, SSE, Polling, Storage)
+  let lastHandledInviteId = null;
+
   function handleIncomingCastEvent(evt) {
     if (!evt || !evt.action) return;
+    // Don't process events emitted by this exact tab
+    if (evt.senderTabId && evt.senderTabId === TAB_ID) return;
+    if (evt.tabId && evt.tabId === TAB_ID) return;
+
     const { self } = getProfiles();
 
     switch (evt.action) {
       case 'invite': {
-        // Only show invite if this client is the designated target OR in test mode
-        if (evt.target && evt.target.role === self.role) {
+        // Did THIS tab send the invite?
+        if (state.isCasting && evt.inviteId && evt.inviteId === state.mySentInviteId) {
+          return;
+        }
+
+        // Avoid duplicate triggers for the same invite
+        if (evt.inviteId && evt.inviteId === lastHandledInviteId && state.activeInvite) {
+          return;
+        }
+
+        // Check if this invite is from the companion or targeted at us
+        const isFromOther = evt.caster && (evt.caster.role !== self.role || evt.caster.code !== self.code);
+        const isTargetMe = !evt.target || evt.target.role === self.role || evt.target.code === self.code;
+
+        // If not casting, we are ready to receive invites anywhere in the app!
+        if (isFromOther || isTargetMe || !state.isCasting) {
+          if (evt.inviteId) lastHandledInviteId = evt.inviteId;
           state.activeInvite = evt;
           showIncomingInviteBanner(evt);
         }
         break;
       }
+
+      case 'respond':
       case 'accepted': {
-        if (state.isCasting && evt.caster && evt.caster.role === self.role) {
-          onCastAcceptedByCompanion(evt);
+        const isAccepted = evt.action === 'accepted' || (evt.action === 'respond' && evt.accepted);
+        if (isAccepted) {
+          if (state.isCasting) {
+            onCastAcceptedByCompanion(evt);
+          }
+        } else {
+          if (state.isCasting) {
+            onCastDeclinedByCompanion(evt);
+          }
         }
         break;
       }
+
       case 'declined': {
-        if (state.isCasting && evt.caster && evt.caster.role === self.role) {
+        if (state.isCasting) {
           onCastDeclinedByCompanion(evt);
         }
         break;
       }
+
       case 'sync': {
         if (state.isReceiving) {
           syncReceiverPlayback(evt.video);
         }
         break;
       }
+
       case 'reaction': {
         spawnReactionParticle(evt.reaction);
         break;
       }
+
+      case 'end':
       case 'ended': {
         if (state.isReceiving) {
           closeFullscreenReceiverTheater('Companion stopped casting');
         } else if (state.isCasting) {
           stopCasting(false);
         }
+        hideIncomingInviteBanner();
         break;
       }
     }
   }
 
-  // Setup Broadcast Channel & Server SSE Listeners
+  // Setup Broadcast Channel Listener
   if (broadcastChannel) {
     broadcastChannel.onmessage = (e) => handleIncomingCastEvent(e.data);
   }
 
+  // Setup Storage Listener for same-origin tabs
   window.addEventListener('storage', (e) => {
     if (e.key === 'viev_aircast_event' && e.newValue) {
       try {
@@ -174,19 +226,66 @@
     if (typeof EventSource === 'undefined') return;
     try {
       const es = new EventSource('/api/cast/events');
+      es.addEventListener('init', (e) => {
+        try {
+          const sess = JSON.parse(e.data);
+          if (sess && sess.status === 'invited' && sess.active) {
+            handleIncomingCastEvent({ action: 'invite', ...sess });
+          }
+        } catch (_) {}
+      });
       es.addEventListener('invite', (e) => handleIncomingCastEvent({ action: 'invite', ...JSON.parse(e.data) }));
       es.addEventListener('accepted', (e) => handleIncomingCastEvent({ action: 'accepted', ...JSON.parse(e.data) }));
       es.addEventListener('declined', (e) => handleIncomingCastEvent({ action: 'declined', ...JSON.parse(e.data) }));
+      es.addEventListener('respond', (e) => handleIncomingCastEvent({ action: 'respond', ...JSON.parse(e.data) }));
       es.addEventListener('sync', (e) => handleIncomingCastEvent({ action: 'sync', ...JSON.parse(e.data) }));
       es.addEventListener('reaction', (e) => handleIncomingCastEvent({ action: 'reaction', ...JSON.parse(e.data) }));
       es.addEventListener('ended', (e) => handleIncomingCastEvent({ action: 'ended', ...JSON.parse(e.data) }));
       es.onerror = () => {
         es.close();
-        setTimeout(initSSE, 6000);
+        setTimeout(initSSE, 7000);
       };
     } catch (_) {}
   }
   initSSE();
+
+  // Smart Polling Loop (Essential fallback for Vercel, static servers, mobile browsers)
+  let lastSeenUpdate = 0;
+  async function pollCastStatus() {
+    try {
+      const res = await fetch('/api/cast/status?_t=' + Date.now(), { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        const sess = data.session;
+        if (sess && sess.lastUpdate && sess.lastUpdate > lastSeenUpdate) {
+          lastSeenUpdate = sess.lastUpdate;
+
+          if (sess.status === 'invited' && sess.active) {
+            if (sess.inviteId && sess.inviteId !== lastHandledInviteId) {
+              handleIncomingCastEvent(Object.assign({ action: 'invite' }, sess));
+            }
+          } else if (sess.status === 'accepted') {
+            if (state.isCasting) {
+              handleIncomingCastEvent(Object.assign({ action: 'accepted' }, sess));
+            }
+          } else if (sess.status === 'declined') {
+            if (state.isCasting) {
+              handleIncomingCastEvent(Object.assign({ action: 'declined' }, sess));
+            }
+          } else if (sess.status === 'ended') {
+            handleIncomingCastEvent(Object.assign({ action: 'ended' }, sess));
+          } else if (sess.status === 'sync' && state.isReceiving) {
+            handleIncomingCastEvent(Object.assign({ action: 'sync' }, sess));
+          }
+        }
+      }
+    } catch (_) {}
+
+    // Faster polling rate (650ms) when waiting for response or casting, 1200ms when idle
+    const pollDelay = (state.isCasting || state.isReceiving || state.activeInvite) ? 650 : 1200;
+    setTimeout(pollCastStatus, pollDelay);
+  }
+  setTimeout(pollCastStatus, 800);
 
   // Floating Reaction Particle Effect
   function spawnReactionParticle(emoji) {
@@ -195,7 +294,6 @@
     particle.className = 'viev-floating-particle';
     particle.textContent = emoji;
 
-    // Random horizontal position around center/right
     const minX = window.innerWidth * 0.35;
     const maxX = window.innerWidth * 0.85;
     const randomX = Math.floor(Math.random() * (maxX - minX)) + minX;
@@ -213,7 +311,7 @@
     const modal = document.getElementById('cinema-cast-modal');
     if (!modal) return;
 
-    const { self, companion } = getProfiles();
+    const { companion } = getProfiles();
 
     // Populate Companion Card
     const avatarEl = document.getElementById('cast-partner-avatar');
@@ -223,7 +321,7 @@
     const actionBtn = document.getElementById('cinema-start-cast-btn');
     const titleEl = document.getElementById('cinema-cast-title');
 
-    if (avatarEl) avatarEl.src = companion.avatar;
+    if (avatarEl && companion.avatar) avatarEl.src = companion.avatar;
     if (nameEl) nameEl.textContent = companion.name;
     if (handleEl) handleEl.textContent = `${companion.channelName} • ${companion.handle}`;
     if (statusEl) statusEl.textContent = '🟢 Online on VIEVS • Ready for Cast';
@@ -255,9 +353,11 @@
   // --- START CASTING ---
   function startCasting() {
     const { self, companion } = getProfiles();
+    const inviteId = 'cast_' + Date.now();
     state.isCasting = true;
     state.target = companion;
     state.caster = self;
+    state.mySentInviteId = inviteId;
 
     // Grab current playing video state from Cinema if available
     let currentVideo = {
@@ -291,8 +391,9 @@
     if (waitingView) waitingView.style.display = 'flex';
     if (waitingText) waitingText.textContent = `Beaming invite to ${companion.name}... Waiting for acceptance`;
 
-    // Emit cast invite
+    // Emit cast invite across all layers
     emitCastEvent('invite', {
+      inviteId,
       caster: self,
       target: companion,
       video: currentVideo
@@ -301,34 +402,62 @@
     // Update Cast Button in header to pulsing
     const castHeaderBtn = document.getElementById('yt-header-cast-btn');
     if (castHeaderBtn) castHeaderBtn.classList.add('is-active');
+
+    if (window.showHUD) {
+      window.showHUD('Beaming AirCast', `Request sent to ${companion.name}...`, 'cast');
+    }
   }
 
   function onCastAcceptedByCompanion(evt) {
     closeCastModal();
     const { companion } = getProfiles();
+    const partnerName = (evt.target && evt.target.name) ? evt.target.name : companion.name;
 
     // Show floating caster HUD
     const hud = document.getElementById('viev-casting-floating-hud');
     const hudPartner = document.getElementById('viev-hud-partner-name');
     if (hud) hud.classList.add('is-visible');
-    if (hudPartner) hudPartner.textContent = `Casting to ${companion.name} (Active)`;
+    if (hudPartner) hudPartner.textContent = `Casting to ${partnerName} (Active)`;
+
+    // Play chime sound on acceptance!
+    playAppleChime();
 
     if (window.showHUD) {
-      window.showHUD('Cast Connected', `Live screen mirror active with ${companion.name}`, 'cast');
+      window.showHUD('Cast Connected', `Live screen mirror active with ${partnerName}`, 'cast');
     }
+
+    // Send immediate sync update of current video
+    setTimeout(() => {
+      if (window.vievAirCast && window.vievAirCast.notifyPlaybackState) {
+        const mainIframe = document.getElementById('cinema-inapp-iframe');
+        let currentId = 'kJQP7kiw5Fk';
+        if (mainIframe && mainIframe.src) {
+          const match = mainIframe.src.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+          if (match) currentId = match[1];
+        }
+        window.vievAirCast.notifyPlaybackState({
+          id: currentId,
+          currentTime: 1,
+          isPlaying: true
+        });
+      }
+    }, 400);
   }
 
   function onCastDeclinedByCompanion(evt) {
     closeCastModal();
     stopCasting(false);
+    const { companion } = getProfiles();
+    const partnerName = (evt.target && evt.target.name) ? evt.target.name : companion.name;
     if (window.showHUD) {
-      window.showHUD('Cast Declined', 'Companion is not available right now', 'info');
+      window.showHUD('Cast Declined', `${partnerName} is not available right now`, 'info');
     }
   }
 
   function stopCasting(emit = true) {
     state.isCasting = false;
     state.target = null;
+    state.mySentInviteId = null;
     closeCastModal();
 
     const hud = document.getElementById('viev-casting-floating-hud');
@@ -342,7 +471,9 @@
     }
   }
 
-  // --- RECEIVER INVITATION BANNER ---
+  // --- RECEIVER INVITATION BANNER (Appears anywhere in VIEVS: Home, Music, Cinema, Settings) ---
+  let inviteAutoDismissTimer = null;
+
   function showIncomingInviteBanner(evt) {
     playAppleChime();
 
@@ -356,10 +487,13 @@
     const thumb = document.getElementById('viev-invite-thumb');
     const videoTitle = document.getElementById('viev-invite-video-title');
 
-    const casterName = evt.caster ? evt.caster.name : 'Digi';
-    if (avatar && evt.caster && evt.caster.avatar) avatar.src = evt.caster.avatar;
+    const { companion } = getProfiles();
+    const caster = evt.caster || companion || { name: 'Companion', avatar: 'song/virat_plays_avatar.png' };
+    const casterName = caster.name || 'Companion';
+
+    if (avatar && caster.avatar) avatar.src = caster.avatar;
     if (heading) heading.textContent = `${casterName} wants to show you something ✨`;
-    if (subtext) subtext.textContent = `${casterName} is inviting you to watch her YouTube screen live with sound.`;
+    if (subtext) subtext.textContent = `${casterName} is inviting you to watch live screen with synchronized audio.`;
 
     if (evt.video && evt.video.id) {
       if (previewCard) previewCard.style.display = 'flex';
@@ -369,12 +503,31 @@
       if (previewCard) previewCard.style.display = 'none';
     }
 
+    // Ensure overlay is brought to front and animated into view
+    overlay.style.display = 'block';
     overlay.classList.add('is-visible');
+
+    // Auto-dismiss after 60 seconds if no action taken
+    if (inviteAutoDismissTimer) clearTimeout(inviteAutoDismissTimer);
+    inviteAutoDismissTimer = setTimeout(() => {
+      hideIncomingInviteBanner();
+    }, 60000);
   }
 
   function hideIncomingInviteBanner() {
+    if (inviteAutoDismissTimer) {
+      clearTimeout(inviteAutoDismissTimer);
+      inviteAutoDismissTimer = null;
+    }
     const overlay = document.getElementById('viev-cast-invitation-overlay');
-    if (overlay) overlay.classList.remove('is-visible');
+    if (overlay) {
+      overlay.classList.remove('is-visible');
+      setTimeout(() => {
+        if (!overlay.classList.contains('is-visible')) {
+          overlay.style.display = 'none';
+        }
+      }, 450);
+    }
   }
 
   function acceptIncomingCast() {
@@ -384,25 +537,43 @@
     state.isReceiving = true;
     state.caster = state.activeInvite.caster;
 
-    // Send accept response
-    emitCastEvent('respond', {
+    // 1. Pause background music player so audio does not collide
+    try {
+      if (typeof audio !== 'undefined' && audio && !audio.paused) {
+        audio.pause();
+      }
+      if (typeof isPlaying !== 'undefined') {
+        isPlaying = false;
+      }
+      const playBtn = document.getElementById('play-btn');
+      if (playBtn) playBtn.classList.remove('playing');
+    } catch (_) {}
+
+    // 2. Send both 'accepted' and 'respond' actions to ensure all server/client models accept it
+    const acceptPayload = {
       accepted: true,
+      inviteId: state.activeInvite.inviteId,
       target: state.activeInvite.target,
       caster: state.activeInvite.caster
-    });
+    };
+    emitCastEvent('accepted', acceptPayload);
+    emitCastEvent('respond', acceptPayload);
 
-    // Open Fullscreen Live Mirror Theater
+    // 3. Open Fullscreen Live Mirror Theater over whichever section user is in
     openFullscreenReceiverTheater(state.activeInvite);
   }
 
   function declineIncomingCast() {
     hideIncomingInviteBanner();
     if (state.activeInvite) {
-      emitCastEvent('respond', {
+      const declinePayload = {
         accepted: false,
+        inviteId: state.activeInvite.inviteId,
         target: state.activeInvite.target,
         caster: state.activeInvite.caster
-      });
+      };
+      emitCastEvent('declined', declinePayload);
+      emitCastEvent('respond', declinePayload);
     }
     state.activeInvite = null;
   }
@@ -414,7 +585,8 @@
     const theater = document.getElementById('viev-cast-fullscreen-theater');
     if (!theater) return;
 
-    const caster = invite.caster || { name: 'Digi', avatar: 'song/Screenshot 2026-10-24 224431.png' };
+    const { companion } = getProfiles();
+    const caster = invite.caster || companion || { name: 'Companion', avatar: 'song/Screenshot 2026-10-24 224431.png' };
     const video = invite.video || { id: 'kJQP7kiw5Fk', title: 'Live Stream', currentTime: 0 };
 
     const avatar = document.getElementById('viev-fullscreen-user-avatar');
@@ -422,7 +594,7 @@
     const title = document.getElementById('viev-fullscreen-video-title');
     const glow = document.getElementById('viev-fullscreen-glow-layer');
 
-    if (avatar) avatar.src = caster.avatar;
+    if (avatar && caster.avatar) avatar.src = caster.avatar;
     if (name) name.textContent = `${caster.name}'s YouTube`;
     if (title) title.textContent = video.title || 'YouTube Live Cast';
     if (glow && video.id) {
@@ -515,7 +687,7 @@
           receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
         }
 
-        // Only seek if drift is greater than 2.5 seconds to keep playback super smooth
+        // Only seek if drift is greater than 2.5 seconds to keep playback smooth
         if (typeof video.currentTime === 'number') {
           const drift = Math.abs(video.currentTime - state.lastSyncedTime);
           if (drift > 2.5) {
@@ -552,7 +724,7 @@
     }
   }
 
-  // --- HOOK INTO CINEMA.JS TO STREAM CASTER'S PLAYBACK CHANGES ---
+  // --- HOOK INTO CINEMA.JS & GLOBAL WINDOW TO STREAM PLAYBACK ---
   window.vievAirCast = {
     openModal: openCastModal,
     closeModal: closeCastModal,
@@ -568,7 +740,6 @@
     notifyPlaybackState: (playback) => {
       if (!state.isCasting) return;
       const now = Date.now();
-      // Throttle sync to once per 1 second unless video changed
       if (playback.id !== state.lastSyncedVideoId || (now - state.lastSyncTimestamp > 950)) {
         state.lastSyncedVideoId = playback.id;
         state.lastSyncTimestamp = now;
@@ -578,11 +749,12 @@
     // Test simulator: simulates incoming request from companion
     simulateTestReceiver: () => {
       closeCastModal();
-      const { companion } = getProfiles();
+      const { companion, self } = getProfiles();
       const mockInvite = {
         action: 'invite',
+        inviteId: 'mock_' + Date.now(),
         caster: companion,
-        target: getProfiles().self,
+        target: self,
         video: {
           id: 'BddP6PYo2gs',
           title: 'Ve Kamleya (Full Video) | Arijit Singh, Shreya Ghoshal | Alia, Ranveer',
@@ -613,7 +785,20 @@
       });
     }
 
-    // 2. Cast Modal Controls
+    // 2. Music Player AirPlay button triggers AirCast modal directly from Music Screen!
+    const musicAirplayBtn = document.getElementById('music-airplay-btn');
+    if (musicAirplayBtn) {
+      musicAirplayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (state.isCasting) {
+          stopCasting(true);
+        } else {
+          openCastModal();
+        }
+      });
+    }
+
+    // 3. Cast Modal Controls
     const closeCastBtn = document.getElementById('cinema-cast-close-btn');
     if (closeCastBtn) closeCastBtn.addEventListener('click', closeCastModal);
 
@@ -626,18 +811,18 @@
     const testModeBtn = document.getElementById('cinema-cast-test-mode-btn');
     if (testModeBtn) testModeBtn.addEventListener('click', window.vievAirCast.simulateTestReceiver);
 
-    // 3. Floating Caster HUD Stop Button
+    // 4. Floating Caster HUD Stop Button
     const hudStopBtn = document.getElementById('viev-hud-stop-btn');
     if (hudStopBtn) hudStopBtn.addEventListener('click', () => stopCasting(true));
 
-    // 4. Incoming Invitation Accept & Decline
+    // 5. Incoming Invitation Accept & Decline
     const acceptBtn = document.getElementById('viev-invite-accept-btn');
     if (acceptBtn) acceptBtn.addEventListener('click', acceptIncomingCast);
 
     const declineBtn = document.getElementById('viev-invite-decline-btn');
     if (declineBtn) declineBtn.addEventListener('click', declineIncomingCast);
 
-    // 5. Fullscreen Receiver Theater Controls
+    // 6. Fullscreen Receiver Theater Controls
     const fsExitBtn = document.getElementById('viev-fullscreen-exit-btn');
     if (fsExitBtn) fsExitBtn.addEventListener('click', () => closeFullscreenReceiverTheater('Exited fullscreen view'));
 
@@ -649,7 +834,7 @@
       });
     }
 
-    // 6. Reaction Emoji Buttons
+    // 7. Reaction Emoji Buttons
     const emojiBtns = document.querySelectorAll('.viev-reaction-emoji-btn');
     emojiBtns.forEach(btn => {
       btn.addEventListener('click', () => {

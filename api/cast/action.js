@@ -39,9 +39,13 @@ module.exports = (req, res) => {
         video: payload.video || { id: null, title: '', channel: '', avatar: '', currentTime: 0, duration: 0, isPlaying: false },
         reaction: null
       };
-    } else if (action === 'respond') {
-      if (payload.accepted) {
+    } else if (action === 'respond' || action === 'accepted' || action === 'declined') {
+      const isAccepted = action === 'accepted' || (action === 'respond' && payload.accepted);
+      if (isAccepted) {
         global.__activeCastSession.status = 'accepted';
+        global.__activeCastSession.active = true;
+        if (payload.target) global.__activeCastSession.target = payload.target;
+        if (payload.caster) global.__activeCastSession.caster = payload.caster;
         global.__activeCastSession.lastUpdate = Date.now();
       } else {
         global.__activeCastSession.status = 'declined';

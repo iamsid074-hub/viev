@@ -318,9 +318,13 @@ const server = http.createServer((req, res) => {
             reaction: null
           };
           broadcastCastEvent('invite', activeCastSession);
-        } else if (action === 'respond') {
-          if (payload.accepted) {
+        } else if (action === 'respond' || action === 'accepted' || action === 'declined') {
+          const isAccepted = action === 'accepted' || (action === 'respond' && payload.accepted);
+          if (isAccepted) {
             activeCastSession.status = 'accepted';
+            activeCastSession.active = true;
+            if (payload.target) activeCastSession.target = payload.target;
+            if (payload.caster) activeCastSession.caster = payload.caster;
             activeCastSession.lastUpdate = Date.now();
             broadcastCastEvent('accepted', activeCastSession);
           } else {
