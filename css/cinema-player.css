@@ -646,10 +646,12 @@
   z-index: 20;
   width: 100%;
   box-sizing: border-box;
+  transform: none !important;
 }
 
 #cinema-screen.active {
   display: flex;
+  transform: none !important;
 }
 
 /* Cinema Top Header */
@@ -2462,7 +2464,34 @@
 .yt-header-brand-group {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 6px;
+}
+
+.yt-header-back-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  padding: 0;
+  margin-right: 2px;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.yt-header-back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.yt-header-back-btn:active {
+  transform: scale(0.92);
 }
 
 .yt-official-logo-wrap {
@@ -2888,14 +2917,20 @@
    ACTIVE VIDEO THEATER: APPLE VISION PRO GLASS + AMBILIGHT
    Exact replica of VIEVS Music Player Card (Image 2)
    ========================================================= */
-/* When player is ON in full theater mode, hide the top bar so player shifts to the top! */
+/* In theater mode, keep the top bar accessible with Back button, Logo, and Search */
 .cinema-player-viewport.theater-active:not(.miniplayer-mode) .yt-mobile-app-header {
-  display: none !important;
+  display: flex !important;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-theater-stage {
-  margin-top: 0;
-  padding-top: 2px;
+  margin-top: 4px;
+  padding-top: 0;
 }
 
 /* In miniplayer mode, the home screen and top bar are fully visible */
@@ -3327,18 +3362,18 @@
    ========================================================= */
 .cinema-theater-stage.is-miniplayer {
   position: fixed !important;
-  bottom: calc(var(--sab, 16px) + 76px) !important;
+  bottom: calc(var(--sab, 16px) + 80px) !important;
   right: 16px !important;
-  width: 165px !important;
+  width: 175px !important;
   max-width: calc(100vw - 32px) !important;
   height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
-  z-index: 9999 !important;
+  z-index: 100000 !important;
   border-radius: 14px !important;
   cursor: pointer !important;
   overflow: hidden !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 0 1.5px rgba(255, 255, 255, 0.28) !important;
   animation: miniplayerPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
               bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1),

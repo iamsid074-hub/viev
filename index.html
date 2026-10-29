@@ -709,6 +709,12 @@ tu h digi meri mai hu pyar tera .
           <!-- Top Row: Back + YouTube Logo + Cast + Bell 9+ + Search + Avatar -->
           <div class="yt-header-main-row">
             <div class="yt-header-brand-group">
+              <!-- Back Button to return to Launcher -->
+              <button type="button" class="yt-header-icon-btn yt-header-back-btn" id="cinema-player-back-btn" title="Back to Launcher" aria-label="Back to Launcher">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
               <!-- Official YouTube Brand Logo (Tap to Reload Feed) -->
               <button type="button" class="yt-official-logo-wrap" id="yt-official-logo-btn" title="Tap to Reload YouTube Feed" aria-label="Reload YouTube Feed">
                 <svg viewBox="0 0 102 22" height="20" aria-label="YouTube">
@@ -721,8 +727,16 @@ tu h digi meri mai hu pyar tera .
               </button>
             </div>
 
-            <!-- Right Action Icons: Cast, Notification Bell (9+), Search, Avatar (Image 1) -->
+            <!-- Right Action Icons: Add Video, Cast, Notification Bell (9+), Search, Avatar -->
             <div class="yt-header-actions-group">
+              <!-- Add Video Button -->
+              <button type="button" class="yt-header-icon-btn" id="cinema-open-add-btn" title="Add Video URL" aria-label="Add Video">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+
               <!-- Cast Icon -->
               <button type="button" class="yt-header-icon-btn" title="Cast to screen" aria-label="Cast">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -867,8 +881,13 @@ tu h digi meri mai hu pyar tera .
 
               <!-- Custom Video Player Controls Overlay (Matches YouTube Mobile without clutter) -->
               <div class="cinema-custom-player-controls" id="cinema-custom-player-controls">
-                <!-- Top Actions Bar (Audio Mute, CC, Settings Gear - Title/Avatar Removed) -->
+                <!-- Top Actions Bar (Minimize Chevron, Audio Mute, CC, Settings Gear) -->
                 <div class="cinema-ctrl-top-bar">
+                  <button type="button" class="cinema-ctrl-icon-btn cinema-ctrl-minimize-btn" id="cinema-ctrl-minimize-btn" title="Minimize to small player" aria-label="Minimize to small player">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
                   <div class="cinema-ctrl-top-spacer"></div>
                   <div class="cinema-ctrl-top-actions">
                     <button type="button" class="cinema-ctrl-icon-btn" id="cinema-ctrl-mute-btn" title="Mute/Unmute" aria-label="Mute">
