@@ -322,13 +322,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function updatePlayPauseIcons(isPlaying) {
     if (ctrlPlayIcon) {
       ctrlPlayIcon.innerHTML = isPlaying
-        ? '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>'
-        : '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+        ? '<rect x="6" y="5" width="3.5" height="14" rx="1"></rect><rect x="14.5" y="5" width="3.5" height="14" rx="1"></rect>'
+        : '<polygon points="6 4 20 12 6 20"></polygon>';
     }
     if (miniPlayIcon) {
       miniPlayIcon.innerHTML = isPlaying
-        ? '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>'
-        : '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+        ? '<rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect>'
+        : '<polygon points="6 4 20 12 6 20"></polygon>';
     }
     if (ctrlPlayBtn) ctrlPlayBtn.classList.toggle('is-paused', !isPlaying);
   }
@@ -480,6 +480,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function animateAutoDragToMiniplayer() {
+    if (!theaterStage || theaterStage.classList.contains('is-miniplayer')) return;
+    if (typeof window.triggerHaptic === 'function') window.triggerHaptic('medium');
+
+    dragJustFinished = true;
+
+    // Smoothly drag & scale video card towards the bottom-right miniplayer position
+    theaterStage.style.transition = 'transform 0.36s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.28s ease';
+    theaterStage.style.transformOrigin = 'bottom right';
+    theaterStage.style.transform = 'translate(10px, 220px) scale(0.52)';
+
+    if (customControls) {
+      customControls.style.transition = 'opacity 0.2s ease';
+      customControls.style.opacity = '0';
+    }
+    if (theaterYtBar) {
+      theaterYtBar.style.transition = 'opacity 0.22s ease';
+      theaterYtBar.style.opacity = '0';
+    }
+
+    setTimeout(() => {
+      enterMiniplayer();
+      dragJustFinished = false;
+    }, 350);
+  }
+
   function enterMiniplayer() {
     if (!theaterStage) return;
     dragJustFinished = true;
@@ -511,9 +537,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Synchronize miniplayer play/pause icon
     if (miniPlayIcon) {
       if (isVideoPlaying) {
-        miniPlayIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+        miniPlayIcon.innerHTML = '<rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect>';
       } else {
-        miniPlayIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+        miniPlayIcon.innerHTML = '<polygon points="6 4 20 12 6 20"></polygon>';
       }
     }
 
@@ -704,12 +730,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Top-left Minimize button on custom controls
+    // Top-left Minimize button on custom controls: Auto-drags down to miniplayer
     if (ctrlMinimizeBtn) {
       ctrlMinimizeBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        enterMiniplayer();
+        animateAutoDragToMiniplayer();
       });
     }
 
