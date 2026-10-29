@@ -334,11 +334,11 @@ const server = http.createServer((req, res) => {
             activeCastSession.active = false;
           }
         } else if (action === 'sync') {
-          if (activeCastSession.active) {
-            activeCastSession.video = Object.assign(activeCastSession.video || {}, payload.video || {});
-            activeCastSession.lastUpdate = Date.now();
-            broadcastCastEvent('sync', activeCastSession);
-          }
+          activeCastSession.active = true;
+          activeCastSession.video = Object.assign(activeCastSession.video || {}, payload.video || {});
+          activeCastSession.status = 'sync';
+          activeCastSession.lastUpdate = Date.now();
+          broadcastCastEvent('sync', activeCastSession);
         } else if (action === 'reaction') {
           activeCastSession.reaction = payload.reaction;
           broadcastCastEvent('reaction', { reaction: payload.reaction, from: payload.from });

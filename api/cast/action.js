@@ -53,8 +53,10 @@ module.exports = (req, res) => {
         global.__activeCastSession.lastUpdate = Date.now();
       }
     } else if (action === 'sync') {
-      if (global.__activeCastSession.active) {
+      if (global.__activeCastSession) {
+        global.__activeCastSession.active = true;
         global.__activeCastSession.video = Object.assign(global.__activeCastSession.video || {}, payload.video || {});
+        global.__activeCastSession.status = 'sync';
         global.__activeCastSession.lastUpdate = Date.now();
       }
     } else if (action === 'reaction') {

@@ -274,8 +274,13 @@
             }
           } else if (sess.status === 'ended') {
             handleIncomingCastEvent(Object.assign({ action: 'ended' }, sess));
-          } else if (sess.status === 'sync' && state.isReceiving) {
-            handleIncomingCastEvent(Object.assign({ action: 'sync' }, sess));
+          }
+
+          // Live sync receiver playback whenever caster changes video, time, or state!
+          if (state.isReceiving && sess.video && sess.video.id) {
+            if (sess.video.id !== state.lastSyncedVideoId || sess.status === 'sync') {
+              syncReceiverPlayback(sess.video);
+            }
           }
         }
       }
@@ -359,28 +364,71 @@
     state.caster = self;
     state.mySentInviteId = inviteId;
 
-    // Grab current playing video state from Cinema if available
-    let currentVideo = {
-      id: 'kJQP7kiw5Fk',
-      title: 'Trending Bollywood & India Hits',
-      channel: 'YouTube',
-      avatar: self.avatar,
-      currentTime: 1,
-      duration: 300,
-      isPlaying: true
-    };
+    // Determine the real current video from Cinema player or active feed
+    let currentVideo = null;
+    if (window.getCurrentCinemaPlayingVideo) {
+      currentVideo = window.getCurrentCinemaPlayingVideo();
+    }
 
-    const mainIframe = document.getElementById('cinema-inapp-iframe');
-    const theaterTitle = document.getElementById('cinema-theater-title');
-    const theaterChannel = document.getElementById('cinema-theater-channel');
-    const theaterAvatar = document.getElementById('cinema-theater-avatar');
+    if (!currentVideo || !currentVideo.id || currentVideo.id === 'kJQP7kiw5Fk') {
+      const mainIframe = document.getElementById('cinema-inapp-iframe');
+      const theaterTitle = document.getElementById('cinema-theater-title');
+      const theaterChannel = document.getElementById('cinema-theater-channel');
+      const theaterAvatar = document.getElementById('cinema-theater-avatar');
 
-    if (mainIframe && mainIframe.src) {
-      const match = mainIframe.src.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
-      if (match) currentVideo.id = match[1];
-      if (theaterTitle && theaterTitle.textContent) currentVideo.title = theaterTitle.textContent;
-      if (theaterChannel && theaterChannel.textContent) currentVideo.channel = theaterChannel.textContent;
-      if (theaterAvatar && theaterAvatar.src) currentVideo.avatar = theaterAvatar.src;
+      if (mainIframe && mainIframe.src && !mainIframe.src.endsWith('/')) {
+        const match = mainIframe.src.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+        if (match && match[1] && match[1] !== 'kJQP7kiw5Fk') {
+          currentVideo = {
+            id: match[1],
+            title: theaterTitle ? theaterTitle.textContent : 'YouTube Video',
+            channel: theaterChannel ? theaterChannel.textContent : 'YouTube',
+            avatar: theaterAvatar ? theaterAvatar.src : self.avatar,
+            currentTime: 1,
+            duration: 300,
+            isPlaying: true
+          };
+        }
+      }
+    }
+
+    if (!currentVideo || !currentVideo.id || currentVideo.id === 'kJQP7kiw5Fk') {
+      // Pick first card visible in YouTube feed
+      const firstCard = document.querySelector('#cinema-video-feed-grid .cinema-feed-card');
+      if (firstCard) {
+        const titleEl = firstCard.querySelector('.cinema-feed-title');
+        const channelEl = firstCard.querySelector('.cinema-feed-channel-name');
+        const thumbEl = firstCard.querySelector('.cinema-feed-thumb');
+        let cardId = 'cUmUOb7j3dc'; // Saiyaara
+        if (thumbEl && thumbEl.src) {
+          const m = thumbEl.src.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
+          if (m && m[1]) cardId = m[1];
+        }
+        currentVideo = {
+          id: cardId,
+          title: (titleEl && titleEl.textContent) ? titleEl.textContent : 'Dhun Song | Saiyaara | Ahaan Panday, Aneet Padda | Arijit Singh',
+          channel: (channelEl && channelEl.textContent) ? channelEl.textContent : 'YRF Music',
+          avatar: self.avatar,
+          currentTime: 1,
+          duration: 252,
+          isPlaying: true
+        };
+      } else {
+        currentVideo = {
+          id: 'cUmUOb7j3dc',
+          title: 'Dhun Song | Saiyaara | Ahaan Panday, Aneet Padda | Arijit Singh',
+          channel: 'YRF Music',
+          avatar: self.avatar,
+          currentTime: 1,
+          duration: 252,
+          isPlaying: true
+        };
+      }
+    }
+
+    // Launch the video in caster's player as well so both watch the same thing together!
+    if (window.playVideoInCinemaById && currentVideo.id) {
+      window.playVideoInCinemaById(currentVideo.id, currentVideo.title, currentVideo.channel);
     }
 
     // Switch modal to waiting state
@@ -428,18 +476,10 @@
 
     // Send immediate sync update of current video
     setTimeout(() => {
-      if (window.vievAirCast && window.vievAirCast.notifyPlaybackState) {
-        const mainIframe = document.getElementById('cinema-inapp-iframe');
-        let currentId = 'kJQP7kiw5Fk';
-        if (mainIframe && mainIframe.src) {
-          const match = mainIframe.src.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
-          if (match) currentId = match[1];
-        }
-        window.vievAirCast.notifyPlaybackState({
-          id: currentId,
-          currentTime: 1,
-          isPlaying: true
-        });
+      let vid = null;
+      if (window.getCurrentCinemaPlayingVideo) vid = window.getCurrentCinemaPlayingVideo();
+      if (vid && window.vievAirCast && window.vievAirCast.notifyPlaybackState) {
+        window.vievAirCast.notifyPlaybackState(vid);
       }
     }, 400);
   }
@@ -587,7 +627,7 @@
 
     const { companion } = getProfiles();
     const caster = invite.caster || companion || { name: 'Companion', avatar: 'song/Screenshot 2026-10-24 224431.png' };
-    const video = invite.video || { id: 'kJQP7kiw5Fk', title: 'Live Stream', currentTime: 0 };
+    const video = invite.video || { id: 'cUmUOb7j3dc', title: 'Dhun Song | Saiyaara | Arijit Singh', currentTime: 0 };
 
     const avatar = document.getElementById('viev-fullscreen-user-avatar');
     const name = document.getElementById('viev-fullscreen-user-name');
@@ -601,7 +641,7 @@
       glow.style.backgroundImage = `url('https://img.youtube.com/vi/${video.id}/hqdefault.jpg')`;
     }
 
-    // Embed YouTube Player with full sound unmuted!
+    // Embed YouTube Player with interactive controls and sound
     const container = document.getElementById('viev-fullscreen-video-wrap');
     if (container) {
       const originParam = (window.location.origin && window.location.origin !== 'null' && window.location.protocol.startsWith('http'))
@@ -612,7 +652,7 @@
       container.innerHTML = `
         <iframe id="viev-fullscreen-receiver-iframe" 
                 class="viev-fullscreen-iframe" 
-                src="https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&enablejsapi=1${originParam}${startParam}&controls=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3" 
+                src="https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&enablejsapi=1${originParam}${startParam}&controls=1&playsinline=1&rel=0&modestbranding=1" 
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                 allowfullscreen></iframe>
         <div class="viev-fullscreen-sync-overlay">
@@ -626,7 +666,6 @@
         receiverIframe.onload = () => {
           try {
             receiverIframe.contentWindow.postMessage('{"event":"listening"}', '*');
-            // Unmute and maximize audio
             receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
             receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
             receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
@@ -637,6 +676,7 @@
 
     state.lastSyncedVideoId = video.id;
     state.lastSyncedTime = video.currentTime || 0;
+    state.lastSyncedIsPlaying = video.isPlaying !== false;
     theater.classList.add('is-active');
 
     // Attempt browser Fullscreen API for authentic theater immersion
@@ -666,11 +706,12 @@
       const startParam = video.currentTime ? `&start=${Math.floor(video.currentTime)}` : '';
 
       if (receiverIframe) {
-        receiverIframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&enablejsapi=1${originParam}${startParam}&controls=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3`;
+        receiverIframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&enablejsapi=1${originParam}${startParam}&controls=1&playsinline=1&rel=0&modestbranding=1`;
         receiverIframe.onload = () => {
           try {
             receiverIframe.contentWindow.postMessage('{"event":"listening"}', '*');
             receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+            receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
             receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
           } catch (_) {}
         };

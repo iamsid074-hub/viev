@@ -406,6 +406,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isVideoPlaying) {
       scheduleControlsAutoHide();
     }
+    if (window.vievAirCast && typeof window.vievAirCast.notifyPlaybackState === 'function' && currentPlayingVideoId) {
+      window.vievAirCast.notifyPlaybackState({
+        id: currentPlayingVideoId,
+        title: (theaterTitle && theaterTitle.textContent) || 'YouTube Video',
+        channel: (theaterChannel && theaterChannel.textContent) || 'YouTube',
+        avatar: (theaterAvatar && theaterAvatar.src) || '',
+        currentTime: videoCurrentSeconds,
+        duration: videoTotalSeconds,
+        isPlaying: isVideoPlaying
+      });
+    }
   }
 
   let seekRippleTimerLeft = null;
@@ -432,6 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  let lastAirCastTickSeconds = 0;
   function startPlaybackTicker() {
     stopPlaybackTicker();
     playbackTickerInterval = setInterval(() => {
@@ -441,6 +453,22 @@ document.addEventListener('DOMContentLoaded', () => {
           videoCurrentSeconds = videoTotalSeconds;
         }
         updateScrubberUI();
+
+        // Sync with AirCast companion every 2 seconds
+        if (window.vievAirCast && typeof window.vievAirCast.notifyPlaybackState === 'function' && currentPlayingVideoId) {
+          if (Math.abs(videoCurrentSeconds - lastAirCastTickSeconds) >= 2) {
+            lastAirCastTickSeconds = videoCurrentSeconds;
+            window.vievAirCast.notifyPlaybackState({
+              id: currentPlayingVideoId,
+              title: (theaterTitle && theaterTitle.textContent) || 'YouTube Video',
+              channel: (theaterChannel && theaterChannel.textContent) || 'YouTube',
+              avatar: (theaterAvatar && theaterAvatar.src) || '',
+              currentTime: videoCurrentSeconds,
+              duration: videoTotalSeconds,
+              isPlaying: true
+            });
+          }
+        }
       }
     }, 1000);
   }
@@ -1083,10 +1111,32 @@ document.addEventListener('DOMContentLoaded', () => {
         avatar: avatar || '',
         currentTime: 1,
         duration: videoTotalSeconds,
-        isPlaying: true
+        isPlaying: true,
+        forceNewVideo: true
       });
     }
   }
+
+  // Global hooks for AirCast
+  window.playVideoInCinemaById = function(vidId, title, channel) {
+    if (!vidId) return;
+    playVideoInTheater(vidId, title || 'YouTube Video', channel || 'YouTube');
+  };
+
+  window.getCurrentCinemaPlayingVideo = function() {
+    if (currentPlayingVideoId) {
+      return {
+        id: currentPlayingVideoId,
+        title: (theaterTitle && theaterTitle.textContent) || 'YouTube Video',
+        channel: (theaterChannel && theaterChannel.textContent) || 'YouTube',
+        avatar: (theaterAvatar && theaterAvatar.src) || '',
+        currentTime: videoCurrentSeconds || 1,
+        duration: videoTotalSeconds || 300,
+        isPlaying: isVideoPlaying
+      };
+    }
+    return null;
+  };
 
   function getActiveYouTubeAccount() {
     try {
