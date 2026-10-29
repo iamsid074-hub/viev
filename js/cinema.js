@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const feedGrid = document.getElementById('cinema-video-feed-grid');
   const feedHeading = document.getElementById('cinema-feed-heading');
   const feedStatus = document.getElementById('cinema-feed-status');
+  const appHeader = document.querySelector('.yt-mobile-app-header');
+  const feedSection = document.querySelector('.cinema-feed-section') || document.getElementById('cinema-video-feed-section');
 
   if (!launcherView || !playerView) return;
 
@@ -572,11 +574,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeVideoCompletely() {
+    isVideoPlaying = false;
+    currentPlayingVideoId = null;
+
     if (iframe) iframe.src = '';
     stopPlaybackTicker();
     hideCustomControls();
     closeSettingsSheet();
 
+    // 1. Hide the video theater stage completely
     if (theaterStage) {
       theaterStage.style.display = 'none';
       theaterStage.classList.remove('is-miniplayer');
@@ -592,16 +598,42 @@ document.addEventListener('DOMContentLoaded', () => {
       artworkContainer.style.borderRadius = '';
       artworkContainer.style.zIndex = '';
     }
+
+    // 2. Redirect to In-App YouTube Home Feed Screen
     if (playerView) {
       playerView.classList.remove('theater-active');
       playerView.classList.remove('miniplayer-mode');
+      playerView.style.display = 'flex';
     }
-    if (theaterYtBar) theaterYtBar.style.opacity = '';
-    if (feedSection) feedSection.style.opacity = '';
-    if (appHeader) {
-      appHeader.style.display = '';
-      appHeader.style.opacity = '';
+    if (launcherView) {
+      launcherView.style.display = 'none';
     }
+
+    // 3. Ensure YouTube mobile app header and feed are fully visible and active
+    const appHeaderEl = appHeader || document.querySelector('.yt-mobile-app-header');
+    if (appHeaderEl) {
+      appHeaderEl.style.display = '';
+      appHeaderEl.style.opacity = '1';
+    }
+    const feedSec = feedSection || document.querySelector('.cinema-feed-section') || document.getElementById('cinema-video-feed-section');
+    if (feedSec) {
+      feedSec.style.display = '';
+      feedSec.style.opacity = '1';
+      feedSec.style.pointerEvents = 'auto';
+    }
+    if (theaterYtBar) {
+      theaterYtBar.style.opacity = '';
+    }
+
+    // 4. Smooth scroll right back to top of YouTube Home feed
+    const cinemaScreen = document.getElementById('cinema-screen');
+    if (cinemaScreen) {
+      cinemaScreen.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (playerView) {
+      playerView.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     if (typeof window.triggerHaptic === 'function') window.triggerHaptic('light');
   }
 

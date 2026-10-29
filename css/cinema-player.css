@@ -2975,6 +2975,10 @@
   transition: opacity 0.3s ease;
 }
 
+.cinema-player-viewport:not(.theater-active) .cinema-theater-stage:not(.is-miniplayer) {
+  display: none !important;
+}
+
 .cinema-theater-stage {
   display: flex;
   flex-direction: column;
