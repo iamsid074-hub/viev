@@ -19,7 +19,7 @@
 
   <link rel="stylesheet" href="css/liquid-glass.css">
   <link rel="stylesheet" href="css/apple-intro.css?v=3.4">
-  <link rel="stylesheet" href="css/cinema-player.css?v=3.5">
+  <link rel="stylesheet" href="css/cinema-player.css?v=3.6">
 </head>
 <body>
 
@@ -623,11 +623,11 @@ tu h digi meri mai hu pyar tera .
       </div>
     </section>
 
-    <!-- SCREEN 3: DEDICATED FULL PAGE - CINEMA & YOUTUBE LOUNGE (DIGI OS 2.0) -->
-    <section id="cinema-screen" class="app-screen" aria-label="Cinema & YouTube Lounge">
+    <!-- SCREEN 3: DEDICATED FULL PAGE - REAL YOUTUBE LOUNGE & FEED (DIGI OS 2.0) -->
+    <section id="cinema-screen" class="app-screen" aria-label="YouTube Lounge">
       
-      <!-- VIEW 1: LUXURY LAUNCHER HUB -->
-      <div class="cinema-launcher-viewport" id="cinema-launcher-view">
+      <!-- VIEW 1: LUXURY LAUNCHER HUB (BYPASS - DIRECT TO FEED) -->
+      <div class="cinema-launcher-viewport" id="cinema-launcher-view" style="display: none;">
         
         <!-- Apple Vision Pro Hero Card -->
         <div class="cinema-hero-card">
@@ -702,15 +702,15 @@ tu h digi meri mai hu pyar tera .
       </div>
 
       <!-- VIEW 2: IN-APP FULL YOUTUBE EXPERIENCE -->
-      <div class="cinema-player-viewport" id="cinema-player-view" style="display: none;">
+      <div class="cinema-player-viewport" id="cinema-player-view" style="display: flex;">
         
         <!-- REAL YOUTUBE MOBILE APP TOP HEADER (IMAGE 1 REPLICA) -->
         <header class="yt-mobile-app-header">
-          <!-- Top Row: Back + YouTube Logo + Cast + Bell 9+ + Search + Avatar -->
+          <!-- Top Row: YouTube Logo + Cast + Bell 9+ + Search + Avatar -->
           <div class="yt-header-main-row">
             <div class="yt-header-brand-group">
-              <!-- Back Button to return to Launcher -->
-              <button type="button" class="yt-header-icon-btn yt-header-back-btn" id="cinema-player-back-btn" title="Back to Launcher" aria-label="Back to Launcher">
+              <!-- Back Button to return to Launcher (Hidden) -->
+              <button type="button" class="yt-header-icon-btn yt-header-back-btn" id="cinema-player-back-btn" title="Back to Launcher" aria-label="Back to Launcher" style="display: none;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
@@ -1195,7 +1195,7 @@ tu h digi meri mai hu pyar tera .
             <span class="settings-group-kicker">Experience & System</span>
             <div class="settings-pills-list">
               <button class="settings-nav-pill" data-target="subpage-cinema" type="button">
-                <span class="pill-nav-title">Cinema & Experience</span>
+                <span class="pill-nav-title">YouTube & Experience</span>
                 <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
@@ -1333,9 +1333,9 @@ tu h digi meri mai hu pyar tera .
             </div>
           </div>
 
-          <!-- SUBPAGE 3: CINEMA & EXPERIENCE -->
+          <!-- SUBPAGE 3: YOUTUBE & EXPERIENCE -->
           <div class="subpage-body-container" id="subpage-cinema" style="display: none;">
-            <h2 class="subpage-large-heading">Cinema & Experience</h2>
+            <h2 class="subpage-large-heading">YouTube & Experience</h2>
 
             <div class="settings-group-card">
               <div class="settings-rows-list">
@@ -1570,8 +1570,8 @@ tu h digi meri mai hu pyar tera .
         <button class="nav-tab-btn" data-tab="music" id="tab-music" aria-selected="false">
           <span class="nav-tab-label">Music</span>
         </button>
-        <button class="nav-tab-btn" data-tab="cinema" id="tab-cinema" aria-selected="false" style="display: none;">
-          <span class="nav-tab-label">Cinema</span>
+        <button class="nav-tab-btn" data-tab="cinema" id="tab-cinema" aria-selected="false">
+          <span class="nav-tab-label">YouTube</span>
         </button>
         <button class="nav-tab-btn" data-tab="settings" id="tab-settings" aria-selected="false">
           <span class="nav-tab-label">Settings</span>
@@ -2027,9 +2027,9 @@ tu h digi meri mai hu pyar tera .
 
   <script src="js/apple-welcome.js"></script>
   <script src="js/daily-note.js?v=2.7"></script>
-  <script src="js/navbar.js?v=2.4"></script>
+  <script src="js/navbar.js?v=2.5"></script>
   <script src="js/youtube-data.js?v=1.0"></script>
-  <script src="js/cinema.js?v=3.5"></script>
+  <script src="js/cinema.js?v=3.6"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
   <script src="js/app.js?v=3.6"></script>
 </body>

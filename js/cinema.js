@@ -81,8 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const currQualityVal = document.getElementById('cinema-curr-quality-val');
   const artworkContainer = document.getElementById('cinema-player-artwork-container');
   const theaterYtBar = document.querySelector('.cinema-theater-yt-bar');
-  const feedSection = document.querySelector('.cinema-feed-section');
-  const appHeader = document.querySelector('.yt-mobile-app-header');
   const theaterAvatar = document.getElementById('cinema-theater-avatar');
   const theaterVerified = document.getElementById('cinema-theater-verified');
   const theaterSubs = document.getElementById('cinema-theater-subs');
@@ -1604,6 +1602,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Expose global open function for direct navbar access
+  window.openCinemaLounge = openCinemaLounge;
+
   // Cross-Tab Navbar Miniplayer visibility
   window.vievCinema = {
     updateMiniPlayerVisibility(targetTab) {
@@ -1614,6 +1615,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Initial sync on load
+  // Direct YouTube Home initialization on load
+  if (launcherView) launcherView.style.display = 'none';
+  if (playerView) playerView.style.display = 'flex';
+  if (theaterStage) theaterStage.style.display = 'none';
   syncYouTubeAccountUI();
+  loadYouTubeFeed('All', false);
 });
