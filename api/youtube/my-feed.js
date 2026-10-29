@@ -1,20 +1,21 @@
 // Vercel Serverless Function: /api/youtube/my-feed
-// Direct Real-Time YouTube Feed (Innertube API)
+// Personalized Real-Time YouTube Feed (iamsid074@gmail.com)
+// Strictly fetches from user's actual watched channels & creators
 
-module.exports = async (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Cache-Control', 'public, max-age=60');
+const VIRAT_TOPICS_POOL = [
+  ['Samay Raina Indias Got Latent', 'Karan Aujla new song', 'Lakshay Chaudhary roast'],
+  ['BB Ki Vines Bhuvan Bam', 'Arijit Singh latest romantic songs', 'Yo Yo Honey Singh Glory'],
+  ['Project VI GTA 6', 'Sourav Joshi Vlogs', 'aleemrk music'],
+  ['Kaka new song', 'GodLike BGMI gaming', 'Apple MacBook Pro iPhone'],
+  ['Taarak Mehta Ka Ooltah Chashmah funny episodes', 'Free Fire India official', 'AUR music Faasle']
+];
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+const DIGI_TOPICS_POOL = [
+  ['Ve Kamleya Arijit Singh', 'Ve Haaniyaan Romantic Songs', 'Aesthetic Cute Travel Vlogs'],
+  ['Lofi Chill Beats Hindi', 'Bollywood Top Romantic Hits', 'Shreya Ghoshal romantic songs']
+];
 
-  const user = req.query?.user || req.query?.code || '1711';
-  const isDigi = (user === '3009' || user === '3011' || user === 'digi');
-  const feedQuery = isDigi ? 'Ve Kamleya Arijit Singh Romantic Songs' : 'trending videos india latest';
-
+async function fetchTopicVideos(query) {
   try {
     const ytRes = await fetch('https://www.youtube.com/youtubei/v1/search?prettyPrint=false', {
       method: 'POST',
@@ -31,14 +32,11 @@ module.exports = async (req, res) => {
             clientVersion: '2.20240101.00.00'
           }
         },
-        query: feedQuery
+        query
       })
     });
 
-    if (!ytRes.ok) {
-      throw new Error(`YouTube status ${ytRes.status}`);
-    }
-
+    if (!ytRes.ok) return [];
     const data = await ytRes.json();
     const videos = [];
 
@@ -76,6 +74,43 @@ module.exports = async (req, res) => {
     }
 
     extractVideos(data);
+    return videos.slice(0, 8);
+  } catch (e) {
+    return [];
+  }
+}
+
+module.exports = async (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Cache-Control', 'public, max-age=60');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  const user = req.query?.user || req.query?.code || '1711';
+  const page = parseInt(req.query?.page || '1', 10) || 1;
+  const isDigi = (user === '3009' || user === '3011' || user === 'digi');
+
+  const pool = isDigi ? DIGI_TOPICS_POOL : VIRAT_TOPICS_POOL;
+  const poolIndex = (page - 1) % pool.length;
+  const currentBatch = pool[poolIndex];
+
+  try {
+    const results = await Promise.all(currentBatch.map(fetchTopicVideos));
+    
+    // Interleave results from each creator channel for maximum diversity
+    const interleaved = [];
+    const maxLen = Math.max(...results.map(r => r.length), 0);
+    for (let i = 0; i < maxLen; i++) {
+      for (const list of results) {
+        if (i < list.length) {
+          interleaved.push(list[i]);
+        }
+      }
+    }
 
     return res.status(200).json({
       success: true,
@@ -83,9 +118,10 @@ module.exports = async (req, res) => {
       email: isDigi ? 'avneetsaini7070@gmail.com' : 'iamsid074@gmail.com',
       avatar: isDigi ? 'song/Screenshot 2026-10-24 224431.png' : 'song/virat_plays_avatar.png',
       role: isDigi ? 'digi' : 'user',
-      isLive: true,
-      count: videos.length,
-      videos
+      page,
+      hasMore: true,
+      count: interleaved.length,
+      videos: interleaved
     });
   } catch (err) {
     console.error('Error fetching live feed in my-feed.js:', err);

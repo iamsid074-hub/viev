@@ -4183,6 +4183,26 @@
   }
 }
 
+.cinema-feed-loading-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 16px 40px 16px;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 500;
+  box-sizing: border-box;
+}
+
+.cinema-feed-loading-more .cinema-feed-spinner {
+  width: 20px;
+  height: 20px;
+  border-width: 2.5px;
+}
+
 /* =========================================================
    YOUTUBE SETTINGS BOTTOM SHEET MODAL (IMAGE 5 REPLICA)
    Options: Playback Speed & Quality

@@ -116,7 +116,7 @@ function getUserPersonalFeed(forceRefresh, callback) {
   const refreshArg = forceRefresh ? ' --refresh' : '';
   exec(`python "${scriptPath}"${refreshArg}`, { maxBuffer: 1024 * 1024 * 10 }, (err, stdout) => {
     if (err || !stdout || stdout.trim() === '[]') {
-      return fetchYouTubeVideos('trending videos india latest', callback);
+      return fetchYouTubeVideos('Samay Raina Indias Got Latent Karan Aujla Lakshay Chaudhary', callback);
     }
     try {
       const videos = JSON.parse(stdout.trim());
@@ -125,10 +125,10 @@ function getUserPersonalFeed(forceRefresh, callback) {
         lastFeedFetch = Date.now();
         callback(null, videos);
       } else {
-        fetchYouTubeVideos('trending videos india latest', callback);
+        fetchYouTubeVideos('Samay Raina Indias Got Latent Karan Aujla Lakshay Chaudhary', callback);
       }
     } catch (e) {
-      fetchYouTubeVideos('trending videos india latest', callback);
+      fetchYouTubeVideos('Samay Raina Indias Got Latent Karan Aujla Lakshay Chaudhary', callback);
     }
   });
 }
@@ -263,6 +263,19 @@ const server = http.createServer((req, res) => {
     }
 
     getUserPersonalFeed(forceRefresh, (err, videos) => {
+      const page = parseInt(parsedUrl.query.page || '1', 10) || 1;
+      const pageSize = 15;
+      const total = videos.length;
+      let paged = videos.slice((page - 1) * pageSize, page * pageSize);
+      if (paged.length === 0 && total > 0) {
+        // Rotate so feed is endless
+        const start = ((page - 1) * pageSize) % total;
+        paged = videos.slice(start, start + pageSize);
+        if (paged.length < pageSize) {
+          paged = paged.concat(videos.slice(0, pageSize - paged.length));
+        }
+      }
+
       res.writeHead(200, {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -274,8 +287,10 @@ const server = http.createServer((req, res) => {
         email: 'iamsid074@gmail.com',
         avatar: 'song/virat_plays_avatar.png',
         role: 'user',
-        count: videos.length,
-        videos
+        page,
+        hasMore: true,
+        count: paged.length,
+        videos: paged
       }));
     });
     return;

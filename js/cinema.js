@@ -1173,9 +1173,205 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.syncYouTubeUser = syncYouTubeAccountUI;
 
-  // Fetch and display real YouTube video feed cards
+  // --- Infinite Scroll & Feed Pagination Engine ---
+  let currentFeedQuery = 'All';
+  let currentFeedPage = 1;
+  let isLoadingMore = false;
+  let hasMoreFeed = true;
+  let infiniteScrollAttached = false;
+
+  function getOrCreateSentinel() {
+    let sentinel = document.getElementById('cinema-feed-sentinel');
+    if (!sentinel && feedGrid && feedGrid.parentNode) {
+      sentinel = document.createElement('div');
+      sentinel.id = 'cinema-feed-sentinel';
+      sentinel.className = 'cinema-feed-loading-more';
+      sentinel.style.display = 'none';
+      sentinel.innerHTML = `
+        <div class="cinema-feed-spinner"></div>
+        <span>Loading more videos...</span>
+      `;
+      feedGrid.parentNode.insertBefore(sentinel, feedGrid.nextSibling);
+    }
+    return sentinel;
+  }
+
+  function renderVideoCards(videos, append = false) {
+    if (!feedGrid) return;
+    if (!append) {
+      feedGrid.innerHTML = '';
+      if (feedStatus) feedStatus.textContent = '';
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    videos.forEach((vid) => {
+      const card = document.createElement('div');
+      card.className = 'cinema-video-card';
+      card.dataset.videoid = vid.id;
+      card.dataset.title = vid.title;
+      card.dataset.channel = vid.channel;
+
+      const safeTitle = (vid.title || 'YouTube Video').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const safeChannel = (vid.channel || 'Channel').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const safeDuration = (vid.duration || '2:40').replace(/&/g, '&amp;');
+      const safeViews = (vid.views || '1M views').replace(/&/g, '&amp;');
+      const safePub = (vid.pub || '').replace(/&/g, '&amp;');
+
+      const verifiedSvg = vid.isVerified
+        ? `<svg class="yt-mobile-verified-badge" viewBox="0 0 24 24" width="13" height="13" fill="#aaaaaa"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`
+        : '';
+
+      const avatarHtml = vid.avatar
+        ? `<img src="${vid.avatar}" alt="${safeChannel}" class="yt-mobile-channel-avatar" loading="lazy" onerror="this.outerHTML='<div class=\\'yt-mobile-channel-avatar placeholder\\'>${safeChannel.charAt(0).toUpperCase()}</div>'">`
+        : `<div class="yt-mobile-channel-avatar placeholder">${safeChannel.charAt(0).toUpperCase()}</div>`;
+
+      const metaParts = [];
+      metaParts.push(`<span class="yt-channel-name">${safeChannel}</span>`);
+      if (verifiedSvg) metaParts.push(verifiedSvg);
+      if (safeViews) metaParts.push(`<span class="yt-dot">•</span><span class="yt-views-count"><span class="yt-play-triangle">▷</span> ${safeViews}</span>`);
+      if (safePub) metaParts.push(`<span class="yt-dot">•</span><span class="yt-pub-time">${safePub}</span>`);
+
+      const isLiveNow = (safeDuration && safeDuration.toLowerCase().includes('live')) || (safePub && safePub.toLowerCase().includes('live')) || (safeViews && safeViews.toLowerCase().includes('watching'));
+      const durationHtml = isLiveNow
+        ? `<span class="yt-mobile-duration yt-live-badge">🔴 LIVE</span>`
+        : `<span class="yt-mobile-duration">♪ ${safeDuration}</span>`;
+
+      card.innerHTML = `
+        <div class="yt-mobile-thumb-wrap">
+          <img src="${vid.thumb}" alt="${safeTitle}" class="yt-mobile-thumb" loading="lazy">
+          ${durationHtml}
+        </div>
+        <div class="yt-mobile-card-details">
+          <div class="yt-mobile-avatar-wrap">
+            ${avatarHtml}
+          </div>
+          <div class="yt-mobile-text-content">
+            <h3 class="yt-mobile-title">${safeTitle}</h3>
+            <div class="yt-mobile-meta-line">
+              ${metaParts.join(' ')}
+            </div>
+          </div>
+          <button type="button" class="yt-mobile-more-btn" aria-label="More" title="More options">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="12" cy="19" r="2"></circle>
+            </svg>
+          </button>
+        </div>
+      `;
+
+      const moreBtn = card.querySelector('.yt-mobile-more-btn');
+      if (moreBtn) {
+        moreBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(`https://www.youtube.com/watch?v=${vid.id}`);
+          }
+          if (typeof window.triggerHaptic === 'function') window.triggerHaptic('medium');
+          moreBtn.title = 'Link Copied! ✓';
+          setTimeout(() => { moreBtn.title = 'More options'; }, 2000);
+        });
+      }
+
+      card.addEventListener('click', () => {
+        const subs = vid.subs || (vid.views ? `${vid.views.replace(/views?/i, '').trim()} subscribers` : '21.1M subscribers');
+        const likes = vid.likes || '50K';
+        playVideoInTheater(vid.id, vid.title, vid.channel, vid.thumb, vid.avatar, subs, vid.isVerified, likes, vid.duration);
+      });
+
+      fragment.appendChild(card);
+    });
+
+    feedGrid.appendChild(fragment);
+  }
+
+  async function loadMoreYouTubeFeed() {
+    if (isLoadingMore || !hasMoreFeed) return;
+    isLoadingMore = true;
+    currentFeedPage++;
+
+    const sentinel = getOrCreateSentinel();
+    if (sentinel) sentinel.style.display = 'flex';
+
+    try {
+      const acc = getActiveYouTubeAccount();
+      const endpoint = (!currentFeedQuery || currentFeedQuery === 'All')
+        ? `/api/youtube/my-feed?user=${acc.code}&page=${currentFeedPage}`
+        : `/api/youtube/search?q=${encodeURIComponent(currentFeedQuery)}&page=${currentFeedPage}`;
+
+      let moreVideos = [];
+      try {
+        const res = await fetch(endpoint);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.videos) && data.videos.length > 0) {
+            moreVideos = data.videos;
+          }
+        }
+      } catch (_) {}
+
+      // Fallback from personalized database if offline
+      if (!moreVideos || moreVideos.length === 0) {
+        const pool = (acc.code === '1711' && Array.isArray(window.VIRAT_YOUTUBE_FEED))
+          ? window.VIRAT_YOUTUBE_FEED
+          : (window.DIGI_YOUTUBE_FEED || []);
+        if (pool && pool.length > 0) {
+          const pageSize = 12;
+          const startIdx = ((currentFeedPage - 1) * pageSize) % pool.length;
+          moreVideos = pool.slice(startIdx, startIdx + pageSize);
+          if (moreVideos.length < pageSize) {
+            moreVideos = moreVideos.concat(pool.slice(0, pageSize - moreVideos.length));
+          }
+        }
+      }
+
+      if (moreVideos && moreVideos.length > 0) {
+        renderVideoCards(moreVideos, true);
+      } else {
+        hasMoreFeed = false;
+      }
+    } catch (e) {
+      console.warn('Infinite scroll error:', e);
+    } finally {
+      if (sentinel) sentinel.style.display = 'none';
+      isLoadingMore = false;
+    }
+  }
+
+  function setupInfiniteScroll() {
+    if (infiniteScrollAttached) return;
+    infiniteScrollAttached = true;
+
+    const screen = document.getElementById('cinema-screen');
+    const onScrollHandler = () => {
+      if (!screen || isLoadingMore || !hasMoreFeed) return;
+      const scrollBottom = screen.scrollHeight - (screen.scrollTop + screen.clientHeight);
+      if (scrollBottom < 650) {
+        loadMoreYouTubeFeed();
+      }
+    };
+
+    if (screen) {
+      screen.addEventListener('scroll', onScrollHandler, { passive: true });
+    }
+    window.addEventListener('scroll', onScrollHandler, { passive: true });
+  }
+
+  // Fetch and display real YouTube video feed cards (with infinite scroll & user personalization)
   async function loadYouTubeFeed(query = 'All', autoPlayFirst = false, forceRefresh = false) {
     if (!feedGrid) return;
+
+    currentFeedQuery = query;
+    currentFeedPage = 1;
+    hasMoreFeed = true;
+    isLoadingMore = false;
+
+    setupInfiniteScroll();
+
+    const sentinel = getOrCreateSentinel();
+    if (sentinel) sentinel.style.display = 'none';
 
     feedGrid.innerHTML = `
       <div class="cinema-feed-loading">
@@ -1187,9 +1383,9 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const acc = getActiveYouTubeAccount();
       const refreshParam = forceRefresh ? `&refresh=1&_t=${Date.now()}` : '';
-      const endpoint = (!query || query === 'All' || query === 'Trending Songs & Vlogs India')
-        ? `/api/youtube/my-feed?user=${acc.code}${refreshParam}`
-        : `/api/youtube/search?q=${encodeURIComponent(query)}&user=${acc.code}${refreshParam}`;
+      const endpoint = (!query || query === 'All')
+        ? `/api/youtube/my-feed?user=${acc.code}&page=1${refreshParam}`
+        : `/api/youtube/search?q=${encodeURIComponent(query)}&user=${acc.code}&page=1${refreshParam}`;
 
       let videos = [];
 
@@ -1206,12 +1402,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Backend not running (e.g. accessing static deployment from phone)
       }
 
-      // 2. Seamless client-side zero-fail fallback (works 100% on phone, PWA shortcut, Vercel)
+      // 2. Seamless client-side zero-fail fallback with user's real watch profile
       if (!videos || videos.length === 0) {
-        if (typeof window.getClientSideYouTubeFeed === 'function') {
-          videos = window.getClientSideYouTubeFeed(query, acc.code);
-        } else if (acc.code === '1711' && Array.isArray(window.VIRAT_YOUTUBE_FEED)) {
-          videos = window.VIRAT_YOUTUBE_FEED;
+        if (acc.code === '1711' && Array.isArray(window.VIRAT_YOUTUBE_FEED) && window.VIRAT_YOUTUBE_FEED.length > 0) {
+          if (!query || query === 'All') {
+            videos = window.VIRAT_YOUTUBE_FEED;
+          } else {
+            const lq = query.toLowerCase();
+            videos = window.VIRAT_YOUTUBE_FEED.filter(v =>
+              (v.title && v.title.toLowerCase().includes(lq)) ||
+              (v.channel && v.channel.toLowerCase().includes(lq))
+            );
+            if (videos.length === 0) {
+              videos = window.VIRAT_YOUTUBE_FEED;
+            }
+          }
         } else if (Array.isArray(window.DIGI_YOUTUBE_FEED)) {
           videos = window.DIGI_YOUTUBE_FEED;
         }
@@ -1226,91 +1431,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      feedGrid.innerHTML = '';
-      if (feedStatus) feedStatus.textContent = '';
-
-      videos.forEach((vid, idx) => {
-        const card = document.createElement('div');
-        card.className = 'cinema-video-card';
-        card.dataset.videoid = vid.id;
-        card.dataset.title = vid.title;
-        card.dataset.channel = vid.channel;
-
-        // Clean escaped strings
-        const safeTitle = (vid.title || 'YouTube Video').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        const safeChannel = (vid.channel || 'Channel').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        const safeDuration = (vid.duration || '2:40').replace(/&/g, '&amp;');
-        const safeViews = (vid.views || '1M views').replace(/&/g, '&amp;');
-        const safePub = (vid.pub || '').replace(/&/g, '&amp;');
-
-        // Verified channel checkmark badge
-        const verifiedSvg = vid.isVerified
-          ? `<svg class="yt-mobile-verified-badge" viewBox="0 0 24 24" width="13" height="13" fill="#aaaaaa"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`
-          : '';
-
-        // Channel avatar image with letter fallback
-        const avatarHtml = vid.avatar
-          ? `<img src="${vid.avatar}" alt="${safeChannel}" class="yt-mobile-channel-avatar" loading="lazy" onerror="this.outerHTML='<div class=\\'yt-mobile-channel-avatar placeholder\\'>${safeChannel.charAt(0).toUpperCase()}</div>'">`
-          : `<div class="yt-mobile-channel-avatar placeholder">${safeChannel.charAt(0).toUpperCase()}</div>`;
-
-        // Metadata parts (Channel • Verified • Views • Time)
-        const metaParts = [];
-        metaParts.push(`<span class="yt-channel-name">${safeChannel}</span>`);
-        if (verifiedSvg) metaParts.push(verifiedSvg);
-        if (safeViews) metaParts.push(`<span class="yt-dot">•</span><span class="yt-views-count"><span class="yt-play-triangle">▷</span> ${safeViews}</span>`);
-        if (safePub) metaParts.push(`<span class="yt-dot">•</span><span class="yt-pub-time">${safePub}</span>`);
-
-        const isLiveNow = (safeDuration && safeDuration.toLowerCase().includes('live')) || (safePub && safePub.toLowerCase().includes('live')) || (safeViews && safeViews.toLowerCase().includes('watching'));
-        const durationHtml = isLiveNow
-          ? `<span class="yt-mobile-duration yt-live-badge">🔴 LIVE</span>`
-          : `<span class="yt-mobile-duration">♪ ${safeDuration}</span>`;
-
-        card.innerHTML = `
-          <div class="yt-mobile-thumb-wrap">
-            <img src="${vid.thumb}" alt="${safeTitle}" class="yt-mobile-thumb" loading="lazy">
-            ${durationHtml}
-          </div>
-          <div class="yt-mobile-card-details">
-            <div class="yt-mobile-avatar-wrap">
-              ${avatarHtml}
-            </div>
-            <div class="yt-mobile-text-content">
-              <h3 class="yt-mobile-title">${safeTitle}</h3>
-              <div class="yt-mobile-meta-line">
-                ${metaParts.join(' ')}
-              </div>
-            </div>
-            <button type="button" class="yt-mobile-more-btn" aria-label="More" title="More options">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="5" r="2"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-                <circle cx="12" cy="19" r="2"></circle>
-              </svg>
-            </button>
-          </div>
-        `;
-
-        const moreBtn = card.querySelector('.yt-mobile-more-btn');
-        if (moreBtn) {
-          moreBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-              navigator.clipboard.writeText(`https://www.youtube.com/watch?v=${vid.id}`);
-            }
-            if (typeof window.triggerHaptic === 'function') window.triggerHaptic('medium');
-            moreBtn.title = 'Link Copied! ✓';
-            setTimeout(() => { moreBtn.title = 'More options'; }, 2000);
-          });
-        }
-
-        card.addEventListener('click', () => {
-          const subs = vid.subs || (vid.views ? `${vid.views.replace(/views?/i, '').trim()} subscribers` : '21.1M subscribers');
-          const likes = vid.likes || '50K';
-          playVideoInTheater(vid.id, vid.title, vid.channel, vid.thumb, vid.avatar, subs, vid.isVerified, likes, vid.duration);
-        });
-
-        feedGrid.appendChild(card);
-      });
+      renderVideoCards(videos, false);
 
       if (autoPlayFirst && videos.length > 0) {
         const first = videos[0];
@@ -1322,40 +1443,11 @@ document.addEventListener('DOMContentLoaded', () => {
       console.warn('Fallback loading YouTube feed:', err);
       try {
         const acc = getActiveYouTubeAccount();
-        const fallback = (typeof window.getClientSideYouTubeFeed === 'function')
-          ? window.getClientSideYouTubeFeed(query, acc.code)
-          : (window.VIRAT_YOUTUBE_FEED || []);
+        const fallback = (acc.code === '1711' && Array.isArray(window.VIRAT_YOUTUBE_FEED))
+          ? window.VIRAT_YOUTUBE_FEED
+          : (window.DIGI_YOUTUBE_FEED || []);
         if (fallback && fallback.length > 0) {
-          feedGrid.innerHTML = '';
-          if (feedStatus) feedStatus.textContent = '';
-          fallback.forEach(vid => {
-            const card = document.createElement('div');
-            card.className = 'cinema-video-card';
-            card.dataset.videoid = vid.id;
-            card.innerHTML = `
-              <div class="yt-mobile-thumb-wrap">
-                <img src="${vid.thumb}" alt="${vid.title}" class="yt-mobile-thumb" loading="lazy">
-                <span class="yt-mobile-duration">♪ ${vid.duration || 'Video'}</span>
-              </div>
-              <div class="yt-mobile-card-details">
-                <div class="yt-mobile-avatar-wrap">
-                  <div class="yt-mobile-channel-avatar placeholder">${(vid.channel || 'Y').charAt(0).toUpperCase()}</div>
-                </div>
-                <div class="yt-mobile-text-content">
-                  <h3 class="yt-mobile-title">${vid.title}</h3>
-                  <div class="yt-mobile-meta-line">
-                    <span class="yt-channel-name">${vid.channel}</span>
-                    <span class="yt-dot">•</span>
-                    <span class="yt-views-count">▷ ${vid.views || '1M views'}</span>
-                  </div>
-                </div>
-              </div>
-            `;
-            card.addEventListener('click', () => {
-              playVideoInTheater(vid.id, vid.title, vid.channel, vid.thumb);
-            });
-            feedGrid.appendChild(card);
-          });
+          renderVideoCards(fallback, false);
           return;
         }
       } catch (_) {}
