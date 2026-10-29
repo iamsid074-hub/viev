@@ -486,40 +486,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     dragJustFinished = true;
 
-    // Immediately and smoothly fade out everything below the video player
-    // (Title, Channel logo/avatar, subscriber count, actions, and recommended videos feed)
+    // Smoothly fade out the metadata (Title, Channel logo/avatar, subscriber count, likes)
     if (theaterYtBar) {
-      theaterYtBar.style.transition = 'opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+      theaterYtBar.style.transition = 'opacity 0.22s ease';
       theaterYtBar.style.opacity = '0';
-    }
-    if (feedSection) {
-      feedSection.style.transition = 'opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
-      feedSection.style.opacity = '0';
     }
     if (customControls) {
       customControls.style.transition = 'opacity 0.15s ease';
       customControls.style.opacity = '0';
     }
 
-    // Measure exact screen coordinates for seamless glide to bottom right
-    const stageRect = theaterStage.getBoundingClientRect();
-    const targetWidth = 175;
-    const targetScale = targetWidth / (stageRect.width || 1);
-    const targetRight = window.innerWidth - 16;
-    const targetBottom = window.innerHeight - 96;
-
-    const deltaX = (targetRight - stageRect.right) + (stageRect.width * (1 - targetScale) / 2);
-    const deltaY = (targetBottom - stageRect.bottom) + (stageRect.height * (1 - targetScale) / 2);
-
-    theaterStage.style.transition = 'transform 0.34s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.34s ease';
-    theaterStage.style.transformOrigin = 'center center';
-    theaterStage.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${targetScale})`;
-    theaterStage.style.boxShadow = '0 16px 40px rgba(0, 0, 0, 0.85), 0 0 0 1.5px rgba(255, 255, 255, 0.28)';
+    // Smoothly scale & glide video card toward the bottom-right corner
+    theaterStage.style.transition = 'transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.3s ease';
+    theaterStage.style.transformOrigin = 'bottom right';
+    theaterStage.style.transform = 'translate(-12px, 340px) scale(0.48)';
 
     setTimeout(() => {
       enterMiniplayer();
       dragJustFinished = false;
-    }, 320);
+    }, 300);
   }
 
   function enterMiniplayer() {
@@ -685,10 +670,6 @@ document.addEventListener('DOMContentLoaded', () => {
           theaterYtBar.style.transition = 'none';
           theaterYtBar.style.opacity = Math.max(1 - progress * 1.6, 0);
         }
-        if (feedSection) {
-          feedSection.style.transition = 'none';
-          feedSection.style.opacity = Math.max(1 - progress * 1.6, 0);
-        }
       }
     }
 
@@ -711,10 +692,6 @@ document.addEventListener('DOMContentLoaded', () => {
           if (theaterYtBar) {
             theaterYtBar.style.transition = 'opacity 0.25s ease';
             theaterYtBar.style.opacity = '1';
-          }
-          if (feedSection) {
-            feedSection.style.transition = 'opacity 0.25s ease';
-            feedSection.style.opacity = '1';
           }
         }
         hasDragged = false;

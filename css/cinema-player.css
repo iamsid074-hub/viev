@@ -2950,7 +2950,6 @@
   padding-right: 16px !important;
   width: calc(100% + 32px) !important;
   box-sizing: border-box !important;
-  transform: none !important;
   /* YouTube boundary divider line right below channel icon / actions row */
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
@@ -3420,8 +3419,8 @@
 }
 
 @keyframes miniplayerPop {
-  from { transform: scale(0.92); opacity: 0.85; }
-  to { transform: scale(1); opacity: 1; }
+  0% { transform: translate(-30px, -80px) scale(1.3); opacity: 0.85; }
+  100% { transform: translate(0, 0) scale(1); opacity: 1; }
 }
 
 .cinema-theater-stage.is-miniplayer .cinema-player-artwork-container {
