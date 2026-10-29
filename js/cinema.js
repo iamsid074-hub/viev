@@ -1146,6 +1146,60 @@ document.addEventListener('DOMContentLoaded', () => {
     return null;
   };
 
+  window.getScreenShareSnapshot = function() {
+    const isPlayer = playerView && playerView.classList.contains('theater-active') && theaterStage && theaterStage.style.display !== 'none' && currentPlayingVideoId;
+    const cinemaScreen = document.getElementById('cinema-screen');
+    const activeChipEl = document.querySelector('#cinema-category-chips .active-chip');
+    
+    // Extract real rendered cards from DOM
+    const cardNodes = document.querySelectorAll('#cinema-video-feed-grid .cinema-video-card');
+    const feedCards = [];
+    cardNodes.forEach((c, idx) => {
+      if (idx > 25) return;
+      const thumb = c.querySelector('.yt-mobile-thumb')?.src || '';
+      const title = c.querySelector('.yt-mobile-title')?.textContent?.trim() || '';
+      const channel = c.querySelector('.yt-channel-name')?.textContent?.trim() || '';
+      const views = c.querySelector('.yt-views-count')?.textContent?.trim() || '';
+      const pub = c.querySelector('.yt-pub-time')?.textContent?.trim() || '';
+      const duration = c.querySelector('.yt-mobile-duration')?.textContent?.trim() || '';
+      const avatar = c.querySelector('.yt-mobile-channel-avatar')?.src || '';
+      const isLive = !!c.querySelector('.yt-live-badge');
+      const isVerified = !!c.querySelector('.yt-mobile-verified-badge');
+      feedCards.push({
+        id: c.dataset.videoid,
+        title,
+        channel,
+        views,
+        pub,
+        duration,
+        avatar,
+        thumb,
+        isLive,
+        isVerified
+      });
+    });
+
+    return {
+      view: isPlayer ? 'player' : 'feed',
+      section: 'cinema',
+      activeChip: activeChipEl ? activeChipEl.textContent.trim() : 'All',
+      scrollTop: cinemaScreen ? cinemaScreen.scrollTop : 0,
+      feedCards: feedCards.length > 0 ? feedCards : (window.CURRENT_CINEMA_FEED || []),
+      player: isPlayer ? {
+        id: currentPlayingVideoId,
+        title: (theaterTitle && theaterTitle.textContent) || (titleEl && titleEl.textContent) || 'YouTube Video',
+        channel: currentPlayingChannel || (theaterChannel && theaterChannel.textContent) || 'YouTube',
+        avatar: (theaterAvatar && theaterAvatar.src) || '',
+        subs: (theaterSubs && theaterSubs.textContent) || '21.1M subscribers',
+        likes: (theaterLikeCount && theaterLikeCount.textContent) || currentBaseLikes || '50K',
+        isPlaying: isVideoPlaying,
+        currentTime: videoCurrentSeconds || 1,
+        duration: videoTotalSeconds || 300,
+        isVerified: theaterVerified ? theaterVerified.style.display !== 'none' : true
+      } : null
+    };
+  };
+
   function getActiveYouTubeAccount() {
     try {
       const raw = localStorage.getItem('viev_auth_session');
@@ -1295,6 +1349,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!append) {
       feedGrid.innerHTML = '';
       if (feedStatus) feedStatus.textContent = '';
+      window.CURRENT_CINEMA_FEED = videos || [];
+    } else if (Array.isArray(window.CURRENT_CINEMA_FEED)) {
+      window.CURRENT_CINEMA_FEED = window.CURRENT_CINEMA_FEED.concat(videos || []);
     }
 
     const fragment = document.createDocumentFragment();

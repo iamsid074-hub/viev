@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="css/liquid-glass.css">
   <link rel="stylesheet" href="css/apple-intro.css?v=3.4">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
-  <link rel="stylesheet" href="css/aircast.css?v=2.1">
+  <link rel="stylesheet" href="css/aircast.css?v=3.0">
 </head>
 <body>
 
@@ -731,12 +731,15 @@ tu h digi meri mai hu pyar tera .
             <!-- Right Action Icons: Search & Account Avatar -->
             <div class="yt-header-actions-group">
 
-              <!-- VIEVS 2.0 AirCast Button -->
-              <button type="button" class="yt-header-icon-btn yt-cast-btn" id="yt-header-cast-btn" title="Cast YouTube Screen (VIEVS 2.0 AirCast)" aria-label="Cast to Companion">
+              <!-- VIEVS 2.0 Screen Share Button -->
+              <button type="button" class="yt-header-icon-btn yt-cast-btn" id="yt-header-cast-btn" title="Share Screen (Live Screen Share)" aria-label="Share Screen with Companion">
                 <div class="yt-cast-waves-aura"></div>
                 <svg class="yt-cast-icon-svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
-                  <line x1="2" y1="20" x2="2.01" y2="20"></line>
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                  <path d="M12 7l4 4-4 4"></path>
+                  <path d="M8 11h8"></path>
                 </svg>
                 <span class="yt-cast-live-badge" id="yt-cast-active-dot"></span>
               </button>
@@ -2015,17 +2018,17 @@ tu h digi meri mai hu pyar tera .
     </div>
   </div>
 
-  <!-- VIEVS 2.0 AIRCAST: CASTER FLOATING ISLAND HUD -->
+  <!-- VIEVS 2.0 SCREEN SHARE: SHARER FLOATING ISLAND HUD -->
   <div class="viev-casting-floating-hud" id="viev-casting-floating-hud">
     <div class="viev-hud-beacon">
       <div class="viev-hud-dot"></div>
-      <span class="viev-hud-label">📡 CASTING LIVE</span>
+      <span class="viev-hud-label">🖥️ SHARING SCREEN</span>
     </div>
-    <span class="viev-hud-partner" id="viev-hud-partner-name">Casting to Companion</span>
-    <button type="button" class="viev-hud-stop-btn" id="viev-hud-stop-btn">Stop Cast ✕</button>
+    <span class="viev-hud-partner" id="viev-hud-partner-name">Live Screen Share (Active)</span>
+    <button type="button" class="viev-hud-stop-btn" id="viev-hud-stop-btn">Stop Sharing ✕</button>
   </div>
 
-  <!-- VIEVS 2.0 AIRCAST MODAL: WHO TO CAST WITH -->
+  <!-- VIEVS 2.0 SCREEN SHARE MODAL: WHO TO SHARE WITH -->
   <div class="cinema-cast-modal-backdrop" id="cinema-cast-modal" role="dialog" aria-modal="true">
     <div class="cinema-cast-sheet">
       <button type="button" class="cinema-cast-close-btn" id="cinema-cast-close-btn" aria-label="Close">✕</button>
@@ -2035,12 +2038,15 @@ tu h digi meri mai hu pyar tera .
         <div class="cinema-cast-header">
           <div class="cinema-cast-icon-orb">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
-              <line x1="2" y1="20" x2="2.01" y2="20"></line>
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+              <path d="M12 7l4 4-4 4"></path>
+              <path d="M8 11h8"></path>
             </svg>
           </div>
-          <h3 class="cinema-cast-title" id="cinema-cast-title">VIEVS 2.0 AirCast</h3>
-          <p class="cinema-cast-subtitle">Beam your YouTube screen in real-time with full synchronized audio & video.</p>
+          <h3 class="cinema-cast-title" id="cinema-cast-title">Share Screen</h3>
+          <p class="cinema-cast-subtitle">Stream your exact live YouTube screen and video in real time to your companion.</p>
         </div>
 
         <!-- Companion Card (Digi or Virat) -->
@@ -2052,7 +2058,7 @@ tu h digi meri mai hu pyar tera .
           <div class="cinema-cast-partner-info">
             <span class="cinema-cast-partner-name" id="cast-partner-name">Virat Plays</span>
             <span class="cinema-cast-partner-handle" id="cast-partner-handle">@viratplaystdm • VIRAT</span>
-            <span class="cinema-cast-partner-status" id="cast-partner-status">🟢 Online on VIEVS • Ready for Cast</span>
+            <span class="cinema-cast-partner-status" id="cast-partner-status">🟢 Online on VIEVS • Ready for Screen Share</span>
           </div>
           <div class="cinema-cast-check-badge">✓</div>
         </div>
@@ -2060,29 +2066,32 @@ tu h digi meri mai hu pyar tera .
         <!-- Features Row -->
         <div class="cinema-cast-features-row">
           <div class="cinema-cast-feat-pill">
-            <span class="cinema-cast-feat-icon">🔊</span>
-            <span class="cinema-cast-feat-text">High-Fi Audio</span>
-          </div>
-          <div class="cinema-cast-feat-pill">
             <span class="cinema-cast-feat-icon">⚡</span>
-            <span class="cinema-cast-feat-text">Zero Latency</span>
+            <span class="cinema-cast-feat-text">Real-Time Stream</span>
           </div>
           <div class="cinema-cast-feat-pill">
-            <span class="cinema-cast-feat-icon">🖥️</span>
-            <span class="cinema-cast-feat-text">Full Screen</span>
+            <span class="cinema-cast-feat-icon">🔒</span>
+            <span class="cinema-cast-feat-text">View-Only Locked</span>
+          </div>
+          <div class="cinema-cast-feat-pill">
+            <span class="cinema-cast-feat-icon">🔊</span>
+            <span class="cinema-cast-feat-text">Master Audio</span>
           </div>
         </div>
 
         <button type="button" class="cinema-cast-start-btn" id="cinema-start-cast-btn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
-            <line x1="2" y1="20" x2="2.01" y2="20"></line>
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+            <path d="M12 7l4 4-4 4"></path>
+            <path d="M8 11h8"></path>
           </svg>
-          <span>Start Live Cast to Companion</span>
+          <span>Start Screen Share with Companion</span>
         </button>
 
         <button type="button" class="cinema-cast-test-mode-btn" id="cinema-cast-test-mode-btn">
-          ✨ Simulate Incoming Cast (Test Receiver Experience)
+          ✨ Simulate Incoming Screen Share (Test Receiver View)
         </button>
       </div>
 
@@ -2090,28 +2099,29 @@ tu h digi meri mai hu pyar tera .
       <div class="cinema-cast-waiting-state" id="cinema-cast-waiting-state">
         <div class="cinema-cast-radar">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#007aff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
-            <line x1="2" y1="20" x2="2.01" y2="20"></line>
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
           </svg>
         </div>
-        <h4 class="cinema-cast-title" style="font-size: 18px;">Connecting AirCast...</h4>
-        <p class="cinema-cast-subtitle" id="cinema-cast-waiting-text">Beaming invitation to companion... Waiting for acceptance.</p>
+        <h4 class="cinema-cast-title" style="font-size: 18px;">Connecting Screen Share...</h4>
+        <p class="cinema-cast-subtitle" id="cinema-cast-waiting-text">Sending screen share invitation... Waiting for acceptance.</p>
         <button type="button" class="cinema-cast-cancel-btn" id="cinema-cancel-cast-btn">Cancel Request</button>
       </div>
     </div>
   </div>
 
-  <!-- VIEVS 2.0 AIRCAST: INCOMING INVITATION OVERLAY BANNER -->
+  <!-- VIEVS 2.0 SCREEN SHARE: INCOMING INVITATION OVERLAY BANNER -->
   <div class="viev-cast-invitation-overlay" id="viev-cast-invitation-overlay" role="alert">
     <div class="viev-invite-top-row">
       <div class="viev-invite-avatar-pulse">
-        <img src="song/Screenshot 2026-10-24 224431.png" alt="Digi" class="viev-invite-avatar" id="viev-invite-avatar">
+        <img src="song/Screenshot 2026-10-24 224431.png" alt="Companion" class="viev-invite-avatar" id="viev-invite-avatar">
         <div class="viev-invite-avatar-ring"></div>
       </div>
       <div class="viev-invite-meta">
-        <div class="viev-invite-badge">✨ VIEVS 2.0 AIRCAST</div>
-        <div class="viev-invite-heading" id="viev-invite-heading">Digi wants to show you something ✨</div>
-        <div class="viev-invite-subtext" id="viev-invite-subtext">Digi is inviting you to watch her YouTube screen live with sound.</div>
+        <div class="viev-invite-badge">🖥️ LIVE SCREEN SHARE</div>
+        <div class="viev-invite-heading" id="viev-invite-heading">Digi wants to share her screen ✨</div>
+        <div class="viev-invite-subtext" id="viev-invite-subtext">Digi is sharing her live YouTube screen and video stream with you.</div>
       </div>
     </div>
 
@@ -2123,7 +2133,7 @@ tu h digi meri mai hu pyar tera .
 
     <div class="viev-invite-actions-row">
       <button type="button" class="viev-invite-accept-btn" id="viev-invite-accept-btn">
-        <span>Accept & Watch Fullscreen ▶</span>
+        <span>Watch Screen ▶</span>
       </button>
       <button type="button" class="viev-invite-decline-btn" id="viev-invite-decline-btn">
         <span>Later</span>
@@ -2131,7 +2141,7 @@ tu h digi meri mai hu pyar tera .
     </div>
   </div>
 
-  <!-- VIEVS 2.0 AIRCAST: FULLSCREEN LIVE MIRROR THEATER -->
+  <!-- VIEVS 2.0 SCREEN SHARE: FULLSCREEN LIVE VIEWER -->
   <div class="viev-cast-fullscreen-theater" id="viev-cast-fullscreen-theater">
     <div class="viev-fullscreen-glow-layer" id="viev-fullscreen-glow-layer"></div>
 
@@ -2140,10 +2150,10 @@ tu h digi meri mai hu pyar tera .
       <div class="viev-fullscreen-hud-left">
         <div class="viev-fullscreen-live-badge">
           <div class="viev-fullscreen-live-dot"></div>
-          <span>LIVE MIRROR</span>
+          <span>LIVE SCREEN SHARE</span>
         </div>
         <div class="viev-fullscreen-user-pill">
-          <img src="song/Screenshot 2026-10-24 224431.png" alt="Caster" class="viev-fullscreen-user-avatar" id="viev-fullscreen-user-avatar">
+          <img src="song/Screenshot 2026-10-24 224431.png" alt="Sharer" class="viev-fullscreen-user-avatar" id="viev-fullscreen-user-avatar">
           <span class="viev-fullscreen-user-name" id="viev-fullscreen-user-name">Digi's Screen</span>
         </div>
       </div>
@@ -2153,77 +2163,90 @@ tu h digi meri mai hu pyar tera .
       </div>
 
       <div class="viev-fullscreen-hud-right">
-        <button type="button" class="viev-fullscreen-hud-btn" id="viev-fullscreen-exit-btn" title="Exit Fullscreen">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <polyline points="4 14 10 14 10 20"></polyline>
-            <polyline points="20 10 14 10 14 4"></polyline>
-            <line x1="14" y1="10" x2="21" y2="3"></line>
-            <line x1="3" y1="21" x2="10" y2="14"></line>
-          </svg>
-          <span>Exit</span>
+        <button type="button" class="viev-audio-mode-pill" id="viev-audio-toggle-btn" title="Toggle Sound">
+          <span id="viev-audio-pill-icon">🔈</span>
+          <span id="viev-audio-pill-label">Sound Muted</span>
         </button>
-        <button type="button" class="viev-fullscreen-hud-btn disconnect-btn" id="viev-fullscreen-disconnect-btn" title="Disconnect Cast">
+        <button type="button" class="viev-fullscreen-hud-btn disconnect-btn" id="viev-fullscreen-disconnect-btn" title="Disconnect Screen Share">
           <span>Disconnect ✕</span>
         </button>
       </div>
     </div>
 
-    <!-- Center Stage: Virtual Device Screen Mirroring -->
-    <div class="viev-fullscreen-stage">
-      <!-- 1. Live Feed Mirror Frame (Active when Caster is browsing YouTube Feed) -->
-      <div class="viev-mirror-feed-wrap" id="viev-mirror-feed-wrap">
-        <div class="viev-mirror-device-notch"></div>
-        <div class="viev-mirror-header">
-          <div class="viev-mirror-yt-logo">
+    <!-- Center Stage: Fullscreen Screen Share Stream & Cloned Screen (LOCKED: pointer-events: none) -->
+    <div class="viev-screenshare-stage" id="viev-screenshare-stage">
+      
+      <!-- Option A: WebRTC Video Stream (When browser screen capture is active) -->
+      <video id="viev-screenshare-webrtc" class="viev-screenshare-webrtc-video" autoplay playsinline style="display: none;"></video>
+
+      <!-- Option B: Real-Time In-App Screen Clone (100% exact copy of Digi's YouTube page) -->
+      <div class="viev-screenshare-clone-scroll" id="viev-screenshare-clone-scroll">
+        
+        <!-- Mirrored YouTube App Header -->
+        <div class="viev-clone-app-header">
+          <div class="viev-clone-yt-logo">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="#ff0000">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
             </svg>
-            <span class="viev-mirror-yt-text">YouTube</span>
+            <span class="viev-clone-yt-text">YouTube</span>
           </div>
-          <div class="viev-mirror-header-right">
-            <span class="viev-mirror-live-tag">LIVE SCREEN</span>
-            <img src="song/Screenshot 2026-10-24 224431.png" alt="" class="viev-mirror-avatar" id="viev-mirror-avatar">
-          </div>
-        </div>
-
-        <!-- Mirror Category Chips -->
-        <div class="viev-mirror-chips-bar" id="viev-mirror-chips-bar">
-          <span class="viev-mirror-chip is-active" id="mirror-chip-all">All</span>
-          <span class="viev-mirror-chip" id="mirror-chip-live">Live</span>
-          <span class="viev-mirror-chip" id="mirror-chip-trending">Trending Music</span>
-          <span class="viev-mirror-chip" id="mirror-chip-romantic">Romantic Hits</span>
-        </div>
-
-        <!-- Scrollable Feed Viewport -->
-        <div class="viev-mirror-feed-scroll" id="viev-mirror-feed-scroll">
-          <div class="viev-mirror-cards-container" id="viev-mirror-cards-container">
-            <!-- Dynamically populated mirror cards matching Caster's view -->
+          <div class="viev-clone-header-right">
+            <span class="viev-clone-live-tag">LIVE SCREEN</span>
+            <img src="song/Screenshot 2026-10-24 224431.png" alt="" class="viev-clone-avatar" id="viev-mirror-avatar">
           </div>
         </div>
 
-        <!-- Floating Live Status Footer -->
-        <div class="viev-mirror-live-footer">
-          <div class="viev-mirror-beacon-dot"></div>
-          <span id="viev-mirror-status-label">Digi is browsing YouTube...</span>
+        <!-- Mirrored Category Chips -->
+        <div class="viev-clone-chips-bar" id="viev-mirror-chips-bar">
+          <span class="viev-clone-chip is-active" id="mirror-chip-all">All</span>
+          <span class="viev-clone-chip" id="mirror-chip-live">Live</span>
+          <span class="viev-clone-chip" id="mirror-chip-trending">Trending Music</span>
+          <span class="viev-clone-chip" id="mirror-chip-romantic">Romantic Hits</span>
         </div>
+
+        <!-- Active Video Player Stage (Mirrors Ve Kamleya / active video playing at top) -->
+        <div class="viev-clone-player-stage" id="viev-clone-player-stage" style="display: none;">
+          <div class="viev-clone-iframe-box" id="viev-clone-iframe-box">
+            <!-- Mirrored YouTube Player Injected Here -->
+          </div>
+          <div class="viev-clone-player-meta">
+            <h2 class="viev-clone-player-title" id="viev-clone-player-title">Ve Kamleya (Full Video) | Arijit Singh</h2>
+            <div class="viev-clone-channel-row">
+              <img src="" alt="" class="viev-clone-channel-avatar" id="viev-clone-channel-avatar">
+              <div class="viev-clone-channel-info">
+                <span class="viev-clone-channel-name" id="viev-clone-channel-name">Sony Music India</span>
+                <span class="viev-clone-channel-subs" id="viev-clone-channel-subs">185M subscribers</span>
+              </div>
+              <button type="button" class="viev-clone-sub-btn">Subscribe</button>
+            </div>
+            <div class="viev-clone-action-bar">
+              <div class="viev-clone-like-pill">
+                <span>👍</span>
+                <span id="viev-clone-likes-val">50K</span>
+                <span class="viev-clone-like-divider">|</span>
+                <span>👎</span>
+              </div>
+              <div class="viev-clone-share-pill">
+                <span>↗</span>
+                <span>Share</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feed Cards Container (Mirrors exact feed cards loaded on Sharer's screen) -->
+        <div class="viev-clone-feed-container" id="viev-mirror-cards-container">
+          <!-- Real cards injected here matching Sharer's view -->
+        </div>
+
       </div>
 
-      <!-- 2. Live Playing Video Player (Active when Caster clicks & plays a video) -->
-      <div class="viev-fullscreen-video-wrap" id="viev-fullscreen-video-wrap" style="display: none;">
-        <!-- Live iframe injected dynamically -->
-      </div>
     </div>
 
-    <!-- Bottom Reaction Bar -->
-    <div class="viev-fullscreen-reaction-dock">
-      <div class="viev-reaction-pill-bar">
-        <button type="button" class="viev-reaction-emoji-btn" title="Send Love">❤️</button>
-        <button type="button" class="viev-reaction-emoji-btn" title="Fire">🔥</button>
-        <button type="button" class="viev-reaction-emoji-btn" title="Laugh">😂</button>
-        <button type="button" class="viev-reaction-emoji-btn" title="Applause">👏</button>
-        <button type="button" class="viev-reaction-emoji-btn" title="Heart Eyes">😍</button>
-        <button type="button" class="viev-reaction-emoji-btn" title="Magic Sparkles">✨</button>
-      </div>
+    <!-- Bottom Floating Status Badge -->
+    <div class="viev-screenshare-floating-status">
+      <div class="viev-mirror-beacon-dot"></div>
+      <span id="viev-mirror-status-label">Digi's live screen is streaming</span>
     </div>
   </div>
 
@@ -2231,8 +2254,8 @@ tu h digi meri mai hu pyar tera .
   <script src="js/daily-note.js?v=2.7"></script>
   <script src="js/navbar.js?v=2.5"></script>
   <script src="js/youtube-data.js?v=2.0"></script>
-  <script src="js/cinema.js?v=4.0"></script>
-  <script src="js/cast-engine.js?v=2.2"></script>
+  <script src="js/cinema.js?v=4.2"></script>
+  <script src="js/cast-engine.js?v=3.0"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
   <script src="js/app.js?v=3.7"></script>
 </body>

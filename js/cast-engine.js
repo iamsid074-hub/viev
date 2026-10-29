@@ -378,38 +378,31 @@
     if (modal) modal.classList.remove('is-open');
   }
 
-  // --- START CASTING ---
+  // --- START SCREEN SHARE ---
   function startCasting() {
     const { self, companion } = getProfiles();
-    const inviteId = 'cast_' + Date.now();
+    const inviteId = 'share_' + Date.now();
     state.isCasting = true;
     state.target = companion;
     state.caster = self;
     state.mySentInviteId = inviteId;
 
-    // Check if a video is ALREADY playing in the cinema lounge
-    let isVideoPlayingNow = false;
-    let currentVideo = null;
-
-    if (window.getCurrentCinemaPlayingVideo) {
-      currentVideo = window.getCurrentCinemaPlayingVideo();
-      if (currentVideo && currentVideo.id && currentVideo.isPlaying) {
-        isVideoPlayingNow = true;
-      }
+    // Grab full live snapshot (active video if any, real feed cards, active category chip, scroll position)
+    let snapshot = null;
+    if (typeof window.getScreenShareSnapshot === 'function') {
+      snapshot = window.getScreenShareSnapshot();
     }
-
-    // Determine current view: If video is playing -> 'player'; If browsing feed -> 'feed'
-    const cinemaScreenEl = document.getElementById('cinema-screen');
-    const activeChipEl = document.querySelector('#cinema-category-chips .active-chip');
-    const chipName = activeChipEl ? activeChipEl.textContent.trim() : 'All';
-
-    state.currentScreenState = {
-      view: isVideoPlayingNow ? 'player' : 'feed',
-      section: 'cinema',
-      chip: chipName,
-      scrollTop: cinemaScreenEl ? cinemaScreenEl.scrollTop : 0,
-      video: isVideoPlayingNow ? currentVideo : null
-    };
+    if (!snapshot) {
+      snapshot = {
+        view: 'feed',
+        section: 'cinema',
+        activeChip: 'All',
+        scrollTop: 0,
+        feedCards: window.CURRENT_CINEMA_FEED || [],
+        player: null
+      };
+    }
+    state.currentScreenState = snapshot;
 
     // Switch modal to waiting state
     const initialView = document.getElementById('cinema-cast-initial-view');
@@ -417,15 +410,15 @@
     const waitingText = document.getElementById('cinema-cast-waiting-text');
     if (initialView) initialView.style.display = 'none';
     if (waitingView) waitingView.style.display = 'flex';
-    if (waitingText) waitingText.textContent = `Beaming invite to ${companion.name}... Waiting for acceptance`;
+    if (waitingText) waitingText.textContent = `Sending screen share invitation to ${companion.name}... Waiting for acceptance`;
 
-    // Emit cast invite across all layers (NO auto-play of any random song!)
+    // Emit screen share invite across all layers (NO auto-play of any random song!)
     emitCastEvent('invite', {
       inviteId,
       caster: self,
       target: companion,
-      screenState: state.currentScreenState,
-      video: state.currentScreenState.video
+      screenState: snapshot,
+      video: snapshot.player
     });
 
     // Update Cast Button in header to pulsing
@@ -433,7 +426,7 @@
     if (castHeaderBtn) castHeaderBtn.classList.add('is-active');
 
     if (window.showHUD) {
-      window.showHUD('Beaming AirCast', `Request sent to ${companion.name}...`, 'cast');
+      window.showHUD('Sharing Screen', `Request sent to ${companion.name}...`, 'cast');
     }
   }
 
@@ -446,21 +439,24 @@
     const hud = document.getElementById('viev-casting-floating-hud');
     const hudPartner = document.getElementById('viev-hud-partner-name');
     if (hud) hud.classList.add('is-visible');
-    if (hudPartner) hudPartner.textContent = `Casting to ${partnerName} (Active)`;
+    if (hudPartner) hudPartner.textContent = `Sharing screen to ${partnerName} (Active)`;
 
     // Play chime sound on acceptance!
     playAppleChime();
 
     if (window.showHUD) {
-      window.showHUD('Cast Connected', `Live screen mirror active with ${partnerName}`, 'cast');
+      window.showHUD('Screen Share Active', `Live streaming screen to ${partnerName}`, 'cast');
     }
 
-    // Broadcast initial screen state to companion
+    // Broadcast full live screen state to companion
     setTimeout(() => {
+      if (typeof window.getScreenShareSnapshot === 'function') {
+        state.currentScreenState = window.getScreenShareSnapshot();
+      }
       emitCastEvent('mirror_state', {
         screenState: state.currentScreenState
       });
-    }, 300);
+    }, 200);
   }
 
   function onCastDeclinedByCompanion(evt) {
@@ -583,7 +579,7 @@
     state.activeInvite = null;
   }
 
-  // --- FULLSCREEN LIVE MIRROR THEATER (RECEIVER SIDE) ---
+  // --- FULLSCREEN LIVE SCREEN SHARE VIEWER (RECEIVER SIDE) ---
   let receiverIframe = null;
 
   function openFullscreenReceiverTheater(invite) {
@@ -595,21 +591,32 @@
 
     const avatar = document.getElementById('viev-fullscreen-user-avatar');
     const name = document.getElementById('viev-fullscreen-user-name');
-    const title = document.getElementById('viev-fullscreen-video-title');
     const mirrorAvatar = document.getElementById('viev-mirror-avatar');
 
     if (avatar && caster.avatar) avatar.src = caster.avatar;
     if (mirrorAvatar && caster.avatar) mirrorAvatar.src = caster.avatar;
-    if (name) name.textContent = `${caster.name}'s YouTube`;
+    if (name) name.textContent = `${caster.name}'s Screen`;
+
+    // Audio Pill Setup
+    updateReceiverAudioUI();
+    const audioToggleBtn = document.getElementById('viev-audio-toggle-btn');
+    if (audioToggleBtn && !audioToggleBtn._hasBound) {
+      audioToggleBtn._hasBound = true;
+      audioToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleReceiverAudio();
+      });
+    }
 
     theater.style.display = 'flex';
     theater.classList.add('is-active');
 
-    // Populate the mirror feed cards from active feed data
-    populateMirrorFeedCards();
-
-    // Check what view caster is currently on (player vs feed)
-    const initialScreen = invite.screenState || { view: (invite.video && invite.video.id) ? 'player' : 'feed', video: invite.video };
+    // Render initial screen state (feed cards + player if active)
+    const initialScreen = invite.screenState || {
+      view: (invite.video && invite.video.id) ? 'player' : 'feed',
+      player: invite.video,
+      feedCards: []
+    };
     renderMirrorState(initialScreen);
 
     // Attempt browser Fullscreen API
@@ -622,236 +629,188 @@
     } catch (_) {}
   }
 
-  // Populate Feed Cards inside the Live Mirror Viewport
-  function populateMirrorFeedCards() {
-    const container = document.getElementById('viev-mirror-cards-container');
-    if (!container) return;
+  function updateReceiverAudioUI() {
+    const icon = document.getElementById('viev-audio-pill-icon');
+    const label = document.getElementById('viev-audio-pill-label');
+    if (icon) icon.textContent = state.receiverMuted ? '🔈' : '🔊';
+    if (label) label.textContent = state.receiverMuted ? 'Sound Muted' : 'Sound Active';
+  }
 
-    // Read real cards from DOM or from VIRAT_YOUTUBE_FEED
-    const realCards = document.querySelectorAll('#cinema-video-feed-grid .cinema-feed-card');
-    if (realCards && realCards.length > 0) {
-      let html = '';
-      realCards.forEach((card, idx) => {
-        if (idx > 12) return;
-        const thumb = card.querySelector('.cinema-feed-thumb');
-        const title = card.querySelector('.cinema-feed-title');
-        const channel = card.querySelector('.cinema-feed-channel-name');
-        const views = card.querySelector('.cinema-feed-views');
-        const duration = card.querySelector('.cinema-feed-duration');
-        const avatar = card.querySelector('.cinema-feed-avatar');
-
-        html += `
-          <div class="viev-mirror-card">
-            <div class="viev-mirror-card-thumb-wrap">
-              <img src="${thumb ? thumb.src : ''}" alt="" class="viev-mirror-card-thumb">
-              ${duration ? `<span class="viev-mirror-card-duration">${duration.textContent}</span>` : ''}
-            </div>
-            <div class="viev-mirror-card-meta">
-              <img src="${avatar ? avatar.src : 'song/Screenshot 2026-10-24 224431.png'}" alt="" class="viev-mirror-card-avatar">
-              <div class="viev-mirror-card-info">
-                <div class="viev-mirror-card-title">${title ? title.textContent : ''}</div>
-                <div class="viev-mirror-card-sub">${channel ? channel.textContent : ''} • ${views ? views.textContent : ''}</div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-    } else if (window.VIRAT_YOUTUBE_FEED && window.VIRAT_YOUTUBE_FEED.length > 0) {
-      let html = '';
-      window.VIRAT_YOUTUBE_FEED.slice(0, 10).forEach(vid => {
-        html += `
-          <div class="viev-mirror-card">
-            <div class="viev-mirror-card-thumb-wrap">
-              <img src="${vid.thumb}" alt="" class="viev-mirror-card-thumb">
-              <span class="viev-mirror-card-duration">♪ Video</span>
-            </div>
-            <div class="viev-mirror-card-meta">
-              <img src="${vid.avatar || 'song/Screenshot 2026-10-24 224431.png'}" alt="" class="viev-mirror-card-avatar">
-              <div class="viev-mirror-card-info">
-                <div class="viev-mirror-card-title">${vid.title}</div>
-                <div class="viev-mirror-card-sub">${vid.channel} • ${vid.views || '1M views'}</div>
-              </div>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
+  function toggleReceiverAudio() {
+    state.receiverMuted = !state.receiverMuted;
+    updateReceiverAudioUI();
+    if (receiverIframe && receiverIframe.contentWindow) {
+      try {
+        if (state.receiverMuted) {
+          receiverIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+        } else {
+          receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+          receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+        }
+      } catch (_) {}
     }
   }
 
-  // Render Caster's exact view on Receiver's screen (Feed vs Player)
+  // Render Sharer's exact view on Receiver's screen (100% replica)
   function renderMirrorState(screenState) {
     if (!screenState) return;
 
-    const feedWrap = document.getElementById('viev-mirror-feed-wrap');
-    const videoWrap = document.getElementById('viev-fullscreen-video-wrap');
-    const titleEl = document.getElementById('viev-fullscreen-video-title');
-    const statusLabel = document.getElementById('viev-mirror-status-label');
     const { companion } = getProfiles();
     const casterName = (state.caster && state.caster.name) ? state.caster.name : companion.name;
 
-    // View A: Caster is playing a Video
-    if (screenState.view === 'player' && screenState.video && screenState.video.id) {
-      if (feedWrap) feedWrap.style.display = 'none';
-      if (videoWrap) videoWrap.style.display = 'block';
-
-      if (titleEl) {
-        titleEl.textContent = `${casterName} is watching: ${screenState.video.title || 'YouTube'}`;
-      }
-
-      // Sync and play the exact video!
-      syncReceiverPlayback(screenState.video);
-      return;
+    const titleEl = document.getElementById('viev-fullscreen-video-title');
+    const statusLabel = document.getElementById('viev-mirror-status-label');
+    const mirrorAvatar = document.getElementById('viev-mirror-avatar');
+    if (mirrorAvatar && state.caster && state.caster.avatar) {
+      mirrorAvatar.src = state.caster.avatar;
     }
 
-    // View B: Caster is browsing YouTube Feed
-    if (videoWrap) {
-      videoWrap.style.display = 'none';
-      // Blank out video so no audio plays while browsing!
-      videoWrap.innerHTML = '';
-      receiverIframe = null;
-    }
-
-    if (feedWrap) {
-      feedWrap.style.display = 'flex';
-    }
-
-    if (titleEl) {
-      titleEl.textContent = `${casterName}'s YouTube • Live Screen Mirror`;
-    }
-
-    if (statusLabel) {
-      statusLabel.textContent = `${casterName} is browsing YouTube feed...`;
-    }
-
-    // Sync active category chip
-    if (screenState.chip) {
-      const chips = document.querySelectorAll('.viev-mirror-chip');
+    // 1. Sync Active Category Chip
+    if (screenState.activeChip) {
+      const chips = document.querySelectorAll('.viev-clone-chip');
       chips.forEach(c => {
-        const isMatch = c.textContent.trim().toLowerCase() === screenState.chip.toLowerCase();
+        const isMatch = c.textContent.trim().toLowerCase() === screenState.activeChip.toLowerCase();
         c.classList.toggle('is-active', isMatch);
       });
     }
 
-    // Sync scrolling
-    if (typeof screenState.scrollTop === 'number') {
-      const scrollEl = document.getElementById('viev-mirror-feed-scroll');
-      if (scrollEl) {
-        scrollEl.scrollTop = screenState.scrollTop;
-      }
-    }
-  }
+    // 2. Video Player Stage Sync
+    const playerStage = document.getElementById('viev-clone-player-stage');
+    const iframeBox = document.getElementById('viev-clone-iframe-box');
+    const playerTitle = document.getElementById('viev-clone-player-title');
+    const channelName = document.getElementById('viev-clone-channel-name');
+    const channelAvatar = document.getElementById('viev-clone-channel-avatar');
+    const channelSubs = document.getElementById('viev-clone-channel-subs');
+    const likesVal = document.getElementById('viev-clone-likes-val');
 
-  // Live video player sync (Single Master Audio: Caster plays audio, Receiver muted by default to eliminate echo!)
-  function syncReceiverPlayback(video) {
-    if (!video || !video.id) return;
+    const isPlayerActive = screenState.player && screenState.player.id;
 
-    const titleEl = document.getElementById('viev-fullscreen-video-title');
-    const glow = document.getElementById('viev-fullscreen-glow-layer');
-    const { companion } = getProfiles();
-    const casterName = (state.caster && state.caster.name) ? state.caster.name : companion.name;
+    if (isPlayerActive) {
+      const p = screenState.player;
+      if (playerStage) playerStage.style.display = 'block';
 
-    if (titleEl && video.title) {
-      titleEl.textContent = `${casterName} is watching: ${video.title}`;
-    }
+      if (playerTitle) playerTitle.textContent = p.title || 'YouTube Video';
+      if (channelName) channelName.textContent = p.channel || 'YouTube';
+      if (channelAvatar && p.avatar) channelAvatar.src = p.avatar;
+      if (channelSubs) channelSubs.textContent = p.subs || '185M subscribers';
+      if (likesVal) likesVal.textContent = p.likes || '50K';
 
-    const container = document.getElementById('viev-fullscreen-video-wrap');
-    const feedWrap = document.getElementById('viev-mirror-feed-wrap');
+      if (titleEl) titleEl.textContent = `${casterName} is watching: ${p.title || 'YouTube'}`;
+      if (statusLabel) statusLabel.textContent = `${casterName} is watching ${p.title || 'YouTube'}`;
 
-    if (feedWrap) feedWrap.style.display = 'none';
-    if (container) container.style.display = 'block';
+      // If video ID changed, inject new player
+      if (p.id !== state.lastSyncedVideoId) {
+        state.lastSyncedVideoId = p.id;
+        state.lastSyncedTime = p.currentTime || 0;
 
-    // If video changed, load the new video!
-    if (video.id !== state.lastSyncedVideoId) {
-      state.lastSyncedVideoId = video.id;
-      if (glow) glow.style.backgroundImage = `url('https://img.youtube.com/vi/${video.id}/hqdefault.jpg')`;
+        const originParam = (window.location.origin && window.location.origin !== 'null' && window.location.protocol.startsWith('http'))
+          ? `&origin=${encodeURIComponent(window.location.origin)}`
+          : '';
+        const startParam = p.currentTime ? `&start=${Math.floor(p.currentTime)}` : '';
+        const muteParam = state.receiverMuted ? '&mute=1' : '&mute=0';
 
-      const originParam = (window.location.origin && window.location.origin !== 'null' && window.location.protocol.startsWith('http'))
-        ? `&origin=${encodeURIComponent(window.location.origin)}`
-        : '';
-      const startParam = video.currentTime ? `&start=${Math.floor(video.currentTime)}` : '';
-
-      // Default mute=1 on receiver: Single Master Audio eliminates echo/lag!
-      const muteParam = state.receiverMuted ? '&mute=1' : '&mute=0';
-
-      if (container) {
-        container.innerHTML = `
-          <iframe id="viev-fullscreen-receiver-iframe" 
-                  class="viev-fullscreen-iframe" 
-                  src="https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&enablejsapi=1${originParam}${startParam}${muteParam}&controls=1&playsinline=1&rel=0&modestbranding=1" 
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                  allowfullscreen></iframe>
-          <div class="viev-fullscreen-sync-overlay">
-            <div class="viev-sync-indicator-dot"></div>
-            <span class="viev-sync-text">Live Mirrored with ${casterName}</span>
-            <button type="button" class="viev-audio-mode-pill" id="viev-receiver-audio-toggle">
-              ${state.receiverMuted ? '🔊 Unmute Local Audio' : '🔇 Mute Local Audio (Master Active)'}
-            </button>
-          </div>
-        `;
-
-        receiverIframe = document.getElementById('viev-fullscreen-receiver-iframe');
-        if (receiverIframe) {
-          receiverIframe.onload = () => {
-            try {
-              receiverIframe.contentWindow.postMessage('{"event":"listening"}', '*');
-              if (!state.receiverMuted) {
-                receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-                receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-              } else {
-                receiverIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
-              }
-              receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-            } catch (_) {}
-          };
-        }
-
-        // Hook up audio toggle button
-        const audioToggleBtn = document.getElementById('viev-receiver-audio-toggle');
-        if (audioToggleBtn) {
-          audioToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            state.receiverMuted = !state.receiverMuted;
-            audioToggleBtn.textContent = state.receiverMuted ? '🔊 Unmute Local Audio' : '🔇 Mute Local Audio (Master Active)';
-            if (receiverIframe && receiverIframe.contentWindow) {
+        if (iframeBox) {
+          iframeBox.innerHTML = `
+            <iframe id="viev-clone-receiver-iframe"
+                    src="https://www.youtube-nocookie.com/embed/${p.id}?autoplay=1&enablejsapi=1${originParam}${startParam}${muteParam}&controls=0&playsinline=1&rel=0&modestbranding=1&fs=0&disablekb=1"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+          `;
+          receiverIframe = document.getElementById('viev-clone-receiver-iframe');
+          if (receiverIframe) {
+            receiverIframe.onload = () => {
               try {
+                receiverIframe.contentWindow.postMessage('{"event":"listening"}', '*');
                 if (state.receiverMuted) {
                   receiverIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
                 } else {
                   receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
                   receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
                 }
+                receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
               } catch (_) {}
-            }
-          });
-        }
-      }
-      return;
-    }
-
-    // If same video, sync play/pause & seek time
-    if (receiverIframe && receiverIframe.contentWindow) {
-      try {
-        if (video.isPlaying === false) {
-          receiverIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-        } else {
-          receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-        }
-
-        if (typeof video.currentTime === 'number') {
-          const drift = Math.abs(video.currentTime - state.lastSyncedTime);
-          if (drift > 2.5) {
-            receiverIframe.contentWindow.postMessage(JSON.stringify({
-              event: 'command',
-              func: 'seekTo',
-              args: [video.currentTime, true]
-            }), '*');
-            state.lastSyncedTime = video.currentTime;
+            };
           }
         }
-      } catch (_) {}
+      } else if (receiverIframe && receiverIframe.contentWindow) {
+        // Sync play / pause / seek
+        try {
+          if (p.isPlaying === false) {
+            receiverIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+          } else {
+            receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+          }
+          if (typeof p.currentTime === 'number') {
+            const drift = Math.abs(p.currentTime - state.lastSyncedTime);
+            if (drift > 2.5) {
+              receiverIframe.contentWindow.postMessage(JSON.stringify({
+                event: 'command',
+                func: 'seekTo',
+                args: [p.currentTime, true]
+              }), '*');
+              state.lastSyncedTime = p.currentTime;
+            }
+          }
+        } catch (_) {}
+      }
+
+    } else {
+      // Sharer is browsing feed -> hide player stage and blank out iframe! ZERO auto-play!
+      if (playerStage) playerStage.style.display = 'none';
+      if (iframeBox) iframeBox.innerHTML = '';
+      receiverIframe = null;
+      state.lastSyncedVideoId = null;
+
+      if (titleEl) titleEl.textContent = `${casterName}'s Screen • Live Mirror`;
+      if (statusLabel) statusLabel.textContent = `${casterName} is browsing YouTube feed...`;
     }
+
+    // 3. Render Real Feed Cards (from Digi's feed)
+    if (screenState.feedCards && Array.isArray(screenState.feedCards) && screenState.feedCards.length > 0) {
+      renderClonedFeedCards(screenState.feedCards);
+    }
+
+    // 4. Synchronize Scroll Position
+    if (typeof screenState.scrollTop === 'number') {
+      const scrollContainer = document.getElementById('viev-screenshare-clone-scroll');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = screenState.scrollTop;
+      }
+    }
+  }
+
+  function renderClonedFeedCards(cards) {
+    const container = document.getElementById('viev-mirror-cards-container');
+    if (!container) return;
+
+    let html = '';
+    cards.forEach(card => {
+      const safeTitle = (card.title || 'YouTube Video').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const safeChannel = (card.channel || 'Channel').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      const safeViews = card.views || '';
+      const safePub = card.pub || '';
+      const safeDuration = card.duration || 'Video';
+      const thumb = card.thumb || (card.id ? `https://i.ytimg.com/vi/${card.id}/hqdefault.jpg` : '');
+      const avatar = card.avatar || 'song/Screenshot 2026-10-24 224431.png';
+
+      html += `
+        <div class="viev-clone-card" data-videoid="${card.id || ''}">
+          <div class="viev-clone-thumb-wrap">
+            <img src="${thumb}" alt="${safeTitle}" class="viev-clone-thumb" loading="lazy">
+            <span class="viev-clone-duration">${safeDuration}</span>
+          </div>
+          <div class="viev-clone-card-details">
+            <img src="${avatar}" alt="" class="viev-clone-card-avatar">
+            <div class="viev-clone-card-text">
+              <h3 class="viev-clone-card-title">${safeTitle}</h3>
+              <div class="viev-clone-card-meta">${safeChannel} • ${safeViews} ${safePub ? '• ' + safePub : ''}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
   }
 
   // Close receiver theater immediately and kill all audio/iframes
@@ -867,12 +826,11 @@
     }
 
     // Blank out iframe to STOP ALL AUDIO IMMEDIATELY!
+    const iframeBox = document.getElementById('viev-clone-iframe-box');
+    if (iframeBox) iframeBox.innerHTML = '';
     const container = document.getElementById('viev-fullscreen-video-wrap');
     if (container) container.innerHTML = '';
     receiverIframe = null;
-
-    const feedWrap = document.getElementById('viev-mirror-feed-wrap');
-    if (feedWrap) feedWrap.style.display = 'none';
 
     try {
       if (document.fullscreenElement && document.exitFullscreen) {
@@ -881,7 +839,7 @@
     } catch (_) {}
 
     if (reason && window.showHUD) {
-      window.showHUD('Cast Disconnected', reason, 'info');
+      window.showHUD('Screen Share Ended', reason, 'info');
     }
   }
 
@@ -900,7 +858,12 @@
     // Called whenever caster scrolls, clicks chips, or switches views
     notifyScreenState: (screenData) => {
       if (!state.isCasting) return;
-      state.currentScreenState = Object.assign(state.currentScreenState, screenData);
+      if (typeof window.getScreenShareSnapshot === 'function') {
+        const snap = window.getScreenShareSnapshot();
+        state.currentScreenState = Object.assign(snap, screenData || {});
+      } else {
+        state.currentScreenState = Object.assign(state.currentScreenState, screenData || {});
+      }
       emitCastEvent('mirror_state', {
         screenState: state.currentScreenState
       });
@@ -913,8 +876,12 @@
         state.lastSyncedVideoId = playback.id;
         state.lastSyncTimestamp = now;
 
-        state.currentScreenState.view = 'player';
-        state.currentScreenState.video = playback;
+        if (typeof window.getScreenShareSnapshot === 'function') {
+          state.currentScreenState = window.getScreenShareSnapshot();
+        } else {
+          state.currentScreenState.view = 'player';
+          state.currentScreenState.player = playback;
+        }
 
         emitCastEvent('sync', { video: playback });
         emitCastEvent('mirror_state', { screenState: state.currentScreenState });
@@ -932,14 +899,18 @@
         screenState: {
           view: 'feed',
           section: 'cinema',
-          chip: 'All',
-          scrollTop: 0
+          activeChip: 'All',
+          scrollTop: 0,
+          feedCards: (typeof window.getScreenShareSnapshot === 'function' ? window.getScreenShareSnapshot().feedCards : null) || window.DIGI_YOUTUBE_FEED || [],
+          player: null
         }
       };
       state.activeInvite = mockInvite;
       showIncomingInviteBanner(mockInvite);
     }
   };
+
+  window.vievScreenShare = window.vievAirCast;
 
   // Wire up DOM Listeners on page load
   document.addEventListener('DOMContentLoaded', () => {

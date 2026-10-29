@@ -943,96 +943,113 @@
   }
 }
 
-/* --- Virtual Screen Mirror Device Viewport --- */
-.viev-mirror-feed-wrap {
+/* --- Modern Fullscreen Screen Share Stage --- */
+.viev-screenshare-stage {
   position: relative;
   width: 100%;
-  max-width: 430px;
-  height: calc(100vh - 160px);
-  max-height: 800px;
-  background: #000000;
-  border-radius: 36px;
-  border: 2px solid rgba(255, 255, 255, 0.22);
+  height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.85), 0 0 50px rgba(52, 199, 89, 0.2);
-  transform: translateZ(0);
-}
-
-.viev-mirror-device-notch {
-  width: 90px;
-  height: 20px;
   background: #000000;
-  border-radius: 0 0 14px 14px;
-  margin: 0 auto;
-  flex-shrink: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none !important; /* Receiver CANNOT click or touch the stream */
+  user-select: none !important;
+  touch-action: none !important;
 }
 
-.viev-mirror-header {
+.viev-screenshare-webrtc-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000000;
+  display: none;
+}
+
+/* In-App Mirrored Screen Viewport (Scroll locked to Sharer) */
+.viev-screenshare-clone-scroll {
+  width: 100%;
+  height: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  overflow-y: hidden !important; /* Receiver CANNOT scroll manually */
+  background: #0f0f13;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+  padding-bottom: 50px;
+}
+
+@media (max-width: 600px) {
+  .viev-screenshare-clone-scroll {
+    max-width: 100%;
+  }
+}
+
+/* Cloned YouTube Header */
+.viev-clone-app-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px 10px 16px;
-  background: rgba(12, 12, 16, 0.95);
+  padding: 10px 16px;
+  background: rgba(15, 15, 19, 0.98);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
 }
 
-.viev-mirror-yt-logo {
+.viev-clone-yt-logo {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.viev-mirror-yt-text {
+.viev-clone-yt-text {
   font-family: 'Outfit', sans-serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: #ffffff;
 }
 
-.viev-mirror-header-right {
+.viev-clone-header-right {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.viev-mirror-live-tag {
+.viev-clone-live-tag {
   font-family: 'Outfit', sans-serif;
   font-size: 9.5px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  padding: 2px 7px;
+  padding: 2.5px 8px;
   border-radius: 9999px;
   background: rgba(255, 59, 48, 0.25);
   color: #ff453a;
   border: 1px solid rgba(255, 59, 48, 0.4);
 }
 
-.viev-mirror-avatar {
-  width: 24px;
-  height: 24px;
+.viev-clone-avatar {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: 1.5px solid #34c759;
   object-fit: cover;
 }
 
-.viev-mirror-chips-bar {
+/* Cloned Category Chips */
+.viev-clone-chips-bar {
   display: flex;
   gap: 8px;
   padding: 8px 14px;
-  background: rgba(16, 16, 20, 0.95);
-  overflow-x: auto;
-  scrollbar-width: none;
+  background: rgba(18, 18, 23, 0.95);
+  overflow-x: hidden !important;
   flex-shrink: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.viev-mirror-chip {
-  padding: 5px 12px;
+.viev-clone-chip {
+  padding: 5px 13px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.7);
@@ -1040,28 +1057,130 @@
   font-size: 11.5px;
   font-weight: 600;
   white-space: nowrap;
-  transition: all 0.2s ease;
 }
 
-.viev-mirror-chip.is-active {
+.viev-clone-chip.is-active {
   background: #ffffff;
   color: #000000;
 }
 
-.viev-mirror-feed-scroll {
+/* Cloned Video Player Stage */
+.viev-clone-player-stage {
+  flex-shrink: 0;
+  background: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.viev-clone-iframe-box {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000000;
+  position: relative;
+}
+
+.viev-clone-iframe-box iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+}
+
+.viev-clone-player-meta {
+  padding: 12px 14px 14px 14px;
+  background: #0f0f13;
+}
+
+.viev-clone-player-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0 0 10px 0;
+}
+
+.viev-clone-channel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.viev-clone-channel-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #252528;
+}
+
+.viev-clone-channel-info {
   flex: 1;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  padding: 8px 0 40px 0;
-  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
 }
 
-.viev-mirror-card {
-  margin-bottom: 16px;
-  background: transparent;
+.viev-clone-channel-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
 }
 
-.viev-mirror-card-thumb-wrap {
+.viev-clone-channel-subs {
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.viev-clone-sub-btn {
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  border-radius: 9999px;
+  padding: 6px 14px;
+}
+
+.viev-clone-action-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.viev-clone-like-pill,
+.viev-clone-share-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 5px 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.viev-clone-like-divider {
+  opacity: 0.3;
+  margin: 0 2px;
+}
+
+/* Cloned Feed Cards Container */
+.viev-clone-feed-container {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0 20px 0;
+}
+
+.viev-clone-card {
+  margin-bottom: 14px;
+}
+
+.viev-clone-thumb-wrap {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -1069,47 +1188,47 @@
   overflow: hidden;
 }
 
-.viev-mirror-card-thumb {
+.viev-clone-thumb {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.viev-mirror-card-duration {
+.viev-clone-duration {
   position: absolute;
   bottom: 6px;
   right: 8px;
   background: rgba(0, 0, 0, 0.85);
   color: #ffffff;
   font-family: 'Outfit', sans-serif;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
-  padding: 2px 5px;
+  padding: 2px 6px;
   border-radius: 4px;
 }
 
-.viev-mirror-card-meta {
+.viev-clone-card-details {
   display: flex;
-  gap: 10px;
-  padding: 8px 12px;
+  gap: 11px;
+  padding: 9px 12px 2px 12px;
 }
 
-.viev-mirror-card-avatar {
-  width: 34px;
-  height: 34px;
+.viev-clone-card-avatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: #222;
   flex-shrink: 0;
   object-fit: cover;
 }
 
-.viev-mirror-card-info {
+.viev-clone-card-text {
   flex: 1;
 }
 
-.viev-mirror-card-title {
+.viev-clone-card-title {
   font-family: 'Outfit', sans-serif;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   color: #ffffff;
   line-height: 1.35;
@@ -1120,29 +1239,31 @@
   overflow: hidden;
 }
 
-.viev-mirror-card-sub {
+.viev-clone-card-meta {
   font-family: 'Outfit', sans-serif;
   font-size: 11px;
   color: rgba(255, 255, 255, 0.55);
 }
 
-.viev-mirror-live-footer {
-  position: absolute;
-  bottom: 12px;
+/* Floating Status Indicator on Viewer */
+.viev-screenshare-floating-status {
+  position: fixed;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 16px;
+  padding: 6px 18px;
   background: rgba(18, 18, 24, 0.92);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 9999px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
   pointer-events: none;
   white-space: nowrap;
+  z-index: 10001;
 }
 
 .viev-mirror-beacon-dot {
@@ -1161,24 +1282,34 @@
   color: #ffffff;
 }
 
+/* Audio Toggle Pill (Interactive for Viewer) */
 .viev-audio-mode-pill {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 5px 12px;
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 9999px;
   font-family: 'Outfit', sans-serif;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   transition: all 0.2s ease;
+  pointer-events: auto !important;
 }
 
 .viev-audio-mode-pill:hover {
   background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
+}
+
+.viev-fullscreen-top-hud {
+  pointer-events: auto !important;
+}
+
+.viev-fullscreen-top-hud * {
+  pointer-events: auto !important;
 }
 
