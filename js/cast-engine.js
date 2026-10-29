@@ -413,10 +413,16 @@
     if (initialView) initialView.style.display = 'block';
     if (waitingView) waitingView.style.display = 'none';
 
-    modal.style.display = 'flex';
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.style.setProperty('opacity', '1', 'important');
+    modal.style.setProperty('pointer-events', 'auto', 'important');
+    modal.style.setProperty('z-index', '2147483647', 'important');
     void modal.offsetWidth; // Force reflow
     modal.classList.add('is-open');
   }
+
+  window.openCastModal = openCastModal;
+  window.closeCastModal = closeCastModal;
 
   function closeCastModal() {
     // Guard against ghost-clicks / tap bounces immediately after opening
@@ -1126,6 +1132,6 @@
     if (modal && e.target === modal && (Date.now() - modalOpenedTimestamp > 450)) {
       closeCastModal();
     }
-  }, true); // useCapture = true: catches clicks first before any other handler
+  }); // Standard bubbling click listener
 
 })();

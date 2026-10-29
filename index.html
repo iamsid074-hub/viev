@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="css/liquid-glass.css">
   <link rel="stylesheet" href="css/apple-intro.css?v=3.4">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
-  <link rel="stylesheet" href="css/aircast.css?v=3.3">
+  <link rel="stylesheet" href="css/aircast.css?v=3.4">
 </head>
 <body>
 
@@ -702,37 +702,80 @@ tu h digi meri mai hu pyar tera .
 
       </div>
 
-      <!-- VIEW 2: IN-APP FULL YOUTUBE EXPERIENCE -->
-      <div class="cinema-player-viewport" id="cinema-player-view" style="display: flex;">
-        
-        <!-- REAL YOUTUBE MOBILE APP TOP HEADER (IMAGE 1 REPLICA) -->
-        <header class="yt-mobile-app-header">
-          <!-- Top Row: YouTube Logo + Cast + Bell 9+ + Search + Avatar -->
-          <div class="yt-header-main-row">
-            <div class="yt-header-brand-group">
-              <!-- Back Button to return to Launcher (Hidden) -->
-              <button type="button" class="yt-header-icon-btn yt-header-back-btn" id="cinema-player-back-btn" title="Back to Launcher" aria-label="Back to Launcher" style="display: none;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-              </button>
-              <!-- Official YouTube Brand Logo (Tap to Reload Feed) -->
-              <button type="button" class="yt-official-logo-wrap" id="yt-official-logo-btn" title="Tap to Reload YouTube Feed" aria-label="Reload YouTube Feed">
-                <svg viewBox="0 0 102 22" height="20" aria-label="YouTube">
-                  <!-- YouTube Red Icon -->
-                  <path d="M28.5 3.2c-.34-1.25-1.32-2.24-2.57-2.58C23.66 0 14.56 0 14.56 0S5.47 0 3.2.62C1.94.96.96 1.95.62 3.2 0 5.48 0 10.2 0 10.2s0 4.72.62 7c.34 1.25 1.32 2.24 2.58 2.58 2.27.62 11.36.62 11.36.62s9.1 0 11.37-.62c1.25-.34 2.23-1.33 2.57-2.58.62-2.28.62-7 .62-7s0-4.72-.62-7z" fill="#FF0000"/>
-                  <polygon points="11.6,7.2 19.3,11 11.6,14.8" fill="#FFFFFF"/>
-                  <!-- Official YouTube Text Wordmark -->
-                  <text x="33" y="16.2" fill="#FFFFFF" font-family="'YouTube Sans', -apple-system, Roboto, 'Outfit', sans-serif" font-weight="700" font-size="16.5" letter-spacing="-0.5px">YouTube</text>
-                </svg>
-              </button>
-            </div>
+  <script>
+    function openScreenShareModalDirect(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch (_) {}
+      }
+      const modal = document.getElementById('cinema-cast-modal');
+      if (modal) {
+        const initialView = document.getElementById('cinema-cast-initial-view');
+        const waitingView = document.getElementById('cinema-cast-waiting-state');
+        if (initialView) initialView.style.display = 'block';
+        if (waitingView) waitingView.style.display = 'none';
 
-            <!-- Right Action Icons: Search & Account Avatar -->
-            <div class="yt-header-actions-group">
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.style.setProperty('opacity', '1', 'important');
+        modal.style.setProperty('pointer-events', 'auto', 'important');
+        modal.style.setProperty('z-index', '2147483647', 'important');
+        modal.classList.add('is-open');
+      }
+      if (window.openCastModal && typeof window.openCastModal === 'function') {
+        try { window.openCastModal(); } catch (_) {}
+      } else if (window.vievAirCast && typeof window.vievAirCast.openModal === 'function') {
+        try { window.vievAirCast.openModal(); } catch (_) {}
+      }
+    }
 
-              <!-- VIEVS 2.0 Screen Share Button -->
-              <button type="button" class="yt-header-icon-btn yt-cast-btn" id="yt-header-cast-btn" onclick="if(window.vievScreenShare){window.vievScreenShare.openModal();}else if(window.vievAirCast){window.vievAirCast.openModal();}" title="Share Screen (Live Screen Share)" aria-label="Share Screen with Companion">
+    function closeScreenShareModalDirect(e) {
+      if (e) {
+        try { e.preventDefault(); e.stopPropagation(); } catch (_) {}
+      }
+      const modal = document.getElementById('cinema-cast-modal');
+      if (modal) {
+        modal.classList.remove('is-open');
+        modal.style.setProperty('display', 'none', 'important');
+        modal.style.setProperty('pointer-events', 'none', 'important');
+      }
+      if (window.closeCastModal && typeof window.closeCastModal === 'function') {
+        try { window.closeCastModal(); } catch (_) {}
+      } else if (window.vievAirCast && typeof window.vievAirCast.closeModal === 'function') {
+        try { window.vievAirCast.closeModal(); } catch (_) {}
+      }
+    }
+  </script>
+
+  <!-- VIEW 2: IN-APP FULL YOUTUBE EXPERIENCE -->
+  <div class="cinema-player-viewport" id="cinema-player-view" style="display: flex;">
+    
+    <!-- REAL YOUTUBE MOBILE APP TOP HEADER (IMAGE 1 REPLICA) -->
+    <header class="yt-mobile-app-header">
+      <!-- Top Row: YouTube Logo + Cast + Bell 9+ + Search + Avatar -->
+      <div class="yt-header-main-row">
+        <div class="yt-header-brand-group">
+          <!-- Back Button to return to Launcher (Hidden) -->
+          <button type="button" class="yt-header-icon-btn yt-header-back-btn" id="cinema-player-back-btn" title="Back to Launcher" aria-label="Back to Launcher" style="display: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <!-- Official YouTube Brand Logo (Tap to Reload Feed) -->
+          <button type="button" class="yt-official-logo-wrap" id="yt-official-logo-btn" title="Tap to Reload YouTube Feed" aria-label="Reload YouTube Feed">
+            <svg viewBox="0 0 102 22" height="20" aria-label="YouTube">
+              <!-- YouTube Red Icon -->
+              <path d="M28.5 3.2c-.34-1.25-1.32-2.24-2.57-2.58C23.66 0 14.56 0 14.56 0S5.47 0 3.2.62C1.94.96.96 1.95.62 3.2 0 5.48 0 10.2 0 10.2s0 4.72.62 7c.34 1.25 1.32 2.24 2.58 2.58 2.27.62 11.36.62 11.36.62s9.1 0 11.37-.62c1.25-.34 2.23-1.33 2.57-2.58.62-2.28.62-7 .62-7s0-4.72-.62-7z" fill="#FF0000"/>
+              <polygon points="11.6,7.2 19.3,11 11.6,14.8" fill="#FFFFFF"/>
+              <!-- Official YouTube Text Wordmark -->
+              <text x="33" y="16.2" fill="#FFFFFF" font-family="'YouTube Sans', -apple-system, Roboto, 'Outfit', sans-serif" font-weight="700" font-size="16.5" letter-spacing="-0.5px">YouTube</text>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Right Action Icons: Search & Account Avatar -->
+        <div class="yt-header-actions-group">
+
+          <!-- VIEVS 2.0 Screen Share Button -->
+          <button type="button" class="yt-header-icon-btn yt-cast-btn" id="yt-header-cast-btn" onclick="openScreenShareModalDirect(event);" title="Share Screen (Live Screen Share)" aria-label="Share Screen with Companion">
                 <div class="yt-cast-waves-aura"></div>
                 <svg class="yt-cast-icon-svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
@@ -2029,9 +2072,9 @@ tu h digi meri mai hu pyar tera .
   </div>
 
   <!-- VIEVS 2.0 SCREEN SHARE MODAL: WHO TO SHARE WITH -->
-  <div class="cinema-cast-modal-backdrop" id="cinema-cast-modal" role="dialog" aria-modal="true">
+  <div class="cinema-cast-modal-backdrop" id="cinema-cast-modal" onclick="if(event.target===this){closeScreenShareModalDirect(event);}" role="dialog" aria-modal="true">
     <div class="cinema-cast-sheet">
-      <button type="button" class="cinema-cast-close-btn" id="cinema-cast-close-btn" onclick="if(window.vievAirCast){window.vievAirCast.closeModal();}" aria-label="Close">✕</button>
+      <button type="button" class="cinema-cast-close-btn" id="cinema-cast-close-btn" onclick="closeScreenShareModalDirect(event);" aria-label="Close">✕</button>
 
       <!-- View A: Selection View -->
       <div id="cinema-cast-initial-view">
@@ -2275,7 +2318,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/navbar.js?v=2.5"></script>
   <script src="js/youtube-data.js?v=2.0"></script>
   <script src="js/cinema.js?v=4.3"></script>
-  <script src="js/cast-engine.js?v=3.3"></script>
+  <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
   <script src="js/app.js?v=3.7"></script>
 </body>
