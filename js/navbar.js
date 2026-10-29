@@ -118,6 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Slide the liquid glass pill indicator smoothly
     updateIndicator(clickedBtn);
 
+    if (window.vievAirCast && typeof window.vievAirCast.notifyScreenState === 'function') {
+      window.vievAirCast.notifyScreenState({
+        section: targetTab,
+        view: targetTab === 'cinema' ? 'feed' : targetTab
+      });
+    }
+
     // Switch dedicated full-page screens
     Object.keys(pageScreens).forEach(key => {
       const screen = pageScreens[key];

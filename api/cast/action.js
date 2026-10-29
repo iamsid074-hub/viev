@@ -59,11 +59,20 @@ module.exports = (req, res) => {
         global.__activeCastSession.status = 'sync';
         global.__activeCastSession.lastUpdate = Date.now();
       }
+    } else if (action === 'mirror_state') {
+      if (global.__activeCastSession) {
+        global.__activeCastSession.active = true;
+        global.__activeCastSession.status = 'mirror_state';
+        global.__activeCastSession.screenState = Object.assign(global.__activeCastSession.screenState || {}, payload.screenState || {});
+        global.__activeCastSession.lastUpdate = Date.now();
+      }
     } else if (action === 'reaction') {
       global.__activeCastSession.reaction = payload.reaction;
-    } else if (action === 'end') {
+    } else if (action === 'end' || action === 'stop') {
       global.__activeCastSession.status = 'ended';
       global.__activeCastSession.active = false;
+      global.__activeCastSession.video = null;
+      global.__activeCastSession.screenState = null;
       global.__activeCastSession.lastUpdate = Date.now();
     }
 

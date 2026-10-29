@@ -1,7 +1,7 @@
 /* =========================================================
-   VIEVS 2.0 AIRCAST • REAL-TIME SCREEN & SOUND MIRROR ENGINE
-   Multi-Transport Signaling: BroadcastChannel • Storage Events • SSE • Smart Polling
-   Works anywhere: Home, Music, Cinema/YouTube, Settings, Modals
+   VIEVS 2.0 AIRCAST • LIVE IN-APP SCREEN MIRROR & SOUND ENGINE
+   True Screen Mirroring • YouTube Feed & Player Live Mirror • Single Master Audio
+   Works seamlessly: Home, Music, Cinema/YouTube, Settings
    ========================================================= */
 
 (function() {
@@ -41,7 +41,7 @@
     } catch (_) {}
   }
 
-  // Active User & Companion Profiles (Supports multi-tab isolation via sessionStorage)
+  // Active User & Companion Profiles
   function getProfiles() {
     let sess = null;
     try {
@@ -85,7 +85,15 @@
     lastSyncedVideoId: null,
     lastSyncedTime: 0,
     lastSyncTimestamp: 0,
-    mySentInviteId: null
+    mySentInviteId: null,
+    currentScreenState: {
+      view: 'feed', // 'feed' | 'player'
+      section: 'cinema',
+      chip: 'All',
+      scrollTop: 0,
+      video: null
+    },
+    receiverMuted: true // Single Master Audio: Muted on receiver by default to prevent echo/lag!
   };
 
   // Broadcast Channels & Server SSE Connection
@@ -102,7 +110,7 @@
       timestamp: Date.now()
     }, payload);
 
-    // 1. Local Broadcast Channel (instant multi-tab in same browser)
+    // 1. Local Broadcast Channel (instant 0ms multi-tab in same browser)
     if (broadcastChannel) {
       try { broadcastChannel.postMessage(data); } catch (_) {}
     }
@@ -146,11 +154,10 @@
           return;
         }
 
-        // Check if this invite is from the companion or targeted at us
+        // Check if this invite is from companion or targeted at us
         const isFromOther = evt.caster && (evt.caster.role !== self.role || evt.caster.code !== self.code);
         const isTargetMe = !evt.target || evt.target.role === self.role || evt.target.code === self.code;
 
-        // If not casting, we are ready to receive invites anywhere in the app!
         if (isFromOther || isTargetMe || !state.isCasting) {
           if (evt.inviteId) lastHandledInviteId = evt.inviteId;
           state.activeInvite = evt;
@@ -181,8 +188,15 @@
         break;
       }
 
-      case 'sync': {
+      case 'mirror_state': {
         if (state.isReceiving) {
+          renderMirrorState(evt.screenState || evt);
+        }
+        break;
+      }
+
+      case 'sync': {
+        if (state.isReceiving && evt.video) {
           syncReceiverPlayback(evt.video);
         }
         break;
@@ -194,10 +208,11 @@
       }
 
       case 'end':
+      case 'stop':
       case 'ended': {
-        if (state.isReceiving) {
-          closeFullscreenReceiverTheater('Companion stopped casting');
-        } else if (state.isCasting) {
+        // Stop on receiver IMMEDIATELY: close theater, wipe iframe, stop all audio
+        closeFullscreenReceiverTheater('Companion stopped casting');
+        if (state.isCasting) {
           stopCasting(false);
         }
         hideIncomingInviteBanner();
@@ -238,6 +253,7 @@
       es.addEventListener('accepted', (e) => handleIncomingCastEvent({ action: 'accepted', ...JSON.parse(e.data) }));
       es.addEventListener('declined', (e) => handleIncomingCastEvent({ action: 'declined', ...JSON.parse(e.data) }));
       es.addEventListener('respond', (e) => handleIncomingCastEvent({ action: 'respond', ...JSON.parse(e.data) }));
+      es.addEventListener('mirror_state', (e) => handleIncomingCastEvent({ action: 'mirror_state', ...JSON.parse(e.data) }));
       es.addEventListener('sync', (e) => handleIncomingCastEvent({ action: 'sync', ...JSON.parse(e.data) }));
       es.addEventListener('reaction', (e) => handleIncomingCastEvent({ action: 'reaction', ...JSON.parse(e.data) }));
       es.addEventListener('ended', (e) => handleIncomingCastEvent({ action: 'ended', ...JSON.parse(e.data) }));
@@ -273,10 +289,17 @@
               handleIncomingCastEvent(Object.assign({ action: 'declined' }, sess));
             }
           } else if (sess.status === 'ended') {
-            handleIncomingCastEvent(Object.assign({ action: 'ended' }, sess));
+            // Instant stop on both sides
+            closeFullscreenReceiverTheater('Companion stopped casting');
+            if (state.isCasting) stopCasting(false);
           }
 
-          // Live sync receiver playback whenever caster changes video, time, or state!
+          // Live sync screen state (feed vs player)
+          if (state.isReceiving && sess.screenState) {
+            renderMirrorState(sess.screenState);
+          }
+
+          // Live sync video playback
           if (state.isReceiving && sess.video && sess.video.id) {
             if (sess.video.id !== state.lastSyncedVideoId || sess.status === 'sync') {
               syncReceiverPlayback(sess.video);
@@ -286,8 +309,8 @@
       }
     } catch (_) {}
 
-    // Faster polling rate (650ms) when waiting for response or casting, 1200ms when idle
-    const pollDelay = (state.isCasting || state.isReceiving || state.activeInvite) ? 650 : 1200;
+    // Faster polling rate (600ms) when active or waiting, 1200ms when idle
+    const pollDelay = (state.isCasting || state.isReceiving || state.activeInvite) ? 600 : 1200;
     setTimeout(pollCastStatus, pollDelay);
   }
   setTimeout(pollCastStatus, 800);
@@ -364,72 +387,29 @@
     state.caster = self;
     state.mySentInviteId = inviteId;
 
-    // Determine the real current video from Cinema player or active feed
+    // Check if a video is ALREADY playing in the cinema lounge
+    let isVideoPlayingNow = false;
     let currentVideo = null;
+
     if (window.getCurrentCinemaPlayingVideo) {
       currentVideo = window.getCurrentCinemaPlayingVideo();
-    }
-
-    if (!currentVideo || !currentVideo.id || currentVideo.id === 'kJQP7kiw5Fk') {
-      const mainIframe = document.getElementById('cinema-inapp-iframe');
-      const theaterTitle = document.getElementById('cinema-theater-title');
-      const theaterChannel = document.getElementById('cinema-theater-channel');
-      const theaterAvatar = document.getElementById('cinema-theater-avatar');
-
-      if (mainIframe && mainIframe.src && !mainIframe.src.endsWith('/')) {
-        const match = mainIframe.src.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
-        if (match && match[1] && match[1] !== 'kJQP7kiw5Fk') {
-          currentVideo = {
-            id: match[1],
-            title: theaterTitle ? theaterTitle.textContent : 'YouTube Video',
-            channel: theaterChannel ? theaterChannel.textContent : 'YouTube',
-            avatar: theaterAvatar ? theaterAvatar.src : self.avatar,
-            currentTime: 1,
-            duration: 300,
-            isPlaying: true
-          };
-        }
+      if (currentVideo && currentVideo.id && currentVideo.isPlaying) {
+        isVideoPlayingNow = true;
       }
     }
 
-    if (!currentVideo || !currentVideo.id || currentVideo.id === 'kJQP7kiw5Fk') {
-      // Pick first card visible in YouTube feed
-      const firstCard = document.querySelector('#cinema-video-feed-grid .cinema-feed-card');
-      if (firstCard) {
-        const titleEl = firstCard.querySelector('.cinema-feed-title');
-        const channelEl = firstCard.querySelector('.cinema-feed-channel-name');
-        const thumbEl = firstCard.querySelector('.cinema-feed-thumb');
-        let cardId = 'cUmUOb7j3dc'; // Saiyaara
-        if (thumbEl && thumbEl.src) {
-          const m = thumbEl.src.match(/\/vi\/([a-zA-Z0-9_-]{11})\//);
-          if (m && m[1]) cardId = m[1];
-        }
-        currentVideo = {
-          id: cardId,
-          title: (titleEl && titleEl.textContent) ? titleEl.textContent : 'Dhun Song | Saiyaara | Ahaan Panday, Aneet Padda | Arijit Singh',
-          channel: (channelEl && channelEl.textContent) ? channelEl.textContent : 'YRF Music',
-          avatar: self.avatar,
-          currentTime: 1,
-          duration: 252,
-          isPlaying: true
-        };
-      } else {
-        currentVideo = {
-          id: 'cUmUOb7j3dc',
-          title: 'Dhun Song | Saiyaara | Ahaan Panday, Aneet Padda | Arijit Singh',
-          channel: 'YRF Music',
-          avatar: self.avatar,
-          currentTime: 1,
-          duration: 252,
-          isPlaying: true
-        };
-      }
-    }
+    // Determine current view: If video is playing -> 'player'; If browsing feed -> 'feed'
+    const cinemaScreenEl = document.getElementById('cinema-screen');
+    const activeChipEl = document.querySelector('#cinema-category-chips .active-chip');
+    const chipName = activeChipEl ? activeChipEl.textContent.trim() : 'All';
 
-    // Launch the video in caster's player as well so both watch the same thing together!
-    if (window.playVideoInCinemaById && currentVideo.id) {
-      window.playVideoInCinemaById(currentVideo.id, currentVideo.title, currentVideo.channel);
-    }
+    state.currentScreenState = {
+      view: isVideoPlayingNow ? 'player' : 'feed',
+      section: 'cinema',
+      chip: chipName,
+      scrollTop: cinemaScreenEl ? cinemaScreenEl.scrollTop : 0,
+      video: isVideoPlayingNow ? currentVideo : null
+    };
 
     // Switch modal to waiting state
     const initialView = document.getElementById('cinema-cast-initial-view');
@@ -439,12 +419,13 @@
     if (waitingView) waitingView.style.display = 'flex';
     if (waitingText) waitingText.textContent = `Beaming invite to ${companion.name}... Waiting for acceptance`;
 
-    // Emit cast invite across all layers
+    // Emit cast invite across all layers (NO auto-play of any random song!)
     emitCastEvent('invite', {
       inviteId,
       caster: self,
       target: companion,
-      video: currentVideo
+      screenState: state.currentScreenState,
+      video: state.currentScreenState.video
     });
 
     // Update Cast Button in header to pulsing
@@ -474,14 +455,12 @@
       window.showHUD('Cast Connected', `Live screen mirror active with ${partnerName}`, 'cast');
     }
 
-    // Send immediate sync update of current video
+    // Broadcast initial screen state to companion
     setTimeout(() => {
-      let vid = null;
-      if (window.getCurrentCinemaPlayingVideo) vid = window.getCurrentCinemaPlayingVideo();
-      if (vid && window.vievAirCast && window.vievAirCast.notifyPlaybackState) {
-        window.vievAirCast.notifyPlaybackState(vid);
-      }
-    }, 400);
+      emitCastEvent('mirror_state', {
+        screenState: state.currentScreenState
+      });
+    }, 300);
   }
 
   function onCastDeclinedByCompanion(evt) {
@@ -532,8 +511,8 @@
     const casterName = caster.name || 'Companion';
 
     if (avatar && caster.avatar) avatar.src = caster.avatar;
-    if (heading) heading.textContent = `${casterName} wants to show you something ✨`;
-    if (subtext) subtext.textContent = `${casterName} is inviting you to watch live screen with synchronized audio.`;
+    if (heading) heading.textContent = `${casterName} wants to share her screen ✨`;
+    if (subtext) subtext.textContent = `${casterName} is inviting you to watch her YouTube screen live with sound.`;
 
     if (evt.video && evt.video.id) {
       if (previewCard) previewCard.style.display = 'flex';
@@ -543,11 +522,9 @@
       if (previewCard) previewCard.style.display = 'none';
     }
 
-    // Ensure overlay is brought to front and animated into view
     overlay.style.display = 'block';
     overlay.classList.add('is-visible');
 
-    // Auto-dismiss after 60 seconds if no action taken
     if (inviteAutoDismissTimer) clearTimeout(inviteAutoDismissTimer);
     inviteAutoDismissTimer = setTimeout(() => {
       hideIncomingInviteBanner();
@@ -577,19 +554,7 @@
     state.isReceiving = true;
     state.caster = state.activeInvite.caster;
 
-    // 1. Pause background music player so audio does not collide
-    try {
-      if (typeof audio !== 'undefined' && audio && !audio.paused) {
-        audio.pause();
-      }
-      if (typeof isPlaying !== 'undefined') {
-        isPlaying = false;
-      }
-      const playBtn = document.getElementById('play-btn');
-      if (playBtn) playBtn.classList.remove('playing');
-    } catch (_) {}
-
-    // 2. Send both 'accepted' and 'respond' actions to ensure all server/client models accept it
+    // Send both 'accepted' and 'respond' actions
     const acceptPayload = {
       accepted: true,
       inviteId: state.activeInvite.inviteId,
@@ -599,7 +564,7 @@
     emitCastEvent('accepted', acceptPayload);
     emitCastEvent('respond', acceptPayload);
 
-    // 3. Open Fullscreen Live Mirror Theater over whichever section user is in
+    // Open Fullscreen Live Mirror Theater over whichever section user is in
     openFullscreenReceiverTheater(state.activeInvite);
   }
 
@@ -618,7 +583,7 @@
     state.activeInvite = null;
   }
 
-  // --- FULLSCREEN LIVE MIRROR THEATER (RECEIVER) ---
+  // --- FULLSCREEN LIVE MIRROR THEATER (RECEIVER SIDE) ---
   let receiverIframe = null;
 
   function openFullscreenReceiverTheater(invite) {
@@ -626,60 +591,28 @@
     if (!theater) return;
 
     const { companion } = getProfiles();
-    const caster = invite.caster || companion || { name: 'Companion', avatar: 'song/Screenshot 2026-10-24 224431.png' };
-    const video = invite.video || { id: 'cUmUOb7j3dc', title: 'Dhun Song | Saiyaara | Arijit Singh', currentTime: 0 };
+    const caster = invite.caster || companion || { name: 'Digi', avatar: 'song/Screenshot 2026-10-24 224431.png' };
 
     const avatar = document.getElementById('viev-fullscreen-user-avatar');
     const name = document.getElementById('viev-fullscreen-user-name');
     const title = document.getElementById('viev-fullscreen-video-title');
-    const glow = document.getElementById('viev-fullscreen-glow-layer');
+    const mirrorAvatar = document.getElementById('viev-mirror-avatar');
 
     if (avatar && caster.avatar) avatar.src = caster.avatar;
+    if (mirrorAvatar && caster.avatar) mirrorAvatar.src = caster.avatar;
     if (name) name.textContent = `${caster.name}'s YouTube`;
-    if (title) title.textContent = video.title || 'YouTube Live Cast';
-    if (glow && video.id) {
-      glow.style.backgroundImage = `url('https://img.youtube.com/vi/${video.id}/hqdefault.jpg')`;
-    }
 
-    // Embed YouTube Player with interactive controls and sound
-    const container = document.getElementById('viev-fullscreen-video-wrap');
-    if (container) {
-      const originParam = (window.location.origin && window.location.origin !== 'null' && window.location.protocol.startsWith('http'))
-        ? `&origin=${encodeURIComponent(window.location.origin)}`
-        : '';
-      const startParam = video.currentTime ? `&start=${Math.floor(video.currentTime)}` : '';
-
-      container.innerHTML = `
-        <iframe id="viev-fullscreen-receiver-iframe" 
-                class="viev-fullscreen-iframe" 
-                src="https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&enablejsapi=1${originParam}${startParam}&controls=1&playsinline=1&rel=0&modestbranding=1" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                allowfullscreen></iframe>
-        <div class="viev-fullscreen-sync-overlay">
-          <div class="viev-sync-indicator-dot"></div>
-          <span class="viev-sync-text">Live Synchronized • Sound Active 🔊</span>
-        </div>
-      `;
-
-      receiverIframe = document.getElementById('viev-fullscreen-receiver-iframe');
-      if (receiverIframe) {
-        receiverIframe.onload = () => {
-          try {
-            receiverIframe.contentWindow.postMessage('{"event":"listening"}', '*');
-            receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-            receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-            receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-          } catch (_) {}
-        };
-      }
-    }
-
-    state.lastSyncedVideoId = video.id;
-    state.lastSyncedTime = video.currentTime || 0;
-    state.lastSyncedIsPlaying = video.isPlaying !== false;
+    theater.style.display = 'flex';
     theater.classList.add('is-active');
 
-    // Attempt browser Fullscreen API for authentic theater immersion
+    // Populate the mirror feed cards from active feed data
+    populateMirrorFeedCards();
+
+    // Check what view caster is currently on (player vs feed)
+    const initialScreen = invite.screenState || { view: (invite.video && invite.video.id) ? 'player' : 'feed', video: invite.video };
+    renderMirrorState(initialScreen);
+
+    // Attempt browser Fullscreen API
     try {
       if (theater.requestFullscreen) {
         theater.requestFullscreen().catch(() => {});
@@ -689,11 +622,145 @@
     } catch (_) {}
   }
 
+  // Populate Feed Cards inside the Live Mirror Viewport
+  function populateMirrorFeedCards() {
+    const container = document.getElementById('viev-mirror-cards-container');
+    if (!container) return;
+
+    // Read real cards from DOM or from VIRAT_YOUTUBE_FEED
+    const realCards = document.querySelectorAll('#cinema-video-feed-grid .cinema-feed-card');
+    if (realCards && realCards.length > 0) {
+      let html = '';
+      realCards.forEach((card, idx) => {
+        if (idx > 12) return;
+        const thumb = card.querySelector('.cinema-feed-thumb');
+        const title = card.querySelector('.cinema-feed-title');
+        const channel = card.querySelector('.cinema-feed-channel-name');
+        const views = card.querySelector('.cinema-feed-views');
+        const duration = card.querySelector('.cinema-feed-duration');
+        const avatar = card.querySelector('.cinema-feed-avatar');
+
+        html += `
+          <div class="viev-mirror-card">
+            <div class="viev-mirror-card-thumb-wrap">
+              <img src="${thumb ? thumb.src : ''}" alt="" class="viev-mirror-card-thumb">
+              ${duration ? `<span class="viev-mirror-card-duration">${duration.textContent}</span>` : ''}
+            </div>
+            <div class="viev-mirror-card-meta">
+              <img src="${avatar ? avatar.src : 'song/Screenshot 2026-10-24 224431.png'}" alt="" class="viev-mirror-card-avatar">
+              <div class="viev-mirror-card-info">
+                <div class="viev-mirror-card-title">${title ? title.textContent : ''}</div>
+                <div class="viev-mirror-card-sub">${channel ? channel.textContent : ''} • ${views ? views.textContent : ''}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    } else if (window.VIRAT_YOUTUBE_FEED && window.VIRAT_YOUTUBE_FEED.length > 0) {
+      let html = '';
+      window.VIRAT_YOUTUBE_FEED.slice(0, 10).forEach(vid => {
+        html += `
+          <div class="viev-mirror-card">
+            <div class="viev-mirror-card-thumb-wrap">
+              <img src="${vid.thumb}" alt="" class="viev-mirror-card-thumb">
+              <span class="viev-mirror-card-duration">♪ Video</span>
+            </div>
+            <div class="viev-mirror-card-meta">
+              <img src="${vid.avatar || 'song/Screenshot 2026-10-24 224431.png'}" alt="" class="viev-mirror-card-avatar">
+              <div class="viev-mirror-card-info">
+                <div class="viev-mirror-card-title">${vid.title}</div>
+                <div class="viev-mirror-card-sub">${vid.channel} • ${vid.views || '1M views'}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+  }
+
+  // Render Caster's exact view on Receiver's screen (Feed vs Player)
+  function renderMirrorState(screenState) {
+    if (!screenState) return;
+
+    const feedWrap = document.getElementById('viev-mirror-feed-wrap');
+    const videoWrap = document.getElementById('viev-fullscreen-video-wrap');
+    const titleEl = document.getElementById('viev-fullscreen-video-title');
+    const statusLabel = document.getElementById('viev-mirror-status-label');
+    const { companion } = getProfiles();
+    const casterName = (state.caster && state.caster.name) ? state.caster.name : companion.name;
+
+    // View A: Caster is playing a Video
+    if (screenState.view === 'player' && screenState.video && screenState.video.id) {
+      if (feedWrap) feedWrap.style.display = 'none';
+      if (videoWrap) videoWrap.style.display = 'block';
+
+      if (titleEl) {
+        titleEl.textContent = `${casterName} is watching: ${screenState.video.title || 'YouTube'}`;
+      }
+
+      // Sync and play the exact video!
+      syncReceiverPlayback(screenState.video);
+      return;
+    }
+
+    // View B: Caster is browsing YouTube Feed
+    if (videoWrap) {
+      videoWrap.style.display = 'none';
+      // Blank out video so no audio plays while browsing!
+      videoWrap.innerHTML = '';
+      receiverIframe = null;
+    }
+
+    if (feedWrap) {
+      feedWrap.style.display = 'flex';
+    }
+
+    if (titleEl) {
+      titleEl.textContent = `${casterName}'s YouTube • Live Screen Mirror`;
+    }
+
+    if (statusLabel) {
+      statusLabel.textContent = `${casterName} is browsing YouTube feed...`;
+    }
+
+    // Sync active category chip
+    if (screenState.chip) {
+      const chips = document.querySelectorAll('.viev-mirror-chip');
+      chips.forEach(c => {
+        const isMatch = c.textContent.trim().toLowerCase() === screenState.chip.toLowerCase();
+        c.classList.toggle('is-active', isMatch);
+      });
+    }
+
+    // Sync scrolling
+    if (typeof screenState.scrollTop === 'number') {
+      const scrollEl = document.getElementById('viev-mirror-feed-scroll');
+      if (scrollEl) {
+        scrollEl.scrollTop = screenState.scrollTop;
+      }
+    }
+  }
+
+  // Live video player sync (Single Master Audio: Caster plays audio, Receiver muted by default to eliminate echo!)
   function syncReceiverPlayback(video) {
     if (!video || !video.id) return;
-    const title = document.getElementById('viev-fullscreen-video-title');
+
+    const titleEl = document.getElementById('viev-fullscreen-video-title');
     const glow = document.getElementById('viev-fullscreen-glow-layer');
-    if (title && video.title) title.textContent = video.title;
+    const { companion } = getProfiles();
+    const casterName = (state.caster && state.caster.name) ? state.caster.name : companion.name;
+
+    if (titleEl && video.title) {
+      titleEl.textContent = `${casterName} is watching: ${video.title}`;
+    }
+
+    const container = document.getElementById('viev-fullscreen-video-wrap');
+    const feedWrap = document.getElementById('viev-mirror-feed-wrap');
+
+    if (feedWrap) feedWrap.style.display = 'none';
+    if (container) container.style.display = 'block';
 
     // If video changed, load the new video!
     if (video.id !== state.lastSyncedVideoId) {
@@ -705,21 +772,65 @@
         : '';
       const startParam = video.currentTime ? `&start=${Math.floor(video.currentTime)}` : '';
 
-      if (receiverIframe) {
-        receiverIframe.src = `https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&enablejsapi=1${originParam}${startParam}&controls=1&playsinline=1&rel=0&modestbranding=1`;
-        receiverIframe.onload = () => {
-          try {
-            receiverIframe.contentWindow.postMessage('{"event":"listening"}', '*');
-            receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-            receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
-            receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-          } catch (_) {}
-        };
+      // Default mute=1 on receiver: Single Master Audio eliminates echo/lag!
+      const muteParam = state.receiverMuted ? '&mute=1' : '&mute=0';
+
+      if (container) {
+        container.innerHTML = `
+          <iframe id="viev-fullscreen-receiver-iframe" 
+                  class="viev-fullscreen-iframe" 
+                  src="https://www.youtube-nocookie.com/embed/${video.id}?autoplay=1&enablejsapi=1${originParam}${startParam}${muteParam}&controls=1&playsinline=1&rel=0&modestbranding=1" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                  allowfullscreen></iframe>
+          <div class="viev-fullscreen-sync-overlay">
+            <div class="viev-sync-indicator-dot"></div>
+            <span class="viev-sync-text">Live Mirrored with ${casterName}</span>
+            <button type="button" class="viev-audio-mode-pill" id="viev-receiver-audio-toggle">
+              ${state.receiverMuted ? '🔊 Unmute Local Audio' : '🔇 Mute Local Audio (Master Active)'}
+            </button>
+          </div>
+        `;
+
+        receiverIframe = document.getElementById('viev-fullscreen-receiver-iframe');
+        if (receiverIframe) {
+          receiverIframe.onload = () => {
+            try {
+              receiverIframe.contentWindow.postMessage('{"event":"listening"}', '*');
+              if (!state.receiverMuted) {
+                receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+                receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+              } else {
+                receiverIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+              }
+              receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+            } catch (_) {}
+          };
+        }
+
+        // Hook up audio toggle button
+        const audioToggleBtn = document.getElementById('viev-receiver-audio-toggle');
+        if (audioToggleBtn) {
+          audioToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            state.receiverMuted = !state.receiverMuted;
+            audioToggleBtn.textContent = state.receiverMuted ? '🔊 Unmute Local Audio' : '🔇 Mute Local Audio (Master Active)';
+            if (receiverIframe && receiverIframe.contentWindow) {
+              try {
+                if (state.receiverMuted) {
+                  receiverIframe.contentWindow.postMessage('{"event":"command","func":"mute","args":""}', '*');
+                } else {
+                  receiverIframe.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
+                  receiverIframe.contentWindow.postMessage('{"event":"command","func":"setVolume","args":[100]}', '*');
+                }
+              } catch (_) {}
+            }
+          });
+        }
       }
       return;
     }
 
-    // If same video, sync play/pause & seek
+    // If same video, sync play/pause & seek time
     if (receiverIframe && receiverIframe.contentWindow) {
       try {
         if (video.isPlaying === false) {
@@ -728,7 +839,6 @@
           receiverIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
         }
 
-        // Only seek if drift is greater than 2.5 seconds to keep playback smooth
         if (typeof video.currentTime === 'number') {
           const drift = Math.abs(video.currentTime - state.lastSyncedTime);
           if (drift > 2.5) {
@@ -744,15 +854,25 @@
     }
   }
 
+  // Close receiver theater immediately and kill all audio/iframes
   function closeFullscreenReceiverTheater(reason) {
     state.isReceiving = false;
-    const theater = document.getElementById('viev-cast-fullscreen-theater');
-    if (theater) theater.classList.remove('is-active');
+    state.lastSyncedVideoId = null;
+    state.activeInvite = null;
 
-    // Blank out iframe to stop audio immediately
+    const theater = document.getElementById('viev-cast-fullscreen-theater');
+    if (theater) {
+      theater.classList.remove('is-active');
+      theater.style.display = 'none';
+    }
+
+    // Blank out iframe to STOP ALL AUDIO IMMEDIATELY!
     const container = document.getElementById('viev-fullscreen-video-wrap');
     if (container) container.innerHTML = '';
     receiverIframe = null;
+
+    const feedWrap = document.getElementById('viev-mirror-feed-wrap');
+    if (feedWrap) feedWrap.style.display = 'none';
 
     try {
       if (document.fullscreenElement && document.exitFullscreen) {
@@ -761,11 +881,11 @@
     } catch (_) {}
 
     if (reason && window.showHUD) {
-      window.showHUD('Cast Ended', reason, 'info');
+      window.showHUD('Cast Disconnected', reason, 'info');
     }
   }
 
-  // --- HOOK INTO CINEMA.JS & GLOBAL WINDOW TO STREAM PLAYBACK ---
+  // --- HOOKS EXPOSED TO CINEMA.JS & APPLICATION ---
   window.vievAirCast = {
     openModal: openCastModal,
     closeModal: closeCastModal,
@@ -777,17 +897,30 @@
       spawnReactionParticle(emoji);
       emitCastEvent('reaction', { reaction: emoji });
     },
-    // Called by cinema.js whenever video changes or time ticks
+    // Called whenever caster scrolls, clicks chips, or switches views
+    notifyScreenState: (screenData) => {
+      if (!state.isCasting) return;
+      state.currentScreenState = Object.assign(state.currentScreenState, screenData);
+      emitCastEvent('mirror_state', {
+        screenState: state.currentScreenState
+      });
+    },
+    // Called by cinema.js when a video plays, ticks, or seeks
     notifyPlaybackState: (playback) => {
       if (!state.isCasting) return;
       const now = Date.now();
       if (playback.id !== state.lastSyncedVideoId || (now - state.lastSyncTimestamp > 950)) {
         state.lastSyncedVideoId = playback.id;
         state.lastSyncTimestamp = now;
+
+        state.currentScreenState.view = 'player';
+        state.currentScreenState.video = playback;
+
         emitCastEvent('sync', { video: playback });
+        emitCastEvent('mirror_state', { screenState: state.currentScreenState });
       }
     },
-    // Test simulator: simulates incoming request from companion
+    // Test simulator
     simulateTestReceiver: () => {
       closeCastModal();
       const { companion, self } = getProfiles();
@@ -796,14 +929,11 @@
         inviteId: 'mock_' + Date.now(),
         caster: companion,
         target: self,
-        video: {
-          id: 'BddP6PYo2gs',
-          title: 'Ve Kamleya (Full Video) | Arijit Singh, Shreya Ghoshal | Alia, Ranveer',
-          channel: 'Sony Music India',
-          avatar: companion.avatar,
-          currentTime: 14,
-          duration: 246,
-          isPlaying: true
+        screenState: {
+          view: 'feed',
+          section: 'cinema',
+          chip: 'All',
+          scrollTop: 0
         }
       };
       state.activeInvite = mockInvite;
@@ -852,9 +982,13 @@
     const testModeBtn = document.getElementById('cinema-cast-test-mode-btn');
     if (testModeBtn) testModeBtn.addEventListener('click', window.vievAirCast.simulateTestReceiver);
 
-    // 4. Floating Caster HUD Stop Button
+    // 4. Floating Caster HUD Stop Button (DIGI CLICKS STOP CAST)
     const hudStopBtn = document.getElementById('viev-hud-stop-btn');
-    if (hudStopBtn) hudStopBtn.addEventListener('click', () => stopCasting(true));
+    if (hudStopBtn) {
+      hudStopBtn.addEventListener('click', () => {
+        stopCasting(true);
+      });
+    }
 
     // 5. Incoming Invitation Accept & Decline
     const acceptBtn = document.getElementById('viev-invite-accept-btn');

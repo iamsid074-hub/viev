@@ -680,6 +680,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cinemaScreen) {
       cinemaScreen.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    if (window.vievAirCast && typeof window.vievAirCast.notifyScreenState === 'function') {
+      window.vievAirCast.notifyScreenState({
+        view: 'feed',
+        video: null,
+        scrollTop: 0
+      });
+    }
     if (playerView) {
       playerView.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1657,8 +1665,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const query = chip.dataset.query || chip.textContent.trim();
       loadYouTubeFeed(query, false);
+
+      if (window.vievAirCast && typeof window.vievAirCast.notifyScreenState === 'function') {
+        window.vievAirCast.notifyScreenState({
+          view: 'feed',
+          chip: chip.textContent.trim(),
+          query: query
+        });
+      }
     });
   });
+
+  // Track screen scrolling when casting to mirror scroll on companion screen!
+  const cinemaScreenEl = document.getElementById('cinema-screen');
+  let lastMirrorScrollEmit = 0;
+  if (cinemaScreenEl) {
+    cinemaScreenEl.addEventListener('scroll', () => {
+      const now = Date.now();
+      if (now - lastMirrorScrollEmit > 120) {
+        lastMirrorScrollEmit = now;
+        if (window.vievAirCast && typeof window.vievAirCast.notifyScreenState === 'function') {
+          const isPlayer = playerView && playerView.classList.contains('theater-active');
+          window.vievAirCast.notifyScreenState({
+            view: isPlayer ? 'player' : 'feed',
+            scrollTop: cinemaScreenEl.scrollTop
+          });
+        }
+      }
+    }, { passive: true });
+  }
 
   // Custom Search / Paste Link Input
   function handleCustomSearch() {

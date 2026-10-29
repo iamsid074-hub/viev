@@ -339,12 +339,20 @@ const server = http.createServer((req, res) => {
           activeCastSession.status = 'sync';
           activeCastSession.lastUpdate = Date.now();
           broadcastCastEvent('sync', activeCastSession);
+        } else if (action === 'mirror_state') {
+          activeCastSession.active = true;
+          activeCastSession.status = 'mirror_state';
+          activeCastSession.screenState = Object.assign(activeCastSession.screenState || {}, payload.screenState || {});
+          activeCastSession.lastUpdate = Date.now();
+          broadcastCastEvent('mirror_state', activeCastSession);
         } else if (action === 'reaction') {
           activeCastSession.reaction = payload.reaction;
           broadcastCastEvent('reaction', { reaction: payload.reaction, from: payload.from });
-        } else if (action === 'end') {
+        } else if (action === 'end' || action === 'stop') {
           activeCastSession.status = 'ended';
           activeCastSession.active = false;
+          activeCastSession.video = null;
+          activeCastSession.screenState = null;
           activeCastSession.lastUpdate = Date.now();
           broadcastCastEvent('ended', activeCastSession);
         }
