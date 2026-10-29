@@ -334,34 +334,45 @@
     setTimeout(() => particle.remove(), 2300);
   }
 
-  // --- CAST MODAL (WHO TO CAST WITH) ---
+  // --- SCREEN SHARE MODAL (WHO TO SHARE WITH) ---
   function openCastModal() {
     const modal = document.getElementById('cinema-cast-modal');
     if (!modal) return;
 
-    const { companion } = getProfiles();
+    try {
+      const { companion } = getProfiles();
 
-    // Populate Companion Card
-    const avatarEl = document.getElementById('cast-partner-avatar');
-    const nameEl = document.getElementById('cast-partner-name');
-    const handleEl = document.getElementById('cast-partner-handle');
-    const statusEl = document.getElementById('cast-partner-status');
-    const actionBtn = document.getElementById('cinema-start-cast-btn');
-    const titleEl = document.getElementById('cinema-cast-title');
+      // Populate Companion Card
+      const avatarEl = document.getElementById('cast-partner-avatar');
+      const nameEl = document.getElementById('cast-partner-name');
+      const handleEl = document.getElementById('cast-partner-handle');
+      const statusEl = document.getElementById('cast-partner-status');
+      const actionBtn = document.getElementById('cinema-start-cast-btn');
+      const titleEl = document.getElementById('cinema-cast-title');
 
-    if (avatarEl && companion.avatar) avatarEl.src = companion.avatar;
-    if (nameEl) nameEl.textContent = companion.name;
-    if (handleEl) handleEl.textContent = `${companion.channelName} • ${companion.handle}`;
-    if (statusEl) statusEl.textContent = '🟢 Online on VIEVS • Ready for Cast';
-    if (titleEl) titleEl.textContent = `Cast to ${companion.name}`;
-    if (actionBtn) {
-      actionBtn.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
-          <line x1="2" y1="20" x2="2.01" y2="20"></line>
-        </svg>
-        <span>Start Live Cast to ${companion.name}</span>
-      `;
+      const companionName = (companion && companion.name) ? companion.name : 'Companion';
+      const companionAvatar = (companion && companion.avatar) ? companion.avatar : 'song/virat_plays_avatar.png';
+      const companionHandle = (companion && companion.handle) ? `${companion.channelName} • ${companion.handle}` : 'Companion';
+
+      if (avatarEl) avatarEl.src = companionAvatar;
+      if (nameEl) nameEl.textContent = companionName;
+      if (handleEl) handleEl.textContent = companionHandle;
+      if (statusEl) statusEl.textContent = '🟢 Online on VIEVS • Ready for Screen Share';
+      if (titleEl) titleEl.textContent = `Share Screen with ${companionName}`;
+      if (actionBtn) {
+        actionBtn.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+            <path d="M12 7l4 4-4 4"></path>
+            <path d="M8 11h8"></path>
+          </svg>
+          <span>Start Screen Share with ${companionName}</span>
+        `;
+      }
+    } catch (e) {
+      console.warn('Error populating profiles:', e);
     }
 
     // Reset initial view
@@ -370,12 +381,21 @@
     if (initialView) initialView.style.display = 'block';
     if (waitingView) waitingView.style.display = 'none';
 
+    modal.style.display = 'flex';
+    void modal.offsetWidth; // Force reflow
     modal.classList.add('is-open');
   }
 
   function closeCastModal() {
     const modal = document.getElementById('cinema-cast-modal');
-    if (modal) modal.classList.remove('is-open');
+    if (modal) {
+      modal.classList.remove('is-open');
+      setTimeout(() => {
+        if (!modal.classList.contains('is-open')) {
+          modal.style.display = 'none';
+        }
+      }, 350);
+    }
   }
 
   // --- START SCREEN SHARE ---
@@ -912,82 +932,130 @@
 
   window.vievScreenShare = window.vievAirCast;
 
-  // Wire up DOM Listeners on page load
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1. YouTube Header Cast Button
-    const castHeaderBtn = document.getElementById('yt-header-cast-btn');
+  // Wire up DOM Listeners (Capture phase delegation so nothing can block or swallow clicks)
+  document.addEventListener('click', (e) => {
+    // 1. YouTube Header Cast/Screen Share Button
+    const castHeaderBtn = e.target.closest('#yt-header-cast-btn') || e.target.closest('.yt-cast-btn');
     if (castHeaderBtn) {
-      castHeaderBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state.isCasting) {
-          stopCasting(true);
-        } else {
-          openCastModal();
-        }
-      });
+      e.preventDefault();
+      e.stopPropagation();
+      openCastModal();
+      return;
     }
 
-    // 2. Music Player AirPlay button triggers AirCast modal directly from Music Screen!
-    const musicAirplayBtn = document.getElementById('music-airplay-btn');
+    // 2. Music Player AirPlay button
+    const musicAirplayBtn = e.target.closest('#music-airplay-btn');
     if (musicAirplayBtn) {
-      musicAirplayBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (state.isCasting) {
-          stopCasting(true);
-        } else {
-          openCastModal();
-        }
-      });
+      e.preventDefault();
+      e.stopPropagation();
+      openCastModal();
+      return;
     }
 
-    // 3. Cast Modal Controls
-    const closeCastBtn = document.getElementById('cinema-cast-close-btn');
-    if (closeCastBtn) closeCastBtn.addEventListener('click', closeCastModal);
+    // 3. Modal Close Button
+    const closeCastBtn = e.target.closest('#cinema-cast-close-btn');
+    if (closeCastBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeCastModal();
+      return;
+    }
 
-    const startCastBtn = document.getElementById('cinema-start-cast-btn');
-    if (startCastBtn) startCastBtn.addEventListener('click', startCasting);
+    // 4. Modal Start Screen Share Button
+    const startCastBtn = e.target.closest('#cinema-start-cast-btn');
+    if (startCastBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      startCasting();
+      return;
+    }
 
-    const cancelCastBtn = document.getElementById('cinema-cancel-cast-btn');
-    if (cancelCastBtn) cancelCastBtn.addEventListener('click', () => stopCasting(true));
+    // 5. Modal Cancel Button
+    const cancelCastBtn = e.target.closest('#cinema-cancel-cast-btn');
+    if (cancelCastBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      stopCasting(true);
+      return;
+    }
 
-    const testModeBtn = document.getElementById('cinema-cast-test-mode-btn');
-    if (testModeBtn) testModeBtn.addEventListener('click', window.vievAirCast.simulateTestReceiver);
+    // 6. Test Mode Button
+    const testModeBtn = e.target.closest('#cinema-cast-test-mode-btn');
+    if (testModeBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      window.vievAirCast.simulateTestReceiver();
+      return;
+    }
 
-    // 4. Floating Caster HUD Stop Button (DIGI CLICKS STOP CAST)
-    const hudStopBtn = document.getElementById('viev-hud-stop-btn');
+    // 7. Floating Caster HUD Stop Button (Stop Sharing)
+    const hudStopBtn = e.target.closest('#viev-hud-stop-btn');
     if (hudStopBtn) {
-      hudStopBtn.addEventListener('click', () => {
-        stopCasting(true);
-      });
+      e.preventDefault();
+      e.stopPropagation();
+      stopCasting(true);
+      return;
     }
 
-    // 5. Incoming Invitation Accept & Decline
-    const acceptBtn = document.getElementById('viev-invite-accept-btn');
-    if (acceptBtn) acceptBtn.addEventListener('click', acceptIncomingCast);
+    // 8. Incoming Invitation Accept & Decline
+    const acceptBtn = e.target.closest('#viev-invite-accept-btn');
+    if (acceptBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      acceptIncomingCast();
+      return;
+    }
 
-    const declineBtn = document.getElementById('viev-invite-decline-btn');
-    if (declineBtn) declineBtn.addEventListener('click', declineIncomingCast);
+    const declineBtn = e.target.closest('#viev-invite-decline-btn');
+    if (declineBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      declineIncomingCast();
+      return;
+    }
 
-    // 6. Fullscreen Receiver Theater Controls
-    const fsExitBtn = document.getElementById('viev-fullscreen-exit-btn');
-    if (fsExitBtn) fsExitBtn.addEventListener('click', () => closeFullscreenReceiverTheater('Exited fullscreen view'));
+    // 9. Fullscreen Receiver Theater Exit / Disconnect
+    const fsExitBtn = e.target.closest('#viev-fullscreen-exit-btn');
+    if (fsExitBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeFullscreenReceiverTheater('Exited fullscreen view');
+      return;
+    }
 
-    const fsDisconnectBtn = document.getElementById('viev-fullscreen-disconnect-btn');
+    const fsDisconnectBtn = e.target.closest('#viev-fullscreen-disconnect-btn') || e.target.closest('.disconnect-btn');
     if (fsDisconnectBtn) {
-      fsDisconnectBtn.addEventListener('click', () => {
-        emitCastEvent('end', {});
-        closeFullscreenReceiverTheater('Disconnected live cast');
-      });
+      e.preventDefault();
+      e.stopPropagation();
+      emitCastEvent('end', {});
+      closeFullscreenReceiverTheater('Disconnected live screen share');
+      return;
     }
 
-    // 7. Reaction Emoji Buttons
-    const emojiBtns = document.querySelectorAll('.viev-reaction-emoji-btn');
-    emojiBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const emoji = btn.textContent.trim();
-        window.vievAirCast.sendReaction(emoji);
-      });
-    });
-  });
+    // 10. Reaction Emoji Buttons
+    const emojiBtn = e.target.closest('.viev-reaction-emoji-btn');
+    if (emojiBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const emoji = emojiBtn.textContent.trim();
+      window.vievAirCast.sendReaction(emoji);
+      return;
+    }
+
+    // 11. Modal Backdrop Click -> Close
+    const modal = document.getElementById('cinema-cast-modal');
+    if (modal && e.target === modal) {
+      closeCastModal();
+    }
+  }, true); // useCapture = true: catches clicks first before any other handler
+
+  // Mobile Touch Support
+  document.addEventListener('touchend', (e) => {
+    const castHeaderBtn = e.target.closest('#yt-header-cast-btn') || e.target.closest('.yt-cast-btn');
+    if (castHeaderBtn) {
+      e.preventDefault();
+      openCastModal();
+    }
+  }, { passive: false, capture: true });
 
 })();
