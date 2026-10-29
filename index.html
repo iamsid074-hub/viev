@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="css/liquid-glass.css">
   <link rel="stylesheet" href="css/apple-intro.css?v=3.4">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
-  <link rel="stylesheet" href="css/aircast.css?v=3.2">
+  <link rel="stylesheet" href="css/aircast.css?v=3.3">
 </head>
 <body>
 
@@ -2025,13 +2025,13 @@ tu h digi meri mai hu pyar tera .
       <span class="viev-hud-label">🖥️ SHARING SCREEN</span>
     </div>
     <span class="viev-hud-partner" id="viev-hud-partner-name">Live Screen Share (Active)</span>
-    <button type="button" class="viev-hud-stop-btn" id="viev-hud-stop-btn">Stop Sharing ✕</button>
+    <button type="button" class="viev-hud-stop-btn" id="viev-hud-stop-btn" onclick="if(window.vievAirCast){window.vievAirCast.stopCast(true);}">Stop Sharing ✕</button>
   </div>
 
   <!-- VIEVS 2.0 SCREEN SHARE MODAL: WHO TO SHARE WITH -->
   <div class="cinema-cast-modal-backdrop" id="cinema-cast-modal" role="dialog" aria-modal="true">
     <div class="cinema-cast-sheet">
-      <button type="button" class="cinema-cast-close-btn" id="cinema-cast-close-btn" aria-label="Close">✕</button>
+      <button type="button" class="cinema-cast-close-btn" id="cinema-cast-close-btn" onclick="if(window.vievAirCast){window.vievAirCast.closeModal();}" aria-label="Close">✕</button>
 
       <!-- View A: Selection View -->
       <div id="cinema-cast-initial-view">
@@ -2079,7 +2079,7 @@ tu h digi meri mai hu pyar tera .
           </div>
         </div>
 
-        <button type="button" class="cinema-cast-start-btn" id="cinema-start-cast-btn">
+        <button type="button" class="cinema-cast-start-btn" id="cinema-start-cast-btn" onclick="if(window.vievAirCast){window.vievAirCast.startCast();}">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
             <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -2090,7 +2090,7 @@ tu h digi meri mai hu pyar tera .
           <span>Start Screen Share with Companion</span>
         </button>
 
-        <button type="button" class="cinema-cast-test-mode-btn" id="cinema-cast-test-mode-btn">
+        <button type="button" class="cinema-cast-test-mode-btn" id="cinema-cast-test-mode-btn" onclick="if(window.vievAirCast){window.vievAirCast.simulateTestReceiver();}">
           ✨ Simulate Incoming Screen Share (Test Receiver View)
         </button>
       </div>
@@ -2106,7 +2106,7 @@ tu h digi meri mai hu pyar tera .
         </div>
         <h4 class="cinema-cast-title" style="font-size: 18px;">Connecting Screen Share...</h4>
         <p class="cinema-cast-subtitle" id="cinema-cast-waiting-text">Sending screen share invitation... Waiting for acceptance.</p>
-        <button type="button" class="cinema-cast-cancel-btn" id="cinema-cancel-cast-btn">Cancel Request</button>
+        <button type="button" class="cinema-cast-cancel-btn" id="cinema-cancel-cast-btn" onclick="if(window.vievAirCast){window.vievAirCast.stopCast(true);}">Cancel Request</button>
       </div>
     </div>
   </div>
@@ -2132,10 +2132,10 @@ tu h digi meri mai hu pyar tera .
     </div>
 
     <div class="viev-invite-actions-row">
-      <button type="button" class="viev-invite-accept-btn" id="viev-invite-accept-btn">
+      <button type="button" class="viev-invite-accept-btn" id="viev-invite-accept-btn" onclick="if(window.vievAirCast){window.vievAirCast.acceptInvite();}">
         <span>Watch Screen ▶</span>
       </button>
-      <button type="button" class="viev-invite-decline-btn" id="viev-invite-decline-btn">
+      <button type="button" class="viev-invite-decline-btn" id="viev-invite-decline-btn" onclick="if(window.vievAirCast){window.vievAirCast.declineInvite();}">
         <span>Later</span>
       </button>
     </div>
@@ -2167,7 +2167,7 @@ tu h digi meri mai hu pyar tera .
           <span id="viev-audio-pill-icon">🔈</span>
           <span id="viev-audio-pill-label">Sound Muted</span>
         </button>
-        <button type="button" class="viev-fullscreen-hud-btn disconnect-btn" id="viev-fullscreen-disconnect-btn" title="Disconnect Screen Share">
+        <button type="button" class="viev-fullscreen-hud-btn disconnect-btn" id="viev-fullscreen-disconnect-btn" onclick="if(window.vievAirCast){window.vievAirCast.stopCast(true);}" title="Disconnect Screen Share">
           <span>Disconnect ✕</span>
         </button>
       </div>
@@ -2275,7 +2275,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/navbar.js?v=2.5"></script>
   <script src="js/youtube-data.js?v=2.0"></script>
   <script src="js/cinema.js?v=4.3"></script>
-  <script src="js/cast-engine.js?v=3.2"></script>
+  <script src="js/cast-engine.js?v=3.3"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
   <script src="js/app.js?v=3.7"></script>
 </body>

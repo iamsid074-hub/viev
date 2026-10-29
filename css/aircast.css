@@ -178,10 +178,11 @@
 
 .cinema-cast-modal-backdrop.is-open {
   opacity: 1;
-  pointer-events: all;
+  pointer-events: auto !important;
 }
 
 .cinema-cast-sheet {
+  pointer-events: auto !important;
   position: relative;
   width: 100%;
   max-width: 440px;
@@ -397,6 +398,7 @@
   font-weight: 700;
   letter-spacing: -0.2px;
   cursor: pointer;
+  pointer-events: auto !important;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -363,9 +363,13 @@
   }
 
   // --- SCREEN SHARE MODAL (WHO TO SHARE WITH) ---
+  let modalOpenedTimestamp = 0;
+
   function openCastModal() {
     const modal = document.getElementById('cinema-cast-modal');
     if (!modal) return;
+
+    modalOpenedTimestamp = Date.now();
 
     try {
       const { companion } = getProfiles();
@@ -415,6 +419,11 @@
   }
 
   function closeCastModal() {
+    // Guard against ghost-clicks / tap bounces immediately after opening
+    if (Date.now() - modalOpenedTimestamp < 450) {
+      return;
+    }
+
     const modal = document.getElementById('cinema-cast-modal');
     if (modal) {
       modal.classList.remove('is-open');
@@ -1112,20 +1121,11 @@
       return;
     }
 
-    // 11. Modal Backdrop Click -> Close
+    // 11. Modal Backdrop Click -> Close (Only if clicking backdrop directly and not right after opening)
     const modal = document.getElementById('cinema-cast-modal');
-    if (modal && e.target === modal) {
+    if (modal && e.target === modal && (Date.now() - modalOpenedTimestamp > 450)) {
       closeCastModal();
     }
   }, true); // useCapture = true: catches clicks first before any other handler
-
-  // Mobile Touch Support
-  document.addEventListener('touchend', (e) => {
-    const castHeaderBtn = e.target.closest('#yt-header-cast-btn') || e.target.closest('.yt-cast-btn');
-    if (castHeaderBtn) {
-      e.preventDefault();
-      openCastModal();
-    }
-  }, { passive: false, capture: true });
 
 })();
