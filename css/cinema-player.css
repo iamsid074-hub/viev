@@ -300,7 +300,8 @@
   justify-content: space-between;
 }
 
-.controls-left, .controls-right {
+.controls-left,
+.controls-right {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -719,8 +720,17 @@
 }
 
 @keyframes syncDotPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.45; transform: scale(0.85); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
 }
 
 /* Apple Spotlight Search & URL Paste Input Bar */
@@ -888,10 +898,25 @@
 }
 
 @keyframes reactionFloatUp {
-  0% { opacity: 0; transform: translateY(0) scale(0.6); }
-  20% { opacity: 1; transform: translateY(-30px) scale(1.2); }
-  80% { opacity: 0.9; transform: translateY(-110px) scale(1); }
-  100% { opacity: 0; transform: translateY(-160px) scale(0.8); }
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translateY(-30px) scale(1.2);
+  }
+
+  80% {
+    opacity: 0.9;
+    transform: translateY(-110px) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-160px) scale(0.8);
+  }
 }
 
 /* Floating Reactions Bar */
@@ -1451,7 +1476,9 @@
 }
 
 @keyframes feedSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .cinema-feed-grid {
@@ -1854,8 +1881,15 @@
 }
 
 @keyframes ytSearchSlide {
-  from { opacity: 0; transform: translateY(-12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .yt-search-nav {
@@ -2523,10 +2557,23 @@
 }
 
 @keyframes ytLogoSpinBounce {
-  0% { transform: scale(1); }
-  35% { transform: scale(0.88); opacity: 0.7; }
-  65% { transform: scale(1.06); opacity: 1; }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  35% {
+    transform: scale(0.88);
+    opacity: 0.7;
+  }
+
+  65% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .yt-official-logo-wrap svg {
@@ -2635,6 +2682,7 @@
     opacity: 0;
     transform: scale(0.92) translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -2917,49 +2965,20 @@
    ACTIVE VIDEO THEATER: APPLE VISION PRO GLASS + AMBILIGHT
    Exact replica of VIEVS Music Player Card (Image 2)
    ========================================================= */
-/* =========================================================
-   WHEN VIDEO PLAYER IS ACTIVE:
-   1. Remove top header bar (.yt-mobile-app-header)
-   2. Move player right to the top (compact safe-area padding)
-   3. Keep player fixed/sticky at the top during scrolling
-   4. Clear boundary line set just below channel icon (YouTube style)
-   ========================================================= */
-.cinema-player-viewport.theater-active:not(.miniplayer-mode) {
-  padding-top: 0 !important;
-  gap: 0 !important;
-}
-
-/* Remove top bar completely when video player is on */
+/* In theater mode, keep the top bar accessible with Back button, Logo, and Search */
 .cinema-player-viewport.theater-active:not(.miniplayer-mode) .yt-mobile-app-header {
-  display: none !important;
+  display: flex !important;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
-/* Fixed/Sticky Player Stage at Top (Exact YouTube Mobile UI) */
 .cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-theater-stage {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 80 !important;
-  background: #000000 !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  padding-top: calc(var(--sat, 12px) + 6px) !important;
-  padding-bottom: 12px !important;
-  margin-left: -16px !important;
-  margin-right: -16px !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
-  width: calc(100% + 32px) !important;
-  box-sizing: border-box !important;
-  /* YouTube boundary divider line right below channel icon / actions row */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
-}
-
-/* Feed section positioning under sticky player: scrolls freely right up to boundary line */
-.cinema-player-viewport.theater-active:not(.miniplayer-mode) .cinema-feed-section {
-  position: relative !important;
-  z-index: 10 !important;
-  padding-top: 14px !important;
+  margin-top: 4px;
+  padding-top: 0;
 }
 
 /* In miniplayer mode, the home screen and top bar are fully visible */
@@ -2995,6 +3014,7 @@
     opacity: 0;
     transform: scale(0.96) translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -3066,13 +3086,11 @@
   pointer-events: none;
   z-index: 2;
   border: 1.5px solid rgba(255, 255, 255, 0.28);
-  background: linear-gradient(
-    135deg, 
-    rgba(255, 255, 255, 0.28) 0%, 
-    rgba(255, 255, 255, 0.06) 30%, 
-    rgba(255, 255, 255, 0.02) 65%, 
-    rgba(255, 255, 255, 0.22) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0.06) 30%,
+      rgba(255, 255, 255, 0.02) 65%,
+      rgba(255, 255, 255, 0.22) 100%);
   box-shadow:
     0 16px 42px rgba(0, 0, 0, 0.85),
     inset 0 1px 1px rgba(255, 255, 255, 0.45),
@@ -3112,7 +3130,8 @@
   border-radius: 0;
   filter: none !important;
   -webkit-filter: none !important;
-  pointer-events: none !important; /* Disables all native YouTube hover overlays */
+  pointer-events: none !important;
+  /* Disables all native YouTube hover overlays */
 }
 
 .cinema-card-reflection {
@@ -3127,12 +3146,17 @@
   position: absolute;
   inset: 0;
   z-index: 10;
-  cursor: pointer;
-  touch-action: manipulation;
-  background: rgba(0, 0, 0, 0.001); /* ensures iOS & Android touch hits surface reliably */
+  cursor: grab;
+  touch-action: none;
+  background: rgba(0, 0, 0, 0.001);
+  /* CRITICAL: ensures iOS & Android touch hits surface reliably */
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+.cinema-player-drag-surface:active {
+  cursor: grabbing;
 }
 
 /* =========================================================
@@ -3152,14 +3176,13 @@
   justify-content: space-between;
   padding: 10px 14px 6px 14px;
   box-sizing: border-box;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.65) 0%,
-    rgba(0, 0, 0, 0.15) 24%,
-    rgba(0, 0, 0, 0.1) 60%,
-    rgba(0, 0, 0, 0.75) 100%
-  );
-  pointer-events: none; /* Let drag and tap pass through to dragSurface! */
+  background: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0.65) 0%,
+      rgba(0, 0, 0, 0.15) 24%,
+      rgba(0, 0, 0, 0.1) 60%,
+      rgba(0, 0, 0, 0.75) 100%);
+  pointer-events: none;
+  /* Let drag and tap pass through to dragSurface! */
   opacity: 1;
   transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
   visibility: visible;
@@ -3169,7 +3192,8 @@
 .cinema-custom-player-controls .cinema-ctrl-play-btn,
 .cinema-custom-player-controls .cinema-ctrl-fullscreen-btn,
 .cinema-custom-player-controls .cinema-ctrl-scrub-container {
-  pointer-events: auto; /* Only buttons intercept touches */
+  pointer-events: auto;
+  /* Only buttons intercept touches */
 }
 
 .cinema-custom-player-controls.is-hidden {
@@ -3280,7 +3304,8 @@
 }
 
 .cinema-ctrl-play-btn.is-paused svg {
-  margin-left: 2px; /* Optical center compensation for play triangle */
+  margin-left: 2px;
+  /* Optical center compensation for play triangle */
 }
 
 .cinema-ctrl-play-btn:hover {
@@ -3398,8 +3423,6 @@
    ========================================================= */
 .cinema-theater-stage.is-miniplayer {
   position: fixed !important;
-  top: auto !important;
-  left: auto !important;
   bottom: calc(var(--sab, 16px) + 80px) !important;
   right: 16px !important;
   width: 175px !important;
@@ -3407,9 +3430,6 @@
   height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
-  border: none !important;
-  border-bottom: none !important;
-  background: #000000 !important;
   z-index: 100000 !important;
   border-radius: 14px !important;
   cursor: pointer !important;
@@ -3417,21 +3437,22 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 0 1.5px rgba(255, 255, 255, 0.28) !important;
   animation: miniplayerPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              right 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.25s ease !important;
-}
-
-@media (min-width: 441px) {
-  .cinema-theater-stage.is-miniplayer {
-    right: max(16px, calc((100vw - 440px) / 2 + 16px)) !important;
-  }
+    bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    right 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.25s ease !important;
 }
 
 @keyframes miniplayerPop {
-  0% { transform: translate(-20px, -40px) scale(1.15); opacity: 0.85; }
-  100% { transform: translate(0, 0) scale(1); opacity: 1; }
+  from {
+    transform: scale(0.92);
+    opacity: 0.85;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .cinema-theater-stage.is-miniplayer .cinema-player-artwork-container {
@@ -3439,10 +3460,6 @@
   width: 100% !important;
   aspect-ratio: 16 / 9 !important;
   overflow: hidden !important;
-  transform: none !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
 }
 
 .cinema-theater-stage.is-miniplayer .cinema-video-card-stage {
@@ -3527,15 +3544,37 @@
 }
 
 @keyframes seekRippleFlash {
-  0% { opacity: 0; transform: scale(0.85); }
-  25% { opacity: 1; transform: scale(1.05); }
-  75% { opacity: 0.9; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.08); }
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  25% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  75% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
 }
 
 @keyframes seekChevronPulse {
-  from { transform: translateX(0); opacity: 0.75; }
-  to { transform: translateX(4px); opacity: 1; }
+  from {
+    transform: translateX(0);
+    opacity: 0.75;
+  }
+
+  to {
+    transform: translateX(4px);
+    opacity: 1;
+  }
 }
 
 /* =========================================================
@@ -3715,14 +3754,13 @@
   justify-content: center;
   gap: 2px;
   min-width: 0;
-  flex: 1;
+  flex-shrink: 1;
 }
 
 .cinema-yt-channel-name-row {
   display: flex;
   align-items: center;
   gap: 4px;
-  min-width: 0;
 }
 
 .cinema-yt-channel-name {
@@ -3733,7 +3771,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 180px;
+  max-width: 130px;
   letter-spacing: -0.15px;
 }
 
@@ -3750,7 +3788,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: block;
 }
 
 /* Subscribe Pill Button (Image 5 Replica) */
@@ -4125,7 +4162,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* =========================================================
@@ -4146,8 +4185,13 @@
 }
 
 @keyframes fadeInModal {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .cinema-settings-sheet {
@@ -4163,8 +4207,13 @@
 }
 
 @keyframes sheetSlideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 .cinema-settings-pill-handle {
@@ -4316,6 +4365,3 @@
   font-weight: 700;
   color: #3ea6ff;
 }
-
-
-

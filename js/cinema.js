@@ -1368,6 +1368,25 @@ document.addEventListener('DOMContentLoaded', () => {
     launcherView.style.display = 'none';
     playerView.style.display = 'flex';
 
+    // Strictly ensure no black player is displayed on Home Feed
+    if (!autoPlayFirst) {
+      if (theaterStage) {
+        theaterStage.style.display = 'none';
+      }
+      playerView.classList.remove('theater-active');
+      playerView.classList.remove('miniplayer-mode');
+      if (iframe) iframe.src = '';
+    }
+
+    if (appHeader) {
+      appHeader.style.display = '';
+      appHeader.style.opacity = '1';
+    }
+    if (feedSection) {
+      feedSection.style.display = '';
+      feedSection.style.opacity = '1';
+    }
+
     if (urlInput) urlInput.value = '';
 
     syncYouTubeAccountUI();
