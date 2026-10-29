@@ -280,6 +280,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ctrlTimeDisplay) {
       ctrlTimeDisplay.textContent = `${formatTimeCode(videoCurrentSeconds)} / ${formatTimeCode(videoTotalSeconds)}`;
     }
+
+    if (window.vievAirCast && typeof window.vievAirCast.notifyPlaybackState === 'function') {
+      window.vievAirCast.notifyPlaybackState({
+        id: currentPlayingVideoId,
+        title: (theaterTitle && theaterTitle.textContent) || 'YouTube Video',
+        channel: (theaterChannel && theaterChannel.textContent) || 'YouTube',
+        avatar: (theaterAvatar && theaterAvatar.src) || '',
+        currentTime: videoCurrentSeconds,
+        duration: videoTotalSeconds,
+        isPlaying: isVideoPlaying
+      });
+    }
   }
 
   function sendIframeCommand(func, args) {
@@ -367,6 +379,18 @@ document.addEventListener('DOMContentLoaded', () => {
       stopPlaybackTicker();
       showCustomControls();
       clearTimeout(controlsAutoHideTimer);
+    }
+
+    if (window.vievAirCast && typeof window.vievAirCast.notifyPlaybackState === 'function') {
+      window.vievAirCast.notifyPlaybackState({
+        id: currentPlayingVideoId,
+        title: (theaterTitle && theaterTitle.textContent) || 'YouTube Video',
+        channel: (theaterChannel && theaterChannel.textContent) || 'YouTube',
+        avatar: (theaterAvatar && theaterAvatar.src) || '',
+        currentTime: videoCurrentSeconds,
+        duration: videoTotalSeconds,
+        isPlaying: play
+      });
     }
   }
 
@@ -1049,6 +1073,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const screen = document.getElementById('cinema-screen');
     if (screen) {
       screen.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    if (window.vievAirCast && typeof window.vievAirCast.notifyPlaybackState === 'function') {
+      window.vievAirCast.notifyPlaybackState({
+        id: videoId,
+        title: title || 'YouTube Video',
+        channel: channel || 'YouTube',
+        avatar: avatar || '',
+        currentTime: 1,
+        duration: videoTotalSeconds,
+        isPlaying: true
+      });
     }
   }
 

@@ -6,6 +6,10 @@
       "dest": "/api/youtube/$1.js"
     },
     {
+      "src": "/api/cast/(.*)",
+      "dest": "/api/cast/$1.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }

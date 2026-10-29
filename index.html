@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="css/liquid-glass.css">
   <link rel="stylesheet" href="css/apple-intro.css?v=3.4">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
+  <link rel="stylesheet" href="css/aircast.css?v=2.0">
 </head>
 <body>
 
@@ -730,6 +731,16 @@ tu h digi meri mai hu pyar tera .
             <!-- Right Action Icons: Search & Account Avatar -->
             <div class="yt-header-actions-group">
 
+              <!-- VIEVS 2.0 AirCast Button -->
+              <button type="button" class="yt-header-icon-btn yt-cast-btn" id="yt-header-cast-btn" title="Cast YouTube Screen (VIEVS 2.0 AirCast)" aria-label="Cast to Companion">
+                <div class="yt-cast-waves-aura"></div>
+                <svg class="yt-cast-icon-svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+                  <line x1="2" y1="20" x2="2.01" y2="20"></line>
+                </svg>
+                <span class="yt-cast-live-badge" id="yt-cast-active-dot"></span>
+              </button>
+
               <!-- Search Toggle Icon -->
               <button type="button" class="yt-header-icon-btn" id="yt-header-search-toggle" title="Search" aria-label="Search">
                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1398,47 +1409,47 @@ tu h digi meri mai hu pyar tera .
               <div class="apple-update-card">
                 <div class="update-card-top-row">
                   <div class="update-icon-squircle">
-                    <span class="update-icon-ver" id="avail-update-ver-icon">1.3</span>
+                    <span class="update-icon-ver" id="avail-update-ver-icon">2.0</span>
                   </div>
                   <div class="update-meta-wrap">
-                    <h3 class="update-os-title" id="avail-update-title">Digi OS 1.3</h3>
+                    <h3 class="update-os-title" id="avail-update-title">Digi OS 2.0</h3>
                     <span class="update-company-line">VIEV Inc.</span>
-                    <span class="update-size-line" id="avail-update-size">186.4 MB</span>
+                    <span class="update-size-line" id="avail-update-size">298.6 MB</span>
                   </div>
                 </div>
 
                 <div class="update-card-body">
                   <p class="update-lead-text" id="avail-update-lead">
-                    This update includes major new features, smoother performance, and background improvements:
+                    The revolutionary 2.0 update exclusively crafted for Princess Digi: Live AirCast companion screen & sound mirror, In-App YouTube Cinema Lounge, and Liquid Glass 2.0:
                   </p>
                   
                   <div class="update-features-list">
                     <div class="update-feature-item">
-                      <span class="feature-bullet-icon">🎵</span>
+                      <span class="feature-bullet-icon">📡</span>
                       <div class="feature-text-block">
-                        <strong class="feature-text-title">Background Music Playback</strong>
-                        <span class="feature-text-desc">Phone lock hone ya app band hone par bhi gaane non-stop play honge.</span>
+                        <strong class="feature-text-title">VIEVS 2.0 AirCast (Live Screen & Sound Mirror)</strong>
+                        <span class="feature-text-desc">Apni YouTube screen ko direct Virat ke sath live beam karein. Video, high-fi sound aur floating emoji reactions real-time me dono screens par sync honge.</span>
                       </div>
                     </div>
                     <div class="update-feature-item">
-                      <span class="feature-bullet-icon">📱</span>
+                      <span class="feature-bullet-icon">🍿</span>
                       <div class="feature-text-block">
-                        <strong class="feature-text-title">Lock Screen & Bluetooth Player</strong>
-                        <span class="feature-text-desc">Phone ke lock screen aur car/earphones par album poster, song title aur controls show honge.</span>
+                        <strong class="feature-text-title">In-App YouTube Cinema Lounge</strong>
+                        <span class="feature-text-desc">Digi ke romantic songs & trending favorites ka personalized feed, real video search aur zero popups.</span>
                       </div>
                     </div>
                     <div class="update-feature-item">
-                      <span class="feature-bullet-icon">🎤</span>
+                      <span class="feature-bullet-icon">🔽</span>
                       <div class="feature-text-block">
-                        <strong class="feature-text-title">Real-Time Synced Lyrics</strong>
-                        <span class="feature-text-desc">Gaane ke har beat ke sath lyrics real-time me Apple Music style me auto-scroll honge.</span>
+                        <strong class="feature-text-title">Gesture Drag-to-Miniplayer</strong>
+                        <span class="feature-text-desc">Player ko smoothly drag karke floating corner picture-in-picture miniplayer me convert karein.</span>
                       </div>
                     </div>
                     <div class="update-feature-item">
                       <span class="feature-bullet-icon">✨</span>
                       <div class="feature-text-block">
-                        <strong class="feature-text-title">Apple Smooth Animations & Haptics</strong>
-                        <span class="feature-text-desc">Puri app me fluid transitions, gentle touch vibration aur faster response time.</span>
+                        <strong class="feature-text-title">Liquid Glass 2.0 & Tactile Physics</strong>
+                        <span class="feature-text-desc">Apple Vision Pro style specular glass rim, dynamic ambient glow projection aur super-fast 60fps response.</span>
                       </div>
                     </div>
                   </div>
@@ -1446,7 +1457,7 @@ tu h digi meri mai hu pyar tera .
                   <p class="update-sub-text">
                     For information on the private features of Digi OS updates, please visit:
                   </p>
-                  <a href="https://viev.digi.space/os-1.3" target="_blank" class="update-website-link">https://viev.digi.space/os-1.3</a>
+                  <a href="https://viev.digi.space/os-2.0" target="_blank" class="update-website-link">https://viev.digi.space/os-2.0</a>
                 </div>
 
                 <div class="update-card-actions">
@@ -1497,16 +1508,16 @@ tu h digi meri mai hu pyar tera .
               <!-- Collapsible More Details Sheet / Box -->
               <div class="uptodate-details-drawer" id="uptodate-details-drawer" style="display: none;">
                 <div class="uptodate-details-header">
-                  <span class="details-drawer-title">What's in Digi OS 1.3</span>
+                  <span class="details-drawer-title">What's in Digi OS 2.0</span>
                   <button type="button" class="details-close-btn" id="details-close-btn">Done</button>
                 </div>
                 <div class="uptodate-details-content">
-                  <p class="details-lead">What was updated in Digi OS 1.3:</p>
+                  <p class="details-lead">What was updated in Digi OS 2.0:</p>
                   <ul class="details-list">
-                    <li><strong>Background Music:</strong> Phone lock hone aur app switch karne par bhi gaane non-stop play hote hain.</li>
-                    <li><strong>Lock Screen & Bluetooth:</strong> Lock screen par full album poster, music slider aur controls.</li>
-                    <li><strong>Synced Lyrics:</strong> Har beat ke sath real-time line-by-line auto-scroll lyrics.</li>
-                    <li><strong>Apple Tactile & Speed:</strong> Smooth fluid animations aur gentle haptic vibration touch response.</li>
+                    <li><strong>VIEVS 2.0 AirCast:</strong> Live stream your YouTube screen to Virat with synchronized sound and floating emoji reactions.</li>
+                    <li><strong>Real YouTube Cinema:</strong> In-app YouTube lounge with Digi's romantic feed & favorite creators.</li>
+                    <li><strong>Gesture Miniplayer:</strong> Drag video downwards into floating PiP miniplayer.</li>
+                    <li><strong>Liquid Glass 2.0:</strong> Next-generation refractive glass, specular highlights, and ultra-fluid animations.</li>
                   </ul>
                 </div>
               </div>
@@ -2004,11 +2015,185 @@ tu h digi meri mai hu pyar tera .
     </div>
   </div>
 
+  <!-- VIEVS 2.0 AIRCAST: CASTER FLOATING ISLAND HUD -->
+  <div class="viev-casting-floating-hud" id="viev-casting-floating-hud">
+    <div class="viev-hud-beacon">
+      <div class="viev-hud-dot"></div>
+      <span class="viev-hud-label">📡 CASTING LIVE</span>
+    </div>
+    <span class="viev-hud-partner" id="viev-hud-partner-name">Casting to Companion</span>
+    <button type="button" class="viev-hud-stop-btn" id="viev-hud-stop-btn">Stop Cast ✕</button>
+  </div>
+
+  <!-- VIEVS 2.0 AIRCAST MODAL: WHO TO CAST WITH -->
+  <div class="cinema-cast-modal-backdrop" id="cinema-cast-modal" role="dialog" aria-modal="true">
+    <div class="cinema-cast-sheet">
+      <button type="button" class="cinema-cast-close-btn" id="cinema-cast-close-btn" aria-label="Close">✕</button>
+
+      <!-- View A: Selection View -->
+      <div id="cinema-cast-initial-view">
+        <div class="cinema-cast-header">
+          <div class="cinema-cast-icon-orb">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+              <line x1="2" y1="20" x2="2.01" y2="20"></line>
+            </svg>
+          </div>
+          <h3 class="cinema-cast-title" id="cinema-cast-title">VIEVS 2.0 AirCast</h3>
+          <p class="cinema-cast-subtitle">Beam your YouTube screen in real-time with full synchronized audio & video.</p>
+        </div>
+
+        <!-- Companion Card (Digi or Virat) -->
+        <div class="cinema-cast-partner-card" id="cinema-cast-partner-card">
+          <div class="cinema-cast-partner-avatar-wrap">
+            <img src="song/virat_plays_avatar.png" alt="Companion" class="cinema-cast-partner-avatar" id="cast-partner-avatar">
+            <div class="cinema-cast-partner-online-dot"></div>
+          </div>
+          <div class="cinema-cast-partner-info">
+            <span class="cinema-cast-partner-name" id="cast-partner-name">Virat Plays</span>
+            <span class="cinema-cast-partner-handle" id="cast-partner-handle">@viratplaystdm • VIRAT</span>
+            <span class="cinema-cast-partner-status" id="cast-partner-status">🟢 Online on VIEVS • Ready for Cast</span>
+          </div>
+          <div class="cinema-cast-check-badge">✓</div>
+        </div>
+
+        <!-- Features Row -->
+        <div class="cinema-cast-features-row">
+          <div class="cinema-cast-feat-pill">
+            <span class="cinema-cast-feat-icon">🔊</span>
+            <span class="cinema-cast-feat-text">High-Fi Audio</span>
+          </div>
+          <div class="cinema-cast-feat-pill">
+            <span class="cinema-cast-feat-icon">⚡</span>
+            <span class="cinema-cast-feat-text">Zero Latency</span>
+          </div>
+          <div class="cinema-cast-feat-pill">
+            <span class="cinema-cast-feat-icon">🖥️</span>
+            <span class="cinema-cast-feat-text">Full Screen</span>
+          </div>
+        </div>
+
+        <button type="button" class="cinema-cast-start-btn" id="cinema-start-cast-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+            <line x1="2" y1="20" x2="2.01" y2="20"></line>
+          </svg>
+          <span>Start Live Cast to Companion</span>
+        </button>
+
+        <button type="button" class="cinema-cast-test-mode-btn" id="cinema-cast-test-mode-btn">
+          ✨ Simulate Incoming Cast (Test Receiver Experience)
+        </button>
+      </div>
+
+      <!-- View B: Waiting for Companion to Accept -->
+      <div class="cinema-cast-waiting-state" id="cinema-cast-waiting-state">
+        <div class="cinema-cast-radar">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#007aff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path>
+            <line x1="2" y1="20" x2="2.01" y2="20"></line>
+          </svg>
+        </div>
+        <h4 class="cinema-cast-title" style="font-size: 18px;">Connecting AirCast...</h4>
+        <p class="cinema-cast-subtitle" id="cinema-cast-waiting-text">Beaming invitation to companion... Waiting for acceptance.</p>
+        <button type="button" class="cinema-cast-cancel-btn" id="cinema-cancel-cast-btn">Cancel Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEVS 2.0 AIRCAST: INCOMING INVITATION OVERLAY BANNER -->
+  <div class="viev-cast-invitation-overlay" id="viev-cast-invitation-overlay" role="alert">
+    <div class="viev-invite-top-row">
+      <div class="viev-invite-avatar-pulse">
+        <img src="song/Screenshot 2026-10-24 224431.png" alt="Digi" class="viev-invite-avatar" id="viev-invite-avatar">
+        <div class="viev-invite-avatar-ring"></div>
+      </div>
+      <div class="viev-invite-meta">
+        <div class="viev-invite-badge">✨ VIEVS 2.0 AIRCAST</div>
+        <div class="viev-invite-heading" id="viev-invite-heading">Digi wants to show you something ✨</div>
+        <div class="viev-invite-subtext" id="viev-invite-subtext">Digi is inviting you to watch her YouTube screen live with sound.</div>
+      </div>
+    </div>
+
+    <!-- Video Preview Card -->
+    <div class="viev-invite-preview-card" id="viev-invite-preview-card" style="display: none;">
+      <img src="" alt="" class="viev-invite-thumb" id="viev-invite-thumb">
+      <span class="viev-invite-video-title" id="viev-invite-video-title">YouTube Video</span>
+    </div>
+
+    <div class="viev-invite-actions-row">
+      <button type="button" class="viev-invite-accept-btn" id="viev-invite-accept-btn">
+        <span>Accept & Watch Fullscreen ▶</span>
+      </button>
+      <button type="button" class="viev-invite-decline-btn" id="viev-invite-decline-btn">
+        <span>Later</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- VIEVS 2.0 AIRCAST: FULLSCREEN LIVE MIRROR THEATER -->
+  <div class="viev-cast-fullscreen-theater" id="viev-cast-fullscreen-theater">
+    <div class="viev-fullscreen-glow-layer" id="viev-fullscreen-glow-layer"></div>
+
+    <!-- Top HUD Bar -->
+    <div class="viev-fullscreen-top-hud">
+      <div class="viev-fullscreen-hud-left">
+        <div class="viev-fullscreen-live-badge">
+          <div class="viev-fullscreen-live-dot"></div>
+          <span>LIVE MIRROR</span>
+        </div>
+        <div class="viev-fullscreen-user-pill">
+          <img src="song/Screenshot 2026-10-24 224431.png" alt="Caster" class="viev-fullscreen-user-avatar" id="viev-fullscreen-user-avatar">
+          <span class="viev-fullscreen-user-name" id="viev-fullscreen-user-name">Digi's Screen</span>
+        </div>
+      </div>
+
+      <div class="viev-fullscreen-title-wrap">
+        <div class="viev-fullscreen-video-title" id="viev-fullscreen-video-title">Connecting Stream...</div>
+      </div>
+
+      <div class="viev-fullscreen-hud-right">
+        <button type="button" class="viev-fullscreen-hud-btn" id="viev-fullscreen-exit-btn" title="Exit Fullscreen">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="4 14 10 14 10 20"></polyline>
+            <polyline points="20 10 14 10 14 4"></polyline>
+            <line x1="14" y1="10" x2="21" y2="3"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+          <span>Exit</span>
+        </button>
+        <button type="button" class="viev-fullscreen-hud-btn disconnect-btn" id="viev-fullscreen-disconnect-btn" title="Disconnect Cast">
+          <span>Disconnect ✕</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Stage -->
+    <div class="viev-fullscreen-stage">
+      <div class="viev-fullscreen-video-wrap" id="viev-fullscreen-video-wrap">
+        <!-- Live iframe injected dynamically -->
+      </div>
+    </div>
+
+    <!-- Bottom Reaction Bar -->
+    <div class="viev-fullscreen-reaction-dock">
+      <div class="viev-reaction-pill-bar">
+        <button type="button" class="viev-reaction-emoji-btn" title="Send Love">❤️</button>
+        <button type="button" class="viev-reaction-emoji-btn" title="Fire">🔥</button>
+        <button type="button" class="viev-reaction-emoji-btn" title="Laugh">😂</button>
+        <button type="button" class="viev-reaction-emoji-btn" title="Applause">👏</button>
+        <button type="button" class="viev-reaction-emoji-btn" title="Heart Eyes">😍</button>
+        <button type="button" class="viev-reaction-emoji-btn" title="Magic Sparkles">✨</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/apple-welcome.js"></script>
   <script src="js/daily-note.js?v=2.7"></script>
   <script src="js/navbar.js?v=2.5"></script>
   <script src="js/youtube-data.js?v=2.0"></script>
   <script src="js/cinema.js?v=3.9"></script>
+  <script src="js/cast-engine.js?v=2.0"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
   <script src="js/app.js?v=3.6"></script>
 </body>

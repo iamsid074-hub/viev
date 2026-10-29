@@ -233,10 +233,133 @@ function getDigiPersonalFeed(forceRefresh, callback) {
   });
 }
 
+// In-memory VIEVS 2.0 AirCast Real-Time Synchronization Session
+let activeCastSession = {
+  active: false,
+  caster: null,
+  target: null,
+  status: 'idle', // 'idle' | 'invited' | 'accepted' | 'declined' | 'ended'
+  inviteId: null,
+  lastUpdate: Date.now(),
+  video: {
+    id: null,
+    title: '',
+    channel: '',
+    avatar: '',
+    currentTime: 0,
+    duration: 0,
+    isPlaying: false
+  },
+  reaction: null
+};
+
+const castSseClients = new Set();
+
+function broadcastCastEvent(eventType, payload) {
+  const data = `event: ${eventType}\ndata: ${JSON.stringify(payload || activeCastSession)}\n\n`;
+  for (const client of castSseClients) {
+    try {
+      client.write(data);
+    } catch (_) {
+      castSseClients.delete(client);
+    }
+  }
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
   const pathname = parsedUrl.pathname;
   const forceRefresh = parsedUrl.query.refresh === '1' || parsedUrl.query.reload === '1';
+
+  // 0. VIEVS 2.0 AirCast Real-Time Signaling Endpoints
+  if (pathname === '/api/cast/events') {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.write(`event: init\ndata: ${JSON.stringify(activeCastSession)}\n\n`);
+    castSseClients.add(res);
+
+    req.on('close', () => {
+      castSseClients.delete(res);
+    });
+    return;
+  }
+
+  if (pathname === '/api/cast/status') {
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'no-cache'
+    });
+    res.end(JSON.stringify({ success: true, session: activeCastSession }));
+    return;
+  }
+
+  if (pathname === '/api/cast/action' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const action = payload.action;
+
+        if (action === 'invite') {
+          activeCastSession = {
+            active: true,
+            caster: payload.caster,
+            target: payload.target,
+            status: 'invited',
+            inviteId: 'cast_' + Date.now(),
+            lastUpdate: Date.now(),
+            video: payload.video || { id: null, title: '', channel: '', avatar: '', currentTime: 0, duration: 0, isPlaying: false },
+            reaction: null
+          };
+          broadcastCastEvent('invite', activeCastSession);
+        } else if (action === 'respond') {
+          if (payload.accepted) {
+            activeCastSession.status = 'accepted';
+            activeCastSession.lastUpdate = Date.now();
+            broadcastCastEvent('accepted', activeCastSession);
+          } else {
+            activeCastSession.status = 'declined';
+            activeCastSession.lastUpdate = Date.now();
+            broadcastCastEvent('declined', activeCastSession);
+            activeCastSession.active = false;
+          }
+        } else if (action === 'sync') {
+          if (activeCastSession.active) {
+            activeCastSession.video = Object.assign(activeCastSession.video || {}, payload.video || {});
+            activeCastSession.lastUpdate = Date.now();
+            broadcastCastEvent('sync', activeCastSession);
+          }
+        } else if (action === 'reaction') {
+          activeCastSession.reaction = payload.reaction;
+          broadcastCastEvent('reaction', { reaction: payload.reaction, from: payload.from });
+        } else if (action === 'end') {
+          activeCastSession.status = 'ended';
+          activeCastSession.active = false;
+          activeCastSession.lastUpdate = Date.now();
+          broadcastCastEvent('ended', activeCastSession);
+        }
+
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: true, session: activeCastSession }));
+      } catch (err) {
+        res.writeHead(400, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
 
   // 1. User Personal Feed Endpoint (Exact personal account feed: 3011 Digi vs 1711 Virat)
   if (pathname === '/api/youtube/my-feed') {
