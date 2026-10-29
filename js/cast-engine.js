@@ -96,6 +96,26 @@
     receiverMuted: true // Single Master Audio: Muted on receiver by default to prevent echo/lag!
   };
 
+  // Fast synchronization state
+  let lastServerScrollPost = 0;
+  let lastRenderedFeedSignature = '';
+  let mirrorScrollRaf = null;
+
+  function applyMirrorScroll(scrollTop, scrollRatio) {
+    if (mirrorScrollRaf) cancelAnimationFrame(mirrorScrollRaf);
+    mirrorScrollRaf = requestAnimationFrame(() => {
+      const scrollContainer = document.getElementById('viev-screenshare-clone-scroll');
+      if (!scrollContainer) return;
+
+      if (typeof scrollRatio === 'number') {
+        const maxScroll = Math.max(1, scrollContainer.scrollHeight - scrollContainer.clientHeight);
+        scrollContainer.scrollTop = Math.round(maxScroll * scrollRatio);
+      } else if (typeof scrollTop === 'number') {
+        scrollContainer.scrollTop = scrollTop;
+      }
+    });
+  }
+
   // Broadcast Channels & Server SSE Connection
   let broadcastChannel = null;
   if (typeof BroadcastChannel !== 'undefined') {
@@ -195,6 +215,13 @@
         break;
       }
 
+      case 'mirror_scroll': {
+        if (state.isReceiving) {
+          applyMirrorScroll(evt.scrollTop, evt.scrollRatio);
+        }
+        break;
+      }
+
       case 'sync': {
         if (state.isReceiving && evt.video) {
           syncReceiverPlayback(evt.video);
@@ -254,6 +281,7 @@
       es.addEventListener('declined', (e) => handleIncomingCastEvent({ action: 'declined', ...JSON.parse(e.data) }));
       es.addEventListener('respond', (e) => handleIncomingCastEvent({ action: 'respond', ...JSON.parse(e.data) }));
       es.addEventListener('mirror_state', (e) => handleIncomingCastEvent({ action: 'mirror_state', ...JSON.parse(e.data) }));
+      es.addEventListener('mirror_scroll', (e) => handleIncomingCastEvent({ action: 'mirror_scroll', ...JSON.parse(e.data) }));
       es.addEventListener('sync', (e) => handleIncomingCastEvent({ action: 'sync', ...JSON.parse(e.data) }));
       es.addEventListener('reaction', (e) => handleIncomingCastEvent({ action: 'reaction', ...JSON.parse(e.data) }));
       es.addEventListener('ended', (e) => handleIncomingCastEvent({ action: 'ended', ...JSON.parse(e.data) }));
@@ -790,18 +818,22 @@
       renderClonedFeedCards(screenState.feedCards);
     }
 
-    // 4. Synchronize Scroll Position
-    if (typeof screenState.scrollTop === 'number') {
-      const scrollContainer = document.getElementById('viev-screenshare-clone-scroll');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = screenState.scrollTop;
-      }
+    // 4. Synchronize Scroll Position (0ms instant tracking)
+    if (typeof screenState.scrollRatio === 'number' || typeof screenState.scrollTop === 'number') {
+      applyMirrorScroll(screenState.scrollTop, screenState.scrollRatio);
     }
   }
 
   function renderClonedFeedCards(cards) {
     const container = document.getElementById('viev-mirror-cards-container');
     if (!container) return;
+
+    // Cache / Memoize feed cards: Do NOT rebuild DOM if cards are already rendered!
+    const sig = cards.map(c => c.id || c.title).slice(0, 15).join('|');
+    if (sig === lastRenderedFeedSignature && container.children.length > 0) {
+      return; // 0ms early return, zero DOM manipulation!
+    }
+    lastRenderedFeedSignature = sig;
 
     let html = '';
     cards.forEach(card => {
@@ -838,6 +870,7 @@
     state.isReceiving = false;
     state.lastSyncedVideoId = null;
     state.activeInvite = null;
+    lastRenderedFeedSignature = '';
 
     const theater = document.getElementById('viev-cast-fullscreen-theater');
     if (theater) {
@@ -875,7 +908,44 @@
       spawnReactionParticle(emoji);
       emitCastEvent('reaction', { reaction: emoji });
     },
-    // Called whenever caster scrolls, clicks chips, or switches views
+    // Called whenever caster scrolls: 0ms BroadcastChannel + throttled network
+    notifyScroll: (scrollTop, scrollRatio) => {
+      if (!state.isCasting) return;
+      if (!state.currentScreenState) state.currentScreenState = {};
+      state.currentScreenState.scrollTop = scrollTop;
+      state.currentScreenState.scrollRatio = scrollRatio;
+
+      const payload = {
+        action: 'mirror_scroll',
+        scrollTop,
+        scrollRatio,
+        tabId: TAB_ID,
+        senderTabId: TAB_ID,
+        timestamp: Date.now()
+      };
+
+      // 1. Instant 0ms broadcast between local browser tabs
+      if (broadcastChannel) {
+        try { broadcastChannel.postMessage(payload); } catch (_) {}
+      }
+
+      // 2. Storage broadcast fallback
+      try {
+        localStorage.setItem('viev_aircast_event', JSON.stringify(payload));
+      } catch (_) {}
+
+      // 3. Throttled server POST (max 1 per 250ms) to prevent network lag
+      const now = Date.now();
+      if (now - lastServerScrollPost > 250) {
+        lastServerScrollPost = now;
+        fetch('/api/cast/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => {});
+      }
+    },
+    // Called whenever caster clicks chips or switches views
     notifyScreenState: (screenData) => {
       if (!state.isCasting) return;
       if (typeof window.getScreenShareSnapshot === 'function') {

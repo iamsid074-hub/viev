@@ -66,6 +66,15 @@ module.exports = (req, res) => {
         global.__activeCastSession.screenState = Object.assign(global.__activeCastSession.screenState || {}, payload.screenState || {});
         global.__activeCastSession.lastUpdate = Date.now();
       }
+    } else if (action === 'mirror_scroll') {
+      if (global.__activeCastSession) {
+        global.__activeCastSession.active = true;
+        global.__activeCastSession.status = 'mirror_scroll';
+        if (!global.__activeCastSession.screenState) global.__activeCastSession.screenState = {};
+        global.__activeCastSession.screenState.scrollTop = payload.scrollTop;
+        global.__activeCastSession.screenState.scrollRatio = payload.scrollRatio;
+        global.__activeCastSession.lastUpdate = Date.now();
+      }
     } else if (action === 'reaction') {
       global.__activeCastSession.reaction = payload.reaction;
     } else if (action === 'end' || action === 'stop') {

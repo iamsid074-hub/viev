@@ -973,33 +973,50 @@
   display: none;
 }
 
-/* In-App Mirrored Screen Viewport (Scroll locked to Sharer) */
+/* In-App Mirrored Screen Viewport (Scroll locked to Sharer, 1:1 mobile phone replica) */
 .viev-screenshare-clone-scroll {
+  position: relative;
   width: 100%;
   height: 100%;
-  max-width: 540px;
+  max-width: 440px;
   margin: 0 auto;
-  overflow-y: hidden !important; /* Receiver CANNOT scroll manually */
+  overflow-y: scroll !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
   background: #0f0f13;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
-  padding-bottom: 50px;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-radius: 26px 26px 0 0;
+  padding-bottom: 20px;
+  scroll-behavior: auto;
+}
+
+.viev-screenshare-clone-scroll::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 @media (max-width: 600px) {
   .viev-screenshare-clone-scroll {
     max-width: 100%;
+    border-radius: 0;
   }
 }
 
-/* Cloned YouTube Header */
+/* Cloned YouTube Header - Pinned at top */
 .viev-clone-app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
   background: rgba(15, 15, 19, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
 }
@@ -1044,12 +1061,17 @@
   object-fit: cover;
 }
 
-/* Cloned Category Chips */
+/* Cloned Category Chips - Pinned under header */
 .viev-clone-chips-bar {
+  position: sticky;
+  top: 48px;
+  z-index: 29;
   display: flex;
   gap: 8px;
   padding: 8px 14px;
-  background: rgba(18, 18, 23, 0.95);
+  background: rgba(18, 18, 23, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   overflow-x: hidden !important;
   flex-shrink: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -1069,6 +1091,48 @@
 .viev-clone-chip.is-active {
   background: #ffffff;
   color: #000000;
+}
+
+/* Cloned Mobile App Bottom Navigation Bar */
+.viev-clone-bottom-nav {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 7px 12px;
+  background: rgba(15, 15, 19, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.viev-clone-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.viev-clone-nav-item.is-active {
+  color: #ffffff;
+}
+
+.viev-clone-nav-item svg {
+  opacity: 0.6;
+}
+
+.viev-clone-nav-item.is-active svg {
+  opacity: 1;
 }
 
 /* Cloned Video Player Stage */

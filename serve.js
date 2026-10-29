@@ -345,6 +345,17 @@ const server = http.createServer((req, res) => {
           activeCastSession.screenState = Object.assign(activeCastSession.screenState || {}, payload.screenState || {});
           activeCastSession.lastUpdate = Date.now();
           broadcastCastEvent('mirror_state', activeCastSession);
+        } else if (action === 'mirror_scroll') {
+          activeCastSession.active = true;
+          activeCastSession.status = 'mirror_scroll';
+          if (!activeCastSession.screenState) activeCastSession.screenState = {};
+          activeCastSession.screenState.scrollTop = payload.scrollTop;
+          activeCastSession.screenState.scrollRatio = payload.scrollRatio;
+          activeCastSession.lastUpdate = Date.now();
+          broadcastCastEvent('mirror_scroll', {
+            scrollTop: payload.scrollTop,
+            scrollRatio: payload.scrollRatio
+          });
         } else if (action === 'reaction') {
           activeCastSession.reaction = payload.reaction;
           broadcastCastEvent('reaction', { reaction: payload.reaction, from: payload.from });

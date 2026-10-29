@@ -1733,22 +1733,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Track screen scrolling when casting to mirror scroll on companion screen!
+  // Track screen scrolling when casting to mirror scroll on companion screen (0ms latency, 60fps RAF)
   const cinemaScreenEl = document.getElementById('cinema-screen');
-  let lastMirrorScrollEmit = 0;
+  let scrollRafId = null;
   if (cinemaScreenEl) {
     cinemaScreenEl.addEventListener('scroll', () => {
-      const now = Date.now();
-      if (now - lastMirrorScrollEmit > 120) {
-        lastMirrorScrollEmit = now;
-        if (window.vievAirCast && typeof window.vievAirCast.notifyScreenState === 'function') {
-          const isPlayer = playerView && playerView.classList.contains('theater-active');
-          window.vievAirCast.notifyScreenState({
-            view: isPlayer ? 'player' : 'feed',
-            scrollTop: cinemaScreenEl.scrollTop
-          });
+      if (scrollRafId) return;
+      scrollRafId = requestAnimationFrame(() => {
+        scrollRafId = null;
+        if (window.vievAirCast && typeof window.vievAirCast.notifyScroll === 'function') {
+          const maxScroll = Math.max(1, cinemaScreenEl.scrollHeight - cinemaScreenEl.clientHeight);
+          const scrollRatio = cinemaScreenEl.scrollTop / maxScroll;
+          window.vievAirCast.notifyScroll(cinemaScreenEl.scrollTop, scrollRatio);
         }
-      }
+      });
     }, { passive: true });
   }
 
