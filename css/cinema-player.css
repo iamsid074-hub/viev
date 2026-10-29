@@ -3701,13 +3701,14 @@
   justify-content: center;
   gap: 2px;
   min-width: 0;
-  flex-shrink: 1;
+  flex: 1;
 }
 
 .cinema-yt-channel-name-row {
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
 }
 
 .cinema-yt-channel-name {
@@ -3718,7 +3719,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 130px;
+  max-width: 180px;
   letter-spacing: -0.15px;
 }
 
@@ -3735,6 +3736,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
 }
 
 /* Subscribe Pill Button (Image 5 Replica) */

@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const seekRippleRight = document.getElementById('seek-ripple-right');
   const customControls = document.getElementById('cinema-custom-player-controls');
   const ctrlMinimizeBtn = document.getElementById('cinema-ctrl-minimize-btn');
-  const ctrlCloseBtn = document.getElementById('cinema-ctrl-close-btn');
   const openAddModalBtn = document.getElementById('cinema-open-add-btn');
   const addModal = document.getElementById('cinema-add-modal');
   const closeAddModalBtn = document.getElementById('cinema-close-add-btn');
@@ -737,15 +736,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         e.stopPropagation();
         animateAutoDragToMiniplayer();
-      });
-    }
-
-    // Top-right Close button on custom controls: Closes video completely
-    if (ctrlCloseBtn) {
-      ctrlCloseBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        closeVideoCompletely();
       });
     }
 
