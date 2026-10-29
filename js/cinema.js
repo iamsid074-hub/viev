@@ -1058,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const originParam = (window.location.origin && window.location.origin !== 'null' && window.location.protocol.startsWith('http'))
         ? `&origin=${encodeURIComponent(window.location.origin)}`
         : '';
-      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1${originParam}&controls=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&fs=0`;
+      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1${originParam}&controls=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1`;
       iframe.onload = () => {
         try {
           iframe.contentWindow.postMessage('{"event":"listening"}', '*');
