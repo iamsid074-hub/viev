@@ -230,7 +230,7 @@ html.is-exxclusive-active {
 }
 
 /* =========================================================
-   REAL-TIME DYNAMIC AMBILIGHT SYSTEM
+   REAL-TIME 4-ZONE DIRECTIONAL EDGE AMBILIGHT SYSTEM
    ========================================================= */
 .oled-ambilight-canvas-wrap {
   position: absolute;
@@ -238,11 +238,65 @@ html.is-exxclusive-active {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
   transition: width 0.35s ease, height 0.35s ease;
 }
 
-/* Ultra-Blurred Dynamic Video Canvas Halo */
+/* 4 Directional Edge Zones (Independent Top, Bottom, Left, Right Lighting) */
+.amb-zone {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  mix-blend-mode: screen;
+  will-change: opacity, background;
+}
+
+.oled-ambilight-canvas-wrap.is-active .amb-zone {
+  opacity: 0.90;
+}
+
+/* Top Edge Glow (Sky / Ceiling Light) */
+.amb-zone-top {
+  top: -14%;
+  left: 6%;
+  right: 6%;
+  height: 48%;
+  background: radial-gradient(ellipse at 50% 0%, var(--amb-top, rgba(255, 185, 110, 0.65)) 0%, transparent 72%);
+  filter: blur(55px);
+}
+
+/* Bottom Edge Glow (Ground / Floor Lighting) */
+.amb-zone-bottom {
+  bottom: -16%;
+  left: 6%;
+  right: 6%;
+  height: 48%;
+  background: radial-gradient(ellipse at 50% 100%, var(--amb-bottom, rgba(255, 150, 80, 0.65)) 0%, transparent 72%);
+  filter: blur(55px);
+}
+
+/* Left Flank Glow (Curved Left Edge Throw) */
+.amb-zone-left {
+  top: 8%;
+  bottom: 8%;
+  left: -15%;
+  width: 50%;
+  background: radial-gradient(ellipse at 0% 50%, var(--amb-left, rgba(255, 180, 100, 0.65)) 0%, transparent 72%);
+  filter: blur(58px);
+}
+
+/* Right Flank Glow (Curved Right Edge Throw) */
+.amb-zone-right {
+  top: 8%;
+  bottom: 8%;
+  right: -15%;
+  width: 50%;
+  background: radial-gradient(ellipse at 100% 50%, var(--amb-right, rgba(255, 180, 100, 0.65)) 0%, transparent 72%);
+  filter: blur(58px);
+}
+
+/* Central Ultra-Blurred Dynamic Video Halo Canvas */
 .oled-ambilight-canvas {
   position: absolute;
   width: 108%;
@@ -273,7 +327,63 @@ html.is-exxclusive-active {
 }
 
 .oled-ambilight-diffuser.is-dimmed {
-  opacity: 0.20;
+  opacity: 0.15;
+}
+
+/* =========================================================
+   GLOSSY STAGE FLOOR REFLECTION (HIGH-DEPTH OBSIDIAN FLOOR)
+   ========================================================= */
+.theater-stage-floor-reflection {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 26%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+  perspective: 800px;
+}
+
+.stage-floor-mirror-wrap {
+  position: relative;
+  width: 84%;
+  height: 100%;
+  transform: rotateX(68deg) scaleY(-1);
+  transform-origin: top center;
+  filter: blur(6px) saturate(180%) brightness(0.9);
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.25) 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.25) 50%, transparent 100%);
+  will-change: opacity;
+}
+
+.stage-floor-mirror-wrap.is-active {
+  opacity: 0.60;
+}
+
+.theater-floor-canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+
+/* Polished Black Glass Stage Overlay */
+.stage-floor-gloss-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.04) 0%, 
+    transparent 20%, 
+    rgba(0, 0, 0, 0.55) 70%, 
+    #000000 100%
+  );
+  pointer-events: none;
 }
 
 /* Massive 3D Curved OLED Monitor Chassis */
@@ -282,7 +392,7 @@ html.is-exxclusive-active {
   transform-style: preserve-3d;
   transform: perspective(1100px) rotateX(2deg);
   filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.04));
-  z-index: 3;
+  z-index: 4;
   transition: width 0.35s ease, height 0.35s ease;
   cursor: pointer;
 }

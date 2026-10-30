@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/apple-intro.css?v=4.1">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
   <link rel="stylesheet" href="css/aircast.css?v=3.5">
-  <link rel="stylesheet" href="css/exxclusive.css?v=5.5">
+  <link rel="stylesheet" href="css/exxclusive.css?v=6.0">
 </head>
 <body>
 
@@ -1397,10 +1397,22 @@ tu h digi meri mai hu pyar tera .
                 <div class="theater-floor-horizon"></div>
               </div>
 
-              <!-- Real-Time Dynamic Ambilight Backglow (Video-Synchronized Halo) -->
+              <!-- 4-Zone Directional Edge Ambilight + Central Video Halo -->
               <div class="oled-ambilight-canvas-wrap" id="oled-ambilight-wrap" aria-hidden="true">
+                <div class="amb-zone amb-zone-top" id="amb-zone-top"></div>
+                <div class="amb-zone amb-zone-bottom" id="amb-zone-bottom"></div>
+                <div class="amb-zone amb-zone-left" id="amb-zone-left"></div>
+                <div class="amb-zone amb-zone-right" id="amb-zone-right"></div>
                 <canvas id="oled-ambilight-canvas" class="oled-ambilight-canvas" width="64" height="36"></canvas>
                 <div class="oled-ambilight-diffuser" id="oled-ambilight-diffuser"></div>
+              </div>
+
+              <!-- Glossy Stage Floor Reflection Layer (Dynamic Perspective Floor Mirror) -->
+              <div class="theater-stage-floor-reflection" id="theater-stage-floor-reflection" aria-hidden="true">
+                <div class="stage-floor-mirror-wrap" id="stage-floor-mirror-wrap">
+                  <canvas id="theater-floor-canvas" class="theater-floor-canvas" width="64" height="24"></canvas>
+                </div>
+                <div class="stage-floor-gloss-overlay"></div>
               </div>
 
               <!-- SVG Definitions for True 1000R Concave Arc Geometry & Specular Gradients -->
@@ -2416,7 +2428,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/cinema.js?v=4.3"></script>
   <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
-  <script src="js/exxclusive.js?v=5.5"></script>
+  <script src="js/exxclusive.js?v=6.0"></script>
   <script src="js/app.js?v=4.0"></script>
 </body>
 </html>
