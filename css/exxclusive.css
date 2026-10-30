@@ -73,9 +73,9 @@ html.is-exxclusive-active {
     max-height: 86vw !important;
   }
 
-  #subpage-exxclusive .oled-cinema-close-trigger {
-    top: 16px !important;
-    left: 20px !important;
+  #subpage-exxclusive .oled-cinema-exit-btn {
+    top: 14px !important;
+    right: 18px !important;
   }
 }
 
@@ -94,42 +94,42 @@ html.is-exxclusive-active {
     max-height: 88vh !important;
   }
 
-  #subpage-exxclusive .oled-cinema-close-trigger {
-    top: 18px !important;
-    left: 24px !important;
+  #subpage-exxclusive .oled-cinema-exit-btn {
+    top: 16px !important;
+    right: 22px !important;
   }
 }
 
-/* Minimal Floating Glass Back to Settings Button */
-.oled-cinema-close-trigger {
+/* Minimal Subtle Exit Button (Top-Right) */
+.oled-cinema-exit-btn {
   position: absolute !important;
   z-index: 50 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  padding: 8px 16px !important;
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   color: #ffffff !important;
-  font-family: var(--font-main, 'Outfit', sans-serif) !important;
-  font-size: 13.5px !important;
-  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   cursor: pointer !important;
   outline: none !important;
-  backdrop-filter: blur(28px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
-  transition: transform 0.2s ease, background 0.2s ease !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+  opacity: 0.65 !important;
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease !important;
 }
 
-.oled-cinema-close-trigger:hover {
-  background: rgba(255, 255, 255, 0.16) !important;
-  transform: scale(1.05) !important;
+.oled-cinema-exit-btn:hover {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.20) !important;
+  transform: scale(1.08) !important;
 }
 
-.oled-cinema-close-trigger:active {
-  transform: scale(0.95) !important;
+.oled-cinema-exit-btn:active {
+  transform: scale(0.92) !important;
 }
 
 /* =========================================================
@@ -193,21 +193,14 @@ html.is-exxclusive-active {
   );
 }
 
-.exxclusive-yt-iframe {
+.exxclusive-video-player {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  border: none;
-  background: #000000;
-  display: block;
-  z-index: 2;
-}
-
-.exxclusive-video-player {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
+  clip-path: url(#curvedOledClip);
+  -webkit-clip-path: url(#curvedOledClip);
   display: block;
   background: #000000;
   z-index: 2;
@@ -257,6 +250,8 @@ html.is-exxclusive-active {
 .oled-placeholder-overlay {
   position: absolute;
   inset: 0;
+  clip-path: url(#curvedOledClip);
+  -webkit-clip-path: url(#curvedOledClip);
   z-index: 4;
   display: flex;
   flex-direction: column;
