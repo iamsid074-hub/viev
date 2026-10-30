@@ -213,12 +213,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return stored || '1.1'; // Strict default on deploy
     }
 
-    // Digi (3009 / 3011) - Supports 1.1, 1.3, and revolutionary Digi OS 2.0
+    // Digi (3009 / 3011) - Starts on OS 1.3 (the version before 2.0) so OS TWICE (2.0) can be downloaded
+    const digiDownloadedTwice = localStorage.getItem('viev_digi_os_twice_downloaded') === 'true';
+    if (!digiDownloadedTwice) {
+      if (stored === '2.0' || !stored) {
+        localStorage.setItem('viev_digi_os_version', '1.3');
+        return '1.3';
+      }
+    }
     if (stored === '2.0') return '2.0';
     if (stored === '2.0 BETA') return '2.0';
     if (stored === '1.3') return '1.3';
+    if (stored === '1.1') return '1.1';
     if (stored === '1.0') return '1.0';
-    return stored || '1.3'; // Installed 1.3, so 2.0 update shows available!
+    return stored || '1.3'; // Installed 1.3, so OS TWICE (2.0) update shows available!
   }
 
   function getPreviousVersion(currentVer) {
@@ -242,28 +250,32 @@ document.addEventListener('DOMContentLoaded', () => {
         // Virat sees update badge if not yet updated to OS 2.0
         updateBadge.style.display = (version !== '2.0 BETA' && version !== '2.0') ? 'inline-flex' : 'none';
       } else {
-        // Digi sees update badge if below 2.0
+        // Digi sees update badge if below 2.0 (so badge shows on 1.3!)
         updateBadge.style.display = (version !== '2.0' && parseFloat(version) < 2.0) ? 'inline-flex' : 'none';
       }
     }
 
     // 2. Hub Screen Badge Button & Document Title
-    const osTitlePrefix = isVirat ? 'OS ' : 'Digi OS ';
+    const osTitlePrefix = isVirat ? 'OS ' : (version === '2.0' ? 'OS TWICE ' : 'Digi OS ');
     document.querySelectorAll('.os-badge-text').forEach(el => {
-      el.textContent = 'OS ' + version;
+      el.textContent = (!isVirat && version === '2.0') ? 'OS TWICE' : ('OS ' + version);
     });
-    document.title = (isVirat && version === '2.0 BETA') ? 'OS 2.0 BETA - Special Viev' : (osTitlePrefix + version + ' - Special Viev');
+    document.title = (isVirat && version === '2.0 BETA') 
+      ? 'OS 2.0 BETA - Special Viev' 
+      : ((!isVirat && version === '2.0') ? 'OS TWICE (2.0) - Special Viev' : (osTitlePrefix + version + ' - Special Viev'));
 
     // 3. Settings Modal Sheet Titles & Story Branding
     document.querySelectorAll('.os-version-title').forEach(el => {
-      el.textContent = osTitlePrefix + version;
+      el.textContent = (!isVirat && version === '2.0') ? 'OS TWICE (Digi OS 2.0)' : (osTitlePrefix + version);
     });
     document.querySelectorAll('.story-branding').forEach(el => {
-      el.textContent = osTitlePrefix + version + ' • Special Viev';
+      el.textContent = (!isVirat && version === '2.0') ? 'OS TWICE • Special Viev' : (osTitlePrefix + version + ' • Special Viev');
     });
     document.querySelectorAll('.spec-val').forEach(el => {
-      if (el.textContent.includes('OS 1.') || el.textContent.includes('OS 2.')) {
-        el.textContent = (isVirat && version === '2.0 BETA') ? 'OS 2.0 BETA (Testing)' : ('OS ' + version + ' (Official)');
+      if (el.textContent.includes('OS 1.') || el.textContent.includes('OS 2.') || el.textContent.includes('OS TWICE')) {
+        el.textContent = (isVirat && version === '2.0 BETA') 
+          ? 'OS 2.0 BETA (Testing)' 
+          : ((!isVirat && version === '2.0') ? 'OS TWICE (2.0 Official)' : ('OS ' + version + ' (Official)'));
       }
     });
 
@@ -415,11 +427,11 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
     } else {
-      // Digi (3009 / 3011) sees Digi OS 2.0!
+      // Digi (3009 / 3011) sees OS TWICE (Digi OS 2.0)!
       if (availVerIcon) availVerIcon.textContent = '2.0';
-      if (availTitle) availTitle.textContent = 'Digi OS 2.0';
+      if (availTitle) availTitle.textContent = 'OS TWICE (Digi OS 2.0)';
       if (availSize) availSize.textContent = '298.6 MB';
-      if (availLead) availLead.textContent = 'The revolutionary 2.0 update exclusively crafted for Princess Digi: Live AirCast companion screen & sound mirror, In-App YouTube Cinema Lounge, and Liquid Glass 2.0:';
+      if (availLead) availLead.textContent = 'The revolutionary OS TWICE (Digi OS 2.0) update exclusively crafted for Princess Digi: Live AirCast companion screen & sound mirror, In-App YouTube Cinema Lounge, and Liquid Glass 2.0:';
       if (featuresList) {
         featuresList.innerHTML = `
           <div class="update-feature-item">
@@ -453,15 +465,15 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
       if (subTextLink) {
-        subTextLink.href = 'https://viev.digi.space/os-2.0';
-        subTextLink.textContent = 'https://viev.digi.space/os-2.0';
+        subTextLink.href = 'https://viev.digi.space/os-twice';
+        subTextLink.textContent = 'https://viev.digi.space/os-twice';
       }
       if (currentVerBadge) currentVerBadge.textContent = '1.3';
       if (currentVerTitle) currentVerTitle.textContent = 'Digi OS 1.3';
       if (uptodateTitleText) uptodateTitleText.textContent = 'Digi OS is up to date';
-      if (uptodateVerSub) uptodateVerSub.textContent = 'Digi OS ' + ver;
-      if (detailsDrawerTitle) detailsDrawerTitle.textContent = "What's in Digi OS 2.0";
-      if (detailsLead) detailsLead.textContent = 'What was updated in Digi OS 2.0:';
+      if (uptodateVerSub) uptodateVerSub.textContent = (ver === '2.0') ? 'OS TWICE (Digi OS 2.0)' : ('Digi OS ' + ver);
+      if (detailsDrawerTitle) detailsDrawerTitle.textContent = "What's in OS TWICE (2.0)";
+      if (detailsLead) detailsLead.textContent = 'What was updated in OS TWICE (Digi OS 2.0):';
       if (detailsList) {
         detailsList.innerHTML = `
           <li><strong>VIEVS 2.0 AirCast:</strong> Live stream your YouTube screen to Virat with synchronized sound and floating emoji reactions.</li>
@@ -564,8 +576,9 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('viev_user_os_version', '2.0 BETA');
         applySystemVersion('2.0 BETA');
       } else {
-        // Upgrade Digi (3009/3011) to Digi OS 2.0!
+        // Upgrade Digi (3009/3011) to OS TWICE (Digi OS 2.0)!
         localStorage.setItem('viev_digi_os_version', '2.0');
+        localStorage.setItem('viev_digi_os_twice_downloaded', 'true');
         applySystemVersion('2.0');
       }
 
@@ -818,7 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.triggerHaptic) window.triggerHaptic('light');
       const session = getAuthSession();
       const isVirat = session && (session.code === '1711' || session.role === 'user');
-      const updateName = isVirat ? 'OS 2.0 BETA' : 'Digi OS 2.0';
+      const updateName = isVirat ? 'OS 2.0 BETA' : 'OS TWICE (Digi OS 2.0)';
       alert(`${updateName} will automatically install tonight when connected to power and Wi-Fi.`);
       if (typeof closeSubpage === 'function') {
         closeSubpage();
@@ -841,7 +854,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Rollback ONLY the active logged-in profile (strict isolation)
       localStorage.setItem('viev_' + role + '_os_version', prevVer);
-
+      if (role === 'digi') {
+        localStorage.removeItem('viev_digi_os_twice_downloaded');
+      }
       applySystemVersion(prevVer);
       triggerSoftwareUpdateCheck();
     });
