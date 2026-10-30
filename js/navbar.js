@@ -505,6 +505,284 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // =========================================================
+  // 3D LIQUID GLASS SHADER ENGINE (WebGL Optical Corner Refraction)
+  // Replicating the exact WebGL lens shader with dynamic corner water reflections
+  // =========================================================
+  function initPillLiquidEngine() {
+    const canvas = document.getElementById('pill-liquid-canvas');
+    if (!canvas) return;
+
+    let gl = null;
+    try {
+      gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false, antialias: true }) ||
+           canvas.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: false, antialias: true });
+    } catch (e) {}
+
+    if (!gl) {
+      console.warn('WebGL not supported for liquid pill, using CSS caustics fallback');
+      return;
+    }
+
+    const vsSource = `
+      attribute vec2 position;
+      void main() {
+        gl_Position = vec4(position, 0.0, 1.0);
+      }
+    `;
+
+    const fsSource = `
+      precision mediump float;
+      uniform vec3 iResolution;
+      uniform float iTime;
+      uniform vec4 iMouse;
+      uniform sampler2D iChannel0;
+
+      void main() {
+        const float POWER_EXPONENT = 6.0;
+        const float SAMPLE_RANGE = 3.0;
+        const float SAMPLE_OFFSET = 0.55;
+        const float GRADIENT_RANGE = 0.35;
+        const float GRADIENT_OFFSET = 0.15;
+        const float LIGHTING_INTENSITY = 0.42;
+
+        vec2 uv = gl_FragCoord.xy / iResolution.xy;
+        
+        // Fluid tilt displacement based on pointer and spring motion
+        vec2 mouseOffset = (iMouse.xy / iResolution.xy - 0.5) * 0.22;
+        vec2 m2 = uv - (vec2(0.5) + mouseOffset);
+
+        // Aspect ratio compensation for rounded pill
+        float aspect = iResolution.x / iResolution.y;
+        vec2 p = m2 * vec2(aspect * 0.52, 1.15);
+        
+        // Non-linear corner superellipse (squircle rounded box)
+        float roundedBox = pow(abs(p.x * 2.05), POWER_EXPONENT) + pow(abs(p.y * 2.05), POWER_EXPONENT);
+
+        // Multi-level rim masks for physical 3D bevel & internal reflection
+        float rb1 = clamp((1.0 - roundedBox) * 7.0, 0.0, 1.0);
+        float rb2 = clamp((1.04 - roundedBox) * 16.0, 0.0, 1.0) - clamp((0.92 - roundedBox) * 16.0, 0.0, 1.0);
+        float rb3 = clamp((1.35 - roundedBox) * 3.0, 0.0, 1.0) - clamp((0.98 - roundedBox) * 3.0, 0.0, 1.0);
+
+        float transition = smoothstep(0.0, 0.75, rb1 + rb2);
+
+        if (transition > 0.01) {
+          // Dynamic optical barrel distortion: bending texture around the corners like real water
+          float distortion = (1.0 - roundedBox * 0.45);
+          vec2 lens = ((uv - 0.5) * distortion + 0.5);
+
+          // Multi-tap chromatic dispersion sampling across the curved lens
+          vec4 totalColor = vec4(0.0);
+          float totalWeight = 0.0;
+
+          for (float x = -SAMPLE_RANGE; x <= SAMPLE_RANGE; x += 1.0) {
+            for (float y = -SAMPLE_RANGE; y <= SAMPLE_RANGE; y += 1.0) {
+              vec2 offset = vec2(x, y) * SAMPLE_OFFSET / iResolution.xy;
+              vec2 sampleUV = clamp(offset + lens, 0.001, 0.999);
+              
+              // 7-color chromatic fringe dispersion around the corners
+              float r = texture2D(iChannel0, clamp(sampleUV + offset * 0.45, 0.001, 0.999)).r;
+              float g = texture2D(iChannel0, sampleUV).g;
+              float b = texture2D(iChannel0, clamp(sampleUV - offset * 0.45, 0.001, 0.999)).b;
+              
+              totalColor += vec4(r, g, b, 1.0);
+              totalWeight += 1.0;
+            }
+          }
+          vec4 refracted = totalColor / totalWeight;
+
+          // Internal specular caustic gradient (sky reflection + horizon compression line)
+          float gradient = clamp((clamp(m2.y + 0.08, 0.0, GRADIENT_RANGE) + GRADIENT_OFFSET) * 0.5, 0.0, 1.0) +
+                           clamp((clamp(-m2.y - 0.04, -10.0, GRADIENT_RANGE) * rb3 + GRADIENT_OFFSET) * 0.5, 0.0, 1.0);
+
+          vec4 lighting = clamp(refracted + vec4(rb1) * gradient + vec4(rb2) * LIGHTING_INTENSITY, 0.0, 1.0);
+
+          gl_FragColor = vec4(lighting.rgb, transition * 0.96);
+        } else {
+          gl_FragColor = vec4(0.0);
+        }
+      }
+    `;
+
+    function compileShader(type, src) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, src);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Shader compile err:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    }
+
+    const vs = compileShader(gl.VERTEX_SHADER, vsSource);
+    const fs = compileShader(gl.FRAGMENT_SHADER, fsSource);
+    if (!vs || !fs) return;
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.error('Program link err:', gl.getProgramInfoLog(prog));
+      return;
+    }
+    gl.useProgram(prog);
+
+    const quadBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1, -1,
+       1, -1,
+      -1,  1,
+       1,  1
+    ]), gl.STATIC_DRAW);
+
+    const posLoc = gl.getAttribLocation(prog, 'position');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uRes = gl.getUniformLocation(prog, 'iResolution');
+    const uTime = gl.getUniformLocation(prog, 'iTime');
+    const uMouse = gl.getUniformLocation(prog, 'iMouse');
+    const uTex = gl.getUniformLocation(prog, 'iChannel0');
+
+    // Texture setup: procedural starry lake & autumn tree reflection canvas
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    function createProceduralTexture() {
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = 512;
+      offCanvas.height = 512;
+      const ctx = offCanvas.getContext('2d');
+      if (!ctx) return offCanvas;
+
+      // Dark starry night sky & calm lake horizon matching reference image
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, 512);
+      skyGrad.addColorStop(0, '#0a1428');
+      skyGrad.addColorStop(0.48, '#1e385c');
+      skyGrad.addColorStop(0.50, '#0c182a'); // Horizon
+      skyGrad.addColorStop(0.52, '#1a3250'); // Lake reflection
+      skyGrad.addColorStop(1, '#070f1e');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Warm autumn glowing tree / center reflection
+      const treeGrad = ctx.createRadialGradient(256, 230, 10, 256, 230, 90);
+      treeGrad.addColorStop(0, 'rgba(235, 110, 40, 0.95)');
+      treeGrad.addColorStop(0.5, 'rgba(180, 75, 20, 0.85)');
+      treeGrad.addColorStop(1, 'rgba(180, 75, 20, 0)');
+      ctx.fillStyle = treeGrad;
+      ctx.beginPath();
+      ctx.arc(256, 230, 90, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Tree reflection in lake
+      ctx.save();
+      ctx.translate(0, 512);
+      ctx.scale(1, -1);
+      ctx.globalAlpha = 0.75;
+      ctx.beginPath();
+      ctx.arc(256, 230, 90, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      return offCanvas;
+    }
+
+    const defaultOffscreen = createProceduralTexture();
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, defaultOffscreen);
+
+    // Also load the real wallpaper or song cover image if accessible
+    const sourceImg = new Image();
+    sourceImg.crossOrigin = 'anonymous';
+    sourceImg.onload = () => {
+      try {
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, sourceImg);
+      } catch (err) {}
+    };
+    sourceImg.src = 'song/Screenshot 2026-10-24 224431.png';
+
+    // Interactive pointer & spring motion tracking
+    let targetMouse = [0.5, 0.5];
+    let curMouse = [0.5, 0.5];
+
+    if (nav) {
+      nav.addEventListener('pointermove', (e) => {
+        if (!indicator) return;
+        const rect = indicator.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          const relX = (e.clientX - rect.left) / rect.width;
+          const relY = (e.clientY - rect.top) / rect.height;
+          targetMouse[0] = Math.max(0, Math.min(1, relX));
+          targetMouse[1] = Math.max(0, Math.min(1, 1 - relY));
+        }
+      });
+      nav.addEventListener('pointerleave', () => {
+        targetMouse[0] = 0.5;
+        targetMouse[1] = 0.5;
+      });
+    }
+
+    // Dynamic resolution adjustment matching pill dimensions
+    function syncCanvasSize() {
+      if (!indicator) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.round((indicator.offsetWidth || 78) * dpr);
+      const h = Math.round((indicator.offsetHeight || 38) * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    syncCanvasSize();
+    window.addEventListener('resize', syncCanvasSize);
+
+    // Continuous 60/120fps WebGL render loop
+    const startTime = performance.now();
+    function renderLoop() {
+      syncCanvasSize();
+
+      // Fluid spring interpolation: water reflections actively react around the corners
+      curMouse[0] += (targetMouse[0] - curMouse[0]) * 0.12;
+      curMouse[1] += (targetMouse[1] - curMouse[1]) * 0.12;
+
+      const elapsed = (performance.now() - startTime) / 1000;
+
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      gl.useProgram(prog);
+
+      gl.uniform3f(uRes, canvas.width, canvas.height, 1.0);
+      gl.uniform1f(uTime, elapsed);
+      gl.uniform4f(uMouse, curMouse[0] * canvas.width, curMouse[1] * canvas.height, 0, 0);
+
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.uniform1i(uTex, 0);
+
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    requestAnimationFrame(renderLoop);
+  }
+
+  // Initialize WebGL Liquid Pill Engine
+  setTimeout(initPillLiquidEngine, 100);
+
+  // =========================================================
   // APPLE TACTILE HAPTICS ENGINE
   // =========================================================
   function triggerHaptic(type = 'light') {
