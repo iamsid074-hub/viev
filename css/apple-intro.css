@@ -1051,40 +1051,52 @@
   align-items: center;
   flex-shrink: 0;
   padding: 5px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  /* iOS 26/27 Hyper-Transparent Optical Liquid Crystal */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.038) 0%, rgba(255, 255, 255, 0.012) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 9999px;
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(36px) saturate(220%) brightness(1.06);
+  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.06);
+  box-shadow: 
+    0 18px 46px rgba(0, 0, 0, 0.62),
+    0 4px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.44),   /* Prismatic top rim */
+    inset 0 -1px 0.8px rgba(255, 255, 255, 0.07);    /* Bottom ambient refraction */
   pointer-events: auto;
   user-select: none;
   touch-action: none;
   cursor: grab;
   transition: opacity 0.25s ease,
-              transform 0.25s ease,
+              transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.25s ease,
               background 0.25s ease,
               border-color 0.25s ease;
   will-change: transform;
 }
 
-/* Hover: Completely stable, zero enlargement */
+/* Hover: Crystal subtle luminous bloom, stable zero enlargement */
 .apple-floating-navbar:hover {
-  background: rgba(255, 255, 255, 0.09);
-  border-color: rgba(255, 255, 255, 0.20);
-  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.66),
+    0 6px 18px rgba(0, 0, 0, 0.38),
+    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.52),
+    inset 0 -1px 0.8px rgba(255, 255, 255, 0.10);
 }
 
-/* Tap / Click / Active: Halka sa enlarge smoothly */
+/* Tap / Click / Active: Tactile fluid compression */
 .apple-floating-navbar:active,
 .apple-floating-navbar.is-dragging,
 .apple-floating-navbar.is-tap-enlarged {
   cursor: grabbing;
-  transform: scale(1.04);
-  background: rgba(255, 255, 255, 0.12);
+  transform: scale(1.035);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.03) 100%);
   border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.60), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: 
+    0 22px 54px rgba(0, 0, 0, 0.72),
+    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.60),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.12);
 }
 
 /* =========================================================
@@ -1145,11 +1157,12 @@
   height: 48px;
   border-radius: 50%;
   padding: 0;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1.5px solid rgba(255, 255, 255, 0.30);
-  backdrop-filter: blur(32px) saturate(200%);
-  -webkit-backdrop-filter: blur(32px) saturate(200%);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.65), 0 3px 10px rgba(0, 0, 0, 0.35), inset 0 1.5px 1px rgba(255, 255, 255, 0.45);
+  /* Matching iOS 26/27 Crystal Specular Frame */
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.26);
+  backdrop-filter: blur(36px) saturate(220%);
+  -webkit-backdrop-filter: blur(36px) saturate(220%);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.68), 0 4px 12px rgba(0, 0, 0, 0.38), inset 0 1.5px 1px rgba(255, 255, 255, 0.50);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1212,23 +1225,30 @@
   to { transform: rotate(360deg); }
 }
 
-/* Small Active Indicator Pill (Strictly Bounded Inside Big Navbar) */
+/* Small Active Indicator Pill (iOS 26/27 Viscous Mercury Liquid Lens) */
 .nav-indicator-pill {
   position: absolute;
   top: 5px;
   bottom: 5px;
   left: 5px;
-  background: rgba(255, 255, 255, 0.17);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  /* Pure Illuminated Liquid Crystal Pill */
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.30);
   border-radius: 9999px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.30), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 4px 18px rgba(0, 0, 0, 0.32),
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    0 0 18px rgba(255, 255, 255, 0.14);
   pointer-events: none;
   z-index: 1;
-  transform: none;
-  transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+  transform-origin: center center;
+  transition: left 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.30s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.30s cubic-bezier(0.16, 1, 0.3, 1),
               background 0.2s ease,
-              border-color 0.2s ease;
+              border-color 0.2s ease,
+              box-shadow 0.2s ease;
+  will-change: left, width, transform;
 }
 
 /* Traveling Liquid Glass Specular Shimmer inside the Pill */
@@ -1237,8 +1257,8 @@
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 55%, transparent 100%);
-  opacity: 0.65;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 50%, transparent 100%);
+  opacity: 0.80;
   pointer-events: none;
 }
 
@@ -1246,12 +1266,33 @@
   transition: none !important;
 }
 
+/* iOS 26/27 Viscous Mercury Fluid Slider States */
+.nav-indicator-pill.is-mercury-stretching {
+  transition: left 0.14s cubic-bezier(0.2, 0.9, 0.3, 1),
+              width 0.14s cubic-bezier(0.2, 0.9, 0.3, 1),
+              transform 0.14s ease !important;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.36), inset 0 1px 1px rgba(255, 255, 255, 0.60), 0 0 22px rgba(255, 255, 255, 0.20);
+}
+
+.nav-indicator-pill.is-mercury-snapping {
+  transition: left 0.34s cubic-bezier(0.175, 0.885, 0.32, 1.24),
+              width 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.18),
+              transform 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.24) !important;
+}
+
+.nav-indicator-pill.is-dragging {
+  background: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.40);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.40), inset 0 1.2px 1.2px rgba(255, 255, 255, 0.65), 0 0 24px rgba(255, 255, 255, 0.22);
+}
+
 .nav-tab-btn {
   position: relative;
   z-index: 2;
   background: transparent;
   border: none;
-  padding: 8px 19px;
+  padding: 8px 18px;
   min-height: 38px;
   display: inline-flex;
   align-items: center;
@@ -1261,8 +1302,8 @@
   font-family: var(--font-main);
   font-size: 13.5px;
   font-weight: 550;
-  letter-spacing: 0.15px;
-  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.25px;
+  color: rgba(255, 255, 255, 0.58);
   cursor: pointer;
   outline: none;
   transform-origin: center center;
@@ -1272,18 +1313,20 @@
 .nav-tab-label {
   display: inline-block;
   pointer-events: none;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, text-shadow 0.2s ease;
 }
 
 /* Mac Dock Magnification on Tabs */
 .nav-tab-btn:hover .nav-tab-label,
 .nav-tab-btn.is-dock-magnified .nav-tab-label {
   color: rgba(255, 255, 255, 0.95);
-  transform: scale(1.10);
+  transform: scale(1.08);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
 }
 
 .nav-tab-btn:active .nav-tab-label {
-  transform: scale(1.12);
+  transform: scale(1.10);
   color: #ffffff;
 }
 
@@ -1293,7 +1336,8 @@
 }
 
 .nav-tab-btn.active .nav-tab-label {
-  transform: scale(1.04);
+  transform: scale(1.03);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.45), 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 
 /* =========================================================

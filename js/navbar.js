@@ -23,11 +23,67 @@ document.addEventListener('DOMContentLoaded', () => {
     settings: document.getElementById('settings-screen')
   };
 
-  function updateIndicator(activeBtn) {
+  let lastActiveBtn = null;
+  let mercuryTimer = null;
+
+  function updateIndicator(activeBtn, enableMercuryFluid = true) {
     if (!indicator || !activeBtn) return;
-    indicator.classList.remove('no-transition');
-    indicator.style.left = `${activeBtn.offsetLeft}px`;
-    indicator.style.width = `${activeBtn.offsetWidth}px`;
+
+    if (!enableMercuryFluid || !lastActiveBtn || lastActiveBtn === activeBtn) {
+      if (mercuryTimer) {
+        clearTimeout(mercuryTimer);
+        mercuryTimer = null;
+      }
+      indicator.classList.remove('no-transition', 'is-mercury-stretching', 'is-mercury-snapping');
+      indicator.style.left = `${activeBtn.offsetLeft}px`;
+      indicator.style.width = `${activeBtn.offsetWidth}px`;
+      indicator.style.transform = '';
+      lastActiveBtn = activeBtn;
+      return;
+    }
+
+    const prevLeft = lastActiveBtn.offsetLeft;
+    const prevWidth = lastActiveBtn.offsetWidth;
+    const targetLeft = activeBtn.offsetLeft;
+    const targetWidth = activeBtn.offsetWidth;
+    const isMovingRight = targetLeft > prevLeft;
+
+    if (mercuryTimer) {
+      clearTimeout(mercuryTimer);
+      mercuryTimer = null;
+    }
+
+    // Viscous Mercury Fluid Stretch (iOS 26/27 Liquid Engine)
+    indicator.classList.remove('no-transition', 'is-mercury-snapping');
+    indicator.classList.add('is-mercury-stretching');
+
+    // Elastic stretch span: calculate combined bounding envelope
+    const stretchLeft = isMovingRight ? prevLeft : targetLeft;
+    const stretchWidth = isMovingRight 
+      ? (targetLeft + targetWidth - prevLeft) 
+      : (prevLeft + prevWidth - targetLeft);
+
+    // Phase 1: Expand into a continuous liquid mercury bead across the span
+    indicator.style.left = `${stretchLeft}px`;
+    indicator.style.width = `${stretchWidth}px`;
+    indicator.style.transform = 'scaleY(0.92)';
+
+    // Phase 2: Rapidly coalesce and snap into destination with organic spring bounce
+    mercuryTimer = setTimeout(() => {
+      indicator.classList.remove('is-mercury-stretching');
+      indicator.classList.add('is-mercury-snapping');
+      indicator.style.left = `${targetLeft}px`;
+      indicator.style.width = `${targetWidth}px`;
+      indicator.style.transform = 'scale(1)';
+
+      mercuryTimer = setTimeout(() => {
+        indicator.classList.remove('is-mercury-snapping');
+        indicator.style.transform = '';
+        mercuryTimer = null;
+      }, 340);
+    }, 120);
+
+    lastActiveBtn = activeBtn;
   }
 
   window.syncCinemaTabVisibility = function() {
