@@ -1225,33 +1225,73 @@
   to { transform: rotate(360deg); }
 }
 
-/* Small Active Indicator Pill (Strictly Bounded Inside Big Navbar) */
+/* =========================================================
+   IOS 27 PURE LIQUID GLASS INDICATOR PILL
+   - Zero opaque / zero frosty milky haze
+   - Pure crystal liquid meniscus & surface tension
+   - Refraction of 7 spectral colors (VIBGYOR chromatic prism) on rounded edges
+   ========================================================= */
 .nav-indicator-pill {
   position: absolute;
   top: 5px;
   bottom: 5px;
   left: 5px;
-  background: rgba(255, 255, 255, 0.17);
-  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 9999px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.30), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  /* Pure liquid body: zero milky frost, 100% transparent optical droplet */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.005) 100%);
+  border: 1px solid transparent;
   pointer-events: none;
   z-index: 1;
   transform: none;
-  transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-              width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-              background 0.2s ease,
-              border-color 0.2s ease;
+  /* Physical liquid meniscus light & 7-color chromatic edge dispersion */
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.50),
+    inset 0 1.2px 0.6px rgba(255, 255, 255, 0.82),    /* Top water-droplet meniscus specular */
+    inset 0 -1px 0.6px rgba(255, 255, 255, 0.18),    /* Bottom caustics */
+    0 0 10px rgba(100, 210, 255, 0.22),               /* Ambient spectral cyan glow */
+    0 0 16px rgba(191, 90, 242, 0.18);                /* Ambient spectral violet glow */
+  transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s ease;
+  will-change: left, width;
 }
 
-/* Traveling Liquid Glass Specular Shimmer inside the Pill */
+/* 7-Color Prismatic Refraction Rim (VIBGYOR Dispersion on Rounded Edges) */
 .nav-indicator-pill::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 9999px;
+  padding: 1.2px;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 59, 105, 0.85) 0%,     /* Red */
+    rgba(255, 149, 0, 0.80) 16%,     /* Orange */
+    rgba(255, 214, 10, 0.75) 32%,     /* Yellow */
+    rgba(48, 209, 88, 0.75) 50%,      /* Green */
+    rgba(100, 210, 255, 0.85) 68%,    /* Cyan/Blue */
+    rgba(88, 86, 214, 0.85) 84%,     /* Indigo */
+    rgba(191, 90, 242, 0.85) 100%     /* Violet */
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.90;
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.6));
+}
+
+/* Crystal Surface Tension & Optical Liquid Meniscus Lens */
+.nav-indicator-pill::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 55%, transparent 100%);
-  opacity: 0.65;
+  background: 
+    radial-gradient(ellipse 65% 45% at 50% 0%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
   pointer-events: none;
 }
 
