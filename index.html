@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/apple-intro.css?v=4.1">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
   <link rel="stylesheet" href="css/aircast.css?v=3.5">
-  <link rel="stylesheet" href="css/exxclusive.css?v=4.5">
+  <link rel="stylesheet" href="css/exxclusive.css?v=5.0">
 </head>
 <body>
 
@@ -1392,9 +1392,9 @@ tu h digi meri mai hu pyar tera .
               <!-- SVG Definitions for True 1000R Concave Arc Geometry & Specular Gradients -->
               <svg width="0" height="0" class="oled-svg-defs" aria-hidden="true" style="position: absolute; pointer-events: none; opacity: 0;">
                 <defs>
-                  <!-- 1000R Concave Arc Silhouette (Top dips inward, bottom curves upward) -->
+                  <!-- 1000R Concave Arc Silhouette (Clamped inside bezel edges, perfectly eliminating side spill) -->
                   <clipPath id="curvedOledClip" clipPathUnits="objectBoundingBox">
-                    <path d="M 0.015,0.06 Q 0.5,0.138 0.985,0.06 Q 1,0.06 1,0.085 L 1,0.915 Q 1,0.94 0.985,0.94 Q 0.5,0.862 0.015,0.94 Q 0,0.94 0,0.915 L 0,0.085 Q 0,0.06 0.015,0.06 Z" />
+                    <path d="M 0.028,0.065 Q 0.5,0.138 0.972,0.065 Q 0.975,0.065 0.975,0.075 L 0.975,0.925 Q 0.975,0.935 0.972,0.935 Q 0.5,0.862 0.028,0.935 Q 0.025,0.935 0.025,0.925 L 0.025,0.075 Q 0.025,0.065 0.028,0.065 Z" />
                   </clipPath>
                   <linearGradient id="topBezelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stop-color="rgba(255, 255, 255, 0.15)"/>
@@ -1434,12 +1434,18 @@ tu h digi meri mai hu pyar tera .
                   </div>
                 </div>
 
-                <!-- Titanium Curved Bezel Arc Overlay (Top / Bottom Physical Curvature Lines) -->
+                <!-- Titanium Curved Bezel Arc Overlay (Enclosing Frame + Top/Bottom Highlights) -->
                 <svg class="oled-bezel-arc-overlay" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden="true">
-                  <path d="M 15 25 Q 500 58 985 25" class="oled-bezel-path-top" />
-                  <path d="M 15 395 Q 500 362 985 395" class="oled-bezel-path-bottom" />
-                  <line x1="15" y1="25" x2="15" y2="395" class="oled-bezel-path-edge" />
-                  <line x1="985" y1="25" x2="985" y2="395" class="oled-bezel-path-edge" />
+                  <!-- Full Continuous Outer Rim Frame -->
+                  <path d="M 28 27 Q 500 58 972 27 Q 975 27 975 31 L 975 389 Q 975 393 972 393 Q 500 362 28 393 Q 25 393 25 389 L 25 31 Q 25 27 28 27 Z" class="oled-bezel-outer-frame" />
+                  <!-- Top Specular Titanium Arc -->
+                  <path d="M 25 27 Q 500 58 975 27" class="oled-bezel-path-top" />
+                  <!-- Bottom Specular Titanium Arc -->
+                  <path d="M 25 393 Q 500 362 975 393" class="oled-bezel-path-bottom" />
+                  <!-- Left Side Titanium Pillar -->
+                  <line x1="25" y1="27" x2="25" y2="393" class="oled-bezel-path-edge" />
+                  <!-- Right Side Titanium Pillar -->
+                  <line x1="975" y1="27" x2="975" y2="393" class="oled-bezel-path-edge" />
                 </svg>
               </div>
             </div>
@@ -2396,7 +2402,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/cinema.js?v=4.3"></script>
   <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
-  <script src="js/exxclusive.js?v=4.5"></script>
+  <script src="js/exxclusive.js?v=5.0"></script>
   <script src="js/app.js?v=4.0"></script>
 </body>
 </html>

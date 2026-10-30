@@ -163,6 +163,7 @@ html.is-exxclusive-active {
 }
 
 /* Concave 1000R Clipped Display Surface */
+/* Concave 1000R Clipped Display Surface */
 .oled-screen-surface {
   position: absolute;
   inset: 0;
@@ -174,6 +175,8 @@ html.is-exxclusive-active {
   align-items: center;
   justify-content: center;
   z-index: 2;
+  isolation: isolate;
+  contain: paint;
 }
 
 /* Cylindrical Concave Curve Shadow Vignette */
@@ -184,12 +187,12 @@ html.is-exxclusive-active {
   pointer-events: none;
   z-index: 5;
   background: linear-gradient(90deg, 
-    rgba(0, 0, 0, 0.72) 0%, 
-    rgba(0, 0, 0, 0.18) 12%, 
-    transparent 26%, 
-    transparent 74%, 
-    rgba(0, 0, 0, 0.18) 88%, 
-    rgba(0, 0, 0, 0.72) 100%
+    rgba(0, 0, 0, 0.75) 0%, 
+    rgba(0, 0, 0, 0.20) 8%, 
+    transparent 20%, 
+    transparent 80%, 
+    rgba(0, 0, 0, 0.20) 92%, 
+    rgba(0, 0, 0, 0.75) 100%
   );
 }
 
@@ -206,7 +209,7 @@ html.is-exxclusive-active {
   z-index: 2;
 }
 
-/* Titanium Curved Bezel Arc Overlay (Top / Bottom Physical Curvature) */
+/* Titanium Curved Bezel Arc Overlay (Top / Bottom Physical Curvature & Side Pillars) */
 .oled-bezel-arc-overlay {
   position: absolute;
   inset: 0;
@@ -217,24 +220,35 @@ html.is-exxclusive-active {
   overflow: visible;
 }
 
+.oled-bezel-outer-frame {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  fill: none;
+}
+
 .oled-bezel-path-top {
   stroke: url(#topBezelGrad);
-  stroke-width: 2.4;
+  stroke-width: 2.8;
+  stroke-linecap: round;
   fill: none;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.65));
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.75));
 }
 
 .oled-bezel-path-bottom {
   stroke: url(#bottomBezelGrad);
-  stroke-width: 2.2;
+  stroke-width: 2.6;
+  stroke-linecap: round;
   fill: none;
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.35));
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.40));
 }
 
 .oled-bezel-path-edge {
-  stroke: rgba(255, 255, 255, 0.35);
-  stroke-width: 1.8;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 3.5;
+  stroke-linecap: round;
   fill: none;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.35));
 }
 
 /* Dimmer vignette behind the poster play button */
