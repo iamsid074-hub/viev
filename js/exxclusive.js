@@ -125,6 +125,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Dedicated Cinema Back Button
+  const cinemaCloseBtn = document.getElementById('oled-cinema-close-trigger');
+  if (cinemaCloseBtn) {
+    cinemaCloseBtn.addEventListener('click', () => {
+      if (typeof triggerHaptic === 'function') triggerHaptic('light');
+      const settingsBackBtn = document.getElementById('settings-back-btn');
+      if (settingsBackBtn) {
+        settingsBackBtn.click();
+      } else {
+        window.vievExxclusive.pauseVideo();
+        const sub = document.getElementById('subpage-exxclusive');
+        if (sub) sub.style.display = 'none';
+      }
+    });
+  }
+
+  // Landscape Cinema Orientation Mode Toggle
+  const landscapeToggleBtn = document.getElementById('oled-landscape-toggle');
+  const subpageContainer = document.getElementById('subpage-exxclusive');
+  if (landscapeToggleBtn && subpageContainer) {
+    landscapeToggleBtn.addEventListener('click', () => {
+      if (typeof triggerHaptic === 'function') triggerHaptic('medium');
+      const isForced = subpageContainer.classList.toggle('is-force-landscape');
+      
+      // Attempt hardware screen orientation lock if supported
+      if (screen.orientation && typeof screen.orientation.lock === 'function') {
+        if (isForced) {
+          screen.orientation.lock('landscape').catch(() => {});
+        } else {
+          try { screen.orientation.unlock(); } catch (e) {}
+        }
+      }
+
+      if (typeof window.setFloatingNavVisible === 'function') {
+        window.setFloatingNavVisible(!isForced);
+      }
+    });
+  }
+
   // Full Panoramic Curved Theater Mode Toggle
   if (theaterExpandBtn && viewport) {
     theaterExpandBtn.addEventListener('click', () => {
@@ -144,9 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (viewport && viewport.classList.contains('is-panoramic')) {
         viewport.classList.remove('is-panoramic');
-        if (typeof window.setFloatingNavVisible === 'function') {
-          window.setFloatingNavVisible(true);
-        }
+      }
+      if (subpageContainer && subpageContainer.classList.contains('is-force-landscape')) {
+        subpageContainer.classList.remove('is-force-landscape');
+        try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+      }
+      if (typeof window.setFloatingNavVisible === 'function') {
+        window.setFloatingNavVisible(true);
       }
     }
   };

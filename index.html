@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/apple-intro.css?v=4.1">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
   <link rel="stylesheet" href="css/aircast.css?v=3.5">
-  <link rel="stylesheet" href="css/exxclusive.css?v=2.0">
+  <link rel="stylesheet" href="css/exxclusive.css?v=2.5">
 </head>
 <body>
 
@@ -1379,11 +1379,13 @@ tu h digi meri mai hu pyar tera .
 
           <!-- SUBPAGE: EXXCLUSIVE (MASSIVE CURVED OLED EXPERIENCE) -->
           <div class="subpage-body-container" id="subpage-exxclusive" style="display: none;">
-            <div class="exxclusive-header">
-              <span class="exxclusive-kicker">PREMIERE EDITION</span>
-              <h2 class="subpage-large-heading exxclusive-heading">Exxclusive</h2>
-              <p class="exxclusive-subtitle">Ultra-Wide Curved OLED Cinema Experience</p>
-            </div>
+            <!-- Dedicated Minimal Floating Cinema Back Button -->
+            <button class="oled-cinema-close-trigger" id="oled-cinema-close-trigger" type="button" aria-label="Back to Settings">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              <span>Settings</span>
+            </button>
 
             <!-- Massive 3D Curved OLED Stage -->
             <div class="oled-theater-viewport" id="oled-theater-viewport">
@@ -1486,6 +1488,16 @@ tu h digi meri mai hu pyar tera .
                 </svg>
               </button>
 
+              <!-- Landscape / Orientation Mode Toggle -->
+              <button class="oled-ctrl-btn" id="oled-landscape-toggle" aria-label="Toggle Landscape Cinema" type="button" title="Landscape Mode">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2.5"></rect>
+                  <line x1="12" y1="2" x2="12" y2="5"></line>
+                  <line x1="12" y1="19" x2="12" y2="22"></line>
+                </svg>
+              </button>
+
+              <!-- Theater Fullscreen Toggle -->
               <button class="oled-ctrl-btn" id="oled-theater-expand" aria-label="Toggle Panoramic Theater" type="button" title="Full Curved Theater">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="15 3 21 3 21 9"></polyline>
@@ -1494,20 +1506,6 @@ tu h digi meri mai hu pyar tera .
                   <line x1="3" y1="21" x2="10" y2="14"></line>
                 </svg>
               </button>
-            </div>
-
-            <!-- Exxclusive Tech Spec Pill Group -->
-            <div class="exxclusive-specs-row">
-              <span class="oled-spec-badge">
-                <span class="oled-spec-dot"></span>
-                <span>OLED HDR Master</span>
-              </span>
-              <span class="oled-spec-badge">
-                <span>Spatial 3D Audio</span>
-              </span>
-              <span class="oled-spec-badge">
-                <span>Ultra-Wide 21:9 Curve</span>
-              </span>
             </div>
           </div>
 
@@ -2462,7 +2460,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/cinema.js?v=4.3"></script>
   <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
-  <script src="js/exxclusive.js?v=2.0"></script>
+  <script src="js/exxclusive.js?v=2.5"></script>
   <script src="js/app.js?v=3.8"></script>
 </body>
 </html>
