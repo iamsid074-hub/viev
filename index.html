@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/apple-intro.css?v=4.1">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
   <link rel="stylesheet" href="css/aircast.css?v=3.5">
-  <link rel="stylesheet" href="css/exxclusive.css?v=5.0">
+  <link rel="stylesheet" href="css/exxclusive.css?v=5.5">
 </head>
 <body>
 
@@ -1389,6 +1389,20 @@ tu h digi meri mai hu pyar tera .
 
             <!-- Massive 3D Curved OLED Stage -->
             <div class="oled-theater-viewport" id="oled-theater-viewport">
+              <!-- Dark Luxury Acoustic Slat Wall & Overhead Theater Sconce Beams -->
+              <div class="theater-acoustic-backdrop" id="theater-acoustic-backdrop" aria-hidden="true">
+                <div class="theater-slat-texture"></div>
+                <div class="theater-sconce-beam theater-sconce-left"></div>
+                <div class="theater-sconce-beam theater-sconce-right"></div>
+                <div class="theater-floor-horizon"></div>
+              </div>
+
+              <!-- Real-Time Dynamic Ambilight Backglow (Video-Synchronized Halo) -->
+              <div class="oled-ambilight-canvas-wrap" id="oled-ambilight-wrap" aria-hidden="true">
+                <canvas id="oled-ambilight-canvas" class="oled-ambilight-canvas" width="64" height="36"></canvas>
+                <div class="oled-ambilight-diffuser" id="oled-ambilight-diffuser"></div>
+              </div>
+
               <!-- SVG Definitions for True 1000R Concave Arc Geometry & Specular Gradients -->
               <svg width="0" height="0" class="oled-svg-defs" aria-hidden="true" style="position: absolute; pointer-events: none; opacity: 0;">
                 <defs>
@@ -1415,7 +1429,7 @@ tu h digi meri mai hu pyar tera .
                 <!-- Concave Curved Display Surface -->
                 <div class="oled-screen-surface" id="oled-screen-surface">
                   <!-- Native 1080p MP4 Video conforming 100% to Curved Silhouette -->
-                  <video id="exxclusive-video" class="exxclusive-video-player" playsinline loop preload="auto">
+                  <video id="exxclusive-video" class="exxclusive-video-player" playsinline loop preload="auto" crossorigin="anonymous">
                     <source src="video/exxclusive.mp4" type="video/mp4">
                   </video>
 
@@ -2402,7 +2416,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/cinema.js?v=4.3"></script>
   <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
-  <script src="js/exxclusive.js?v=5.0"></script>
+  <script src="js/exxclusive.js?v=5.5"></script>
   <script src="js/app.js?v=4.0"></script>
 </body>
 </html>

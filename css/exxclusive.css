@@ -73,6 +73,13 @@ html.is-exxclusive-active {
     max-height: 86vw !important;
   }
 
+  #subpage-exxclusive .oled-ambilight-canvas-wrap {
+    width: 92vh !important;
+    max-width: 94vh !important;
+    height: 86vw !important;
+    max-height: 88vw !important;
+  }
+
   #subpage-exxclusive .oled-cinema-exit-btn {
     top: 14px !important;
     right: 18px !important;
@@ -92,6 +99,13 @@ html.is-exxclusive-active {
     max-width: 94vw !important;
     height: 86vh !important;
     max-height: 88vh !important;
+  }
+
+  #subpage-exxclusive .oled-ambilight-canvas-wrap {
+    width: 94vw !important;
+    max-width: 96vw !important;
+    height: 88vh !important;
+    max-height: 90vh !important;
   }
 
   #subpage-exxclusive .oled-cinema-exit-btn {
@@ -146,9 +160,120 @@ html.is-exxclusive-active {
   overflow: hidden;
 }
 
-/* Pure Black Ambient Backdrop */
-.oled-ambient-backdrop {
-  display: none; /* Removed completely for pure OLED 0-light black */
+/* =========================================================
+   DARK LUXURY ACOUSTIC SLAT WALL & THEATER ARCHITECTURE
+   ========================================================= */
+.theater-acoustic-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #040406;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Vertical Acoustic Timber/Fabric Slat Wall */
+.theater-slat-texture {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    #0c0d12 0px,
+    #0c0d12 11px,
+    #040406 11px,
+    #040406 18px
+  );
+  opacity: 0.75;
+}
+
+/* Subtle Stage Vignette - Directs optical focus to center display */
+.theater-acoustic-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.15) 20%, rgba(0, 0, 0, 0.88) 85%);
+  pointer-events: none;
+}
+
+/* Dual Overhead Theater Sconce Pin-Spot Beams */
+.theater-sconce-beam {
+  position: absolute;
+  top: 0;
+  width: 280px;
+  height: 70%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 215, 140, 0.08) 0%, rgba(255, 195, 110, 0.03) 45%, transparent 75%);
+  filter: blur(16px);
+  z-index: 2;
+}
+
+.theater-sconce-left {
+  left: 10%;
+}
+
+.theater-sconce-right {
+  right: 10%;
+}
+
+/* Theater Floor Horizon / Ground Drop Shadow */
+.theater-floor-horizon {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 22%;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.65) 50%, #000000 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* =========================================================
+   REAL-TIME DYNAMIC AMBILIGHT SYSTEM
+   ========================================================= */
+.oled-ambilight-canvas-wrap {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  transition: width 0.35s ease, height 0.35s ease;
+}
+
+/* Ultra-Blurred Dynamic Video Canvas Halo */
+.oled-ambilight-canvas {
+  position: absolute;
+  width: 108%;
+  height: 108%;
+  border-radius: 40px;
+  filter: blur(65px) saturate(210%) brightness(1.25);
+  opacity: 0;
+  transform: translateZ(0);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity;
+}
+
+.oled-ambilight-canvas.is-active {
+  opacity: 0.88;
+}
+
+/* Warm Cinema Idle Diffuser Glow (Visible before playback starts) */
+.oled-ambilight-diffuser {
+  position: absolute;
+  width: 102%;
+  height: 102%;
+  border-radius: 40px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(255, 185, 110, 0.20) 0%, rgba(210, 130, 60, 0.08) 55%, transparent 80%);
+  filter: blur(50px);
+  opacity: 0.75;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.oled-ambilight-diffuser.is-dimmed {
+  opacity: 0.20;
 }
 
 /* Massive 3D Curved OLED Monitor Chassis */
@@ -157,7 +282,7 @@ html.is-exxclusive-active {
   transform-style: preserve-3d;
   transform: perspective(1100px) rotateX(2deg);
   filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.04));
-  z-index: 2;
+  z-index: 3;
   transition: width 0.35s ease, height 0.35s ease;
   cursor: pointer;
 }
