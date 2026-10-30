@@ -1225,94 +1225,34 @@
   to { transform: rotate(360deg); }
 }
 
-/* =========================================================
-   3D LIQUID GLASS INDICATOR PILL (Exact Optical Lens Shader Replica)
-   - Replicating the 3D Liquid Glass Squircle Shader
-   - Thick, radiant, pure white beveled perimeter rim (rb2 specular ring)
-   - Vertical caustic gradient: top liquid cap + lower dark horizon reflection line (rb1 + rb3)
-   - Optical glass clarity & magnification (backdrop brightness & contrast)
-   ========================================================= */
+/* Small Active Indicator Pill (Strictly Bounded Inside Big Navbar) */
 .nav-indicator-pill {
   position: absolute;
   top: 5px;
   bottom: 5px;
   left: 5px;
+  background: rgba(255, 255, 255, 0.17);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 9999px;
-  box-sizing: border-box;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.30), inset 0 1px 1px rgba(255, 255, 255, 0.3);
   pointer-events: none;
   z-index: 1;
-  overflow: hidden;
-  background: transparent;
-  
-  /* 1. Body: Optical glass magnification & clarity matching the shader sample */
-  backdrop-filter: brightness(1.28) contrast(1.18) saturate(190%) blur(1.5px);
-  -webkit-backdrop-filter: brightness(1.28) contrast(1.18) saturate(190%) blur(1.5px);
-
-  /* 2. Radiant 3D Liquid Bevel & Edge (matching shader rb2 rim lighting) */
-  border: 1.2px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 
-    0 10px 28px rgba(0, 0, 0, 0.58),                /* Deep floating shadow */
-    0 0 18px rgba(255, 255, 255, 0.22),              /* Ambient optical lens glow */
-    inset 0 2.2px 1.5px rgba(255, 255, 255, 0.95),   /* Intense top liquid meniscus bevel */
-    inset 0 -2px 1.5px rgba(255, 255, 255, 0.75),   /* Bottom upward rim reflection */
-    inset 2px 0 2px rgba(255, 255, 255, 0.50),       /* Left edge light */
-    inset -2px 0 2px rgba(255, 255, 255, 0.50);      /* Right edge light */
-
-  transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-              width 0.26s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.25s ease;
-  will-change: left, width;
+  transform: none;
+  transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.2s ease,
+              border-color 0.2s ease;
 }
 
-/* 3. Embedded WebGL 3D Liquid Glass Canvas */
-.pill-liquid-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 9999px;
-  pointer-events: none;
-  display: block;
-  z-index: 0;
-}
-
-/* 4. Top Curving 3D Glass Dome Sheen (Spherical Meniscus Cap) */
+/* Traveling Liquid Glass Specular Shimmer inside the Pill */
 .nav-indicator-pill::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60%;
-  border-radius: 9999px 9999px 50% 50%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.65) 0%,
-    rgba(255, 255, 255, 0.25) 45%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  pointer-events: none;
-  opacity: 0.88;
-  z-index: 1;
-}
-
-/* 5. Prismatic Edge Dispersion & Bottom Internal Refraction Arc */
-.nav-indicator-pill::after {
-  content: '';
-  position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: 
-    radial-gradient(ellipse 70% 35% at 50% 100%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 70%),
-    linear-gradient(90deg, 
-      rgba(255, 59, 105, 0.22) 0%, 
-      transparent 15%, 
-      transparent 85%, 
-      rgba(100, 210, 255, 0.28) 100%
-    );
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 55%, transparent 100%);
+  opacity: 0.65;
   pointer-events: none;
-  mix-blend-mode: overlay;
-  z-index: 1;
 }
 
 .nav-indicator-pill.no-transition {
@@ -1324,7 +1264,7 @@
   z-index: 2;
   background: transparent;
   border: none;
-  padding: 8px 18px;
+  padding: 8px 19px;
   min-height: 38px;
   display: inline-flex;
   align-items: center;
@@ -1334,8 +1274,8 @@
   font-family: var(--font-main);
   font-size: 13.5px;
   font-weight: 550;
-  letter-spacing: 0.25px;
-  color: rgba(255, 255, 255, 0.58);
+  letter-spacing: 0.15px;
+  color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
   outline: none;
   transform-origin: center center;
@@ -1345,20 +1285,18 @@
 .nav-tab-label {
   display: inline-block;
   pointer-events: none;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease, text-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
 }
 
 /* Mac Dock Magnification on Tabs */
 .nav-tab-btn:hover .nav-tab-label,
 .nav-tab-btn.is-dock-magnified .nav-tab-label {
   color: rgba(255, 255, 255, 0.95);
-  transform: scale(1.08);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+  transform: scale(1.10);
 }
 
 .nav-tab-btn:active .nav-tab-label {
-  transform: scale(1.10);
+  transform: scale(1.12);
   color: #ffffff;
 }
 
@@ -1368,8 +1306,7 @@
 }
 
 .nav-tab-btn.active .nav-tab-label {
-  transform: scale(1.03);
-  text-shadow: 0 0 12px rgba(255, 255, 255, 0.45), 0 1px 4px rgba(0, 0, 0, 0.8);
+  transform: scale(1.04);
 }
 
 /* =========================================================
