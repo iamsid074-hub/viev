@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/apple-intro.css?v=4.1">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
   <link rel="stylesheet" href="css/aircast.css?v=3.5">
-  <link rel="stylesheet" href="css/exxclusive.css?v=1.0">
+  <link rel="stylesheet" href="css/exxclusive.css?v=2.0">
 </head>
 <body>
 
@@ -1387,12 +1387,31 @@ tu h digi meri mai hu pyar tera .
 
             <!-- Massive 3D Curved OLED Stage -->
             <div class="oled-theater-viewport" id="oled-theater-viewport">
+              <!-- SVG Definitions for True 1000R Concave Arc Geometry & Specular Gradients -->
+              <svg width="0" height="0" class="oled-svg-defs" aria-hidden="true" style="position: absolute; pointer-events: none; opacity: 0;">
+                <defs>
+                  <!-- 1000R Concave Arc Silhouette (Top dips inward, bottom curves upward) -->
+                  <clipPath id="curvedOledClip" clipPathUnits="objectBoundingBox">
+                    <path d="M 0.02,0.06 Q 0.5,0.138 0.98,0.06 Q 1,0.06 1,0.09 L 1,0.91 Q 1,0.94 0.98,0.94 Q 0.5,0.862 0.02,0.94 Q 0,0.94 0,0.91 L 0,0.09 Q 0,0.06 0.02,0.06 Z" />
+                  </clipPath>
+                  <linearGradient id="topBezelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="rgba(255, 255, 255, 0.15)"/>
+                    <stop offset="25%" stop-color="rgba(255, 255, 255, 0.95)"/>
+                    <stop offset="50%" stop-color="#ffffff"/>
+                    <stop offset="75%" stop-color="rgba(255, 255, 255, 0.95)"/>
+                    <stop offset="100%" stop-color="rgba(255, 255, 255, 0.15)"/>
+                  </linearGradient>
+                  <linearGradient id="bottomBezelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="rgba(255, 255, 255, 0.08)"/>
+                    <stop offset="50%" stop-color="rgba(255, 255, 255, 0.65)"/>
+                    <stop offset="100%" stop-color="rgba(255, 255, 255, 0.08)"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+
               <div class="oled-ambient-backdrop" id="oled-ambient-backdrop"></div>
               
               <div class="oled-curved-frame-wrap" id="oled-curved-frame-wrap">
-                <!-- Top curved glass specular rim -->
-                <div class="oled-rim-crest oled-rim-top"></div>
-
                 <!-- Concave Curved Display Surface -->
                 <div class="oled-screen-surface">
                   <video id="exxclusive-video" class="exxclusive-video-player" playsinline preload="metadata">
@@ -1415,11 +1434,24 @@ tu h digi meri mai hu pyar tera .
                   </div>
                 </div>
 
-                <!-- Bottom curved glass specular rim -->
-                <div class="oled-rim-crest oled-rim-bottom"></div>
+                <!-- Titanium Curved Bezel Arc Overlay (Top / Bottom Physical Curvature Lines) -->
+                <svg class="oled-bezel-arc-overlay" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M 20 25 Q 500 58 980 25" class="oled-bezel-path-top" />
+                  <path d="M 20 395 Q 500 362 980 395" class="oled-bezel-path-bottom" />
+                  <line x1="20" y1="25" x2="20" y2="395" class="oled-bezel-path-edge" />
+                  <line x1="980" y1="25" x2="980" y2="395" class="oled-bezel-path-edge" />
+                </svg>
               </div>
 
-              <!-- Ambient OLED Under-Glow & Floor Reflection -->
+              <!-- Curved OLED Pedestal Stand -->
+              <div class="oled-curved-pedestal" aria-hidden="true">
+                <div class="pedestal-neck"></div>
+                <div class="pedestal-arc-base">
+                  <div class="pedestal-glow-dot"></div>
+                </div>
+              </div>
+
+              <!-- Ambient OLED Under-Glow & Glossy Floor Reflection -->
               <div class="oled-floor-reflection" id="oled-floor-reflection"></div>
             </div>
 
@@ -2430,7 +2462,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/cinema.js?v=4.3"></script>
   <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
-  <script src="js/exxclusive.js?v=1.0"></script>
-  <script src="js/app.js?v=3.7"></script>
+  <script src="js/exxclusive.js?v=2.0"></script>
+  <script src="js/app.js?v=3.8"></script>
 </body>
 </html>

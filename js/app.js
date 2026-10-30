@@ -700,6 +700,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Trigger sliding animation
     settingsViewport.classList.add('is-subpage-open');
+    if (targetId === 'subpage-exxclusive') {
+      settingsViewport.classList.add('is-exxclusive-mode');
+    } else {
+      settingsViewport.classList.remove('is-exxclusive-mode');
+    }
 
     // Scroll subpage to top
     const subpagePane = document.getElementById('settings-subpage-pane');
@@ -716,6 +721,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeSubpage() {
     if (!settingsViewport) return;
     settingsViewport.classList.remove('is-subpage-open');
+    settingsViewport.classList.remove('is-exxclusive-mode');
     if (window.vievExxclusive && typeof window.vievExxclusive.pauseVideo === 'function') {
       window.vievExxclusive.pauseVideo();
     }
