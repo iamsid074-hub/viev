@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="css/apple-intro.css?v=4.1">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
   <link rel="stylesheet" href="css/aircast.css?v=3.5">
+  <link rel="stylesheet" href="css/exxclusive.css?v=1.0">
 </head>
 <body>
 
@@ -1223,6 +1224,13 @@ tu h digi meri mai hu pyar tera .
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </button>
+
+              <button class="settings-nav-pill" data-target="subpage-exxclusive" type="button">
+                <span class="pill-nav-title">Exxclusive</span>
+                <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -1366,6 +1374,108 @@ tu h digi meri mai hu pyar tera .
                   <input type="range" id="spatial-depth-slider" min="10" max="70" value="35" class="apple-range-slider" aria-label="Spatial Reverb Wetness">
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- SUBPAGE: EXXCLUSIVE (MASSIVE CURVED OLED EXPERIENCE) -->
+          <div class="subpage-body-container" id="subpage-exxclusive" style="display: none;">
+            <div class="exxclusive-header">
+              <span class="exxclusive-kicker">PREMIERE EDITION</span>
+              <h2 class="subpage-large-heading exxclusive-heading">Exxclusive</h2>
+              <p class="exxclusive-subtitle">Ultra-Wide Curved OLED Cinema Experience</p>
+            </div>
+
+            <!-- Massive 3D Curved OLED Stage -->
+            <div class="oled-theater-viewport" id="oled-theater-viewport">
+              <div class="oled-ambient-backdrop" id="oled-ambient-backdrop"></div>
+              
+              <div class="oled-curved-frame-wrap" id="oled-curved-frame-wrap">
+                <!-- Top curved glass specular rim -->
+                <div class="oled-rim-crest oled-rim-top"></div>
+
+                <!-- Concave Curved Display Surface -->
+                <div class="oled-screen-surface">
+                  <video id="exxclusive-video" class="exxclusive-video-player" playsinline preload="metadata">
+                    <source src="video/exxclusive.mp4" type="video/mp4">
+                    <source src="video/exclusive.mp4" type="video/mp4">
+                    <source src="song/exxclusive.mp4" type="video/mp4">
+                  </video>
+
+                  <!-- Empty state / Waiting for file poster -->
+                  <div class="oled-placeholder-overlay" id="oled-placeholder-overlay">
+                    <div class="oled-placeholder-glyph">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                      </svg>
+                    </div>
+                    <div class="oled-placeholder-text">
+                      <span class="oled-placeholder-title">Curved OLED Ready</span>
+                      <span class="oled-placeholder-desc">Drop your video & audio into <code>video/exxclusive.mp4</code></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bottom curved glass specular rim -->
+                <div class="oled-rim-crest oled-rim-bottom"></div>
+              </div>
+
+              <!-- Ambient OLED Under-Glow & Floor Reflection -->
+              <div class="oled-floor-reflection" id="oled-floor-reflection"></div>
+            </div>
+
+            <!-- Custom Curved Glass Controls Bar -->
+            <div class="oled-controls-bar" id="oled-controls-bar">
+              <button class="oled-ctrl-btn" id="oled-play-toggle" aria-label="Play / Pause" type="button">
+                <svg class="oled-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="6 4 20 12 6 20 6 4"></polygon>
+                </svg>
+                <svg class="oled-icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                  <rect x="6" y="4" width="4" height="16"></rect>
+                  <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+              </button>
+
+              <div class="oled-timeline-wrap">
+                <input type="range" class="oled-scrubber" id="oled-scrubber" min="0" max="100" value="0" step="0.1" aria-label="Video Timeline">
+                <div class="oled-time-display">
+                  <span id="oled-time-current">0:00</span> / <span id="oled-time-duration">0:00</span>
+                </div>
+              </div>
+
+              <button class="oled-ctrl-btn" id="oled-mute-toggle" aria-label="Mute / Unmute" type="button">
+                <svg class="oled-icon-volume" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                <svg class="oled-icon-muted" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <line x1="23" y1="9" x2="17" y2="15"></line>
+                  <line x1="17" y1="9" x2="23" y2="15"></line>
+                </svg>
+              </button>
+
+              <button class="oled-ctrl-btn" id="oled-theater-expand" aria-label="Toggle Panoramic Theater" type="button" title="Full Curved Theater">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <polyline points="9 21 3 21 3 15"></polyline>
+                  <line x1="21" y1="3" x2="14" y2="10"></line>
+                  <line x1="3" y1="21" x2="10" y2="14"></line>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Exxclusive Tech Spec Pill Group -->
+            <div class="exxclusive-specs-row">
+              <span class="oled-spec-badge">
+                <span class="oled-spec-dot"></span>
+                <span>OLED HDR Master</span>
+              </span>
+              <span class="oled-spec-badge">
+                <span>Spatial 3D Audio</span>
+              </span>
+              <span class="oled-spec-badge">
+                <span>Ultra-Wide 21:9 Curve</span>
+              </span>
             </div>
           </div>
 
@@ -2320,6 +2430,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/cinema.js?v=4.3"></script>
   <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
+  <script src="js/exxclusive.js?v=1.0"></script>
   <script src="js/app.js?v=3.7"></script>
 </body>
 </html>

@@ -716,6 +716,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeSubpage() {
     if (!settingsViewport) return;
     settingsViewport.classList.remove('is-subpage-open');
+    if (window.vievExxclusive && typeof window.vievExxclusive.pauseVideo === 'function') {
+      window.vievExxclusive.pauseVideo();
+    }
     const navCenterTitle = document.getElementById('subpage-nav-center-title');
     if (navCenterTitle) {
       navCenterTitle.textContent = '';

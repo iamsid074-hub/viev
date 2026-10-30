@@ -173,6 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.vievCinema && typeof window.vievCinema.updateMiniPlayerVisibility === 'function') {
       window.vievCinema.updateMiniPlayerVisibility(targetTab);
     }
+
+    // Pause Exxclusive curved video when switching tabs away from settings
+    if (targetTab !== 'settings' && window.vievExxclusive && typeof window.vievExxclusive.pauseVideo === 'function') {
+      window.vievExxclusive.pauseVideo();
+    }
   }
 
   // Find nearest tab button from a clientX coordinate
