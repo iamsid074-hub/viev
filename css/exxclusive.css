@@ -53,6 +53,21 @@ html.is-exxclusive-active {
   align-items: center !important;
   justify-content: center !important;
   box-sizing: border-box !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#subpage-exxclusive.is-visible,
+html.is-exxclusive-active #subpage-exxclusive {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+html.is-exxclusive-closing #subpage-exxclusive {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* PORTRAIT MOBILES: Automatic 90deg Landscape Rotation (Zero portrait allowed) */
@@ -172,6 +187,17 @@ html.is-exxclusive-active {
   pointer-events: none;
   z-index: 1;
   overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.is-exxclusive-active .theater-acoustic-backdrop {
+  opacity: 1;
+}
+
+html.is-exxclusive-closing .theater-acoustic-backdrop {
+  opacity: 0 !important;
+  transition: opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Vertical Acoustic Timber/Fabric Slat Wall */
@@ -230,7 +256,7 @@ html.is-exxclusive-active {
 }
 
 /* =========================================================
-   REAL-TIME 4-ZONE DIRECTIONAL EDGE AMBILIGHT SYSTEM
+   REAL-TIME DYNAMIC AMBILIGHT SYSTEM
    ========================================================= */
 .oled-ambilight-canvas-wrap {
   position: absolute;
@@ -238,65 +264,11 @@ html.is-exxclusive-active {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: 3;
+  z-index: 2;
   transition: width 0.35s ease, height 0.35s ease;
 }
 
-/* 4 Directional Edge Zones (Independent Top, Bottom, Left, Right Lighting) */
-.amb-zone {
-  position: absolute;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  mix-blend-mode: screen;
-  will-change: opacity, background;
-}
-
-.oled-ambilight-canvas-wrap.is-active .amb-zone {
-  opacity: 0.90;
-}
-
-/* Top Edge Glow (Sky / Ceiling Light) */
-.amb-zone-top {
-  top: -14%;
-  left: 6%;
-  right: 6%;
-  height: 48%;
-  background: radial-gradient(ellipse at 50% 0%, var(--amb-top, rgba(255, 185, 110, 0.65)) 0%, transparent 72%);
-  filter: blur(55px);
-}
-
-/* Bottom Edge Glow (Ground / Floor Lighting) */
-.amb-zone-bottom {
-  bottom: -16%;
-  left: 6%;
-  right: 6%;
-  height: 48%;
-  background: radial-gradient(ellipse at 50% 100%, var(--amb-bottom, rgba(255, 150, 80, 0.65)) 0%, transparent 72%);
-  filter: blur(55px);
-}
-
-/* Left Flank Glow (Curved Left Edge Throw) */
-.amb-zone-left {
-  top: 8%;
-  bottom: 8%;
-  left: -15%;
-  width: 50%;
-  background: radial-gradient(ellipse at 0% 50%, var(--amb-left, rgba(255, 180, 100, 0.65)) 0%, transparent 72%);
-  filter: blur(58px);
-}
-
-/* Right Flank Glow (Curved Right Edge Throw) */
-.amb-zone-right {
-  top: 8%;
-  bottom: 8%;
-  right: -15%;
-  width: 50%;
-  background: radial-gradient(ellipse at 100% 50%, var(--amb-right, rgba(255, 180, 100, 0.65)) 0%, transparent 72%);
-  filter: blur(58px);
-}
-
-/* Central Ultra-Blurred Dynamic Video Halo Canvas */
+/* Ultra-Blurred Dynamic Video Canvas Halo */
 .oled-ambilight-canvas {
   position: absolute;
   width: 108%;
@@ -327,74 +299,38 @@ html.is-exxclusive-active {
 }
 
 .oled-ambilight-diffuser.is-dimmed {
-  opacity: 0.15;
-}
-
-/* =========================================================
-   GLOSSY STAGE FLOOR REFLECTION (HIGH-DEPTH OBSIDIAN FLOOR)
-   ========================================================= */
-.theater-stage-floor-reflection {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 26%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
-  perspective: 800px;
-}
-
-.stage-floor-mirror-wrap {
-  position: relative;
-  width: 84%;
-  height: 100%;
-  transform: rotateX(68deg) scaleY(-1);
-  transform-origin: top center;
-  filter: blur(6px) saturate(180%) brightness(0.9);
-  opacity: 0;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.25) 50%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.25) 50%, transparent 100%);
-  will-change: opacity;
-}
-
-.stage-floor-mirror-wrap.is-active {
-  opacity: 0.60;
-}
-
-.theater-floor-canvas {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  display: block;
-}
-
-/* Polished Black Glass Stage Overlay */
-.stage-floor-gloss-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, 
-    rgba(255, 255, 255, 0.04) 0%, 
-    transparent 20%, 
-    rgba(0, 0, 0, 0.55) 70%, 
-    #000000 100%
-  );
-  pointer-events: none;
+  opacity: 0.20;
 }
 
 /* Massive 3D Curved OLED Monitor Chassis */
 .oled-curved-frame-wrap {
   position: relative;
   transform-style: preserve-3d;
-  transform: perspective(1100px) rotateX(2deg);
-  filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.04));
-  z-index: 4;
-  transition: width 0.35s ease, height 0.35s ease;
+  transform: perspective(1100px) rotateX(2deg) scale(0.92);
+  opacity: 0;
+  filter: blur(14px) drop-shadow(0 0 35px rgba(255, 255, 255, 0.04));
+  z-index: 3;
+  transition: width 0.35s ease, 
+              height 0.35s ease, 
+              opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), 
+              filter 0.65s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+}
+
+html.is-exxclusive-active .oled-curved-frame-wrap {
+  transform: perspective(1100px) rotateX(2deg) scale(1);
+  opacity: 1;
+  filter: blur(0px) drop-shadow(0 0 35px rgba(255, 255, 255, 0.04));
+}
+
+html.is-exxclusive-closing .oled-curved-frame-wrap {
+  transform: perspective(1100px) rotateX(2deg) scale(0.92) !important;
+  opacity: 0 !important;
+  filter: blur(12px) !important;
+  transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.42s cubic-bezier(0.4, 0, 0.2, 1), 
+              filter 0.42s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Concave 1000R Clipped Display Surface */
@@ -561,4 +497,86 @@ html.is-exxclusive-active {
   color: rgba(255, 255, 255, 0.75);
   line-height: 1.4;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+}
+
+/* =========================================================
+   CURVED DURATION / PROGRESS BAR (Parallel to 1000R Chin)
+   ========================================================= */
+.oled-curved-duration-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 8;
+  overflow: visible;
+}
+
+.oled-curved-duration-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.oled-duration-glow {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 6;
+  stroke-linecap: round;
+  fill: none;
+  filter: blur(3px);
+}
+
+.oled-duration-track {
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  fill: none;
+  transition: stroke 0.25s ease;
+}
+
+.oled-curved-duration-wrap:hover .oled-duration-track {
+  stroke: rgba(255, 255, 255, 0.30);
+}
+
+.oled-duration-fill {
+  stroke: url(#durationProgressGrad);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  fill: none;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.85));
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  will-change: stroke-dashoffset;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.oled-duration-hit {
+  stroke: transparent;
+  stroke-width: 28;
+  stroke-linecap: round;
+  fill: none;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.oled-duration-head {
+  fill: #ffffff;
+  stroke: rgba(0, 0, 0, 0.7);
+  stroke-width: 1.5;
+  pointer-events: none;
+  will-change: cx, cy;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.oled-duration-time-curr,
+.oled-duration-time-total {
+  fill: rgba(255, 255, 255, 0.45);
+  font-size: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  user-select: none;
+  pointer-events: none;
 }

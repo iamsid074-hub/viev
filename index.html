@@ -1397,22 +1397,10 @@ tu h digi meri mai hu pyar tera .
                 <div class="theater-floor-horizon"></div>
               </div>
 
-              <!-- 4-Zone Directional Edge Ambilight + Central Video Halo -->
+              <!-- Real-Time Dynamic Ambilight Backglow (Video-Synchronized Halo) -->
               <div class="oled-ambilight-canvas-wrap" id="oled-ambilight-wrap" aria-hidden="true">
-                <div class="amb-zone amb-zone-top" id="amb-zone-top"></div>
-                <div class="amb-zone amb-zone-bottom" id="amb-zone-bottom"></div>
-                <div class="amb-zone amb-zone-left" id="amb-zone-left"></div>
-                <div class="amb-zone amb-zone-right" id="amb-zone-right"></div>
                 <canvas id="oled-ambilight-canvas" class="oled-ambilight-canvas" width="64" height="36"></canvas>
                 <div class="oled-ambilight-diffuser" id="oled-ambilight-diffuser"></div>
-              </div>
-
-              <!-- Glossy Stage Floor Reflection Layer (Dynamic Perspective Floor Mirror) -->
-              <div class="theater-stage-floor-reflection" id="theater-stage-floor-reflection" aria-hidden="true">
-                <div class="stage-floor-mirror-wrap" id="stage-floor-mirror-wrap">
-                  <canvas id="theater-floor-canvas" class="theater-floor-canvas" width="64" height="24"></canvas>
-                </div>
-                <div class="stage-floor-gloss-overlay"></div>
               </div>
 
               <!-- SVG Definitions for True 1000R Concave Arc Geometry & Specular Gradients -->
@@ -1473,6 +1461,39 @@ tu h digi meri mai hu pyar tera .
                   <!-- Right Side Titanium Pillar -->
                   <line x1="975" y1="27" x2="975" y2="393" class="oled-bezel-path-edge" />
                 </svg>
+
+                <!-- Interactive Curved Duration / Progress Bar (Curving Parallel Below Bottom Edge) -->
+                <div class="oled-curved-duration-wrap" id="oled-curved-duration-wrap">
+                  <svg class="oled-curved-duration-svg" viewBox="0 0 1000 425" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="durationProgressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="85%" stop-color="#ffffff"/>
+                        <stop offset="100%" stop-color="#f5e1a4"/>
+                      </linearGradient>
+                      <filter id="durationHeadGlow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+                        <feMerge>
+                          <feMergeNode in="blur"/>
+                          <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                      </filter>
+                    </defs>
+                    <!-- Ambient Diffuse Glow behind track -->
+                    <path d="M 45 407 Q 500 376 955 407" class="oled-duration-glow" />
+                    <!-- Background Inactive Track Arc -->
+                    <path d="M 45 407 Q 500 376 955 407" class="oled-duration-track" />
+                    <!-- Active Progress Arc (Fills seamlessly as video plays) -->
+                    <path d="M 45 407 Q 500 376 955 407" class="oled-duration-fill" id="oled-curved-duration-fill" />
+                    <!-- Invisible Expanded Hit-Test Arc for Smooth Touch / Click Scrubbing -->
+                    <path d="M 45 407 Q 500 376 955 407" class="oled-duration-hit" id="oled-curved-duration-hit" />
+                    <!-- Glowing Playhead Scrubber Dot -->
+                    <circle cx="45" cy="407" r="4.5" class="oled-duration-head" id="oled-curved-duration-head" filter="url(#durationHeadGlow)" />
+                    <!-- Sleek Timestamps at Curve Terminals -->
+                    <text x="45" y="421" class="oled-duration-time-curr" id="oled-time-curr">0:00</text>
+                    <text x="955" y="421" text-anchor="end" class="oled-duration-time-total" id="oled-time-total">--:--</text>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
@@ -2429,6 +2450,6 @@ tu h digi meri mai hu pyar tera .
   <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
   <script src="js/exxclusive.js?v=6.0"></script>
-  <script src="js/app.js?v=4.0"></script>
+  <script src="js/app.js?v=4.5"></script>
 </body>
 </html>

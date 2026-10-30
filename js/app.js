@@ -707,6 +707,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof window.setFloatingNavVisible === 'function') {
         window.setFloatingNavVisible(false);
       }
+      if (window.vievExxclusive && typeof window.vievExxclusive.enterCinema === 'function') {
+        window.vievExxclusive.enterCinema();
+      }
     } else {
       settingsViewport.classList.remove('is-exxclusive-mode');
       document.body.classList.remove('is-exxclusive-active');
@@ -729,6 +732,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeSubpage() {
+    if (!settingsViewport) return;
+
+    if (document.documentElement.classList.contains('is-exxclusive-active')) {
+      if (window.vievExxclusive && typeof window.vievExxclusive.exitCinema === 'function') {
+        window.vievExxclusive.exitCinema(() => {
+          finalizeCloseSubpage();
+        });
+        return;
+      }
+    }
+    finalizeCloseSubpage();
+  }
+
+  function finalizeCloseSubpage() {
     if (!settingsViewport) return;
     settingsViewport.classList.remove('is-subpage-open');
     settingsViewport.classList.remove('is-exxclusive-mode');
