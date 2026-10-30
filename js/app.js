@@ -702,8 +702,18 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsViewport.classList.add('is-subpage-open');
     if (targetId === 'subpage-exxclusive') {
       settingsViewport.classList.add('is-exxclusive-mode');
+      document.body.classList.add('is-exxclusive-active');
+      document.documentElement.classList.add('is-exxclusive-active');
+      if (typeof window.setFloatingNavVisible === 'function') {
+        window.setFloatingNavVisible(false);
+      }
     } else {
       settingsViewport.classList.remove('is-exxclusive-mode');
+      document.body.classList.remove('is-exxclusive-active');
+      document.documentElement.classList.remove('is-exxclusive-active');
+      if (typeof window.setFloatingNavVisible === 'function') {
+        window.setFloatingNavVisible(true);
+      }
     }
 
     // Scroll subpage to top
@@ -722,6 +732,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!settingsViewport) return;
     settingsViewport.classList.remove('is-subpage-open');
     settingsViewport.classList.remove('is-exxclusive-mode');
+    document.body.classList.remove('is-exxclusive-active');
+    document.documentElement.classList.remove('is-exxclusive-active');
+    if (typeof window.setFloatingNavVisible === 'function') {
+      window.setFloatingNavVisible(true);
+    }
     if (window.vievExxclusive && typeof window.vievExxclusive.pauseVideo === 'function') {
       window.vievExxclusive.pauseVideo();
     }
