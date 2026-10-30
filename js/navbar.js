@@ -355,14 +355,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (indicator) {
         indicator.classList.add('is-popped');
       }
-      if (nav) {
-        nav.classList.add('is-tap-enlarged');
-      }
       if (tapTimeout) clearTimeout(tapTimeout);
       tapTimeout = setTimeout(() => {
         if (indicator) indicator.classList.remove('is-popped');
-        if (nav) nav.classList.remove('is-tap-enlarged');
-      }, 300);
+      }, 220);
     });
   });
 
