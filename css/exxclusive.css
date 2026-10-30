@@ -140,12 +140,24 @@
   );
 }
 
+.exxclusive-yt-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #000000;
+  display: block;
+  z-index: 2;
+}
+
 .exxclusive-video-player {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
   background: #000000;
+  z-index: 2;
 }
 
 /* Overlay Curved Bezel Arc Lines (Matches the exact 1000R Arc) */
@@ -179,6 +191,15 @@
   fill: none;
 }
 
+/* Dimmer vignette behind the poster play button */
+.oled-poster-dimmer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.40) 0%, rgba(0, 0, 0, 0.88) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* Ready / Empty State Placeholder Overlay */
 .oled-placeholder-overlay {
   position: absolute;
@@ -188,11 +209,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   padding: 16px;
   text-align: center;
-  background: radial-gradient(ellipse at 50% 50%, rgba(18, 22, 34, 0.96) 0%, rgba(4, 5, 8, 0.99) 100%);
-  transition: opacity 0.3s ease;
+  cursor: pointer;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.oled-placeholder-overlay > * {
+  position: relative;
+  z-index: 2;
 }
 
 .oled-placeholder-overlay.is-hidden {

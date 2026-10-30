@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/apple-intro.css?v=4.1">
   <link rel="stylesheet" href="css/cinema-player.css?v=3.9">
   <link rel="stylesheet" href="css/aircast.css?v=3.5">
-  <link rel="stylesheet" href="css/exxclusive.css?v=2.5">
+  <link rel="stylesheet" href="css/exxclusive.css?v=3.0">
 </head>
 <body>
 
@@ -1415,23 +1415,27 @@ tu h digi meri mai hu pyar tera .
               
               <div class="oled-curved-frame-wrap" id="oled-curved-frame-wrap">
                 <!-- Concave Curved Display Surface -->
-                <div class="oled-screen-surface">
-                  <video id="exxclusive-video" class="exxclusive-video-player" playsinline preload="metadata">
+                <div class="oled-screen-surface" id="oled-screen-surface">
+                  <!-- Direct YouTube Stream Iframe -->
+                  <iframe id="exxclusive-yt-iframe" class="exxclusive-yt-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+                  <video id="exxclusive-video" class="exxclusive-video-player" playsinline preload="metadata" style="display: none;">
                     <source src="video/exxclusive.mp4" type="video/mp4">
                     <source src="video/exclusive.mp4" type="video/mp4">
                     <source src="song/exxclusive.mp4" type="video/mp4">
                   </video>
 
-                  <!-- Empty state / Waiting for file poster -->
-                  <div class="oled-placeholder-overlay" id="oled-placeholder-overlay">
+                  <!-- Direct YouTube Video Poster & Play Trigger -->
+                  <div class="oled-placeholder-overlay" id="oled-placeholder-overlay" style="background-image: url('https://i.ytimg.com/vi/0uR45roIGA4/maxresdefault.jpg'); background-size: cover; background-position: center;">
+                    <div class="oled-poster-dimmer"></div>
                     <div class="oled-placeholder-glyph">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="6 4 20 12 6 20 6 4"></polygon>
                       </svg>
                     </div>
                     <div class="oled-placeholder-text">
-                      <span class="oled-placeholder-title">Curved OLED Ready</span>
-                      <span class="oled-placeholder-desc">Drop your video & audio into <code>video/exxclusive.mp4</code></span>
+                      <span class="oled-placeholder-title">Jab Saiyaan</span>
+                      <span class="oled-placeholder-desc">Gangubai Kathiawadi • Sanjay Leela Bhansali</span>
                     </div>
                   </div>
                 </div>
@@ -2460,7 +2464,7 @@ tu h digi meri mai hu pyar tera .
   <script src="js/cinema.js?v=4.3"></script>
   <script src="js/cast-engine.js?v=3.4"></script>
   <script src="js/motion-ad.js?v=1.0"></script>
-  <script src="js/exxclusive.js?v=2.5"></script>
+  <script src="js/exxclusive.js?v=3.0"></script>
   <script src="js/app.js?v=3.8"></script>
 </body>
 </html>

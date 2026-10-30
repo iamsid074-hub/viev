@@ -1,23 +1,35 @@
 /* =========================================================
    VIEVS EXXCLUSIVE - CURVED OLED CINEMA ENGINE
+   Direct YouTube Video Integration ("Jab Saiyaan" - 0uR45roIGA4)
    Controls for Massive Curved OLED Screen, Custom Timeline,
-   Audio-Muting Handshake & Panoramic Theater Mode
+   Audio-Muting Handshake, Landscape Mode & Panoramic Theater
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const video = document.getElementById('exxclusive-video');
+  const YOUTUBE_VIDEO_ID = '0uR45roIGA4';
+  const ytIframe = document.getElementById('exxclusive-yt-iframe');
+  const localVideo = document.getElementById('exxclusive-video');
   const playToggleBtn = document.getElementById('oled-play-toggle');
   const muteToggleBtn = document.getElementById('oled-mute-toggle');
+  const landscapeToggleBtn = document.getElementById('oled-landscape-toggle');
   const theaterExpandBtn = document.getElementById('oled-theater-expand');
+  const cinemaCloseBtn = document.getElementById('oled-cinema-close-trigger');
   const scrubber = document.getElementById('oled-scrubber');
   const timeCurrent = document.getElementById('oled-time-current');
   const timeDuration = document.getElementById('oled-time-duration');
   const placeholderOverlay = document.getElementById('oled-placeholder-overlay');
   const viewport = document.getElementById('oled-theater-viewport');
+  const subpageContainer = document.getElementById('subpage-exxclusive');
   const playIcon = document.querySelector('.oled-icon-play');
   const pauseIcon = document.querySelector('.oled-icon-pause');
   const volIcon = document.querySelector('.oled-icon-volume');
   const mutedIcon = document.querySelector('.oled-icon-muted');
+
+  let isYtLoaded = false;
+  let isYtPlaying = false;
+  let isYtMuted = false;
+  let ytCurrentTime = 0;
+  let ytDuration = 227; // "Jab Saiyaan" default duration (~3:47)
 
   function formatTime(sec) {
     if (isNaN(sec) || !isFinite(sec)) return '0:00';
@@ -36,97 +48,156 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mutedIcon) mutedIcon.style.display = isMuted ? 'block' : 'none';
   }
 
-  if (video) {
-    // When video starts playing, pause background music audio so tracks don't clash
-    video.addEventListener('play', () => {
+  // Send PostMessage commands to YouTube IFrame API
+  function sendYtCommand(func, args) {
+    if (!ytIframe || !ytIframe.contentWindow) return;
+    try {
+      const msg = {
+        event: 'command',
+        func: func,
+        args: Array.isArray(args) ? args : (args !== undefined && args !== '' ? [args] : [])
+      };
+      ytIframe.contentWindow.postMessage(JSON.stringify(msg), '*');
+    } catch (_) {}
+  }
+
+  // Start / Play YouTube video directly
+  function startYouTubePlayback() {
+    if (placeholderOverlay) placeholderOverlay.classList.add('is-hidden');
+
+    // Pause any background music playing in VIEVS
+    if (typeof window.userExplicitPause !== 'undefined') {
+      window.userExplicitPause = true;
+    }
+    if (typeof pauseTrack === 'function') {
+      pauseTrack();
+    } else {
+      const audio = document.getElementById('audio-player') || window.audio;
+      if (audio && !audio.paused) audio.pause();
+    }
+
+    if (!isYtLoaded && ytIframe) {
+      isYtLoaded = true;
+      const originParam = (window.location.origin && window.location.origin !== 'null' && window.location.protocol.startsWith('http'))
+        ? `&origin=${encodeURIComponent(window.location.origin)}`
+        : '';
+      ytIframe.src = `https://www.youtube-nocookie.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&enablejsapi=1${originParam}&controls=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1`;
+      ytIframe.onload = () => {
+        try {
+          ytIframe.contentWindow.postMessage('{"event":"listening"}', '*');
+          ytIframe.contentWindow.postMessage('{"event":"command","func":"listening","args":""}', '*');
+        } catch (_) {}
+      };
+    } else {
+      sendYtCommand('playVideo');
+    }
+
+    isYtPlaying = true;
+    updatePlayState(true);
+  }
+
+  // Toggle Play / Pause
+  function togglePlayback() {
+    if (typeof triggerHaptic === 'function') triggerHaptic('light');
+    if (!isYtLoaded) {
+      startYouTubePlayback();
+      return;
+    }
+
+    if (isYtPlaying) {
+      sendYtCommand('pauseVideo');
+      isYtPlaying = false;
+      updatePlayState(false);
+    } else {
+      sendYtCommand('playVideo');
+      isYtPlaying = true;
       updatePlayState(true);
-      if (placeholderOverlay) placeholderOverlay.classList.add('is-hidden');
-      if (typeof window.userExplicitPause !== 'undefined') {
-        window.userExplicitPause = true;
-      }
-      if (typeof pauseTrack === 'function') {
-        pauseTrack();
-      } else {
-        const audio = document.getElementById('audio-player') || window.audio;
-        if (audio && !audio.paused) audio.pause();
-      }
-    });
-
-    video.addEventListener('pause', () => {
-      updatePlayState(false);
-    });
-
-    video.addEventListener('ended', () => {
-      updatePlayState(false);
-      if (scrubber) scrubber.value = 0;
-    });
-
-    video.addEventListener('timeupdate', () => {
-      if (!video.duration) return;
-      if (scrubber && !scrubber.matches(':active')) {
-        scrubber.value = (video.currentTime / video.duration) * 100;
-      }
-      if (timeCurrent) timeCurrent.textContent = formatTime(video.currentTime);
-    });
-
-    video.addEventListener('loadedmetadata', () => {
-      if (timeDuration) timeDuration.textContent = formatTime(video.duration);
-      if (placeholderOverlay) placeholderOverlay.classList.add('is-hidden');
-    });
-
-    video.addEventListener('canplay', () => {
-      if (placeholderOverlay) placeholderOverlay.classList.add('is-hidden');
-    });
-
-    video.addEventListener('error', () => {
-      // Show clean placeholder if local file is yet to be placed
-      if (placeholderOverlay) placeholderOverlay.classList.remove('is-hidden');
-    });
-
-    // Scrubber Seeking
-    if (scrubber) {
-      scrubber.addEventListener('input', () => {
-        if (!video.duration) return;
-        const targetTime = (scrubber.value / 100) * video.duration;
-        video.currentTime = targetTime;
-        if (timeCurrent) timeCurrent.textContent = formatTime(targetTime);
-      });
+      if (typeof pauseTrack === 'function') pauseTrack();
     }
+  }
 
-    // Play / Pause Toggle
-    if (playToggleBtn) {
-      playToggleBtn.addEventListener('click', () => {
-        if (typeof triggerHaptic === 'function') triggerHaptic('light');
-        if (video.paused) {
-          video.play().catch(() => {});
-        } else {
-          video.pause();
-        }
-      });
-    }
+  // Toggle Mute / Unmute
+  function toggleMute() {
+    if (typeof triggerHaptic === 'function') triggerHaptic('light');
+    isYtMuted = !isYtMuted;
+    sendYtCommand(isYtMuted ? 'mute' : 'unMute');
+    updateMuteState(isYtMuted);
+  }
 
-    // Mute / Unmute Toggle
-    if (muteToggleBtn) {
-      muteToggleBtn.addEventListener('click', () => {
-        if (typeof triggerHaptic === 'function') triggerHaptic('light');
-        video.muted = !video.muted;
-        updateMuteState(video.muted);
-      });
-    }
-
-    // Click on video directly to play/pause
-    video.addEventListener('click', () => {
-      if (typeof triggerHaptic === 'function') triggerHaptic('light');
-      if (video.paused) {
-        video.play().catch(() => {});
-      } else {
-        video.pause();
-      }
+  // Click on placeholder overlay starts video
+  if (placeholderOverlay) {
+    placeholderOverlay.addEventListener('click', () => {
+      if (typeof triggerHaptic === 'function') triggerHaptic('medium');
+      startYouTubePlayback();
     });
   }
 
+  // Play / Pause button
+  if (playToggleBtn) {
+    playToggleBtn.addEventListener('click', togglePlayback);
+  }
+
+  // Mute / Unmute button
+  if (muteToggleBtn) {
+    muteToggleBtn.addEventListener('click', toggleMute);
+  }
+
+  // Scrubber Seeking
+  if (scrubber) {
+    scrubber.addEventListener('input', () => {
+      if (!ytDuration) return;
+      const targetTime = (scrubber.value / 100) * ytDuration;
+      sendYtCommand('seekTo', [targetTime, true]);
+      if (timeCurrent) timeCurrent.textContent = formatTime(targetTime);
+    });
+  }
+
+  // Listen for YouTube Iframe API playback updates
+  window.addEventListener('message', (event) => {
+    if (!ytIframe || !ytIframe.contentWindow) return;
+    if (event.source !== ytIframe.contentWindow) return;
+    try {
+      const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+      if (!data) return;
+
+      if ((data.event === 'infoDelivery' || data.event === 'initialDelivery') && data.info) {
+        if (typeof data.info.duration === 'number' && data.info.duration > 0) {
+          ytDuration = Math.round(data.info.duration);
+          if (timeDuration) timeDuration.textContent = formatTime(ytDuration);
+        }
+        if (typeof data.info.currentTime === 'number') {
+          ytCurrentTime = data.info.currentTime;
+          if (scrubber && !scrubber.matches(':active') && ytDuration > 0) {
+            scrubber.value = (ytCurrentTime / ytDuration) * 100;
+          }
+          if (timeCurrent) timeCurrent.textContent = formatTime(ytCurrentTime);
+        }
+        if (typeof data.info.playerState === 'number') {
+          const state = data.info.playerState;
+          if (state === 1) { // PLAYING
+            isYtPlaying = true;
+            updatePlayState(true);
+            if (placeholderOverlay) placeholderOverlay.classList.add('is-hidden');
+          } else if (state === 2 || state === 0) { // PAUSED or ENDED
+            isYtPlaying = false;
+            updatePlayState(false);
+          }
+        }
+      } else if (data.event === 'onStateChange' && typeof data.info === 'number') {
+        const state = data.info;
+        if (state === 1) {
+          isYtPlaying = true;
+          updatePlayState(true);
+          if (placeholderOverlay) placeholderOverlay.classList.add('is-hidden');
+        } else if (state === 2 || state === 0) {
+          isYtPlaying = false;
+          updatePlayState(false);
+        }
+      }
+    } catch (_) {}
+  });
+
   // Dedicated Cinema Back Button
-  const cinemaCloseBtn = document.getElementById('oled-cinema-close-trigger');
   if (cinemaCloseBtn) {
     cinemaCloseBtn.addEventListener('click', () => {
       if (typeof triggerHaptic === 'function') triggerHaptic('light');
@@ -135,15 +206,12 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsBackBtn.click();
       } else {
         window.vievExxclusive.pauseVideo();
-        const sub = document.getElementById('subpage-exxclusive');
-        if (sub) sub.style.display = 'none';
+        if (subpageContainer) subpageContainer.style.display = 'none';
       }
     });
   }
 
   // Landscape Cinema Orientation Mode Toggle
-  const landscapeToggleBtn = document.getElementById('oled-landscape-toggle');
-  const subpageContainer = document.getElementById('subpage-exxclusive');
   if (landscapeToggleBtn && subpageContainer) {
     landscapeToggleBtn.addEventListener('click', () => {
       if (typeof triggerHaptic === 'function') triggerHaptic('medium');
@@ -178,8 +246,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Global pause hook when navigating away
   window.vievExxclusive = {
     pauseVideo() {
-      if (video && !video.paused) {
-        video.pause();
+      sendYtCommand('pauseVideo');
+      isYtPlaying = false;
+      updatePlayState(false);
+
+      if (localVideo && !localVideo.paused) {
+        localVideo.pause();
       }
       if (viewport && viewport.classList.contains('is-panoramic')) {
         viewport.classList.remove('is-panoramic');
