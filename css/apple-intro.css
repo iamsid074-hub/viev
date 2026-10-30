@@ -1226,10 +1226,11 @@
 }
 
 /* =========================================================
-   IOS 27 PURE LIQUID GLASS INDICATOR PILL
-   - Zero opaque / zero frosty milky haze
-   - Pure crystal liquid meniscus & surface tension
-   - Refraction of 7 spectral colors (VIBGYOR chromatic prism) on rounded edges
+   3D LIQUID GLASS INDICATOR PILL (Exact Optical Lens Shader Replica)
+   - Replicating the 3D Liquid Glass Squircle Shader
+   - Thick, radiant, pure white beveled perimeter rim (rb2 specular ring)
+   - Vertical caustic gradient: top liquid cap + lower dark horizon reflection line (rb1 + rb3)
+   - Optical glass clarity & magnification (backdrop brightness & contrast)
    ========================================================= */
 .nav-indicator-pill {
   position: absolute;
@@ -1237,62 +1238,77 @@
   bottom: 5px;
   left: 5px;
   border-radius: 9999px;
-  /* Pure liquid body: zero milky frost, 100% transparent optical droplet */
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.005) 100%);
-  border: 1px solid transparent;
+  box-sizing: border-box;
   pointer-events: none;
   z-index: 1;
-  transform: none;
-  /* Physical liquid meniscus light & 7-color chromatic edge dispersion */
+  overflow: hidden;
+  
+  /* 1. Body: Optical glass magnification & clarity matching the shader sample */
+  backdrop-filter: brightness(1.28) contrast(1.18) saturate(190%) blur(1.5px);
+  -webkit-backdrop-filter: brightness(1.28) contrast(1.18) saturate(190%) blur(1.5px);
+  
+  /* 2. Vertical Internal Refraction Gradient (matching shader rb1 * gradient + rb3) */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45) 0%,      /* Top liquid specular crest */
+    rgba(255, 255, 255, 0.16) 28%,     /* Upper clear lens */
+    rgba(255, 255, 255, 0.02) 58%,     /* Pure transparent optical center */
+    rgba(10, 10, 20, 0.40) 78%,         /* Dark horizon total internal reflection line */
+    rgba(255, 255, 255, 0.35) 94%,     /* Bottom caustic bounce */
+    rgba(255, 255, 255, 0.60) 100%     /* Bottom lip highlight */
+  );
+
+  /* 3. Radiant 3D Liquid Bevel & Edge (matching shader rb2 rim lighting) */
+  border: 1.2px solid rgba(255, 255, 255, 0.85);
   box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.50),
-    inset 0 1.2px 0.6px rgba(255, 255, 255, 0.82),    /* Top water-droplet meniscus specular */
-    inset 0 -1px 0.6px rgba(255, 255, 255, 0.18),    /* Bottom caustics */
-    0 0 10px rgba(100, 210, 255, 0.22),               /* Ambient spectral cyan glow */
-    0 0 16px rgba(191, 90, 242, 0.18);                /* Ambient spectral violet glow */
+    0 10px 28px rgba(0, 0, 0, 0.58),                /* Deep floating shadow */
+    0 0 18px rgba(255, 255, 255, 0.22),              /* Ambient optical lens glow */
+    inset 0 2.2px 1.5px rgba(255, 255, 255, 0.95),   /* Intense top liquid meniscus bevel */
+    inset 0 -2px 1.5px rgba(255, 255, 255, 0.75),   /* Bottom upward rim reflection */
+    inset 2px 0 2px rgba(255, 255, 255, 0.50),       /* Left edge light */
+    inset -2px 0 2px rgba(255, 255, 255, 0.50);      /* Right edge light */
+
   transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1),
               width 0.26s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.25s ease;
   will-change: left, width;
 }
 
-/* 7-Color Prismatic Refraction Rim (VIBGYOR Dispersion on Rounded Edges) */
+/* 4. Top Curving 3D Glass Dome Sheen (Spherical Meniscus Cap) */
 .nav-indicator-pill::before {
   content: '';
   position: absolute;
-  inset: -1px;
-  border-radius: 9999px;
-  padding: 1.2px;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  border-radius: 9999px 9999px 50% 50%;
   background: linear-gradient(
-    115deg,
-    rgba(255, 59, 105, 0.85) 0%,     /* Red */
-    rgba(255, 149, 0, 0.80) 16%,     /* Orange */
-    rgba(255, 214, 10, 0.75) 32%,     /* Yellow */
-    rgba(48, 209, 88, 0.75) 50%,      /* Green */
-    rgba(100, 210, 255, 0.85) 68%,    /* Cyan/Blue */
-    rgba(88, 86, 214, 0.85) 84%,     /* Indigo */
-    rgba(191, 90, 242, 0.85) 100%     /* Violet */
+    180deg,
+    rgba(255, 255, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.25) 45%,
+    rgba(255, 255, 255, 0) 100%
   );
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
   pointer-events: none;
-  opacity: 0.90;
-  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.6));
+  opacity: 0.88;
 }
 
-/* Crystal Surface Tension & Optical Liquid Meniscus Lens */
+/* 5. Prismatic Edge Dispersion & Bottom Internal Refraction Arc */
 .nav-indicator-pill::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 9999px;
   background: 
-    radial-gradient(ellipse 65% 45% at 50% 0%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 70%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 35% at 50% 100%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(90deg, 
+      rgba(255, 59, 105, 0.22) 0%, 
+      transparent 15%, 
+      transparent 85%, 
+      rgba(100, 210, 255, 0.28) 100%
+    );
   pointer-events: none;
+  mix-blend-mode: overlay;
 }
 
 .nav-indicator-pill.no-transition {
