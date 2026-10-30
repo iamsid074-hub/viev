@@ -1225,30 +1225,26 @@
   to { transform: rotate(360deg); }
 }
 
-/* Small Active Indicator Pill (Elevated Liquid Lens with Corner Water Reflections) */
+/* Small Active Indicator Pill (Strictly Bounded Inside Big Navbar) */
 .nav-indicator-pill {
   position: absolute;
   top: 5px;
   bottom: 5px;
   left: 5px;
   background: rgba(255, 255, 255, 0.17);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 9999px;
-  /* Liquid meniscus elevation: rests slightly lifted (-1.5px) with soft caustic shadow */
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.35),
-    0 1px 3px rgba(0, 0, 0, 0.25),
-    inset 0 1.2px 1px rgba(255, 255, 255, 0.70),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.28);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.30), inset 0 1px 1px rgba(255, 255, 255, 0.3);
   pointer-events: none;
   z-index: 1;
-  transform: translateY(-1.5px);
-  transition: left 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-              width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.30s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.30s cubic-bezier(0.34, 1.56, 0.64, 1),
-              background 0.2s ease,
-              border-color 0.2s ease;
+  transform: scale(1);
+  transform-origin: center center;
+  transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              background 0.22s ease,
+              border-color 0.22s ease,
+              box-shadow 0.30s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: left, width, transform;
 }
 
@@ -1258,60 +1254,40 @@
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.40) 0%, rgba(255, 255, 255, 0.06) 55%, transparent 100%);
-  opacity: 0.75;
-  pointer-events: none;
-}
-
-/* Corner Water Reflections: Prismatic liquid meniscus refractions on the curved corners */
-.nav-indicator-pill::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 9999px;
-  pointer-events: none;
-  background:
-    /* Top-Left Water Droplet Caustic Highlight */
-    radial-gradient(circle 16px at 12% 16%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.40) 45%, transparent 75%),
-    /* Top-Right Water Droplet Caustic Highlight */
-    radial-gradient(circle 16px at 88% 16%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.40) 45%, transparent 75%),
-    /* Bottom-Left Liquid Refraction Corner Arc */
-    radial-gradient(circle 14px at 10% 86%, rgba(200, 235, 255, 0.75) 0%, rgba(255, 255, 255, 0.25) 50%, transparent 78%),
-    /* Bottom-Right Liquid Refraction Corner Arc */
-    radial-gradient(circle 14px at 90% 86%, rgba(200, 235, 255, 0.75) 0%, rgba(255, 255, 255, 0.25) 50%, transparent 78%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.05) 55%, transparent 100%);
   opacity: 0.65;
-  mix-blend-mode: screen;
-  transition: opacity 0.30s ease, transform 0.30s ease;
-  will-change: opacity, transform;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
 }
 
 .nav-indicator-pill.no-transition {
   transition: none !important;
 }
 
-/* Tap / Click: Dynamic Upward Water-Lift Animation (Pill detaches slightly above the capsule lines) */
-.nav-indicator-pill.is-pill-lifted,
-.apple-floating-navbar.is-tap-enlarged .nav-indicator-pill {
-  transform: translateY(-4px) scale(1.02);
-  background: rgba(255, 255, 255, 0.22);
-  border-color: rgba(255, 255, 255, 0.48);
+/* Option 1: Tap Bloom Pop-Out Effect (Becomes visibly bigger than the floating bar itself) */
+.nav-indicator-pill.is-popped,
+.apple-floating-navbar:active .nav-indicator-pill,
+.apple-floating-navbar.is-dragging .nav-indicator-pill {
+  transform: scale(1.32);
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.45);
   box-shadow: 
-    0 10px 24px rgba(0, 0, 0, 0.52),                 /* Deep separated shadow exposing capsule lines underneath */
-    0 2px 6px rgba(0, 0, 0, 0.35),
-    0 0 16px rgba(255, 255, 255, 0.28),               /* Ambient liquid water dispersion */
-    inset 0 1.8px 1.2px rgba(255, 255, 255, 0.95),   /* High-tension liquid top rim */
-    inset 0 -1.4px 1px rgba(255, 255, 255, 0.50);    /* Elevated bottom refraction line */
+    0 14px 34px rgba(0, 0, 0, 0.65),               /* Deep floating elevation shadow outside bar */
+    0 0 24px rgba(255, 255, 255, 0.30),             /* Radiant optical glass bloom */
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 0.65),  /* Enhanced top bevel reflection */
+    inset 0 -1px 1px rgba(255, 255, 255, 0.20);
+  z-index: 2;
 }
 
-.nav-indicator-pill.is-pill-lifted::after,
-.apple-floating-navbar.is-tap-enlarged .nav-indicator-pill::after {
-  opacity: 1;
-  transform: scale(1.05);
+.nav-indicator-pill.is-popped::before,
+.apple-floating-navbar:active .nav-indicator-pill::before,
+.apple-floating-navbar.is-dragging .nav-indicator-pill::before {
+  opacity: 0.92;
 }
 
 .nav-tab-btn {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   background: transparent;
   border: none;
   padding: 8px 19px;
@@ -1356,11 +1332,7 @@
 }
 
 .nav-tab-btn.active .nav-tab-label {
-  transform: translateY(-1.5px) scale(1.04);
-}
-
-.apple-floating-navbar.is-tap-enlarged .nav-tab-btn.active .nav-tab-label {
-  transform: translateY(-4px) scale(1.06);
+  transform: scale(1.04);
 }
 
 /* =========================================================

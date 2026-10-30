@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       nav.classList.add('is-dragging');
-      indicator.classList.add('is-pressed', 'is-pill-lifted');
+      indicator.classList.add('is-pressed', 'is-popped');
 
       const closest = getClosestTabBtn(e.clientX);
       if (closest) closest.classList.add('is-dock-magnified');
@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isNavDragging) {
         if (Math.abs(e.clientX - dragStartX) > 4) {
           hasDragged = true;
-          indicator.classList.add('no-transition', 'is-dragging', 'is-expanded');
+          indicator.classList.add('no-transition', 'is-dragging', 'is-expanded', 'is-popped');
         }
         if (hasDragged) {
           handleNavDragMove(e.clientX);
@@ -304,8 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
       nav.classList.remove('is-dragging');
       indicator.classList.remove('no-transition', 'is-dragging', 'is-pressed');
       setTimeout(() => {
-        if (indicator) indicator.classList.remove('is-pill-lifted');
-      }, 240);
+        if (indicator) indicator.classList.remove('is-popped');
+      }, 220);
 
       try {
         if (activePointerId !== null) nav.releasePointerCapture(activePointerId);
@@ -347,32 +347,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Click handler for tab buttons (for click/tap without drag)
   let tapTimeout = null;
-  let pillLiftTimeout = null;
-
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       if (hasDragged) return;
       const targetTab = btn.getAttribute('data-tab');
       switchPage(targetTab, btn);
-
-      // Trigger upward water-lift animation on indicator pill
       if (indicator) {
-        indicator.classList.remove('is-pill-lifted');
-        void indicator.offsetWidth; // force reflow for smooth re-trigger
-        indicator.classList.add('is-pill-lifted');
-        if (pillLiftTimeout) clearTimeout(pillLiftTimeout);
-        pillLiftTimeout = setTimeout(() => {
-          indicator.classList.remove('is-pill-lifted');
-        }, 340);
+        indicator.classList.add('is-popped');
       }
-
       if (nav) {
         nav.classList.add('is-tap-enlarged');
-        if (tapTimeout) clearTimeout(tapTimeout);
-        tapTimeout = setTimeout(() => {
-          nav.classList.remove('is-tap-enlarged');
-        }, 240);
       }
+      if (tapTimeout) clearTimeout(tapTimeout);
+      tapTimeout = setTimeout(() => {
+        if (indicator) indicator.classList.remove('is-popped');
+        if (nav) nav.classList.remove('is-tap-enlarged');
+      }, 300);
     });
   });
 
