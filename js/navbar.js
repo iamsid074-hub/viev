@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       nav.classList.add('is-dragging');
-      indicator.classList.add('is-pressed');
+      indicator.classList.add('is-pressed', 'is-pill-lifted');
 
       const closest = getClosestTabBtn(e.clientX);
       if (closest) closest.classList.add('is-dock-magnified');
@@ -303,6 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
       isNavDragging = false;
       nav.classList.remove('is-dragging');
       indicator.classList.remove('no-transition', 'is-dragging', 'is-pressed');
+      setTimeout(() => {
+        if (indicator) indicator.classList.remove('is-pill-lifted');
+      }, 240);
 
       try {
         if (activePointerId !== null) nav.releasePointerCapture(activePointerId);
@@ -344,17 +347,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Click handler for tab buttons (for click/tap without drag)
   let tapTimeout = null;
+  let pillLiftTimeout = null;
+
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       if (hasDragged) return;
       const targetTab = btn.getAttribute('data-tab');
       switchPage(targetTab, btn);
+
+      // Trigger upward water-lift animation on indicator pill
+      if (indicator) {
+        indicator.classList.remove('is-pill-lifted');
+        void indicator.offsetWidth; // force reflow for smooth re-trigger
+        indicator.classList.add('is-pill-lifted');
+        if (pillLiftTimeout) clearTimeout(pillLiftTimeout);
+        pillLiftTimeout = setTimeout(() => {
+          indicator.classList.remove('is-pill-lifted');
+        }, 340);
+      }
+
       if (nav) {
         nav.classList.add('is-tap-enlarged');
         if (tapTimeout) clearTimeout(tapTimeout);
         tapTimeout = setTimeout(() => {
           nav.classList.remove('is-tap-enlarged');
-        }, 220);
+        }, 240);
       }
     });
   });
