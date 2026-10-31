@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const ambLayerB = document.getElementById('cinema-amb-layer-b');
   const ambImgA = document.getElementById('cinema-ambilight-canvas');
   const ambImgB = document.getElementById('cinema-ambilight-canvas-b');
+  const cinemaRealEnv = document.getElementById('cinema-real-environment');
+  const stageFloorImg = document.getElementById('cinema-stage-floor-img');
   let currentAmbBuffer = 'a';
   let offscreenCanvas = null;
   let offscreenCtx = null;
@@ -61,13 +63,24 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (_) {}
 
   function setAmbilightPlaybackState(isPlaying) {
-    if (!ambContainer) return;
-    if (isPlaying) {
-      ambContainer.classList.add('is-playing');
-      ambContainer.classList.remove('is-paused');
-    } else {
-      ambContainer.classList.add('is-paused');
-      ambContainer.classList.remove('is-playing');
+    if (ambContainer) {
+      if (isPlaying) {
+        ambContainer.classList.add('is-playing');
+        ambContainer.classList.remove('is-paused');
+      } else {
+        ambContainer.classList.add('is-paused');
+        ambContainer.classList.remove('is-playing');
+      }
+    }
+    // Option 2: Dimmable House Lights (Fade down when playing, fade up when paused)
+    if (cinemaRealEnv) {
+      if (isPlaying) {
+        cinemaRealEnv.classList.add('house-lights-down');
+        cinemaRealEnv.classList.remove('house-lights-up');
+      } else {
+        cinemaRealEnv.classList.add('house-lights-up');
+        cinemaRealEnv.classList.remove('house-lights-down');
+      }
     }
   }
 
@@ -164,20 +177,38 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function applyAmbilightMultiZoneVars(palette) {
-    if (!ambContainer) return;
     const p = palette.primary;
     const s = palette.secondary;
     const a = palette.accent;
     const f = palette.floor;
 
-    ambContainer.style.setProperty('--amb-primary', `rgba(${p[0]}, ${p[1]}, ${p[2]}, 0.72)`);
-    ambContainer.style.setProperty('--amb-secondary', `rgba(${s[0]}, ${s[1]}, ${s[2]}, 0.65)`);
-    ambContainer.style.setProperty('--amb-accent', `rgba(${a[0]}, ${a[1]}, ${a[2]}, 0.68)`);
-    ambContainer.style.setProperty('--amb-floor', `rgba(${f[0]}, ${f[1]}, ${f[2]}, 0.55)`);
+    const primaryVar = `rgba(${p[0]}, ${p[1]}, ${p[2]}, 0.72)`;
+    const secondaryVar = `rgba(${s[0]}, ${s[1]}, ${s[2]}, 0.65)`;
+    const accentVar = `rgba(${a[0]}, ${a[1]}, ${a[2]}, 0.68)`;
+    const floorVar = `rgba(${f[0]}, ${f[1]}, ${f[2]}, 0.55)`;
+
+    if (ambContainer) {
+      ambContainer.style.setProperty('--amb-primary', primaryVar);
+      ambContainer.style.setProperty('--amb-secondary', secondaryVar);
+      ambContainer.style.setProperty('--amb-accent', accentVar);
+      ambContainer.style.setProperty('--amb-floor', floorVar);
+    }
+
+    // Dynamic light diffusion onto Real Cinema Environment (Acoustic slats & Obsidian floor)
+    if (cinemaRealEnv) {
+      cinemaRealEnv.style.setProperty('--amb-primary', primaryVar);
+      cinemaRealEnv.style.setProperty('--amb-secondary', secondaryVar);
+      cinemaRealEnv.style.setProperty('--amb-accent', accentVar);
+      cinemaRealEnv.style.setProperty('--amb-floor', floorVar);
+    }
   }
 
   function updateSmartAmbilight(thumbUrl, videoId = '', title = '') {
-    if (!ambContainer) return;
+    if (!ambContainer && !cinemaRealEnv) return;
+
+    if (stageFloorImg && thumbUrl) {
+      stageFloorImg.src = thumbUrl;
+    }
 
     const nextBuffer = (currentAmbBuffer === 'a') ? 'b' : 'a';
     const activeLayer = (currentAmbBuffer === 'a') ? ambLayerA : ambLayerB;
@@ -212,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tempImg.onload = () => {
       nextImg.src = thumbUrl;
+      if (stageFloorImg) stageFloorImg.src = thumbUrl;
       try {
         if (offscreenCtx) {
           offscreenCtx.clearRect(0, 0, 32, 18);
@@ -236,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tempImg.onerror = () => {
       nextImg.src = thumbUrl;
+      if (stageFloorImg) stageFloorImg.src = thumbUrl;
       applyAndMorph(fallbackPalette);
     };
 

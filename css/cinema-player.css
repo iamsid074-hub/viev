@@ -3036,6 +3036,261 @@
 }
 
 /* =========================================================
+   REAL CINEMA ENVIRONMENT 2.1
+   Option 1: Velvet Acoustic Architectural Slats (Wall Diffusion)
+   Option 2: VIP Aisle & Floor Guide Lights (Dimmable House Lights)
+   Option 3: Glossy Obsidian Stage Floor Reflection with 3D Depth
+   ========================================================= */
+.cinema-real-environment {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  aspect-ratio: 16 / 9;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  will-change: opacity, transform;
+}
+
+/* Option 1: Velvet Acoustic Side Walls with 3D Perspective Inset */
+.cinema-env-wall {
+  position: absolute;
+  top: 4px;
+  bottom: 8px;
+  width: clamp(20px, 4.5vw, 36px);
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 6px;
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinema-env-wall-left {
+  left: clamp(-16px, -2.5vw, -10px);
+  transform-origin: right center;
+  transform: perspective(600px) rotateY(38deg) scaleZ(1);
+  box-shadow: 4px 0 18px rgba(0, 0, 0, 0.85);
+}
+
+.cinema-env-wall-right {
+  right: clamp(-16px, -2.5vw, -10px);
+  transform-origin: left center;
+  transform: perspective(600px) rotateY(-38deg) scaleZ(1);
+  box-shadow: -4px 0 18px rgba(0, 0, 0, 0.85);
+}
+
+.cinema-env-slats {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(24, 25, 34, 0.95) 0px,
+    rgba(24, 25, 34, 0.95) 3.5px,
+    rgba(8, 8, 12, 0.98) 3.5px,
+    rgba(8, 8, 12, 0.98) 7px
+  );
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.92);
+  border-radius: 4px;
+  opacity: 0.9;
+}
+
+.cinema-env-wall-left .cinema-env-wall-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--amb-secondary, rgba(99, 102, 241, 0.45)) 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  transition: opacity 1.2s ease;
+}
+
+.cinema-env-wall-right .cinema-env-wall-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    270deg,
+    transparent 0%,
+    var(--amb-accent, rgba(244, 63, 94, 0.45)) 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  transition: opacity 1.2s ease;
+}
+
+/* Architectural Sconces */
+.cinema-env-sconce {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1), filter 1.6s ease;
+}
+
+.cinema-env-sconce-slit {
+  width: 2.5px;
+  height: 24px;
+  border-radius: 999px;
+  background: #ffe6b3;
+  box-shadow: 0 0 8px rgba(255, 230, 180, 0.95), 0 0 16px rgba(255, 175, 75, 0.65);
+  transition: all 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cinema-env-sconce-halo {
+  position: absolute;
+  width: 34px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 200, 110, 0.45) 0%, transparent 75%);
+  filter: blur(5px);
+  transition: opacity 1.6s ease;
+}
+
+/* Option 3: Glossy Obsidian Stage Floor Reflection */
+.cinema-env-obsidian-stage {
+  position: absolute;
+  bottom: -28px;
+  left: 2%;
+  right: 2%;
+  height: 52px;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 16px 16px 4px 4px;
+  transform: perspective(450px) rotateX(66deg);
+  transform-origin: 50% 0%;
+  background: linear-gradient(180deg, rgba(14, 15, 22, 0.9) 0%, rgba(4, 4, 8, 0.98) 70%, #000 100%);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease;
+}
+
+.cinema-stage-reflection-container {
+  position: absolute;
+  inset: 0;
+  opacity: 0.6;
+  mix-blend-mode: screen;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black 10%, transparent 92%);
+  mask-image: linear-gradient(to bottom, black 10%, transparent 92%);
+}
+
+.cinema-stage-reflection-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  object-position: bottom center;
+  transform: scaleY(-1);
+  filter: blur(8px) brightness(0.85) saturate(210%);
+  opacity: 0.8;
+}
+
+.cinema-stage-reflection-tint {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--amb-floor, rgba(236, 72, 153, 0.65)) 0%, transparent 85%);
+  mix-blend-mode: color-dodge;
+  opacity: 0.8;
+}
+
+.cinema-stage-marble-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 45%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+.cinema-stage-chamfer-lip {
+  position: absolute;
+  top: 0;
+  left: 4%;
+  right: 4%;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+/* Option 2: VIP Cinema Aisle & Floor Guide Lights */
+.cinema-env-aisle-guide {
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cinema-aisle-track {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.cinema-step-light {
+  display: inline-block;
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  background: #ffd699;
+  box-shadow: 0 0 8px rgba(255, 185, 70, 0.95), 0 0 16px rgba(255, 140, 30, 0.55);
+  transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), transform 1.5s ease, box-shadow 1.5s ease;
+}
+
+.cinema-house-ambient-glow {
+  position: absolute;
+  inset: -30px -15px -10px -15px;
+  background: radial-gradient(ellipse at 50% 120%, rgba(255, 195, 110, 0.12) 0%, transparent 65%);
+  pointer-events: none;
+  transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* House Lights UP (Paused/Ready: Cozy Warm VIP Cinema Lighting) */
+.cinema-real-environment.house-lights-up .cinema-env-sconce {
+  opacity: 0.88;
+  filter: drop-shadow(0 0 6px rgba(255, 205, 100, 0.65));
+}
+
+.cinema-real-environment.house-lights-up .cinema-step-light {
+  opacity: 0.95;
+  transform: scale(1);
+}
+
+.cinema-real-environment.house-lights-up .cinema-house-ambient-glow {
+  opacity: 0.85;
+}
+
+/* House Lights DOWN (Playing: Lights Dim Down to 10-15%, Screen takes over) */
+.cinema-real-environment.house-lights-down .cinema-env-sconce {
+  opacity: 0.08;
+  filter: none;
+}
+
+.cinema-real-environment.house-lights-down .cinema-step-light {
+  opacity: 0.28;
+  transform: scale(0.85);
+  box-shadow: 0 0 5px rgba(255, 185, 70, 0.45);
+}
+
+.cinema-real-environment.house-lights-down .cinema-house-ambient-glow {
+  opacity: 0;
+}
+
+/* =========================================================
    CINEMATIC "SMART AMBILIGHT" PROJECTOR ENGINE 2.1
    Option 1: Dynamic Multi-Zone Color Mesh (Halo, Flanks, Floor)
    Option 5: Double-Buffered 1.2s Silky Color Morphing & Living Light Pulse
@@ -3591,9 +3846,10 @@
   pointer-events: none !important;
 }
 
-/* Hide ambilight, glass frame, metadata bar, drag surface AND custom controls in miniplayer */
+/* Hide ambilight, glass frame, metadata bar, real environment, drag surface AND custom controls in miniplayer */
 .cinema-theater-stage.is-miniplayer .cinema-artwork-glow,
 .cinema-theater-stage.is-miniplayer .cinema-glass-frame,
+.cinema-theater-stage.is-miniplayer .cinema-real-environment,
 .cinema-theater-stage.is-miniplayer .cinema-theater-yt-bar,
 .cinema-theater-stage.is-miniplayer .cinema-player-drag-surface,
 .cinema-theater-stage.is-miniplayer .cinema-custom-player-controls {
