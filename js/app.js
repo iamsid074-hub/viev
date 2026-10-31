@@ -206,30 +206,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const stored = localStorage.getItem(key);
 
     if (isVirat) {
-      if (stored === '2.0 BETA') return '2.0 BETA';
-      if (stored === '2.0') return '2.0';
+      if (stored === '2.1') return '2.1';
+      if (stored === '2.0 BETA' || stored === '2.0') return '2.0';
       if (stored === '1.3') return '1.3';
       if (stored === '1.0') return '1.0';
-      return stored || '1.1'; // Strict default on deploy
+      return stored || '2.0';
     }
 
-    // Digi (3009 / 3011) - Starts on OS 1.3 (the version before 2.0) so OS TWICE (2.0) can be downloaded
-    const digiDownloadedTwice = localStorage.getItem('viev_digi_os_twice_downloaded') === 'true';
-    if (!digiDownloadedTwice) {
-      if (stored === '2.0' || !stored) {
-        localStorage.setItem('viev_digi_os_version', '1.3');
-        return '1.3';
+    // Digi (3009 / 3011) - Starts on OS 2.0 so OS TWICE 2.1 update shows available!
+    const digiDownloaded21 = localStorage.getItem('viev_digi_os_2_1_downloaded') === 'true';
+    if (!digiDownloaded21) {
+      if (stored === '2.1' || !stored) {
+        localStorage.setItem('viev_digi_os_version', '2.0');
+        return '2.0';
       }
     }
+    if (stored === '2.1') return '2.1';
     if (stored === '2.0') return '2.0';
-    if (stored === '2.0 BETA') return '2.0';
     if (stored === '1.3') return '1.3';
-    if (stored === '1.1') return '1.1';
-    if (stored === '1.0') return '1.0';
-    return stored || '1.3'; // Installed 1.3, so OS TWICE (2.0) update shows available!
+    return stored || '2.0'; // Default 2.0 so OS 2.1 update shows available!
   }
 
   function getPreviousVersion(currentVer) {
+    if (currentVer === '2.1') return '2.0';
     if (currentVer === '2.0 BETA' || currentVer === '2.0') return '1.3';
     const cur = parseFloat(currentVer);
     if (cur >= 1.3) return '1.1';
@@ -247,35 +246,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateBadge = document.getElementById('settings-update-badge');
     if (updateBadge) {
       if (isVirat) {
-        // Virat sees update badge if not yet updated to OS 2.0
-        updateBadge.style.display = (version !== '2.0 BETA' && version !== '2.0') ? 'inline-flex' : 'none';
+        // Virat sees update badge if not yet updated to OS 2.1
+        updateBadge.style.display = (version !== '2.1') ? 'inline-flex' : 'none';
       } else {
-        // Digi sees update badge if below 2.0 (so badge shows on 1.3!)
-        updateBadge.style.display = (version !== '2.0' && parseFloat(version) < 2.0) ? 'inline-flex' : 'none';
+        // Digi sees update badge if below 2.1
+        updateBadge.style.display = (version !== '2.1' && parseFloat(version) < 2.1) ? 'inline-flex' : 'none';
       }
     }
 
     // 2. Hub Screen Badge Button & Document Title
-    const osTitlePrefix = isVirat ? 'OS ' : (version === '2.0' ? 'OS TWICE ' : 'Digi OS ');
+    const isTwiceSeries = version.startsWith('2.');
+    const osTitlePrefix = isVirat ? 'OS ' : (isTwiceSeries ? 'OS TWICE ' : 'Digi OS ');
     document.querySelectorAll('.os-badge-text').forEach(el => {
-      el.textContent = (!isVirat && version === '2.0') ? 'OS TWICE' : ('OS ' + version);
+      el.textContent = (!isVirat && isTwiceSeries) ? ('OS TWICE ' + version) : ('OS ' + version);
     });
     document.title = (isVirat && version === '2.0 BETA') 
       ? 'OS 2.0 BETA - Special Viev' 
-      : ((!isVirat && version === '2.0') ? 'OS TWICE (2.0) - Special Viev' : (osTitlePrefix + version + ' - Special Viev'));
+      : ((!isVirat && isTwiceSeries) ? (`OS TWICE (${version}) - Special Viev`) : (osTitlePrefix + version + ' - Special Viev'));
 
     // 3. Settings Modal Sheet Titles & Story Branding
     document.querySelectorAll('.os-version-title').forEach(el => {
-      el.textContent = (!isVirat && version === '2.0') ? 'OS TWICE (Digi OS 2.0)' : (osTitlePrefix + version);
+      el.textContent = (!isVirat && isTwiceSeries) ? (`OS TWICE (Digi OS ${version})`) : (osTitlePrefix + version);
     });
     document.querySelectorAll('.story-branding').forEach(el => {
-      el.textContent = (!isVirat && version === '2.0') ? 'OS TWICE • Special Viev' : (osTitlePrefix + version + ' • Special Viev');
+      el.textContent = (!isVirat && isTwiceSeries) ? (`OS TWICE ${version} • Special Viev`) : (osTitlePrefix + version + ' • Special Viev');
     });
     document.querySelectorAll('.spec-val').forEach(el => {
       if (el.textContent.includes('OS 1.') || el.textContent.includes('OS 2.') || el.textContent.includes('OS TWICE')) {
         el.textContent = (isVirat && version === '2.0 BETA') 
           ? 'OS 2.0 BETA (Testing)' 
-          : ((!isVirat && version === '2.0') ? 'OS TWICE (2.0 Official)' : ('OS ' + version + ' (Official)'));
+          : ((!isVirat && isTwiceSeries) ? (`OS TWICE (${version} Official)`) : ('OS ' + version + ' (Official)'));
       }
     });
 
@@ -412,54 +412,87 @@ document.addEventListener('DOMContentLoaded', () => {
         subTextLink.href = 'https://viev.digi.space/os-2.0-beta';
         subTextLink.textContent = 'https://viev.digi.space/os-2.0-beta';
       }
-      if (currentVerBadge) currentVerBadge.textContent = '1.1';
-      if (currentVerTitle) currentVerTitle.textContent = 'OS 1.1';
-      if (uptodateTitleText) uptodateTitleText.textContent = 'OS is up to date';
-      if (uptodateVerSub) uptodateVerSub.textContent = 'OS ' + ver;
-      if (detailsDrawerTitle) detailsDrawerTitle.textContent = "What's in OS 2.0 BETA";
-      if (detailsLead) detailsLead.textContent = 'What was updated in OS 2.0 BETA:';
-      if (detailsList) {
-        detailsList.innerHTML = `
-          <li><strong>Cinema & Lounge:</strong> In-app YouTube lounge with real video search & trending feeds.</li>
-          <li><strong>Gesture Miniplayer:</strong> Drag video downwards to pop into floating Picture-in-Picture.</li>
-          <li><strong>Custom Controls:</strong> Focused Play/Pause, hide overlays on tap, clean duration scrub.</li>
-          <li><strong>Speed & Quality:</strong> 0.25x to 2.0x speeds and up to 1080p HD stream selection.</li>
-        `;
-      }
-    } else {
-      // Digi (3009 / 3011) sees OS TWICE (Digi OS 2.0)!
-      if (availVerIcon) availVerIcon.textContent = '2.0';
-      if (availTitle) availTitle.textContent = 'OS TWICE (Digi OS 2.0)';
-      if (availSize) availSize.textContent = '298.6 MB';
-      if (availLead) availLead.textContent = 'The revolutionary OS TWICE (Digi OS 2.0) update exclusively crafted for Princess Digi: Live AirCast companion screen & sound mirror, In-App YouTube Cinema Lounge, and Liquid Glass 2.0:';
+      if (availVerIcon) availVerIcon.textContent = '2.1';
+      if (availTitle) availTitle.textContent = 'OS 2.1 (Bug Fixes & Engine 2.1)';
+      if (availSize) availSize.textContent = '145.2 MB';
+      if (availLead) availLead.textContent = 'Official OS 2.1 Update: High-speed zero-lag YouTube search, mobile video playback fix, and AirCast 2.1 screen synchronization.';
       if (featuresList) {
         featuresList.innerHTML = `
           <div class="update-feature-item">
+            <span class="feature-bullet-icon">🚀</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Cinema Engine 2.1 (Zero Unavailable Errors)</strong>
+              <span class="feature-text-desc">High-compatibility YouTube embed stream resolving phone network playback restrictions.</span>
+            </div>
+          </div>
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">⚡</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">Instant 0ms Video Search</strong>
+              <span class="feature-text-desc">Instant local keyword search cache eliminating long loading times and timeouts.</span>
+            </div>
+          </div>
+          <div class="update-feature-item">
             <span class="feature-bullet-icon">📡</span>
             <div class="feature-text-block">
-              <strong class="feature-text-title">VIEVS 2.0 AirCast (Live Screen & Sound Mirror)</strong>
-              <span class="feature-text-desc">Apni YouTube screen ko direct Virat ke sath live beam karein. Video, high-fi sound aur floating emoji reactions real-time me dono screens par sync honge.</span>
+              <strong class="feature-text-title">AirCast 2.1 Synchronization</strong>
+              <span class="feature-text-desc">Sub-second companion video & audio state sync across devices.</span>
+            </div>
+          </div>
+        `;
+      }
+      if (subTextLink) {
+        subTextLink.href = 'https://viev.digi.space/os-2-1';
+        subTextLink.textContent = 'https://viev.digi.space/os-2-1';
+      }
+      if (currentVerBadge) currentVerBadge.textContent = '2.0';
+      if (currentVerTitle) currentVerTitle.textContent = 'OS 2.0';
+      if (uptodateTitleText) uptodateTitleText.textContent = 'OS is up to date';
+      if (uptodateVerSub) uptodateVerSub.textContent = 'OS ' + ver;
+      if (detailsDrawerTitle) detailsDrawerTitle.textContent = "What's in OS 2.1";
+      if (detailsLead) detailsLead.textContent = 'What was updated in OS 2.1:';
+      if (detailsList) {
+        detailsList.innerHTML = `
+          <li><strong>Cinema Engine 2.1:</strong> Resolved YouTube video unavailable errors on mobile data.</li>
+          <li><strong>Instant Search:</strong> 0ms local keyword search and fast cached responses.</li>
+          <li><strong>Mobile Autoplay Safeguard:</strong> Unmuted 1-tap playback controls.</li>
+          <li><strong>AirCast 2.1:</strong> Enhanced live synchronization.</li>
+        `;
+      }
+    } else {
+      // Digi (3009 / 3011) sees OS TWICE 2.1 (Digi OS 2.1)!
+      if (availVerIcon) availVerIcon.textContent = '2.1';
+      if (availTitle) availTitle.textContent = 'OS TWICE 2.1 (Digi OS 2.1)';
+      if (availSize) availSize.textContent = '145.2 MB';
+      if (availLead) availLead.textContent = 'The official OS 2.1 update for Princess Digi: YouTube video unavailable error fix, instant-speed search, and ultra-smooth cinema lounge:';
+      if (featuresList) {
+        featuresList.innerHTML = `
+          <div class="update-feature-item">
+            <span class="feature-bullet-icon">🎬</span>
+            <div class="feature-text-block">
+              <strong class="feature-text-title">YouTube Cinema Engine 2.1</strong>
+              <span class="feature-text-desc">Video unavailable error ko completely fix kiya gaya hai. Ab har video Digi ke phone par direct play hogi bina kisi error ke.</span>
             </div>
           </div>
           <div class="update-feature-item">
-            <span class="feature-bullet-icon">🍿</span>
+            <span class="feature-bullet-icon">⚡</span>
             <div class="feature-text-block">
-              <strong class="feature-text-title">In-App YouTube Cinema Lounge</strong>
-              <span class="feature-text-desc">Digi ke romantic songs & trending favorites ka personalized feed, real video search aur zero popups.</span>
+              <strong class="feature-text-title">Instant Zero-Lag Search</strong>
+              <span class="feature-text-desc">Search karne par ab koi time ya hang nahi hoga. Arijit Singh, Ve Kamleya, TMKOC aur romantic hits instant 0ms me search honge.</span>
             </div>
           </div>
           <div class="update-feature-item">
-            <span class="feature-bullet-icon">🔽</span>
+            <span class="feature-bullet-icon">📱</span>
             <div class="feature-text-block">
-              <strong class="feature-text-title">Gesture Drag-to-Miniplayer</strong>
-              <span class="feature-text-desc">Player ko smoothly drag karke floating corner picture-in-picture miniplayer me convert karein.</span>
+              <strong class="feature-text-title">Mobile Touch & 1-Tap Play</strong>
+              <span class="feature-text-desc">Mobile browser par bina mute huye direct 1-tap me video start hogi, sath hi error recovery and next-song auto switch.</span>
             </div>
           </div>
           <div class="update-feature-item">
-            <span class="feature-bullet-icon">✨</span>
+            <span class="feature-bullet-icon">📡</span>
             <div class="feature-text-block">
-              <strong class="feature-text-title">Liquid Glass 2.0 & Tactile Physics</strong>
-              <span class="feature-text-desc">Apple Vision Pro style specular glass rim, dynamic ambient glow projection aur super-fast 60fps response.</span>
+              <strong class="feature-text-title">VIEVS 2.1 AirCast Sync</strong>
+              <span class="feature-text-desc">Live screen aur companion sound Virat ke sath perfect sync me rahegi.</span>
             </div>
           </div>
         `;
@@ -468,25 +501,25 @@ document.addEventListener('DOMContentLoaded', () => {
         subTextLink.href = 'https://viev.digi.space/os-twice';
         subTextLink.textContent = 'https://viev.digi.space/os-twice';
       }
-      if (currentVerBadge) currentVerBadge.textContent = '1.3';
-      if (currentVerTitle) currentVerTitle.textContent = 'Digi OS 1.3';
+      if (currentVerBadge) currentVerBadge.textContent = '2.0';
+      if (currentVerTitle) currentVerTitle.textContent = 'OS TWICE (Digi OS 2.0)';
       if (uptodateTitleText) uptodateTitleText.textContent = 'Digi OS is up to date';
-      if (uptodateVerSub) uptodateVerSub.textContent = (ver === '2.0') ? 'OS TWICE (Digi OS 2.0)' : ('Digi OS ' + ver);
-      if (detailsDrawerTitle) detailsDrawerTitle.textContent = "What's in OS TWICE (2.0)";
-      if (detailsLead) detailsLead.textContent = 'What was updated in OS TWICE (Digi OS 2.0):';
+      if (uptodateVerSub) uptodateVerSub.textContent = (ver === '2.1') ? 'OS TWICE 2.1 (Digi OS 2.1)' : ('Digi OS ' + ver);
+      if (detailsDrawerTitle) detailsDrawerTitle.textContent = "What's in OS TWICE 2.1";
+      if (detailsLead) detailsLead.textContent = 'What was updated in OS TWICE 2.1 (Digi OS 2.1):';
       if (detailsList) {
         detailsList.innerHTML = `
-          <li><strong>VIEVS 2.0 AirCast:</strong> Live stream your YouTube screen to Virat with synchronized sound and floating emoji reactions.</li>
-          <li><strong>Real YouTube Cinema:</strong> In-app YouTube lounge with Digi's romantic feed & favorite creators.</li>
-          <li><strong>Gesture Miniplayer:</strong> Drag video downwards into floating PiP miniplayer.</li>
-          <li><strong>Liquid Glass 2.0:</strong> Next-generation refractive glass, specular highlights, and ultra-fluid animations.</li>
+          <li><strong>Cinema Engine 2.1:</strong> Video unavailable error fixed on mobile phone networks.</li>
+          <li><strong>Instant Search:</strong> Zero hanging, instant keyword search across all songs & creators.</li>
+          <li><strong>Touch Autoplay:</strong> 1-tap unmuted mobile playback and auto next song recovery.</li>
+          <li><strong>AirCast 2.1:</strong> Live screen & sound synchronization with Virat.</li>
         `;
       }
     }
 
     setTimeout(() => {
       loader.style.display = 'none';
-      const isUpToDate = isVirat ? (ver === '2.0 BETA' || ver === '2.0') : (ver === '2.0' || parseFloat(ver) >= 2.0);
+      const isUpToDate = isVirat ? (ver === '2.1') : (ver === '2.1' || parseFloat(ver) >= 2.1);
       if (!isUpToDate) {
         updateCard.style.display = 'block';
         resultCard.style.display = 'none';
@@ -572,14 +605,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const role = isVirat ? 'user' : (session ? session.role : 'digi');
 
       if (isVirat) {
-        // Upgrade Virat (1711) to OS 2.0 BETA
-        localStorage.setItem('viev_user_os_version', '2.0 BETA');
-        applySystemVersion('2.0 BETA');
+        // Upgrade Virat (1711) to OS 2.1
+        localStorage.setItem('viev_user_os_version', '2.1');
+        applySystemVersion('2.1');
       } else {
-        // Upgrade Digi (3009/3011) to OS TWICE (Digi OS 2.0)!
-        localStorage.setItem('viev_digi_os_version', '2.0');
-        localStorage.setItem('viev_digi_os_twice_downloaded', 'true');
-        applySystemVersion('2.0');
+        // Upgrade Digi (3009/3011) to OS TWICE 2.1 (Digi OS 2.1)!
+        localStorage.setItem('viev_digi_os_version', '2.1');
+        localStorage.setItem('viev_digi_os_2_1_downloaded', 'true');
+        applySystemVersion('2.1');
       }
 
       // 2. Smooth fade out of black update screen
@@ -831,7 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.triggerHaptic) window.triggerHaptic('light');
       const session = getAuthSession();
       const isVirat = session && (session.code === '1711' || session.role === 'user');
-      const updateName = isVirat ? 'OS 2.0 BETA' : 'OS TWICE (Digi OS 2.0)';
+      const updateName = isVirat ? 'OS 2.1' : 'OS TWICE 2.1 (Digi OS 2.1)';
       alert(`${updateName} will automatically install tonight when connected to power and Wi-Fi.`);
       if (typeof closeSubpage === 'function') {
         closeSubpage();
@@ -855,6 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Rollback ONLY the active logged-in profile (strict isolation)
       localStorage.setItem('viev_' + role + '_os_version', prevVer);
       if (role === 'digi') {
+        localStorage.removeItem('viev_digi_os_2_1_downloaded');
         localStorage.removeItem('viev_digi_os_twice_downloaded');
       }
       applySystemVersion(prevVer);

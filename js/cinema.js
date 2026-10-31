@@ -306,13 +306,86 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (_) {}
   }
 
+  function handleVideoPlaybackError(videoId, errCode) {
+    console.warn(`[Cinema] YouTube embed error ${errCode} for video ${videoId}`);
+    let banner = document.getElementById('cinema-player-err-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'cinema-player-err-banner';
+      banner.className = 'cinema-player-err-banner';
+      const stage = document.getElementById('cinema-video-card-stage');
+      if (stage) stage.appendChild(banner);
+    }
+
+    banner.innerHTML = `
+      <div class="cinema-err-content">
+        <div class="cinema-err-badge">YouTube Notice</div>
+        <h4 class="cinema-err-title">Playback Restricted by Creator</h4>
+        <p class="cinema-err-desc">YouTube restricts 3rd-party website embedding for this specific video. You can open direct playback or skip to the next song.</p>
+        <div class="cinema-err-actions">
+          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener noreferrer" class="cinema-err-btn cinema-err-direct">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#ff0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            Play in YouTube
+          </a>
+          <button type="button" class="cinema-err-btn cinema-err-next" id="cinema-err-skip-btn">
+            ⏭ Next Song
+          </button>
+        </div>
+      </div>
+    `;
+    banner.style.display = 'flex';
+
+    const skipBtn = document.getElementById('cinema-err-skip-btn');
+    if (skipBtn) {
+      skipBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        playNextRecommendedVideo();
+      });
+    }
+  }
+
+  function dismissPlaybackErrorBanner() {
+    const banner = document.getElementById('cinema-player-err-banner');
+    if (banner) banner.style.display = 'none';
+  }
+
+  function playNextRecommendedVideo() {
+    dismissPlaybackErrorBanner();
+    const catalog = (window.CURRENT_CINEMA_FEED && window.CURRENT_CINEMA_FEED.length > 0)
+      ? window.CURRENT_CINEMA_FEED
+      : (window.DIGI_YOUTUBE_FEED || window.VIRAT_YOUTUBE_FEED || []);
+    if (!catalog || catalog.length === 0) return;
+
+    let currentIdx = catalog.findIndex(v => v.id === currentPlayingVideoId);
+    let nextIdx = (currentIdx + 1) % catalog.length;
+    const nextVideo = catalog[nextIdx];
+    if (nextVideo && nextVideo.id) {
+      playVideoInTheater(
+        nextVideo.id,
+        nextVideo.title,
+        nextVideo.channel,
+        nextVideo.thumb,
+        nextVideo.avatar,
+        nextVideo.subs,
+        nextVideo.isVerified,
+        nextVideo.likes,
+        nextVideo.duration
+      );
+    }
+  }
+
   // Real YouTube Iframe API Incoming Event Listener
   window.addEventListener('message', (event) => {
     if (!iframe || !iframe.contentWindow) return;
-    if (event.source !== iframe.contentWindow) return;
     try {
       const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
       if (!data) return;
+
+      // Detect YouTube embed playback error codes (150, 101, 100, 2, 5)
+      if (data.event === 'onError' || (typeof data.info === 'number' && [2, 5, 100, 101, 150].includes(data.info))) {
+        handleVideoPlaybackError(currentPlayingVideoId, data.info || data.data || 150);
+        return;
+      }
 
       if ((data.event === 'infoDelivery' || data.event === 'initialDelivery') && data.info) {
         if (typeof data.info.duration === 'number' && data.info.duration > 0) {
@@ -324,9 +397,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (typeof data.info.playerState === 'number') {
           handlePlayerStateChange(data.info.playerState);
+          if (data.info.playerState === 1) {
+            dismissPlaybackErrorBanner();
+          }
         }
       } else if (data.event === 'onStateChange' && typeof data.info === 'number') {
         handlePlayerStateChange(data.info);
+        if (data.info === 1) {
+          dismissPlaybackErrorBanner();
+        }
       }
     } catch (_) {}
   });
@@ -1087,12 +1166,14 @@ document.addEventListener('DOMContentLoaded', () => {
     videoCurrentSeconds = 1;
     updateScrubberUI();
 
-    // Use clean YouTube embed player with controls=0 and safe origin
+    dismissPlaybackErrorBanner();
+
+    // Use clean YouTube embed player with high mobile compatibility
     if (iframe) {
-      const originParam = (window.location.origin && window.location.origin !== 'null' && window.location.protocol.startsWith('http'))
-        ? `&origin=${encodeURIComponent(window.location.origin)}`
-        : '';
-      iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&enablejsapi=1${originParam}&controls=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&fs=0&disablekb=1`;
+      // Standard www.youtube.com (NOT youtube-nocookie, which blocks official music/copyrighted videos)
+      // Pass widget_referrer and enablejsapi for mobile browser cross-origin policy compliance
+      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&widget_referrer=${encodeURIComponent(window.location.href)}`;
+      iframe.src = embedUrl;
       iframe.onload = () => {
         try {
           iframe.contentWindow.postMessage('{"event":"listening"}', '*');
@@ -1454,7 +1535,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let moreVideos = [];
       try {
-        const res = await fetch(endpoint);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(endpoint, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           if (data && Array.isArray(data.videos) && data.videos.length > 0) {
@@ -1467,7 +1551,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!moreVideos || moreVideos.length === 0) {
         const pool = (acc.code === '1711' && Array.isArray(window.VIRAT_YOUTUBE_FEED))
           ? window.VIRAT_YOUTUBE_FEED
-          : (window.DIGI_YOUTUBE_FEED || []);
+          : (window.DIGI_YOUTUBE_FEED || window.VIRAT_YOUTUBE_FEED || []);
         if (pool && pool.length > 0) {
           const pageSize = 12;
           const startIdx = ((currentFeedPage - 1) * pageSize) % pool.length;
@@ -1510,7 +1594,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', onScrollHandler, { passive: true });
   }
 
-  // Fetch and display real YouTube video feed cards (with infinite scroll & user personalization)
+  // Fetch and display real YouTube video feed cards (with instant client search & 3.5s timeout)
   async function loadYouTubeFeed(query = 'All', autoPlayFirst = false, forceRefresh = false) {
     if (!feedGrid) return;
 
@@ -1524,12 +1608,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const sentinel = getOrCreateSentinel();
     if (sentinel) sentinel.style.display = 'none';
 
-    feedGrid.innerHTML = `
-      <div class="cinema-feed-loading">
-        <div class="cinema-feed-spinner"></div>
-        <span>Loading your YouTube feed...</span>
-      </div>
-    `;
+    // 0. Ultra-fast instant local match display for queries (0ms latency!)
+    let displayedInstant = false;
+    if (query && query !== 'All' && typeof window.searchAllYouTubeVideos === 'function') {
+      const instantList = window.searchAllYouTubeVideos(query);
+      if (instantList && instantList.length > 0) {
+        renderVideoCards(instantList, false);
+        displayedInstant = true;
+      }
+    }
+
+    if (!displayedInstant) {
+      feedGrid.innerHTML = `
+        <div class="cinema-feed-loading">
+          <div class="cinema-feed-spinner"></div>
+          <span>Loading your YouTube feed...</span>
+        </div>
+      `;
+    }
 
     try {
       const acc = getActiveYouTubeAccount();
@@ -1540,9 +1636,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let videos = [];
 
-      // 1. Try local/remote backend API endpoint first
+      // 1. Try local/remote backend API endpoint with strict 3.5s timeout
       try {
-        const res = await fetch(endpoint);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(endpoint, { signal: controller.signal });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           if (data && Array.isArray(data.videos) && data.videos.length > 0) {
@@ -1550,35 +1649,28 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       } catch (fetchErr) {
-        // Backend not running (e.g. accessing static deployment from phone)
+        // Backend timeout or offline
       }
 
-      // 2. Seamless client-side zero-fail fallback with user's real watch profile
+      // 2. Seamless client-side zero-fail fallback
       if (!videos || videos.length === 0) {
-        if (acc.code === '1711' && Array.isArray(window.VIRAT_YOUTUBE_FEED) && window.VIRAT_YOUTUBE_FEED.length > 0) {
-          if (!query || query === 'All') {
-            videos = window.VIRAT_YOUTUBE_FEED;
-          } else {
-            const lq = query.toLowerCase();
-            videos = window.VIRAT_YOUTUBE_FEED.filter(v =>
-              (v.title && v.title.toLowerCase().includes(lq)) ||
-              (v.channel && v.channel.toLowerCase().includes(lq))
-            );
-            if (videos.length === 0) {
-              videos = window.VIRAT_YOUTUBE_FEED;
-            }
-          }
-        } else if (Array.isArray(window.DIGI_YOUTUBE_FEED)) {
-          videos = window.DIGI_YOUTUBE_FEED;
+        if (typeof window.searchAllYouTubeVideos === 'function') {
+          videos = window.searchAllYouTubeVideos(query);
+        } else {
+          videos = (acc.code === '3009' || acc.code === '3011' || acc.role === 'digi')
+            ? (window.DIGI_YOUTUBE_FEED || [])
+            : (window.VIRAT_YOUTUBE_FEED || []);
         }
       }
 
       if (!videos || videos.length === 0) {
-        feedGrid.innerHTML = `
-          <div class="cinema-feed-loading">
-            <span>No videos found. Try another search!</span>
-          </div>
-        `;
+        if (!displayedInstant) {
+          feedGrid.innerHTML = `
+            <div class="cinema-feed-loading">
+              <span>No videos found. Try another search!</span>
+            </div>
+          `;
+        }
         return;
       }
 
@@ -1760,8 +1852,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (id) {
       playVideoInTheater(id, 'Playing Custom Video');
     } else {
-      // Real YouTube Search query
-      loadYouTubeFeed(val, true);
+      // Real YouTube Search query: render results cleanly
+      loadYouTubeFeed(val, false);
     }
   }
 

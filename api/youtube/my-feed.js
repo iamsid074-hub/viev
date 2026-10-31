@@ -15,10 +15,17 @@ const DIGI_TOPICS_POOL = [
   ['Lofi Chill Beats Hindi', 'Bollywood Top Romantic Hits', 'Shreya Ghoshal romantic songs']
 ];
 
+const feedCache = new Map();
+const CACHE_TTL_MS = 10 * 60 * 1000;
+
 async function fetchTopicVideos(query) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+
     const ytRes = await fetch('https://www.youtube.com/youtubei/v1/search?prettyPrint=false', {
       method: 'POST',
+      signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -36,15 +43,17 @@ async function fetchTopicVideos(query) {
       })
     });
 
+    clearTimeout(timeoutId);
+
     if (!ytRes.ok) return [];
     const data = await ytRes.json();
     const videos = [];
 
     function extractVideos(obj) {
       if (!obj || typeof obj !== 'object') return;
-      if (obj.videoRenderer) {
-        const vr = obj.videoRenderer;
-        if (vr.videoId && vr.title) {
+      if (obj.videoRenderer || obj.compactVideoRenderer) {
+        const vr = obj.videoRenderer || obj.compactVideoRenderer;
+        if (vr.videoId && (vr.title || vr.headline)) {
           const title = vr.title?.runs?.map(r => r.text).join('') || vr.title?.simpleText || 'YouTube Video';
           const channel = vr.ownerText?.runs?.[0]?.text || vr.shortBylineText?.runs?.[0]?.text || 'Channel';
           const avatar = vr.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.thumbnail?.thumbnails?.[0]?.url || '';
@@ -93,6 +102,12 @@ module.exports = async (req, res) => {
   const user = req.query?.user || req.query?.code || '1711';
   const page = parseInt(req.query?.page || '1', 10) || 1;
   const isDigi = (user === '3009' || user === '3011' || user === 'digi');
+  const cacheKey = `${isDigi ? 'digi' : 'virat'}_${page}`;
+
+  const cached = feedCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL_MS) && cached.data.videos.length > 0) {
+    return res.status(200).json(cached.data);
+  }
 
   const pool = isDigi ? DIGI_TOPICS_POOL : VIRAT_TOPICS_POOL;
   const poolIndex = (page - 1) % pool.length;
@@ -112,7 +127,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    return res.status(200).json({
+    const payload = {
       success: true,
       account: isDigi ? 'DIGI (@avneetsaini7070)' : 'VIRAT PLAYS (@viratplaystdm)',
       email: isDigi ? 'avneetsaini7070@gmail.com' : 'iamsid074@gmail.com',
@@ -122,7 +137,13 @@ module.exports = async (req, res) => {
       hasMore: true,
       count: interleaved.length,
       videos: interleaved
-    });
+    };
+
+    if (interleaved.length > 0) {
+      feedCache.set(cacheKey, { timestamp: Date.now(), data: payload });
+    }
+
+    return res.status(200).json(payload);
   } catch (err) {
     console.error('Error fetching live feed in my-feed.js:', err);
     return res.status(200).json({

@@ -605,3 +605,285 @@ window.VIRAT_YOUTUBE_FEED = [
     "subs": "3.55M subscribers"
   }
 ];
+
+window.DIGI_YOUTUBE_FEED = [
+  {
+    "id": "0uR45roIGA4",
+    "title": "Jab Saiyaan | Full Video | Gangubai Kathiawadi | Alia Bhatt | Shreya Ghoshal",
+    "channel": "Saregama Music",
+    "views": "112M views",
+    "pub": "1 year ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/0uR45roIGA4/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/kzVDg0rujy7laR7qjVTsa7GaiJd6WkQrSlJxDNrhzakH7681kmv7tnoF7VaDmixuYs59QuED8A=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "65.4M subscribers",
+    "likes": "1.2M",
+    "tags": ["jab saiyaan", "shreya ghoshal", "alia bhatt", "romantic", "gangubai", "love"]
+  },
+  {
+    "id": "QXJyMpxd210",
+    "title": "Ve Kamleya | Rocky Aur Rani Kii Prem Kahaani | Ranveer, Alia | Arijit Singh, Shreya Ghoshal",
+    "channel": "Saregama Music",
+    "views": "322M views",
+    "pub": "1 year ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/QXJyMpxd210/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/kzVDg0rujy7laR7qjVTsa7GaiJd6WkQrSlJxDNrhzakH7681kmv7tnoF7VaDmixuYs59QuED8A=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "65.4M subscribers",
+    "likes": "2.8M",
+    "tags": ["ve kamleya", "arijit singh", "shreya ghoshal", "romantic", "rocky aur rani", "love"]
+  },
+  {
+    "id": "E_SbwSe15y0",
+    "title": "Ve Haaniyaan - Official Video | Ravi Dubey & Sargun Mehta | Danny, Avvy Sra",
+    "channel": "Dreamiyata Myusic",
+    "views": "396M views",
+    "pub": "8 months ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/E_SbwSe15y0/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/C3-TCPy6adHX7sBEcYJ2toNEyjPEHsMIwuO4MEeVOjTxnYqzxxVRv0wrnKq_Pc9JPjNYjxOzwFg=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "2.5M subscribers",
+    "likes": "3.1M",
+    "tags": ["ve haaniyaan", "ravi dubey", "sargun mehta", "romantic", "trending", "love"]
+  },
+  {
+    "id": "ElZfdU54Cp8",
+    "title": "Apna Bana Le - Bhediya | Varun Dhawan, Kriti Sanon | Sachin-Jigar, Arijit Singh",
+    "channel": "Zee Music Company",
+    "views": "520M views",
+    "pub": "2 years ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/ElZfdU54Cp8/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/2uUjDK69h-ijAxl6a_XrmKqLdL3ECr78FXXkUWERGJAHpSH0p3DEiNdlOuaR8LT3QCCF9P_ghg=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "104M subscribers",
+    "likes": "4.5M",
+    "tags": ["apna bana le", "arijit singh", "romantic", "bhediya", "love songs"]
+  },
+  {
+    "id": "RLzC55ai0eo",
+    "title": "Heeriye (Official Video) Jasleen Royal ft. Arijit Singh | Dulquer Salmaan",
+    "channel": "Jasleen Royal",
+    "views": "480M views",
+    "pub": "1 year ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/RLzC55ai0eo/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/kp_psIHuMQuiB6hz_0r2brLRI3GFsXgaxTQxma8ZdDneSRF5xWuYkpbBEaqVzOEpLwGSV--h=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "3.8M subscribers",
+    "likes": "4.1M",
+    "tags": ["heeriye", "arijit singh", "jasleen royal", "romantic", "love"]
+  },
+  {
+    "id": "BddP6PYo2gs",
+    "title": "Kesariya - Brahmāstra | Ranbir Kapoor, Alia Bhatt | Pritam, Arijit Singh, Amitabh B",
+    "channel": "Sony Music India",
+    "views": "640M views",
+    "pub": "2 years ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/BddP6PYo2gs/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/kzVDg0rujy7laR7qjVTsa7GaiJd6WkQrSlJxDNrhzakH7681kmv7tnoF7VaDmixuYs59QuED8A=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "60.1M subscribers",
+    "likes": "5.6M",
+    "tags": ["kesariya", "arijit singh", "alia bhatt", "ranbir kapoor", "romantic"]
+  },
+  {
+    "id": "Etkd-07gnxM",
+    "title": "Dunki: O Maahi (Full Video) | Shah Rukh Khan, Taapsee Pannu | Pritam, Arijit Singh",
+    "channel": "T-Series",
+    "views": "315M views",
+    "pub": "10 months ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/Etkd-07gnxM/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/2uUjDK69h-ijAxl6a_XrmKqLdL3ECr78FXXkUWERGJAHpSH0p3DEiNdlOuaR8LT3QCCF9P_ghg=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "278M subscribers",
+    "likes": "2.9M",
+    "tags": ["o maahi", "dunki", "arijit singh", "shah rukh khan", "romantic"]
+  },
+  {
+    "id": "iAIBF2ngbWY",
+    "title": "ANIMAL: Pehle Bhi Main (Full Video) | Ranbir Kapoor, Triptii Dimri | Vishal Mishra",
+    "channel": "T-Series",
+    "views": "462M views",
+    "pub": "9 months ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/iAIBF2ngbWY/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/2uUjDK69h-ijAxl6a_XrmKqLdL3ECr78FXXkUWERGJAHpSH0p3DEiNdlOuaR8LT3QCCF9P_ghg=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "278M subscribers",
+    "likes": "3.8M",
+    "tags": ["pehle bhi main", "animal", "vishal mishra", "romantic", "love"]
+  },
+  {
+    "id": "Umqb9KENgmk",
+    "title": "\"Tum Hi Ho\" Aashiqui 2 Full Song | Aditya Roy Kapur, Shraddha Kapoor | Arijit Singh",
+    "channel": "T-Series",
+    "views": "890M views",
+    "pub": "10 years ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/Umqb9KENgmk/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/2uUjDK69h-ijAxl6a_XrmKqLdL3ECr78FXXkUWERGJAHpSH0p3DEiNdlOuaR8LT3QCCF9P_ghg=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "278M subscribers",
+    "likes": "6.2M",
+    "tags": ["tum hi ho", "arijit singh", "aashiqui 2", "romantic", "all time favorite"]
+  },
+  {
+    "id": "gvyUuxdRdR4",
+    "title": "Raataan Lambiyan – Official Video | Shershaah | Sidharth – Kiara | Tanishk B | Jubin, Asees",
+    "channel": "Sony Music India",
+    "views": "920M views",
+    "pub": "3 years ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/gvyUuxdRdR4/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/kzVDg0rujy7laR7qjVTsa7GaiJd6WkQrSlJxDNrhzakH7681kmv7tnoF7VaDmixuYs59QuED8A=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "60.1M subscribers",
+    "likes": "7.1M",
+    "tags": ["raataan lambiyan", "shershaah", "kiara advani", "sidharth malhotra", "romantic"]
+  },
+  {
+    "id": "-1CwZ-U7UEs",
+    "title": "1 Hour Of Pure Lofi | Arijit Singh Hindi Romantic Lofi Chill Mashup",
+    "channel": "One lofi",
+    "views": "19M views",
+    "pub": "5 months ago",
+    "duration": "1:03:55",
+    "thumb": "https://i.ytimg.com/vi/-1CwZ-U7UEs/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/kp_psIHuMQuiB6hz_0r2brLRI3GFsXgaxTQxma8ZdDneSRF5xWuYkpbBEaqVzOEpLwGSV--h=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": false,
+    "subs": "540K subscribers",
+    "likes": "240K",
+    "tags": ["lofi", "hindi lofi", "chill beats", "arijit singh lofi", "study music", "relaxing"]
+  },
+  {
+    "id": "T_O_UWkRds4",
+    "title": "Best Of Bollywood Hindi Lofi | Arijit Singh & Atif Aslam Romantic Mix",
+    "channel": "Editor Soumya",
+    "views": "7M views",
+    "pub": "8 months ago",
+    "duration": "1:41:50",
+    "thumb": "https://i.ytimg.com/vi/T_O_UWkRds4/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/7-e0DNJyD6y3V76LvoudalBjAiba81ihsHKLwaxqSPEXSGPSMP6551sxC8NoSO4C1cbv0aIMkQ=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": false,
+    "subs": "310K subscribers",
+    "likes": "95K",
+    "tags": ["lofi", "bollywood lofi", "chill", "sleep lofi", "peaceful"]
+  },
+  {
+    "id": "WZzvUS-NaH0",
+    "title": "Jetha ने चुरा लिया Bapuji की Plate से Jalebi Fafda ! | Taarak Mehta Ka Ooltah Chashmah",
+    "channel": "Taarak Mehta Ka Ooltah Chashmah Movies",
+    "views": "10.9M views",
+    "pub": "4 months ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/WZzvUS-NaH0/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/C3-TCPy6adHX7sBEcYJ2toNEyjPEHsMIwuO4MEeVOjTxnYqzxxVRv0wrnKq_Pc9JPjNYjxOzwFg=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "984K subscribers",
+    "likes": "450K",
+    "tags": ["tmkoc", "taarak mehta", "jethalal", "comedy", "funny", "bapuji"]
+  },
+  {
+    "id": "Rx0kf6jxJaI",
+    "title": "Jethalal ne Phoda Iyer ke Piche Bomb! | FULL MOVIE | Taarak Mehta Ka Ooltah Chashmah",
+    "channel": "Taarak Mehta Ka Ooltah Chashmah",
+    "views": "13.3M views",
+    "pub": "1 year ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/Rx0kf6jxJaI/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/kiqCr4WL3xOhb8HU0lOp0djIa-qMfVYuym-Yli3ilwvk920wGsOu81DoVtP_jxpV0nvquo_u8rY=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "38.3M subscribers",
+    "likes": "620K",
+    "tags": ["tmkoc", "jethalal", "iyer", "comedy", "funny", "babita ji"]
+  },
+  {
+    "id": "Z4aMdO8K0XE",
+    "title": "INDIA’S GOT LATENT S2 EP8 ft. MC Stan, Tanmay Bhat, Madhur Virli, Arpit Bala",
+    "channel": "Samay Raina",
+    "views": "48.3M views",
+    "pub": "3d ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/Z4aMdO8K0XE/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/Wa_kc-EY0nzEj6c54uxm4kHnoNEpAdfM_Gd3QOgT-eLBohn0QiL6KRDdn5uWmF1nBhJty5y4=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "12.1M subscribers",
+    "likes": "2.4M",
+    "tags": ["samay raina", "indias got latent", "comedy", "tanmay bhat", "mc stan"]
+  },
+  {
+    "id": "abNaYS4Veto",
+    "title": "I Built My Sister Her Dream Bedroom! Aesthetic Room Makeover",
+    "channel": "Dantic",
+    "views": "36.3M views",
+    "pub": "1 year ago",
+    "duration": "♪ Video",
+    "thumb": "https://i.ytimg.com/vi/abNaYS4Veto/hqdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/7TdvyQjocZNF11vCmvMXPO-5jCx4ICU6bzLQM0o63uNVtpJ5qnqYF42Qb7uOB9cFdkS7AayWvg=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "3.55M subscribers",
+    "likes": "1.8M",
+    "tags": ["vlog", "aesthetic", "room makeover", "cute", "dream room"]
+  }
+];
+
+// Universal High-Speed Client-Side Search Helper across all YouTube curated catalogs
+window.searchAllYouTubeVideos = function(query) {
+  if (!query || query === 'All') {
+    const session = (function() {
+      try {
+        const raw = localStorage.getItem('viev_auth_session');
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) { return null; }
+    })();
+    const isDigi = session && (session.code === '3009' || session.code === '3011' || session.role === 'digi');
+    return isDigi ? (window.DIGI_YOUTUBE_FEED || []) : (window.VIRAT_YOUTUBE_FEED || []);
+  }
+
+  const rawWords = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  if (rawWords.length === 0) return window.DIGI_YOUTUBE_FEED || [];
+
+  const all = [...(window.DIGI_YOUTUBE_FEED || []), ...(window.VIRAT_YOUTUBE_FEED || [])];
+  // Deduplicate by ID
+  const map = new Map();
+  for (const v of all) {
+    if (v && v.id && !map.has(v.id)) {
+      map.set(v.id, v);
+    }
+  }
+  const uniqueVideos = Array.from(map.values());
+
+  const scored = [];
+  for (const v of uniqueVideos) {
+    let score = 0;
+    const title = (v.title || '').toLowerCase();
+    const channel = (v.channel || '').toLowerCase();
+    const tags = Array.isArray(v.tags) ? v.tags.join(' ').toLowerCase() : '';
+
+    const textToMatch = `${title} ${channel} ${tags}`;
+    for (const w of rawWords) {
+      if (title.includes(w)) score += 10;
+      if (channel.includes(w)) score += 6;
+      if (tags.includes(w)) score += 8;
+      if (textToMatch.includes(w)) score += 3;
+    }
+
+    if (score > 0) {
+      scored.push({ video: v, score });
+    }
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  if (scored.length > 0) {
+    return scored.map(s => s.video);
+  }
+
+  // Fallback: return top trending
+  return uniqueVideos.slice(0, 16);
+};
