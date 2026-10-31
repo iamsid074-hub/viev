@@ -1,11 +1,12 @@
 /* =========================================================
    DAILY NOTE FOR PRINCESS DIGI
-   With Apple Bottom Sheet Verification Quiz
+   With Apple Bottom Sheet Verification Quiz (Optional)
    2-Attempts Rule:
-   - 2 chances to answer.
+   - 2 chances to answer when quiz is enabled.
    - If 1st answer is wrong: 1 more chance is given with gentle warning!
    - If 2nd answer is also wrong: Note is permanently locked.
    - On click, displays small subtitle below: "no more attemps".
+   - When quiz is null / disabled: opens directly without asking questions!
    ========================================================= */
 
 // =========================================================
@@ -13,32 +14,13 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_fav_part_2026_relocked",
+  questionId: "digi_note_barosa_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `Baby , sometimes you know we love each others body to just know that itne time tak hmnr sirf pyar dekha 
-                                                                             Arz Kiya Hai 
-tu choo bhi le mai dekhun bhi nah 
-kase chle vyapar tera .
+  noteText: `Shuh shubh jyada kuch nhi kahung mai digi , par tune phli bar kisi par barosa kiya hai , kasam khuda ki , barosha or tujhe dono ko jeetke rahunga`,
 
-tu choo bhi le mai dekhun bhi nah 
-kase chle vyapar tera 
-
-mai uljan me bhi sulzan dhundu 
-tu h digi meri mai hu pyar tera .`,
-
-  // Verification Quiz:
-  quiz: {
-    question: "Digi ka konsa body part virat ko sbse jyada pasand hai ?",
-    correctOption: 4, // 4. Protein Wale BOOBS
-    maxAttempts: 2, // 2 chances to open!
-    options: [
-      { id: 1, text: "Ras-malai jasi IceCreeam" },
-      { id: 2, text: "Soft & Sexy Lips" },
-      { id: 3, text: "Boom digi-digi Boom Boom" },
-      { id: 4, text: "Protein Wale BOOBS", correct: true }
-    ]
-  },
+  // Verification Quiz (Set to null when no question applies):
+  quiz: null,
 
   // Right-side date label:
   dateLabel: "Today"
@@ -58,9 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Storage Key tied strictly to active user role AND questionId
-  const qId = (DAILY_NOTE_CONFIG.questionId || DAILY_NOTE_CONFIG.quiz.question || 'daily')
+  const hasQuiz = Boolean(DAILY_NOTE_CONFIG.quiz && DAILY_NOTE_CONFIG.quiz.question);
+  const qId = (DAILY_NOTE_CONFIG.questionId || (hasQuiz ? DAILY_NOTE_CONFIG.quiz.question : 'digi_barosa_note'))
     .toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 32);
-  const MAX_ATTEMPTS = (DAILY_NOTE_CONFIG.quiz && DAILY_NOTE_CONFIG.quiz.maxAttempts) || 2;
+  const MAX_ATTEMPTS = (hasQuiz && DAILY_NOTE_CONFIG.quiz.maxAttempts) ? DAILY_NOTE_CONFIG.quiz.maxAttempts : 2;
 
   // Clear previous accidental answers across both digi & user roles
   try {
@@ -79,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let attemptsUsed = 0;
   let savedStatus = null;
   let isPermanentlyLocked = false;
-  let isNoteUnlocked = false;
+  let isNoteUnlocked = !hasQuiz;
   let isNoteOpen = false;
 
   // Daily Note Elements
@@ -113,6 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
     </svg>
   `;
 
+  const ICON_ENVELOPE = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+      <polyline points="22,6 12,13 2,6"></polyline>
+    </svg>
+  `;
+
   const ICON_HIDE = `
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
@@ -128,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     noteTextEl.textContent = DAILY_NOTE_CONFIG.noteText;
   }
 
-  // Initialize Quiz Question & Options from Config
+  // Initialize Quiz Question & Options from Config (if quiz configured)
   const questionTitleEl = document.querySelector('.quiz-question-title');
   if (questionTitleEl && DAILY_NOTE_CONFIG.quiz && DAILY_NOTE_CONFIG.quiz.question) {
     questionTitleEl.textContent = DAILY_NOTE_CONFIG.quiz.question;
@@ -149,12 +139,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Set Initial Locked State (Before attempt has been made)
+  // Set Initial State (Before note has been expanded)
   function setInitialLockedState() {
     isNoteOpen = false;
     document.getElementById('welcome-screen')?.classList.remove('is-note-opened');
     if (noteCapsule) {
-      noteCapsule.classList.add('is-revealed', 'is-locked');
+      noteCapsule.classList.add('is-revealed');
+      if (hasQuiz) {
+        noteCapsule.classList.add('is-locked');
+      } else {
+        noteCapsule.classList.remove('is-locked');
+      }
       noteCapsule.classList.remove('is-permanently-locked');
     }
     if (noteTextEl) {
@@ -162,25 +157,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (lockedStateEl) {
       lockedStateEl.style.display = 'flex';
+      const stateIcon = lockedStateEl.querySelector('.locked-icon');
+      if (stateIcon) {
+        if (hasQuiz) {
+          stateIcon.innerHTML = `
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          `;
+        } else {
+          stateIcon.innerHTML = `
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          `;
+        }
+      }
     }
     if (lockedLabelEl) {
-      lockedLabelEl.textContent = isNoteUnlocked 
-        ? 'UNLOCKED • TAP OPEN NOTE TO READ' 
-        : 'LOCKED • TAP OPEN NOTE TO REVEAL';
+      if (!hasQuiz) {
+        lockedLabelEl.textContent = 'TAP OPEN NOTE TO READ';
+      } else {
+        lockedLabelEl.textContent = isNoteUnlocked 
+          ? 'UNLOCKED • TAP OPEN NOTE TO READ' 
+          : 'LOCKED • TAP OPEN NOTE TO REVEAL';
+      }
     }
     if (lockedSubEl) {
       lockedSubEl.style.display = 'none';
     }
     if (noteTagEl) {
-      noteTagEl.textContent = isNoteUnlocked ? 'UNLOCKED' : 'LOCKED';
-      noteTagEl.classList.add('is-locked');
-      noteTagEl.classList.remove('is-opened', 'is-permanently-locked');
+      if (!hasQuiz) {
+        noteTagEl.textContent = 'NOTE';
+        noteTagEl.classList.remove('is-locked', 'is-permanently-locked');
+      } else {
+        noteTagEl.textContent = isNoteUnlocked ? 'UNLOCKED' : 'LOCKED';
+        noteTagEl.classList.add('is-locked');
+        noteTagEl.classList.remove('is-opened', 'is-permanently-locked');
+      }
     }
     if (noteBtnText) {
       noteBtnText.textContent = 'Open Note';
     }
     if (noteBtnIcon) {
-      noteBtnIcon.innerHTML = ICON_LOCK;
+      noteBtnIcon.innerHTML = hasQuiz ? ICON_LOCK : ICON_ENVELOPE;
     }
     if (toggleBtn) {
       toggleBtn.classList.remove('is-opened-mode', 'is-permanently-locked');
@@ -268,6 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Open Quiz Bottom Sheet
   function openQuizSheet() {
+    if (!hasQuiz) {
+      revealNote();
+      return;
+    }
     if (isPermanentlyLocked) {
       triggerNoMoreAttemptsFeedback();
       return;
@@ -348,8 +370,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNoteOpen) {
       hideNote();
     } else {
-      if (isNoteUnlocked) {
-        // Already verified with correct answer! Direct show without asking quiz again!
+      if (isNoteUnlocked || !hasQuiz) {
+        // Direct show without asking quiz!
         revealNote();
       } else {
         openQuizSheet();
@@ -478,8 +500,8 @@ document.addEventListener('DOMContentLoaded', () => {
       attemptsUsed = 0;
     }
 
-    isPermanentlyLocked = (savedStatus === 'permanently_locked' || attemptsUsed >= MAX_ATTEMPTS);
-    isNoteUnlocked = (savedStatus === 'unlocked');
+    isPermanentlyLocked = hasQuiz && (savedStatus === 'permanently_locked' || attemptsUsed >= MAX_ATTEMPTS);
+    isNoteUnlocked = !hasQuiz || (savedStatus === 'unlocked');
     isNoteOpen = false;
 
     // On page load/refresh/reopen: ALWAYS start in collapsed/hidden state!
