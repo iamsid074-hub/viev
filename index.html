@@ -898,9 +898,24 @@ tu h digi meri mai hu pyar tera .
         <div class="cinema-theater-stage" id="cinema-theater-stage" style="display: none;">
           <!-- 16:9 Artwork & Video Stage Container -->
           <div class="cinema-player-artwork-container">
-            <!-- Ambilight Projection Canvas Layer (Mirrors video thumbnail behind the card with high diffusion) -->
-            <div class="cinema-artwork-glow" id="cinema-art-glow" aria-hidden="true">
-              <img src="" alt="" class="cinema-ambilight-canvas" id="cinema-ambilight-canvas">
+            <!-- Intelligent Smart Ambilight Engine (Option 1: Multi-Zone Mesh + Option 5: 1.2s Color Morph) -->
+            <div class="cinema-artwork-glow is-paused" id="cinema-art-glow" aria-hidden="true">
+              <!-- Buffer Layer A -->
+              <div class="cinema-amb-layer cinema-amb-layer-a is-active" id="cinema-amb-layer-a">
+                <img src="" alt="" class="cinema-ambilight-canvas amb-img" id="cinema-ambilight-canvas">
+                <div class="cinema-amb-halo"></div>
+                <div class="cinema-amb-flank-left"></div>
+                <div class="cinema-amb-flank-right"></div>
+              </div>
+              <!-- Buffer Layer B (for silky 1.2s cross-dissolve morph) -->
+              <div class="cinema-amb-layer cinema-amb-layer-b" id="cinema-amb-layer-b">
+                <img src="" alt="" class="cinema-ambilight-canvas amb-img" id="cinema-ambilight-canvas-b">
+                <div class="cinema-amb-halo"></div>
+                <div class="cinema-amb-flank-left"></div>
+                <div class="cinema-amb-flank-right"></div>
+              </div>
+              <!-- Multi-zone Glossy Stage Floor Reflection -->
+              <div class="cinema-amb-floor-stage" id="cinema-amb-floor-stage"></div>
               <div class="cinema-ambilight-bloom"></div>
             </div>
 

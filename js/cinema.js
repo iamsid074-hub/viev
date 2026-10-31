@@ -39,7 +39,209 @@ document.addEventListener('DOMContentLoaded', () => {
     return null;
   }
 
-  const ambilightImg = document.getElementById('cinema-ambilight-canvas');
+  // =========================================================
+  // INTELLIGENT SMART AMBILIGHT ENGINE 2.1
+  // Option 1: Real-Time Dynamic Multi-Zone Color Mesh (Halo, Flanks, Floor)
+  // Option 5: Silky 1.2s Double-Buffered Cross-Dissolve Morphing & Living Pulse
+  // =========================================================
+  const ambContainer = document.getElementById('cinema-art-glow');
+  const ambLayerA = document.getElementById('cinema-amb-layer-a');
+  const ambLayerB = document.getElementById('cinema-amb-layer-b');
+  const ambImgA = document.getElementById('cinema-ambilight-canvas');
+  const ambImgB = document.getElementById('cinema-ambilight-canvas-b');
+  let currentAmbBuffer = 'a';
+  let offscreenCanvas = null;
+  let offscreenCtx = null;
+
+  try {
+    offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = 32;
+    offscreenCanvas.height = 18;
+    offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+  } catch (_) {}
+
+  function setAmbilightPlaybackState(isPlaying) {
+    if (!ambContainer) return;
+    if (isPlaying) {
+      ambContainer.classList.add('is-playing');
+      ambContainer.classList.remove('is-paused');
+    } else {
+      ambContainer.classList.add('is-paused');
+      ambContainer.classList.remove('is-playing');
+    }
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return [h * 360, s, l];
+  }
+
+  function hslToRgb(h, s, l) {
+    h = (h % 360) / 360;
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+  }
+
+  function boostColorVibrance(r, g, b) {
+    const [h, s, l] = rgbToHsl(r, g, b);
+    const boostedS = Math.min(1, Math.max(0.60, s * 1.55));
+    const boostedL = Math.min(0.68, Math.max(0.38, l * 1.08));
+    return hslToRgb(h, boostedS, boostedL);
+  }
+
+  function sampleRegionRgb(ctx, startX, startY, width, height) {
+    try {
+      const imgData = ctx.getImageData(startX, startY, width, height).data;
+      let totalR = 0, totalG = 0, totalB = 0, count = 0;
+      for (let i = 0; i < imgData.length; i += 4) {
+        totalR += imgData[i];
+        totalG += imgData[i + 1];
+        totalB += imgData[i + 2];
+        count++;
+      }
+      if (count === 0) return [236, 72, 153];
+      return boostColorVibrance(
+        Math.round(totalR / count),
+        Math.round(totalG / count),
+        Math.round(totalB / count)
+      );
+    } catch (_) {
+      return [236, 72, 153];
+    }
+  }
+
+  function generateHarmonicPalette(seedStr) {
+    let hash = 0;
+    for (let i = 0; i < seedStr.length; i++) {
+      hash = (hash << 5) - hash + seedStr.charCodeAt(i);
+      hash |= 0;
+    }
+    const baseHue = Math.abs(hash) % 360;
+    const isRomantic = /kamleya|haaniyaan|saiyaan|arijit|love|romantic|shreya|heeriye/i.test(seedStr);
+
+    const primaryHue = isRomantic ? 335 : baseHue;
+    const secondaryHue = isRomantic ? 275 : (baseHue + 45) % 360;
+    const accentHue = isRomantic ? 355 : (baseHue + 180) % 360;
+    const floorHue = isRomantic ? 340 : (baseHue + 25) % 360;
+
+    return {
+      primary: hslToRgb(primaryHue, 0.85, 0.52),
+      secondary: hslToRgb(secondaryHue, 0.80, 0.50),
+      accent: hslToRgb(accentHue, 0.90, 0.55),
+      floor: hslToRgb(floorHue, 0.85, 0.48)
+    };
+  }
+
+  function applyAmbilightMultiZoneVars(palette) {
+    if (!ambContainer) return;
+    const p = palette.primary;
+    const s = palette.secondary;
+    const a = palette.accent;
+    const f = palette.floor;
+
+    ambContainer.style.setProperty('--amb-primary', `rgba(${p[0]}, ${p[1]}, ${p[2]}, 0.72)`);
+    ambContainer.style.setProperty('--amb-secondary', `rgba(${s[0]}, ${s[1]}, ${s[2]}, 0.65)`);
+    ambContainer.style.setProperty('--amb-accent', `rgba(${a[0]}, ${a[1]}, ${a[2]}, 0.68)`);
+    ambContainer.style.setProperty('--amb-floor', `rgba(${f[0]}, ${f[1]}, ${f[2]}, 0.55)`);
+  }
+
+  function updateSmartAmbilight(thumbUrl, videoId = '', title = '') {
+    if (!ambContainer) return;
+
+    const nextBuffer = (currentAmbBuffer === 'a') ? 'b' : 'a';
+    const activeLayer = (currentAmbBuffer === 'a') ? ambLayerA : ambLayerB;
+    const nextLayer = (nextBuffer === 'a') ? ambLayerA : ambLayerB;
+    const nextImg = (nextBuffer === 'a') ? ambImgA : ambImgB;
+
+    if (!nextLayer || !nextImg) {
+      if (ambImgA) ambImgA.src = thumbUrl;
+      return;
+    }
+
+    const seed = `${videoId} ${title}`;
+    const fallbackPalette = generateHarmonicPalette(seed);
+
+    let hasAnalyzed = false;
+
+    function applyAndMorph(palette) {
+      if (hasAnalyzed) return;
+      hasAnalyzed = true;
+
+      applyAmbilightMultiZoneVars(palette);
+
+      // Option 5: Silky 1.2s cross-dissolve color morph
+      nextLayer.classList.add('is-active');
+      if (activeLayer) activeLayer.classList.remove('is-active');
+      currentAmbBuffer = nextBuffer;
+    }
+
+    // Option 1: Sample real-time pixels from thumbnail via offscreen canvas
+    const tempImg = new Image();
+    tempImg.crossOrigin = 'anonymous';
+
+    tempImg.onload = () => {
+      nextImg.src = thumbUrl;
+      try {
+        if (offscreenCtx) {
+          offscreenCtx.clearRect(0, 0, 32, 18);
+          offscreenCtx.drawImage(tempImg, 0, 0, 32, 18);
+
+          const topHaloRgb = sampleRegionRgb(offscreenCtx, 8, 0, 16, 6);
+          const leftFlankRgb = sampleRegionRgb(offscreenCtx, 0, 4, 8, 10);
+          const rightFlankRgb = sampleRegionRgb(offscreenCtx, 24, 4, 8, 10);
+          const floorRgb = sampleRegionRgb(offscreenCtx, 8, 12, 16, 6);
+
+          applyAndMorph({
+            primary: topHaloRgb,
+            secondary: leftFlankRgb,
+            accent: rightFlankRgb,
+            floor: floorRgb
+          });
+          return;
+        }
+      } catch (_) {}
+      applyAndMorph(fallbackPalette);
+    };
+
+    tempImg.onerror = () => {
+      nextImg.src = thumbUrl;
+      applyAndMorph(fallbackPalette);
+    };
+
+    tempImg.src = thumbUrl;
+  }
+
   const dragSurface = document.getElementById('cinema-player-drag-surface');
   const miniExpandBtn = document.getElementById('cinema-miniplayer-expand-btn');
   const miniDismissBtn = document.getElementById('cinema-miniplayer-dismiss-btn');
@@ -429,11 +631,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state === 1) {
       isVideoPlaying = true;
       updatePlayPauseIcons(true);
+      setAmbilightPlaybackState(true);
       startPlaybackTicker();
       scheduleControlsAutoHide();
     } else if (state === 2) {
       isVideoPlaying = false;
       updatePlayPauseIcons(false);
+      setAmbilightPlaybackState(false);
       stopPlaybackTicker();
       showCustomControls();
     } else if (state === 0) {
@@ -441,6 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
       videoCurrentSeconds = 0;
       updateScrubberUI();
       updatePlayPauseIcons(false);
+      setAmbilightPlaybackState(false);
       stopPlaybackTicker();
       showCustomControls();
     }
@@ -449,6 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function setVideoPlaybackState(play) {
     isVideoPlaying = play;
     updatePlayPauseIcons(play);
+    setAmbilightPlaybackState(play);
     if (play) {
       sendIframeCommand('playVideo');
       startPlaybackTicker();
@@ -708,6 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (iframe) iframe.src = '';
     stopPlaybackTicker();
+    setAmbilightPlaybackState(false);
+    dismissPlaybackErrorBanner();
     hideCustomControls();
     closeSettingsSheet();
 
@@ -1103,9 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentBaseLikes = likes || '50K';
 
     const thumbUrl = thumb || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-    if (ambilightImg) {
-      ambilightImg.src = thumbUrl;
-    }
+    updateSmartAmbilight(thumbUrl, videoId, title);
 
     // Reset any miniplayer states or inline drag transforms
     theaterStage.classList.remove('is-miniplayer');
