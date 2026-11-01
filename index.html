@@ -326,7 +326,7 @@ Shuh shubh jyada kuch nhi kahung mai digi , par tune phli bar kisi par barosa ki
         </div>
 
         <!-- Track Meta Header (Left-aligned, Apple style) -->
-        <div class="apple-track-info-row">
+        <div class="apple-track-info-row" id="music-track-info-row">
           <div class="apple-track-meta">
             <h1 class="apple-track-title" id="music-track-title">Ve Haaniyaan</h1>
             <p class="apple-track-artist" id="music-track-artist">Danny • Avvy Sra</p>
@@ -337,6 +337,19 @@ Shuh shubh jyada kuch nhi kahung mai digi , par tune phli bar kisi par barosa ki
             </svg>
             <span class="heart-particles" id="heart-particles" aria-hidden="true"></span>
           </button>
+        </div>
+
+        <!-- Large Detached Song Search Pill (Active in Song List View) -->
+        <div class="apple-song-search-wrap" id="music-song-search-wrap" aria-hidden="true">
+          <div class="apple-song-search-pill">
+            <svg class="search-pill-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="music-song-search-input" class="search-pill-input" placeholder="Search song or artist..." autocomplete="off" spellcheck="false">
+            <button class="search-pill-clear-btn" id="music-song-search-clear" aria-label="Clear search" style="display: none;">✕</button>
+          </div>
+          <div class="search-pill-hint" id="music-search-hint" style="display: none;"></div>
         </div>
 
         <!-- Apple Scrubber Slider & Timestamps -->

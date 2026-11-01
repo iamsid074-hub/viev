@@ -1510,7 +1510,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyQuadrantPalette(palette) {
     if (!palette) return;
-    const target = artworkContainer || document.documentElement;
+    const target = artworkGlow || artworkContainer || document.documentElement;
     target.style.setProperty('--glow-tl', palette.tl);
     target.style.setProperty('--glow-tr', palette.tr);
     target.style.setProperty('--glow-bl', palette.bl);
@@ -1635,12 +1635,10 @@ document.addEventListener('DOMContentLoaded', () => {
     rollingMidAvg = 0.20;
     rollingTrebleAvg = 0.10;
 
-    if (artworkContainer) {
-      artworkContainer.style.setProperty('--bass-energy', '0');
-      artworkContainer.style.setProperty('--mid-energy', '0');
-      artworkContainer.style.setProperty('--treble-energy', '0');
-    }
     if (artworkGlow) {
+      artworkGlow.style.setProperty('--bass-energy', '0');
+      artworkGlow.style.setProperty('--mid-energy', '0');
+      artworkGlow.style.setProperty('--treble-energy', '0');
       artworkGlow.style.transform = '';
       artworkGlow.style.opacity = '';
     }
@@ -1733,18 +1731,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const trebleAttack = targetTreble > currentTreblePulse ? 0.75 : 0.22;
     currentTreblePulse += (targetTreble - currentTreblePulse) * trebleAttack;
 
-    // Push Tri-Band energies to CSS Custom Properties (zero reflow, 100% GPU composited)
-    if (artworkContainer) {
-      artworkContainer.style.setProperty('--bass-energy', currentBassPulse.toFixed(3));
-      artworkContainer.style.setProperty('--mid-energy', currentMidPulse.toFixed(3));
-      artworkContainer.style.setProperty('--treble-energy', currentTreblePulse.toFixed(3));
-    }
-
-    // Subtle atmospheric blur depth on mirrored canvas
-    if (ambilightImg) {
-      const dynamicBlur = 40 + currentMidPulse * 16;
-      const dynamicBrightness = 0.95 + currentMidPulse * 0.25;
-      ambilightImg.style.filter = `blur(${dynamicBlur.toFixed(1)}px) saturate(190%) brightness(${dynamicBrightness.toFixed(2)})`;
+    // Push Tri-Band energies to CSS Custom Properties (isolated on glow, zero parent reflow)
+    if (artworkGlow) {
+      artworkGlow.style.setProperty('--bass-energy', currentBassPulse.toFixed(3));
+      artworkGlow.style.setProperty('--mid-energy', currentMidPulse.toFixed(3));
+      artworkGlow.style.setProperty('--treble-energy', currentTreblePulse.toFixed(3));
     }
 
     // Traveling Rim Prism acceleration: Treble hits ignite crystalline prism transit
@@ -1774,6 +1765,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const songlistItems = document.getElementById('music-songlist-items');
   const lyricsCloseBtn = document.getElementById('lyrics-close-btn');
   const songlistCloseBtn = document.getElementById('songlist-close-btn');
+  const songSearchWrap = document.getElementById('music-song-search-wrap');
+  const songSearchInput = document.getElementById('music-song-search-input');
+  const songSearchClear = document.getElementById('music-song-search-clear');
   const calibMinusBtn = document.getElementById('calib-minus-btn');
   const calibPlusBtn = document.getElementById('calib-plus-btn');
   const calibResetBtn = document.getElementById('calib-reset-btn');
@@ -1978,6 +1972,18 @@ document.addEventListener('DOMContentLoaded', () => {
         nowPlayingWrap.classList.add('is-panel-open');
       } else {
         nowPlayingWrap.classList.remove('is-panel-open');
+      }
+
+      if (view === 'songlist') {
+        nowPlayingWrap.classList.add('is-songlist-mode');
+        if (songSearchWrap) songSearchWrap.setAttribute('aria-hidden', 'false');
+      } else {
+        nowPlayingWrap.classList.remove('is-songlist-mode');
+        if (songSearchWrap) songSearchWrap.setAttribute('aria-hidden', 'true');
+        if (songSearchInput) {
+          songSearchInput.value = '';
+          if (songSearchClear) songSearchClear.style.display = 'none';
+        }
       }
     }
 
@@ -2277,23 +2283,121 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Render All Songs in Song List
-  function renderSongList() {
-    if (!songlistItems) return;
-    let html = '';
+  // Typo-tolerant Damerau-Levenshtein Edit Distance for Search
+  function levenshteinDistance(s1, s2) {
+    if (s1 === s2) return 0;
+    if (!s1 || !s2) return (s1 || s2).length;
+    const v0 = new Int32Array(s2.length + 1);
+    const v1 = new Int32Array(s2.length + 1);
+    for (let i = 0; i <= s2.length; i++) v0[i] = i;
+    for (let i = 0; i < s1.length; i++) {
+      v1[0] = i + 1;
+      for (let j = 0; j < s2.length; j++) {
+        const cost = (s1[i] === s2[j]) ? 0 : 1;
+        v1[j + 1] = Math.min(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
+      }
+      for (let j = 0; j <= s2.length; j++) v0[j] = v1[j];
+    }
+    return v1[s2.length];
+  }
 
-    PLAYLIST.forEach((track, idx) => {
+  function cleanSearchStr(s) {
+    return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+  }
+
+  function scoreTrackSearch(track, query) {
+    const q = query.trim().toLowerCase();
+    const qClean = cleanSearchStr(q);
+    if (!q || !qClean) return 100;
+
+    const title = (track.title || '').toLowerCase();
+    const titleClean = cleanSearchStr(track.title);
+    const artist = (track.artist || '').toLowerCase();
+    const artistClean = cleanSearchStr(track.artist);
+
+    // 1. Direct match on title (highest priority)
+    if (title === q || titleClean === qClean) return 1000;
+    if (title.startsWith(q) || titleClean.startsWith(qClean)) return 850;
+    if (title.includes(q) || titleClean.includes(qClean)) return 700;
+
+    // 2. Artist match
+    if (artist.startsWith(q) || artistClean.startsWith(qClean)) return 550;
+    if (artist.includes(q) || artistClean.includes(qClean)) return 450;
+
+    // 3. Word token matching
+    const qWords = q.split(/\s+/).filter(Boolean);
+    const titleWords = title.split(/\s+/).filter(Boolean);
+    let matchedWords = 0;
+    for (const qw of qWords) {
+      if (titleWords.some(tw => tw.startsWith(qw) || tw.includes(qw))) matchedWords++;
+    }
+    if (matchedWords === qWords.length && qWords.length > 0) return 600;
+
+    // 4. Typo-tolerant edit distance on individual words
+    let bestDist = 999;
+    for (const tw of titleWords) {
+      const dist = levenshteinDistance(q, tw);
+      if (dist < bestDist) bestDist = dist;
+    }
+
+    const maxAllowedTypos = q.length >= 6 ? 2 : (q.length >= 3 ? 1 : 0);
+    if (bestDist <= maxAllowedTypos) {
+      return 380 - bestDist * 60;
+    }
+
+    // 5. Sliding window edit distance on normalized full title (e.g. "kesriya" vs "kesariya", "sawann" vs "sawan")
+    if (titleClean.length >= qClean.length) {
+      for (let i = 0; i <= titleClean.length - qClean.length; i++) {
+        const sub = titleClean.substring(i, i + qClean.length);
+        const dist = levenshteinDistance(qClean, sub);
+        if (dist <= maxAllowedTypos) {
+          return 340 - dist * 50;
+        }
+      }
+    }
+
+    return 0;
+  }
+
+  // Render All Songs (or Search Results with typo tolerance) in Song List
+  function renderSongList(customList = null) {
+    if (!songlistItems) return;
+    let listToRender = [];
+
+    if (customList !== null) {
+      listToRender = customList;
+    } else {
+      listToRender = PLAYLIST.map((track, idx) => ({ track, idx, isRec: false }));
+    }
+
+    if (listToRender.length === 0) {
+      songlistItems.innerHTML = `
+        <div class="songlist-no-results">
+          <p>No matching songs found</p>
+          <span style="font-size: 12px; opacity: 0.6;">Check spelling or try a different keyword</span>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    listToRender.forEach((item) => {
+      const track = item.track;
+      const idx = item.idx;
+      const isRec = item.isRec;
       const isActive = idx === currentTrackIndex;
       const pausedClass = (isActive && !isPlaying) ? ' is-paused' : '';
       const activeClass = isActive ? ' is-active' : '';
+      const recClass = isRec ? ' is-recommended' : '';
 
       html += `
-        <div class="song-list-item${activeClass}${pausedClass}" data-index="${idx}">
+        <div class="song-list-item${activeClass}${pausedClass}${recClass}" data-index="${idx}">
           <img src="${track.cover}" alt="${track.title}" class="song-item-thumb">
           <div class="song-item-info">
             <span class="song-item-title">${track.title}</span>
             <span class="song-item-artist">${track.artist}</span>
           </div>
+          ${isRec ? `<span class="song-item-rec-badge">Recommended</span>` : ''}
           ${isActive ? `
             <div class="song-item-eq">
               <span class="eq-bar"></span>
@@ -2319,6 +2423,48 @@ document.addEventListener('DOMContentLoaded', () => {
           loadTrack(idx, true);
         }
       });
+    });
+  }
+
+  // Wire up Live Search Input with typo tolerance
+  if (songSearchInput) {
+    songSearchInput.addEventListener('input', () => {
+      const q = songSearchInput.value.trim();
+      if (songSearchClear) songSearchClear.style.display = q ? 'flex' : 'none';
+
+      if (!q) {
+        renderSongList();
+        return;
+      }
+
+      const scored = [];
+      PLAYLIST.forEach((track, idx) => {
+        const score = scoreTrackSearch(track, q);
+        if (score > 0) {
+          scored.push({ track, idx, score });
+        }
+      });
+
+      scored.sort((a, b) => b.score - a.score);
+
+      const mapped = scored.map((item, pos) => ({
+        track: item.track,
+        idx: item.idx,
+        isRec: pos === 0 && scored.length > 1 // Highlight highest scoring match
+      }));
+
+      renderSongList(mapped);
+    });
+  }
+
+  if (songSearchClear) {
+    songSearchClear.addEventListener('click', () => {
+      if (songSearchInput) {
+        songSearchInput.value = '';
+        songSearchInput.focus();
+      }
+      songSearchClear.style.display = 'none';
+      renderSongList();
     });
   }
 
