@@ -1401,18 +1401,157 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================
-  // REAL-TIME 16:9 POSTER SINGLE-COLOR BEAT-SYNC ENGINE
-  // High-intensity, vibrant ambient glow strictly of ONE poster color.
-  // Instant snappy beat-reactive kicks & acoustic thump.
+  // MULTI-ZONE SPATIAL CHROMA & TRI-BAND AUDIO REACTIVE ENGINE
+  // Edge-aware 4-quadrant chromatic extraction with independent
+  // Sub-Bass, Vocal Mids, and High Treble frequency separation.
   // =========================================================
   let audioCtx = null;
   let analyser = null;
   let audioSourceNode = null;
   let beatVisualizerRafId = null;
-  let currentPulse = 0;
-  let prevBassEnergy = 0;
+  let currentBassPulse = 0;
+  let currentMidPulse = 0;
+  let currentTreblePulse = 0;
   let rollingBassAvg = 0.15;
+  let rollingMidAvg = 0.20;
+  let rollingTrebleAvg = 0.10;
   let gleamAngle = 45;
+
+  const colorCache = new Map();
+  let sampleCanvas = null;
+  let sampleCtx = null;
+
+  function hexToHsl(hex) {
+    if (!hex) return [340, 85, 55];
+    let c = hex.replace('#', '').trim();
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    if (c.length < 6) return [340, 85, 55];
+    const r = parseInt(c.substring(0, 2), 16) / 255;
+    const g = parseInt(c.substring(2, 4), 16) / 255;
+    const b = parseInt(c.substring(4, 6), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+  }
+
+  function hslToRgb(h, s, l) {
+    s /= 100; l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return `rgb(${Math.round(255 * f(0))}, ${Math.round(255 * f(8))}, ${Math.round(255 * f(4))})`;
+  }
+
+  function generateHarmonicQuadrantPalette(baseColorHex, glowHex) {
+    const [h, s, l] = hexToHsl(baseColorHex || '#ff2d55');
+    const sat = Math.min(100, Math.max(72, s));
+    const light = Math.min(65, Math.max(45, l));
+    return {
+      tl: hslToRgb((h - 26 + 360) % 360, sat, light),
+      tr: glowHex || hslToRgb((h + 24) % 360, Math.min(100, sat + 10), light),
+      bl: hslToRgb((h - 48 + 360) % 360, Math.min(100, sat + 16), Math.max(38, light - 8)),
+      br: hslToRgb((h + 46) % 360, Math.min(100, sat + 14), Math.max(40, light - 6)),
+      mid: hslToRgb(h, sat, light)
+    };
+  }
+
+  function sampleImageQuadrants(img) {
+    try {
+      if (!img || !img.complete || img.naturalWidth === 0) return null;
+      if (!sampleCanvas) {
+        sampleCanvas = document.createElement('canvas');
+        sampleCanvas.width = 16;
+        sampleCanvas.height = 10;
+        sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+      }
+      if (!sampleCtx) return null;
+      sampleCtx.clearRect(0, 0, 16, 10);
+      sampleCtx.drawImage(img, 0, 0, 16, 10);
+      const imgData = sampleCtx.getImageData(0, 0, 16, 10).data;
+
+      const getAvg = (x0, y0, x1, y1, boost = 1.22) => {
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let y = y0; y <= y1; y++) {
+          for (let x = x0; x <= x1; x++) {
+            const idx = (y * 16 + x) * 4;
+            r += imgData[idx];
+            g += imgData[idx + 1];
+            b += imgData[idx + 2];
+            count++;
+          }
+        }
+        r = Math.min(255, Math.round((r / count) * boost));
+        g = Math.min(255, Math.round((g / count) * boost));
+        b = Math.min(255, Math.round((b / count) * boost));
+        return `rgb(${r}, ${g}, ${b})`;
+      };
+
+      return {
+        tl: getAvg(0, 0, 7, 4),
+        tr: getAvg(8, 0, 15, 4),
+        bl: getAvg(0, 5, 7, 9),
+        br: getAvg(8, 5, 15, 9),
+        mid: getAvg(4, 2, 11, 7)
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function applyQuadrantPalette(palette) {
+    if (!palette) return;
+    const target = artworkContainer || document.documentElement;
+    target.style.setProperty('--glow-tl', palette.tl);
+    target.style.setProperty('--glow-tr', palette.tr);
+    target.style.setProperty('--glow-bl', palette.bl);
+    target.style.setProperty('--glow-br', palette.br);
+    target.style.setProperty('--glow-mid', palette.mid);
+    if (glassFrame) {
+      glassFrame.style.setProperty('--poster-specular', palette.tr || palette.mid);
+    }
+  }
+
+  function updateMultiZonePalette(track) {
+    if (!track) return;
+    const key = track.title || track.file;
+    if (colorCache.has(key)) {
+      applyQuadrantPalette(colorCache.get(key));
+      return;
+    }
+    const harmonic = generateHarmonicQuadrantPalette(track.color, track.glow);
+    applyQuadrantPalette(harmonic);
+
+    if (artworkImg && artworkImg.complete && artworkImg.naturalWidth > 0) {
+      const sampled = sampleImageQuadrants(artworkImg);
+      if (sampled) {
+        colorCache.set(key, sampled);
+        applyQuadrantPalette(sampled);
+      }
+    }
+  }
+
+  if (artworkImg) {
+    artworkImg.addEventListener('load', () => {
+      const currentTrack = PLAYLIST[currentTrackIndex];
+      if (currentTrack) {
+        const sampled = sampleImageQuadrants(artworkImg);
+        if (sampled) {
+          colorCache.set(currentTrack.title || currentTrack.file, sampled);
+          applyQuadrantPalette(sampled);
+        }
+      }
+    });
+  }
 
   // Feature 6: Spatial Audio & Binaural Acoustics Nodes
   let dryGainNode = null;
@@ -1461,12 +1600,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initAudioVisualizer() {
-    // Preserves native hardware audio decoder for true background playback on mobile:
-    // Audio will never mute or freeze when the phone is locked, display is turned off,
-    // or when switching between apps!
+    if (audioCtx) return;
+    try {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtxClass) return;
+      audioCtx = new AudioCtxClass();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.8;
+      audioSourceNode = audioCtx.createMediaElementSource(audio);
+      audioSourceNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    } catch (e) {
+      // Graceful fallback to real-time audio.currentTime polyrhythmic wave
+    }
   }
 
   function startBeatVisualizer() {
+    initAudioVisualizer();
     if (!beatVisualizerRafId) {
       beatVisualizerRafId = requestAnimationFrame(beatVisualizerLoop);
     }
@@ -1477,9 +1628,18 @@ document.addEventListener('DOMContentLoaded', () => {
       cancelAnimationFrame(beatVisualizerRafId);
       beatVisualizerRafId = null;
     }
-    currentPulse = 0;
-    prevBassEnergy = 0;
+    currentBassPulse = 0;
+    currentMidPulse = 0;
+    currentTreblePulse = 0;
     rollingBassAvg = 0.15;
+    rollingMidAvg = 0.20;
+    rollingTrebleAvg = 0.10;
+
+    if (artworkContainer) {
+      artworkContainer.style.setProperty('--bass-energy', '0');
+      artworkContainer.style.setProperty('--mid-energy', '0');
+      artworkContainer.style.setProperty('--treble-energy', '0');
+    }
     if (artworkGlow) {
       artworkGlow.style.transform = '';
       artworkGlow.style.opacity = '';
@@ -1507,83 +1667,90 @@ document.addEventListener('DOMContentLoaded', () => {
       audioCtx.resume();
     }
 
-    let targetEnergy = 0;
+    let targetBass = 0;
+    let targetMid = 0;
+    let targetTreble = 0;
     let hasSignal = false;
 
     if (analyser) {
       const freqData = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(freqData);
 
-      // Check if real audio data is flowing through bins
       let signalSum = 0;
-      for (let i = 0; i < 16; i++) {
-        signalSum += freqData[i];
-      }
+      for (let i = 0; i < 20; i++) signalSum += freqData[i];
 
       if (signalSum > 8) {
         hasSignal = true;
-        // Bins 0-1 (~0-90Hz): Sub-bass / 808
-        // Bins 2-4 (~90-220Hz): Kick drum transient & punch
-        // Bins 5-7 (~220-350Hz): Low-mid acoustic body
-        const subBass = (freqData[0] * 1.6 + freqData[1] * 2.2) / (3.8 * 255);
-        const kick = (freqData[2] * 2.4 + freqData[3] * 1.8 + freqData[4] * 1.2) / (5.4 * 255);
-        const rawBass = Math.max(subBass, kick * 1.2);
 
-        // Dynamic Moving Average Peak Detection (adapts to song volume automatically)
-        rollingBassAvg = rollingBassAvg * 0.92 + rawBass * 0.08;
-        const transientDelta = Math.max(0, rawBass - rollingBassAvg * 1.15);
+        // BAND 1: SUB-BASS & KICK (~20Hz - 150Hz, Bins 0..3)
+        const subBass = (freqData[0] * 1.6 + freqData[1] * 2.2 + freqData[2] * 2.0 + freqData[3] * 1.4) / (7.2 * 255);
+        rollingBassAvg = rollingBassAvg * 0.93 + subBass * 0.07;
+        const bassTransient = Math.max(0, subBass - rollingBassAvg * 1.15);
+        targetBass = Math.min(1.0, subBass * 0.55 + bassTransient * 4.0);
 
-        // Immediate punchy target energy
-        targetEnergy = Math.min(1.0, rawBass * 0.55 + transientDelta * 4.2);
+        // BAND 2: VOCALS & MELODIC MIDS (~200Hz - 2.8kHz, Bins 4..24)
+        let midSum = 0;
+        for (let i = 4; i <= 24; i++) midSum += freqData[i];
+        const rawMids = midSum / (21 * 255);
+        rollingMidAvg = rollingMidAvg * 0.95 + rawMids * 0.05;
+        const midTransient = Math.max(0, rawMids - rollingMidAvg * 1.12);
+        targetMid = Math.min(1.0, rawMids * 0.70 + midTransient * 2.8);
+
+        // BAND 3: HIGH TREBLE & CRISP TRANSIENTS (~3.5kHz - 16kHz, Bins 28..64)
+        let trebleSum = 0;
+        const trebleEnd = Math.min(64, freqData.length);
+        for (let i = 28; i < trebleEnd; i++) trebleSum += freqData[i];
+        const rawTreble = trebleSum / (Math.max(1, trebleEnd - 28) * 255);
+        rollingTrebleAvg = rollingTrebleAvg * 0.94 + rawTreble * 0.06;
+        const trebleTransient = Math.max(0, rawTreble - rollingTrebleAvg * 1.25);
+        targetTreble = Math.min(1.0, rawTreble * 0.50 + trebleTransient * 4.6);
       }
     }
 
-    // Song-Specific Real BPM Fallback if audio context is locked / silent
+    // Polyrhythmic Musical Synchronization locked to playback time
     if (!hasSignal) {
       const currentTrack = PLAYLIST[currentTrackIndex];
       const songBpm = (currentTrack && currentTrack.bpm) ? currentTrack.bpm : 92;
-      const t = (performance.now() / 1000) * (songBpm / 60) * Math.PI;
-      // Organic heartbeat-style pulse
-      const primaryBeat = Math.pow(Math.max(0, Math.sin(t)), 4);
-      const secondaryBeat = Math.pow(Math.max(0, Math.sin(t - Math.PI * 0.3)), 6) * 0.4;
-      targetEnergy = Math.min(1.0, 0.20 + (primaryBeat + secondaryBeat) * 0.80);
+      const playTime = audio.currentTime > 0 ? audio.currentTime : (performance.now() / 1000);
+      const t = (playTime * (songBpm / 60)) * Math.PI;
+
+      // 3 independent rhythmic envelopes
+      targetBass = Math.pow(Math.max(0, Math.sin(t)), 4) * 0.82;
+      targetMid = (Math.sin(t * 0.5) * 0.5 + 0.5) * 0.68;
+      targetTreble = Math.pow(Math.max(0, Math.sin(t * 2.0)), 6) * 0.72;
     }
 
-    // Snappy attack on kick hits, organic decay
-    const attack = targetEnergy > currentPulse ? 0.65 : 0.16;
-    currentPulse += (targetEnergy - currentPulse) * attack;
+    // Independent attack and decay curves:
+    // Bass: Snappy kick attack, warm resonant decay
+    const bassAttack = targetBass > currentBassPulse ? 0.55 : 0.12;
+    currentBassPulse += (targetBass - currentBassPulse) * bassAttack;
 
-    // Multi-Attribute Dynamic Glow Flare:
-    if (artworkGlow) {
-      const ambilightScale = 1.0 + currentPulse * 0.18; // +18% explosive expansion
-      const ambilightOpacity = 0.70 + currentPulse * 0.30;
-      artworkGlow.style.transform = `scale(${ambilightScale.toFixed(3)})`;
-      artworkGlow.style.opacity = ambilightOpacity.toFixed(3);
+    // Mids: Fluid organic vocal/melodic breath
+    const midAttack = targetMid > currentMidPulse ? 0.35 : 0.16;
+    currentMidPulse += (targetMid - currentMidPulse) * midAttack;
+
+    // Treble: Fast transient spark, crisp instantaneous release
+    const trebleAttack = targetTreble > currentTreblePulse ? 0.75 : 0.22;
+    currentTreblePulse += (targetTreble - currentTreblePulse) * trebleAttack;
+
+    // Push Tri-Band energies to CSS Custom Properties (zero reflow, 100% GPU composited)
+    if (artworkContainer) {
+      artworkContainer.style.setProperty('--bass-energy', currentBassPulse.toFixed(3));
+      artworkContainer.style.setProperty('--mid-energy', currentMidPulse.toFixed(3));
+      artworkContainer.style.setProperty('--treble-energy', currentTreblePulse.toFixed(3));
     }
 
+    // Subtle atmospheric blur depth on mirrored canvas
     if (ambilightImg) {
-      // Dynamic blur and brightness flare with kick punch
-      const dynamicBlur = 28 + currentPulse * 14;
-      const dynamicBrightness = 1.05 + currentPulse * 0.35;
-      ambilightImg.style.filter = `blur(${dynamicBlur.toFixed(1)}px) saturate(220%) brightness(${dynamicBrightness.toFixed(2)})`;
+      const dynamicBlur = 40 + currentMidPulse * 16;
+      const dynamicBrightness = 0.95 + currentMidPulse * 0.25;
+      ambilightImg.style.filter = `blur(${dynamicBlur.toFixed(1)}px) saturate(190%) brightness(${dynamicBrightness.toFixed(2)})`;
     }
 
-    // Option 4: Apple Vision Pro Rim Prism acceleration & specular gleam
-    gleamAngle = (gleamAngle + 0.95 + currentPulse * 2.8) % 360;
+    // Traveling Rim Prism acceleration: Treble hits ignite crystalline prism transit
+    gleamAngle = (gleamAngle + 0.75 + currentTreblePulse * 3.8 + currentMidPulse * 0.6) % 360;
     if (glassFrame) {
       glassFrame.style.setProperty('--glass-gleam-angle', gleamAngle.toFixed(1) + 'deg');
-      const glassScale = 1.0 + currentPulse * 0.045;
-      const gleamOpacity = 0.75 + currentPulse * 0.25;
-      glassFrame.style.transform = `scale(${glassScale.toFixed(3)})`;
-      if (glowOuter) {
-        glowOuter.style.opacity = gleamOpacity.toFixed(3);
-      }
-    }
-
-    // Acoustic Subwoofer Thump on 16:9 poster card:
-    if (artworkCard && !artworkCard.classList.contains('is-depth-bg')) {
-      const artScale = 1.0 + currentPulse * 0.032; // +3.2% tactile punch!
-      artworkCard.style.transform = `scale(${artScale.toFixed(3)})`;
     }
 
     beatVisualizerRafId = requestAnimationFrame(beatVisualizerLoop);
@@ -2180,10 +2347,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (floatingOrb && (track.glowSoft || track.glow || track.color)) {
       floatingOrb.style.setProperty('--orb-glow', track.glowSoft || track.glow || track.color);
     }
-    // Update Option 1 Ambilight mirrored projection image
+    // Update Option 1 Ambilight mirrored projection image & 4-Quadrant Spatial Chroma Palette
     if (ambilightImg) {
       ambilightImg.src = track.cover;
     }
+    updateMultiZonePalette(track);
     // Update Option 4 Apple Vision Pro Traveling Specular Prism Beam color
     if (glassFrame && track.color) {
       glassFrame.style.setProperty('--poster-specular', track.glow || track.color);
