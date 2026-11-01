@@ -1382,6 +1382,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const glassFrame = document.getElementById('music-glass-frame');
   const glowOuter = document.getElementById('art-glow-outer');
 
+  if (artworkVideo) {
+    artworkVideo.muted = true;
+    artworkVideo.playsInline = true;
+    artworkVideo.addEventListener('playing', () => {
+      if (artworkCard && artworkCard.classList.contains('has-video')) {
+        artworkCard.classList.add('video-ready');
+      }
+    });
+    artworkVideo.addEventListener('timeupdate', () => {
+      if (artworkVideo.currentTime > 0.1 && artworkCard && artworkCard.classList.contains('has-video')) {
+        artworkCard.classList.add('video-ready');
+      }
+    });
+    artworkVideo.addEventListener('error', () => {
+      if (artworkCard) artworkCard.classList.remove('video-ready');
+    });
+  }
+
   // =========================================================
   // REAL-TIME 16:9 POSTER SINGLE-COLOR BEAT-SYNC ENGINE
   // High-intensity, vibrant ambient glow strictly of ONE poster color.
@@ -2174,11 +2192,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // OLED Music Video Integration inside Artwork Card
     if (track.video) {
       if (artworkVideo) {
+        if (artworkCard) {
+          artworkCard.classList.remove('video-ready');
+          artworkCard.classList.add('has-video');
+        }
         if (!artworkVideo.src || !artworkVideo.src.endsWith(encodeURI(track.video))) {
           artworkVideo.src = track.video;
+          artworkVideo.load();
         }
         artworkVideo.currentTime = 0;
-        if (artworkCard) artworkCard.classList.add('has-video');
         if (autoPlay || isPlaying) {
           artworkVideo.play().catch(() => {});
         }
@@ -2188,7 +2210,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (artworkVideo) {
         artworkVideo.pause();
         artworkVideo.removeAttribute('src');
-        if (artworkCard) artworkCard.classList.remove('has-video');
+        if (artworkCard) {
+          artworkCard.classList.remove('has-video');
+          artworkCard.classList.remove('video-ready');
+        }
       }
       if (badgeOledVideo) badgeOledVideo.style.display = 'none';
     }

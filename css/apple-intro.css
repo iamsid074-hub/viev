@@ -1715,17 +1715,17 @@
   pointer-events: none !important;
 }
 
-/* Direct 16:9 poster display */
+/* Direct 16:9 poster display - Always visible as base */
 .apple-artwork-img {
-  position: relative;
-  z-index: 3;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center center;
   border-radius: 20px;
   display: block;
-  transition: opacity 0.35s ease;
 }
 
 /* OLED Music Video Player inside 16:9 Artwork Card */
@@ -1738,20 +1738,20 @@
   object-position: center center;
   border-radius: 20px;
   z-index: 2;
+  opacity: 0;
   display: none;
-  background: #000000;
+  background: transparent;
   pointer-events: none;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.4s ease;
 }
 
 .apple-artwork-card.has-video .apple-artwork-video {
   display: block;
-  z-index: 3;
 }
 
-.apple-artwork-card.has-video .apple-artwork-img {
-  opacity: 0;
-  pointer-events: none;
+.apple-artwork-card.video-ready .apple-artwork-video {
+  opacity: 1;
+  z-index: 3;
 }
 
 .audio-badge.badge-oled-video {
