@@ -149,6 +149,31 @@ document.addEventListener('DOMContentLoaded', () => {
   // Fallback track list in case window.PLAYLIST isn't populated yet
   const FALLBACK_PLAYLIST = [
     {
+      title: 'Kesariya',
+      artist: 'Arijit Singh • Pritam',
+      cover: 'song/Kesariya.jpg'
+    },
+    {
+      title: 'Sawan Aaya Hai',
+      artist: 'Arijit Singh • Tony Kakkar',
+      cover: 'song/Sawan Aaya Hai.jpg'
+    },
+    {
+      title: 'Yaad Hai Na',
+      artist: 'Arijit Singh • Jeet Gannguli',
+      cover: 'song/Yaad Hai Na.jpg'
+    },
+    {
+      title: 'Chhod Diya',
+      artist: 'Arijit Singh • Kanika Kapoor',
+      cover: 'song/Chhod Diya.jpg'
+    },
+    {
+      title: 'Sooiyan',
+      artist: 'Arijit Singh • Chinmayi Sripada',
+      cover: 'song/Sooiyan.jpg'
+    },
+    {
       title: 'Ve Haaniyaan',
       artist: 'Danny • Avvy Sra',
       cover: 'song/Screenshot 2026-10-24 224431.png'

@@ -682,6 +682,166 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================
   const MASTER_PLAYLIST = [
     {
+      title: 'Kesariya',
+      artist: 'Arijit Singh • Pritam • Amitabh B',
+      bpm: 88,
+      src: 'song/Kesariya.mp3',
+      video: 'song/Kesariya.mp4',
+      lrcFile: 'song/Kesariya.lrc',
+      cover: 'song/Kesariya.jpg',
+      color: '#ff7043',
+      glow: 'rgba(255, 112, 67, 0.88)',
+      glowSoft: 'rgba(255, 112, 67, 0.40)',
+      lyrics: [
+        { time: 9.5, text: "Mujhko itna bataye koyi" },
+        { time: 13.8, text: "Kaise tujhse dil na lagaye koyi" },
+        { time: 18.2, text: "Rabba ne tujhko banane mein" },
+        { time: 22.5, text: "Kar di hai husn ki khaali tijoriyan" },
+        { time: 27.0, text: "Kaajal ki siyahi se likhi" },
+        { time: 31.0, text: "Hai tune jaane kitno ki love storiyan" },
+        { time: 36.5, text: "Kesariya tera ishq hai piya" },
+        { time: 41.2, text: "Rang jaaun jo main haath lagaun" },
+        { time: 45.5, text: "Din beete saara teri fikr mein" },
+        { time: 50.0, text: "Rain saari teri khair manaun" },
+        { time: 54.5, text: "Kesariya tera ishq hai piya" },
+        { time: 59.0, text: "Rang jaaun jo main haath lagaun" },
+        { time: 63.5, text: "Din beete saara teri fikr mein" },
+        { time: 68.0, text: "Rain saari teri khair manaun" },
+        { time: 73.0, text: "Patjhad ke mausam mein bhi" },
+        { time: 76.8, text: "Rangi chanar jaisi jhoome" },
+        { time: 81.0, text: "Gehne ki tarah chamke" },
+        { time: 85.5, text: "Jab dhool tere pairo ki choome" },
+        { time: 90.0, text: "Aise na dekh sajna" },
+        { time: 94.0, text: "Bura lagta hai tere bin" },
+        { time: 98.5, text: "Kangan chann chann baje" },
+        { time: 102.5, text: "Teri galiyon mein dhoome" },
+        { time: 107.0, text: "Kesariya tera ishq hai piya" },
+        { time: 112.0, text: "Rang jaaun jo main haath lagaun" },
+        { time: 116.5, text: "Din beete saara teri fikr mein" },
+        { time: 121.0, text: "Rain saari teri khair manaun" },
+        { time: 126.0, text: "Kesariya tera ishq hai piya" },
+        { time: 131.0, text: "Rang jaaun jo main haath lagaun" },
+        { time: 136.0, text: "Din beete saara teri fikr mein" },
+        { time: 142.0, text: "Rain saari teri khair manaun" }
+      ]
+    },
+    {
+      title: 'Sawan Aaya Hai',
+      artist: 'Arijit Singh • Tony Kakkar',
+      bpm: 92,
+      src: 'song/Sawan Aaya Hai.mp3',
+      video: 'song/Sawan Aaya Hai.mp4',
+      lrcFile: 'song/Sawan Aaya Hai.lrc',
+      cover: 'song/Sawan Aaya Hai.jpg',
+      color: '#00b4d8',
+      glow: 'rgba(0, 180, 216, 0.88)',
+      glowSoft: 'rgba(0, 180, 216, 0.40)',
+      lyrics: [
+        { time: 15.5, text: "Mohabbat barsa dena tu, sawan aaya hai" },
+        { time: 23.0, text: "Tere aur mere milne ka, mausam aaya hai" },
+        { time: 31.0, text: "Mohabbat barsa dena tu, sawan aaya hai" },
+        { time: 39.0, text: "Tere aur mere milne ka, mausam aaya hai" },
+        { time: 47.0, text: "Sabse chhupa ke tujhe seene se lagana hai" },
+        { time: 55.0, text: "Pyar mein tere hadd se guzar jaana hai" },
+        { time: 63.0, text: "Itna pyar kisi pe, pehli baar aaya hai" },
+        { time: 71.0, text: "Mohabbat barsa dena tu, sawan aaya hai" },
+        { time: 79.0, text: "Tere aur mere milne ka, mausam aaya hai" },
+        { time: 87.0, text: "Kyun ek pal ki bhi judai sahi jaaye na" },
+        { time: 95.0, text: "Kyun har ghadi sirf tera nasha chadh raha hai" },
+        { time: 103.0, text: "Yeh khumaar tere ishq ka hai" },
+        { time: 109.0, text: "Jo dil pe chha raha hai" },
+        { time: 115.0, text: "Mohabbat barsa dena tu, sawan aaya hai" },
+        { time: 123.0, text: "Tere aur mere milne ka, mausam aaya hai" }
+      ]
+    },
+    {
+      title: 'Yaad Hai Na',
+      artist: 'Arijit Singh • Jeet Gannguli',
+      bpm: 84,
+      src: 'song/Yaad Hai Na.mp3',
+      video: 'song/Yaad Hai Na.mp4',
+      lrcFile: 'song/Yaad Hai Na.lrc',
+      cover: 'song/Yaad Hai Na.jpg',
+      color: '#9d4edd',
+      glow: 'rgba(157, 78, 221, 0.88)',
+      glowSoft: 'rgba(157, 78, 221, 0.40)',
+      lyrics: [
+        { time: 18.0, text: "Woh mere aane pe khil jaana tera" },
+        { time: 24.0, text: "Woh mere jaane pe chid jaana tera" },
+        { time: 30.5, text: "Woh mere chhone pe sharmaana tera" },
+        { time: 37.0, text: "Bheegi raaton mein behak jaana tera" },
+        { time: 43.5, text: "Yaad hai na, yaad hai na, yaad hai na..." },
+        { time: 56.5, text: "Woh mere aane pe khil jaana tera" },
+        { time: 63.0, text: "Woh mere jaane pe chid jaana tera" },
+        { time: 69.5, text: "Saath mein humne jo dekhe the sapne" },
+        { time: 76.0, text: "Lagte the saare jahaan se woh apne" },
+        { time: 82.5, text: "Tu muskuraaye toh jeeta tha main" },
+        { time: 89.0, text: "Tere bina toh adhura tha main" },
+        { time: 95.5, text: "Yaad hai na, yaad hai na, yaad hai na..." },
+        { time: 120.0, text: "Har lamha tujhko hi sochte rehna" },
+        { time: 127.0, text: "Bin bole baatein woh sab samajhna" },
+        { time: 134.0, text: "Khwabon mein तेरे hi bas kho jaana" },
+        { time: 141.0, text: "Tera hi banke hamesha rehna" },
+        { time: 148.0, text: "Yaad hai na, yaad hai na, yaad hai na..." }
+      ]
+    },
+    {
+      title: 'Chhod Diya',
+      artist: 'Arijit Singh • Kanika Kapoor',
+      bpm: 80,
+      src: 'song/Chhod Diya.mp3',
+      video: 'song/Chhod Diya.mp4',
+      lrcFile: 'song/Chhod Diya.lrc',
+      cover: 'song/Chhod Diya.jpg',
+      color: '#e63946',
+      glow: 'rgba(230, 57, 70, 0.88)',
+      glowSoft: 'rgba(230, 57, 70, 0.40)',
+      lyrics: [
+        { time: 9.0, text: "Chhod diya woh raasta" },
+        { time: 14.5, text: "Jis raaste se tum the guzre" },
+        { time: 20.5, text: "Chhod diya woh raasta" },
+        { time: 26.5, text: "Jis raaste se tum the guzre" },
+        { time: 32.5, text: "Tod diya woh aaina" },
+        { time: 38.5, text: "Jis aaine mein tum the dikhte" },
+        { time: 45.0, text: "Roz sambhalte hain hum" },
+        { time: 50.5, text: "Teri yaadon se ladte ladte" },
+        { time: 57.0, text: "Chhod diya woh raasta" },
+        { time: 63.0, text: "Jis raaste se tum the guzre" },
+        { time: 69.0, text: "Tod diya woh aaina" },
+        { time: 75.0, text: "Jis aaine mein tum the dikhte" },
+        { time: 81.0, text: "Dil ko manana aasan nahi tha" },
+        { time: 87.5, text: "Khud ko bhulana aasan nahi tha" },
+        { time: 94.0, text: "Phir bhi yeh faisla humne kiya" },
+        { time: 100.0, text: "Chhod diya woh raasta..." }
+      ]
+    },
+    {
+      title: 'Sooiyan',
+      artist: 'Arijit Singh • Chinmayi Sripada',
+      bpm: 86,
+      src: 'song/Sooiyan.mp3',
+      video: 'song/Sooiyan.mp4',
+      lrcFile: 'song/Sooiyan.lrc',
+      cover: 'song/Sooiyan.jpg',
+      color: '#06d6a0',
+      glow: 'rgba(6, 214, 160, 0.88)',
+      glowSoft: 'rgba(6, 214, 160, 0.40)',
+      lyrics: [
+        { time: 11.0, text: "Sooiyan si, sooiyan si chubhti hain" },
+        { time: 17.5, text: "Yeh aankhein judti hain" },
+        { time: 23.0, text: "Teri aankhon se jab bhi milti hain" },
+        { time: 29.5, text: "Sooiyan si, sooiyan si chubhti hain" },
+        { time: 36.0, text: "Yeh yaadein udti hain" },
+        { time: 41.5, text: "Tere aane se jab yeh khilti hain" },
+        { time: 48.0, text: "Meetha sa dard yeh de jaati hain" },
+        { time: 54.0, text: "Dheeme se paas yeh le aati hain" },
+        { time: 60.5, text: "Khwabon mein rang bharti hain" },
+        { time: 66.5, text: "Sooiyan si, sooiyan si chubhti hain" },
+        { time: 73.0, text: "Yeh raatein dhalti hain" },
+        { time: 79.0, text: "Teri saanson ki aahat milti hai" }
+      ]
+    },
+    {
       title: 'Ve Haaniyaan',
       artist: 'Danny • Avvy Sra',
       bpm: 90,
@@ -1215,6 +1375,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const artworkContainer = document.getElementById('apple-artwork-container');
   const artworkCard = document.getElementById('music-artwork-card');
   const artworkImg = document.getElementById('music-artwork-img');
+  const artworkVideo = document.getElementById('music-artwork-video');
+  const badgeOledVideo = document.getElementById('badge-oled-video');
   const artworkGlow = document.getElementById('music-art-glow');
   const ambilightImg = document.getElementById('music-ambilight-img');
   const glassFrame = document.getElementById('music-glass-frame');
@@ -1575,6 +1737,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (artworkCard) artworkCard.classList.toggle('is-paused', !playing);
     if (artworkGlow) artworkGlow.classList.toggle('is-paused', !playing);
     if (glassFrame) glassFrame.classList.toggle('is-paused', !playing);
+
+    // Sync OLED Video playback state
+    if (artworkVideo && artworkVideo.src) {
+      if (playing) {
+        artworkVideo.play().catch(() => {});
+      } else {
+        artworkVideo.pause();
+      }
+    }
 
     // Update active equalizer in Song List if visible
     if (songlistItems) {
@@ -2000,6 +2171,28 @@ document.addEventListener('DOMContentLoaded', () => {
       glassFrame.style.setProperty('--poster-specular', track.glow || track.color);
     }
 
+    // OLED Music Video Integration inside Artwork Card
+    if (track.video) {
+      if (artworkVideo) {
+        if (!artworkVideo.src || !artworkVideo.src.endsWith(encodeURI(track.video))) {
+          artworkVideo.src = track.video;
+        }
+        artworkVideo.currentTime = 0;
+        if (artworkCard) artworkCard.classList.add('has-video');
+        if (autoPlay || isPlaying) {
+          artworkVideo.play().catch(() => {});
+        }
+      }
+      if (badgeOledVideo) badgeOledVideo.style.display = 'inline-flex';
+    } else {
+      if (artworkVideo) {
+        artworkVideo.pause();
+        artworkVideo.removeAttribute('src');
+        if (artworkCard) artworkCard.classList.remove('has-video');
+      }
+      if (badgeOledVideo) badgeOledVideo.style.display = 'none';
+    }
+
     // Reset Progress
     if (scrubberProgress) scrubberProgress.style.width = '0%';
     if (curTimeEl) curTimeEl.textContent = '0:00';
@@ -2197,8 +2390,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Live update synced lyrics line and auto-scroll
     updateSyncedLyrics(cur);
 
+    // Keep OLED Video in sync with audio
+    if (artworkVideo && artworkVideo.src && !artworkVideo.paused) {
+      if (Math.abs(artworkVideo.currentTime - cur) > 0.4) {
+        artworkVideo.currentTime = cur;
+      }
+    }
+
     if (Math.floor(cur) % 2 === 0) {
       updateMediaSessionPosition();
+    }
+  });
+
+  audio.addEventListener('seeked', () => {
+    if (artworkVideo && artworkVideo.src) {
+      artworkVideo.currentTime = audio.currentTime;
     }
   });
 
