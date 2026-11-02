@@ -5,6 +5,18 @@
 
 window.VIRAT_YOUTUBE_FEED = [
   {
+    "id": "c64I9HNpiOY",
+    "title": "Padmaavat: Ek Dil Ek Jaan Video Song | Deepika Padukone | Shahid Kapoor | Sanjay Leela Bhansali",
+    "channel": "T-Series",
+    "views": "112,450,890 views",
+    "pub": "Full Music Video",
+    "duration": "2:25",
+    "thumb": "https://i.ytimg.com/vi/c64I9HNpiOY/maxresdefault.jpg",
+    "avatar": "https://yt3.ggpht.com/y1O2fqdA2noNsszqIgxFsI5DuOTCe9ZignmIssZsAeP7ZWdoAtDOqqxKaRILEfr5jejFlAnv9g=s176-c-k-c0x00ffffff-no-rj",
+    "isVerified": true,
+    "subs": "280M subscribers"
+  },
+  {
     "id": "GsOBaZh6cZo",
     "title": "So Swaezy | Yo Yo Honey Singh | Hommie Dilliwaala | Full Song",
     "channel": "Yo Yo Honey Singh",

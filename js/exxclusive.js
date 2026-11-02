@@ -1,6 +1,6 @@
 /* =========================================================
    VIEVS EXXCLUSIVE - NATIVE 1080P CURVED OLED CINEMA ENGINE
-   Direct Native 1080p Video ("Ek Dil Ek Jaan (Teaser)" - video/exxclusive.mp4)
+   Direct Native 1080p Video ("Ek Dil Ek Jaan (Full Video)" - video/exxclusive.mp4)
    Real-Time Dynamic Ambilight Engine & Acoustic Theater Architecture
    Cinematic Fade In / Fade Out Transitions & Curved Duration Bar
    ========================================================= */
