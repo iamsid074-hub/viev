@@ -1,6 +1,6 @@
 /* =========================================================
    VIEVS EXXCLUSIVE - NATIVE 1080P CURVED OLED CINEMA ENGINE
-   Direct Native 1080p Video ("Ek Dil Ek Jaan (Full Video)" - video/exxclusive.mp4)
+   Direct Native 1080p Video ("Chhod Diya" - video/exxclusive.mp4)
    Real-Time Dynamic Ambilight Engine & Acoustic Theater Architecture
    Cinematic Fade In / Fade Out Transitions & Curved Duration Bar
    ========================================================= */
@@ -121,7 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (video) {
     video.addEventListener('play', startAmbilight);
     video.addEventListener('pause', stopAmbilight);
-    video.addEventListener('ended', stopAmbilight);
+    video.addEventListener('ended', () => {
+      stopAmbilight();
+      if (placeholderOverlay) placeholderOverlay.classList.remove('is-hidden');
+    });
     video.addEventListener('timeupdate', updateCurvedDuration);
     video.addEventListener('loadedmetadata', () => {
       initCurvedDuration();
@@ -254,6 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       window.vievExxclusive.pauseVideo();
+      if (placeholderOverlay) placeholderOverlay.classList.remove('is-hidden');
+      if (video) video.currentTime = 0;
       if (subpageContainer) subpageContainer.style.display = 'none';
       document.documentElement.classList.remove('is-exxclusive-closing');
       document.documentElement.classList.remove('is-exxclusive-active');
