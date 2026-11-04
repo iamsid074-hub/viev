@@ -14,10 +14,19 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_note_barosa_2026",
+  questionId: "digi_note_chaandni_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `Shuh shubh jyada kuch nhi kahung mai digi , par tune phli bar kisi par barosa kiya hai , kasam khuda ki , barosha or tujhe dono ko jeetke rahunga`,
+  noteText: `Chaandni raat mein, Tera chehra yaad aaya..
+
+Har sitare mein, Tera hi aks nazar aaya..
+
+Humne toh chaand se poochha tha, Husn ka matlab..
+
+"Usne muskura ke tera naam dohraaya.."`,
+
+  // Note Memory Photo:
+  imageUrl: "assets/daily_note.jpg",
 
   // Verification Quiz (Set to null when no question applies):
   quiz: null,
@@ -68,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Daily Note Elements
   const noteCapsule = document.getElementById('daily-note-capsule');
   const noteTextEl = document.getElementById('daily-note-text');
+  const noteImgWrap = document.getElementById('daily-note-img-wrap');
+  const noteImgEl = document.getElementById('daily-note-img');
   const noteDateEl = document.getElementById('daily-note-date');
   const noteTagEl = document.getElementById('daily-note-tag');
   const lockedStateEl = document.getElementById('daily-note-locked-state');
@@ -155,6 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (noteTextEl) {
       noteTextEl.style.display = 'none';
     }
+    if (noteImgWrap) {
+      noteImgWrap.style.display = 'none';
+    }
     if (lockedStateEl) {
       lockedStateEl.style.display = 'flex';
       const stateIcon = lockedStateEl.querySelector('.locked-icon');
@@ -220,6 +234,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (noteTextEl) {
       noteTextEl.style.display = 'none';
+    }
+    if (noteImgWrap) {
+      noteImgWrap.style.display = 'none';
     }
     if (lockedStateEl) {
       lockedStateEl.style.display = 'flex';
@@ -331,6 +348,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (noteTextEl) {
       noteTextEl.style.display = 'block';
+    }
+    if (noteImgWrap) {
+      noteImgWrap.style.display = 'block';
+    }
+    if (noteImgEl && DAILY_NOTE_CONFIG.imageUrl) {
+      noteImgEl.src = DAILY_NOTE_CONFIG.imageUrl;
     }
     if (lockedStateEl) {
       lockedStateEl.style.display = 'none';
