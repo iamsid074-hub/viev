@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const ambilightCanvas = document.getElementById('oled-ambilight-canvas');
   const ambilightDiffuser = document.getElementById('oled-ambilight-diffuser');
   const ambilightWrap = document.getElementById('oled-ambilight-wrap');
+  const floorReflectionCanvas = document.getElementById('oled-floor-reflection-canvas');
+  const floorReflectionCtx = floorReflectionCanvas ? floorReflectionCanvas.getContext('2d', { willReadFrequently: true }) : null;
+  const cinemaSeatsRow = document.getElementById('oled-cinema-seats-row');
 
   // Web Audio Context & Dolby Cinema 3D DSP Audio Engine
   let audioCtx = null;
@@ -227,9 +230,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ambilightWrap) {
         ambilightWrap.style.transform = `scale(${(1.0 + smoothedBass * 0.035).toFixed(3)})`;
       }
+
+      // Modulate Cinema Seats Rim Highlight dynamically with audio swell
+      if (cinemaSeatsRow) {
+        const rimOpacity = (0.24 + smoothedBass * 0.42 + smoothedMid * 0.16).toFixed(2);
+        cinemaSeatsRow.style.setProperty('--seat-rim-opacity', rimOpacity);
+      }
     }
 
-    // 2. Video color sampling (~24fps)
+    // 2. Video color & stage floor reflection sampling (~24fps)
     if (now - lastDrawTime > 40) {
       lastDrawTime = now;
       if (video.readyState >= 2) {
@@ -242,6 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ambilightDiffuser.classList.add('is-dimmed');
           }
         } catch (err) {}
+
+        // Mirror video onto the glossy auditorium stage floor
+        if (floorReflectionCtx && floorReflectionCanvas) {
+          try {
+            floorReflectionCtx.drawImage(video, 0, 0, floorReflectionCanvas.width, floorReflectionCanvas.height);
+          } catch (err) {}
+        }
       }
     }
 
@@ -262,6 +278,12 @@ document.addEventListener('DOMContentLoaded', () => {
       ambilightCanvas.classList.remove('is-active');
       ambilightCanvas.style.transform = '';
       ambilightCanvas.style.filter = '';
+    }
+    if (floorReflectionCtx && floorReflectionCanvas) {
+      floorReflectionCtx.clearRect(0, 0, floorReflectionCanvas.width, floorReflectionCanvas.height);
+    }
+    if (cinemaSeatsRow) {
+      cinemaSeatsRow.style.setProperty('--seat-rim-opacity', '0.24');
     }
     if (ambilightWrap) {
       ambilightWrap.style.transform = '';
