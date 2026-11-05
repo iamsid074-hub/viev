@@ -6005,51 +6005,74 @@
    Image 2: Update Available Card + Footnote + Also Available Section
    ========================================================= */
 
-/* --- Image 1: Up to Date Screen --- */
-.apple-uptodate-screen {
+/* Container for Software Update subpage body */
+#subpage-software {
   width: 100%;
   display: flex;
   flex-direction: column;
+  min-height: calc(100vh - 190px);
+  min-height: calc(100dvh - 190px);
+  box-sizing: border-box;
+}
+
+/* --- Image 1: Up to Date Screen --- */
+.apple-uptodate-screen {
+  width: 100%;
+  flex: 1;
+  min-height: calc(100vh - 190px);
+  min-height: calc(100dvh - 190px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  padding: 12px 0 24px;
+  box-sizing: border-box;
+  padding: 0 0 12px;
 }
 
 .uptodate-hero-center {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   width: 100%;
-  padding: 24px 10px 10px;
+  margin: auto 0;
+  padding: 20px 10px;
+  box-sizing: border-box;
 }
 
 .uptodate-check-circle {
-  width: 54px;
-  height: 54px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: #73757d;
+  background: #63656d;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 18px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+}
+
+.uptodate-check-circle svg {
+  width: 22px;
+  height: 22px;
 }
 
 .uptodate-title-text {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  font-size: 23px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 600;
   color: #ffffff;
-  letter-spacing: -0.4px;
+  letter-spacing: -0.3px;
   margin: 0 0 4px 0;
 }
 
 .uptodate-ver-sub {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  font-size: 15px;
+  font-size: 13.5px;
   color: #8e8e93;
   font-weight: 400;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .uptodate-more-btn {
@@ -6057,7 +6080,7 @@
   border: none;
   color: #0071e3;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  font-size: 15.5px;
+  font-size: 13.5px;
   font-weight: 400;
   cursor: pointer;
   padding: 4px 10px;
@@ -6136,9 +6159,14 @@
 /* --- Image 2: Update Available Screen --- */
 .apple-update-avail-screen {
   width: 100%;
+  flex: 1;
+  min-height: calc(100vh - 190px);
+  min-height: calc(100dvh - 190px);
   display: flex;
   flex-direction: column;
-  padding: 4px 0 24px;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 4px 0 12px;
 }
 
 .apple-update-card {
@@ -6353,7 +6381,9 @@
 /* --- Common: ALSO AVAILABLE Section (Images 1 & 2) --- */
 .also-available-section {
   width: 100%;
-  margin-top: 18px;
+  margin-top: auto !important;
+  padding-top: 20px;
+  margin-bottom: 8px;
   text-align: left;
 }
 
