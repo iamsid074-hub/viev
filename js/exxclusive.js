@@ -1,7 +1,8 @@
 /* =========================================================
    VIEVS EXXCLUSIVE - NATIVE 1080P CURVED OLED CINEMA ENGINE
    Direct Native 1080p Video ("Chhod Diya" - video/exxclusive.mp4)
-   Real-Time Dynamic Ambilight Engine & Acoustic Theater Architecture
+   Dolby Cinema 3D DSP Audio Engine (Sub-Bass Resonator + Vocal Clarity + Binaural Haas)
+   Real-Time Dynamic & Audio-Reactive Multi-Zone Ambilight Pulsing
    Cinematic Fade In / Fade Out Transitions & Curved Duration Bar
    ========================================================= */
 
@@ -13,6 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const subpageContainer = document.getElementById('subpage-exxclusive');
   const ambilightCanvas = document.getElementById('oled-ambilight-canvas');
   const ambilightDiffuser = document.getElementById('oled-ambilight-diffuser');
+  const ambilightWrap = document.getElementById('oled-ambilight-wrap');
+
+  // Web Audio Context & Dolby Cinema 3D DSP Audio Engine
+  let audioCtx = null;
+  let mediaSource = null;
+  let bassFilter = null;
+  let vocalFilter = null;
+  let airFilter = null;
+  let compressor = null;
+  let analyserNode = null;
+  let audioFreqData = null;
+  let smoothedBass = 0;
+  let smoothedMid = 0;
 
   // Curved Duration Bar Elements
   const curvedDurationFill = document.getElementById('oled-curved-duration-fill');
@@ -27,6 +41,105 @@ document.addEventListener('DOMContentLoaded', () => {
   let totalPathLength = 0;
   let isClosing = false;
   let isDraggingScrubber = false;
+
+  // Initialize Dolby Cinema 3D Acoustic DSP Chain
+  function initDolbyAudioDSP() {
+    if (!video) return;
+    try {
+      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtxClass) return;
+
+      if (!audioCtx) {
+        audioCtx = new AudioCtxClass();
+      }
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      if (!mediaSource) {
+        mediaSource = audioCtx.createMediaElementSource(video);
+
+        // 1. Sub-Bass Theater Resonator (Low-Shelf at 60Hz, +5.5dB for movie-theater acoustic weight)
+        bassFilter = audioCtx.createBiquadFilter();
+        bassFilter.type = 'lowshelf';
+        bassFilter.frequency.value = 60;
+        bassFilter.gain.value = 5.5;
+
+        // 2. Vocal Brilliance / Dialogue Clarity (Peaking at 3200Hz, +3.6dB, Q: 1.1)
+        vocalFilter = audioCtx.createBiquadFilter();
+        vocalFilter.type = 'peaking';
+        vocalFilter.frequency.value = 3200;
+        vocalFilter.gain.value = 3.6;
+        vocalFilter.Q.value = 1.1;
+
+        // 3. Acoustic Sparkle & Spatial Air (High-Shelf at 10500Hz, +2.4dB)
+        airFilter = audioCtx.createBiquadFilter();
+        airFilter.type = 'highshelf';
+        airFilter.frequency.value = 10500;
+        airFilter.gain.value = 2.4;
+
+        // 4. Studio Dynamics Limiter / Dolby Volume Leveler
+        compressor = audioCtx.createDynamicsCompressor();
+        compressor.threshold.value = -18;
+        compressor.knee.value = 20;
+        compressor.ratio.value = 4;
+        compressor.attack.value = 0.005;
+        compressor.release.value = 0.22;
+
+        // 5. AnalyserNode for Real-Time Audio-Reactive Multi-Zone Ambilight
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 128;
+        analyserNode.smoothingTimeConstant = 0.82;
+        audioFreqData = new Uint8Array(analyserNode.frequencyBinCount);
+
+        // 6. Binaural Theater Soundstage Spatial Widener (Haas Effect Matrix)
+        const splitter = audioCtx.createChannelSplitter(2);
+        const merger = audioCtx.createChannelMerger(2);
+
+        const directGainL = audioCtx.createGain();
+        const directGainR = audioCtx.createGain();
+        directGainL.gain.value = 0.88;
+        directGainR.gain.value = 0.88;
+
+        const delayLtoR = audioCtx.createDelay(0.05);
+        const delayRtoL = audioCtx.createDelay(0.05);
+        delayLtoR.delayTime.value = 0.016; // 16ms Haas delay
+        delayRtoL.delayTime.value = 0.016;
+
+        const crossGainLtoR = audioCtx.createGain();
+        const crossGainRtoL = audioCtx.createGain();
+        crossGainLtoR.gain.value = 0.20;
+        crossGainRtoL.gain.value = 0.20;
+
+        // Routing Chain: Source -> Bass -> Vocal -> Air -> Compressor -> Analyser -> Splitter
+        mediaSource.connect(bassFilter);
+        bassFilter.connect(vocalFilter);
+        vocalFilter.connect(airFilter);
+        airFilter.connect(compressor);
+        compressor.connect(analyserNode);
+        analyserNode.connect(splitter);
+
+        splitter.connect(directGainL, 0);
+        splitter.connect(delayLtoR, 0);
+        delayLtoR.connect(crossGainLtoR);
+
+        splitter.connect(directGainR, 1);
+        splitter.connect(delayRtoL, 1);
+        delayRtoL.connect(crossGainRtoL);
+
+        directGainL.connect(merger, 0, 0);
+        crossGainRtoL.connect(merger, 0, 0);
+
+        directGainR.connect(merger, 0, 1);
+        crossGainLtoR.connect(merger, 0, 1);
+
+        merger.connect(audioCtx.destination);
+      }
+    } catch (e) {
+      console.warn('Dolby Audio DSP init notice:', e);
+    }
+  }
 
   // Initialize SVG Curved Duration Geometry
   function initCurvedDuration() {
@@ -73,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (timeTotalEl && dur > 0) timeTotalEl.textContent = formatTime(dur);
   }
 
-  // Real-Time Dynamic Ambilight Rendering Loop
+  // Real-Time Dynamic & Audio-Reactive Multi-Zone Ambilight Loop
   function updateAmbilight() {
     if (!video || video.paused || video.ended || !ambilightCtx) {
       stopAmbilight();
@@ -81,7 +194,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const now = performance.now();
-    // Efficiently sample at ~24fps (every 40ms)
+
+    // 1. Audio Frequency Analysis (runs at smooth 60fps for breathing/reactive pulsing)
+    if (analyserNode && audioFreqData) {
+      analyserNode.getByteFrequencyData(audioFreqData);
+
+      // Sub-bass / kick frequency bins (~20Hz - 140Hz)
+      let bassSum = 0;
+      for (let i = 0; i < 4; i++) bassSum += audioFreqData[i] || 0;
+      const targetBass = bassSum / (4 * 255); // 0.0 to 1.0
+
+      // Mid-vocal frequency bins (~200Hz - 2500Hz)
+      let midSum = 0;
+      for (let i = 4; i < 20; i++) midSum += audioFreqData[i] || 0;
+      const targetMid = midSum / (16 * 255);
+
+      // Smooth attack & decay filter
+      smoothedBass += (targetBass - smoothedBass) * 0.18;
+      smoothedMid += (targetMid - smoothedMid) * 0.15;
+
+      // Modulate Ambilight Halo Geometry & Luminance
+      const bassScale = 1.0 + (smoothedBass * 0.11);
+      const blurPx = Math.round(62 + smoothedBass * 20);
+      const satPct = Math.round(210 + smoothedBass * 42);
+      const brightVal = (1.22 + (smoothedBass * 0.40) + (smoothedMid * 0.16)).toFixed(2);
+
+      if (ambilightCanvas) {
+        ambilightCanvas.style.transform = `scale(${bassScale.toFixed(3)}) translateZ(0)`;
+        ambilightCanvas.style.filter = `blur(${blurPx}px) saturate(${satPct}%) brightness(${brightVal})`;
+      }
+
+      if (ambilightWrap) {
+        ambilightWrap.style.transform = `scale(${(1.0 + smoothedBass * 0.035).toFixed(3)})`;
+      }
+    }
+
+    // 2. Video color sampling (~24fps)
     if (now - lastDrawTime > 40) {
       lastDrawTime = now;
       if (video.readyState >= 2) {
@@ -112,10 +260,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (ambilightCanvas) {
       ambilightCanvas.classList.remove('is-active');
+      ambilightCanvas.style.transform = '';
+      ambilightCanvas.style.filter = '';
+    }
+    if (ambilightWrap) {
+      ambilightWrap.style.transform = '';
     }
     if (ambilightDiffuser) {
       ambilightDiffuser.classList.remove('is-dimmed');
     }
+    smoothedBass = 0;
+    smoothedMid = 0;
   }
 
   if (video) {
@@ -178,6 +333,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function startPlayback() {
     if (placeholderOverlay) placeholderOverlay.classList.add('is-hidden');
 
+    // Initialize Dolby Cinema 3D DSP on first user interaction
+    initDolbyAudioDSP();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
     // Pause any background audio in VIEVS
     if (typeof window.userExplicitPause !== 'undefined') {
       window.userExplicitPause = true;
@@ -207,6 +368,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (video.paused) {
+      initDolbyAudioDSP();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
       if (typeof pauseTrack === 'function') pauseTrack();
       video.play().then(() => {
         startAmbilight();

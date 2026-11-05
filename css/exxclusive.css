@@ -99,6 +99,11 @@ html.is-exxclusive-closing #subpage-exxclusive {
     top: 14px !important;
     right: 18px !important;
   }
+
+  #subpage-exxclusive .oled-audio-badge {
+    top: 14px !important;
+    left: 18px !important;
+  }
 }
 
 /* NATURAL LANDSCAPE (Desktop / Tablets / Rotated Phones) */
@@ -127,6 +132,53 @@ html.is-exxclusive-closing #subpage-exxclusive {
     top: 16px !important;
     right: 22px !important;
   }
+
+  #subpage-exxclusive .oled-audio-badge {
+    top: 16px !important;
+    left: 22px !important;
+  }
+}
+
+/* Minimal Theater Acoustic Badge (Top-Left) */
+.oled-audio-badge {
+  position: absolute !important;
+  z-index: 50 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 6px 12px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+  pointer-events: none !important;
+  opacity: 0.82;
+  transition: opacity 0.3s ease;
+}
+
+.oled-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34c759;
+  box-shadow: 0 0 10px rgba(52, 199, 89, 0.95);
+  animation: oledDotPulse 2.2s infinite ease-in-out;
+}
+
+@keyframes oledDotPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.35); opacity: 1; }
+}
+
+.oled-badge-text {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: rgba(255, 255, 255, 0.92);
+  text-transform: uppercase;
 }
 
 /* Minimal Subtle Exit Button (Top-Right) */
@@ -265,10 +317,11 @@ html.is-exxclusive-closing .theater-acoustic-backdrop {
   justify-content: center;
   pointer-events: none;
   z-index: 2;
-  transition: width 0.35s ease, height 0.35s ease;
+  transition: width 0.35s ease, height 0.35s ease, transform 0.08s ease-out;
+  will-change: transform;
 }
 
-/* Ultra-Blurred Dynamic Video Canvas Halo */
+/* Ultra-Blurred Dynamic Video Canvas Halo (Audio-Reactive + Video Color) */
 .oled-ambilight-canvas {
   position: absolute;
   width: 108%;
@@ -276,9 +329,9 @@ html.is-exxclusive-closing .theater-acoustic-backdrop {
   border-radius: 40px;
   filter: blur(65px) saturate(210%) brightness(1.25);
   opacity: 0;
-  transform: translateZ(0);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity;
+  transform: scale(1) translateZ(0);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.08s ease-out, filter 0.08s ease-out;
+  will-change: transform, filter, opacity;
 }
 
 .oled-ambilight-canvas.is-active {
