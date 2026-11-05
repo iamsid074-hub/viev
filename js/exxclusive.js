@@ -432,11 +432,27 @@ document.addEventListener('DOMContentLoaded', () => {
       subpageContainer.classList.add('is-visible');
     }
     setTimeout(initCurvedDuration, 80);
+
+    // If mobile device in landscape, or supports orientation locking on interaction
+    if (screen.orientation && screen.orientation.lock && window.innerWidth < 768) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
   }
 
   function exitCinema(callback) {
     if (isClosing) return;
     isClosing = true;
+
+    // Release orientation lock and exit fullscreen if active
+    if (screen.orientation && screen.orientation.unlock) {
+      try { screen.orientation.unlock(); } catch (e) {}
+    }
+    if (document.fullscreenElement) {
+      const exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+      if (exitFS) {
+        try { exitFS.call(document); } catch (e) {}
+      }
+    }
 
     stopAmbilight();
     document.documentElement.classList.add('is-exxclusive-closing');
@@ -471,6 +487,41 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Rotate to Landscape Pill Button (Mobile Portrait Mode)
+  const rotateHintBtn = document.getElementById('oled-rotate-hint');
+  if (rotateHintBtn) {
+    rotateHintBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (typeof triggerHaptic === 'function') triggerHaptic('medium');
+      try {
+        if (!document.fullscreenElement) {
+          const docEl = document.documentElement;
+          const reqFS = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+          if (reqFS) {
+            await reqFS.call(docEl);
+          }
+        }
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape');
+        }
+      } catch (err) {
+        console.log('Landscape switch attempt:', err);
+      }
+    });
+  }
+
+  window.addEventListener('resize', () => {
+    initCurvedDuration();
+    updateCurvedDuration();
+  });
+
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      initCurvedDuration();
+      updateCurvedDuration();
+    }, 180);
+  });
 
   // Keyboard shortcut (Escape exits cinema)
   window.addEventListener('keydown', (e) => {
