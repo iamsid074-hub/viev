@@ -16,8 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ambilightDiffuser = document.getElementById('oled-ambilight-diffuser');
   const ambilightWrap = document.getElementById('oled-ambilight-wrap');
   const floorReflectionCanvas = document.getElementById('oled-floor-reflection-canvas');
-  const floorReflectionCtx = floorReflectionCanvas ? floorReflectionCanvas.getContext('2d', { willReadFrequently: true }) : null;
-  const cinemaSeatsRow = document.getElementById('oled-cinema-seats-row');
+  let floorReflectionCtx = floorReflectionCanvas ? floorReflectionCanvas.getContext('2d') : null;
 
   // Web Audio Context & Dolby Cinema 3D DSP Audio Engine
   let audioCtx = null;
@@ -230,32 +229,35 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ambilightWrap) {
         ambilightWrap.style.transform = `scale(${(1.0 + smoothedBass * 0.035).toFixed(3)})`;
       }
-
-      // Modulate Cinema Seats Rim Highlight dynamically with audio swell
-      if (cinemaSeatsRow) {
-        const rimOpacity = (0.24 + smoothedBass * 0.42 + smoothedMid * 0.16).toFixed(2);
-        cinemaSeatsRow.style.setProperty('--seat-rim-opacity', rimOpacity);
-      }
     }
 
-    // 2. Video color & stage floor reflection sampling (~24fps)
+    // 2. Video color sampling & Glossy Stage Floor Reflection (~24fps)
     if (now - lastDrawTime > 40) {
       lastDrawTime = now;
       if (video.readyState >= 2) {
-        try {
-          ambilightCtx.drawImage(video, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
-          if (!ambilightCanvas.classList.contains('is-active')) {
-            ambilightCanvas.classList.add('is-active');
-          }
-          if (ambilightDiffuser && !ambilightDiffuser.classList.contains('is-dimmed')) {
-            ambilightDiffuser.classList.add('is-dimmed');
-          }
-        } catch (err) {}
+        // Draw Ambilight halo
+        if (ambilightCtx) {
+          try {
+            ambilightCtx.drawImage(video, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
+            if (!ambilightCanvas.classList.contains('is-active')) {
+              ambilightCanvas.classList.add('is-active');
+            }
+            if (ambilightDiffuser && !ambilightDiffuser.classList.contains('is-dimmed')) {
+              ambilightDiffuser.classList.add('is-dimmed');
+            }
+          } catch (err) {}
+        }
 
-        // Mirror video onto the glossy auditorium stage floor
+        // Draw Inverted Stage Floor Mirror Reflection
         if (floorReflectionCtx && floorReflectionCanvas) {
           try {
+            floorReflectionCtx.clearRect(0, 0, floorReflectionCanvas.width, floorReflectionCanvas.height);
+            floorReflectionCtx.save();
+            // Invert vertically so movie projects downward onto the stage floor
+            floorReflectionCtx.translate(0, floorReflectionCanvas.height);
+            floorReflectionCtx.scale(1, -1);
             floorReflectionCtx.drawImage(video, 0, 0, floorReflectionCanvas.width, floorReflectionCanvas.height);
+            floorReflectionCtx.restore();
           } catch (err) {}
         }
       }
@@ -279,14 +281,11 @@ document.addEventListener('DOMContentLoaded', () => {
       ambilightCanvas.style.transform = '';
       ambilightCanvas.style.filter = '';
     }
-    if (floorReflectionCtx && floorReflectionCanvas) {
-      floorReflectionCtx.clearRect(0, 0, floorReflectionCanvas.width, floorReflectionCanvas.height);
-    }
-    if (cinemaSeatsRow) {
-      cinemaSeatsRow.style.setProperty('--seat-rim-opacity', '0.24');
-    }
     if (ambilightWrap) {
       ambilightWrap.style.transform = '';
+    }
+    if (floorReflectionCtx && floorReflectionCanvas) {
+      floorReflectionCtx.clearRect(0, 0, floorReflectionCanvas.width, floorReflectionCanvas.height);
     }
     if (ambilightDiffuser) {
       ambilightDiffuser.classList.remove('is-dimmed');
@@ -432,27 +431,11 @@ document.addEventListener('DOMContentLoaded', () => {
       subpageContainer.classList.add('is-visible');
     }
     setTimeout(initCurvedDuration, 80);
-
-    // If mobile device in landscape, or supports orientation locking on interaction
-    if (screen.orientation && screen.orientation.lock && window.innerWidth < 768) {
-      screen.orientation.lock('landscape').catch(() => {});
-    }
   }
 
   function exitCinema(callback) {
     if (isClosing) return;
     isClosing = true;
-
-    // Release orientation lock and exit fullscreen if active
-    if (screen.orientation && screen.orientation.unlock) {
-      try { screen.orientation.unlock(); } catch (e) {}
-    }
-    if (document.fullscreenElement) {
-      const exitFS = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-      if (exitFS) {
-        try { exitFS.call(document); } catch (e) {}
-      }
-    }
 
     stopAmbilight();
     document.documentElement.classList.add('is-exxclusive-closing');
@@ -487,41 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Rotate to Landscape Pill Button (Mobile Portrait Mode)
-  const rotateHintBtn = document.getElementById('oled-rotate-hint');
-  if (rotateHintBtn) {
-    rotateHintBtn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      if (typeof triggerHaptic === 'function') triggerHaptic('medium');
-      try {
-        if (!document.fullscreenElement) {
-          const docEl = document.documentElement;
-          const reqFS = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
-          if (reqFS) {
-            await reqFS.call(docEl);
-          }
-        }
-        if (screen.orientation && screen.orientation.lock) {
-          await screen.orientation.lock('landscape');
-        }
-      } catch (err) {
-        console.log('Landscape switch attempt:', err);
-      }
-    });
-  }
-
-  window.addEventListener('resize', () => {
-    initCurvedDuration();
-    updateCurvedDuration();
-  });
-
-  window.addEventListener('orientationchange', () => {
-    setTimeout(() => {
-      initCurvedDuration();
-      updateCurvedDuration();
-    }, 180);
-  });
 
   // Keyboard shortcut (Escape exits cinema)
   window.addEventListener('keydown', (e) => {

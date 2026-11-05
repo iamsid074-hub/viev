@@ -42,9 +42,6 @@ html.is-exxclusive-active {
 #subpage-exxclusive {
   position: fixed !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  transform: none !important;
   z-index: 999999 !important;
   background: #000000 !important;
   overflow: hidden !important;
@@ -73,11 +70,43 @@ html.is-exxclusive-closing #subpage-exxclusive {
   transition: opacity 0.42s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* =========================================================
-   CINEMA RESPONSIVE GEOMETRY (LANDSCAPE FIRST & MOBILE PORTRAIT)
-   ========================================================= */
+/* PORTRAIT MOBILES: Automatic 90deg Landscape Rotation (Zero portrait allowed) */
+@media (orientation: portrait) {
+  #subpage-exxclusive {
+    width: 100vh !important;
+    height: 100vw !important;
+    max-width: 100vh !important;
+    max-height: 100vw !important;
+    transform: rotate(90deg) translateY(-100vw) !important;
+    transform-origin: top left !important;
+  }
 
-/* NATURAL WIDESCREEN LANDSCAPE (Desktop / Laptops / Tablets / Rotated Phones) */
+  #subpage-exxclusive .oled-curved-frame-wrap {
+    width: 90vh !important;
+    max-width: 92vh !important;
+    height: 84vw !important;
+    max-height: 86vw !important;
+  }
+
+  #subpage-exxclusive .oled-ambilight-canvas-wrap {
+    width: 92vh !important;
+    max-width: 94vh !important;
+    height: 86vw !important;
+    max-height: 88vw !important;
+  }
+
+  #subpage-exxclusive .oled-cinema-exit-btn {
+    top: 14px !important;
+    right: 18px !important;
+  }
+
+  #subpage-exxclusive .oled-audio-badge {
+    top: 14px !important;
+    left: 18px !important;
+  }
+}
+
+/* NATURAL LANDSCAPE (Desktop / Tablets / Rotated Phones) */
 @media (orientation: landscape) {
   #subpage-exxclusive {
     width: 100vw !important;
@@ -86,141 +115,27 @@ html.is-exxclusive-closing #subpage-exxclusive {
   }
 
   #subpage-exxclusive .oled-curved-frame-wrap {
-    width: min(84vw, 120vh) !important;
-    height: min(47.25vw, 68vh) !important;
-    max-height: 68vh !important;
-    aspect-ratio: 16 / 9 !important;
-    margin-top: -5vh !important;
-    z-index: 5 !important;
+    width: 92vw !important;
+    max-width: 94vw !important;
+    height: 86vh !important;
+    max-height: 88vh !important;
   }
 
   #subpage-exxclusive .oled-ambilight-canvas-wrap {
-    width: min(88vw, 126vh) !important;
-    height: min(49.5vw, 71vh) !important;
-    max-height: 71vh !important;
-    aspect-ratio: 16 / 9 !important;
-    margin-top: -5vh !important;
-    z-index: 2 !important;
-  }
-
-  #subpage-exxclusive .oled-auditorium-floor {
-    height: 38vh !important;
-    bottom: 0 !important;
-  }
-
-  #subpage-exxclusive .oled-cinema-seats-row {
-    height: 20vh !important;
-    max-height: 110px !important;
-    bottom: 0 !important;
-    z-index: 8 !important;
-  }
-
-  #subpage-exxclusive .oled-cinema-exit-btn {
-    top: 18px !important;
-    right: 24px !important;
-  }
-
-  #subpage-exxclusive .oled-audio-badge {
-    top: 18px !important;
-    left: 24px !important;
-  }
-
-  #subpage-exxclusive .oled-rotate-hint {
-    display: none !important;
-  }
-}
-
-/* PORTRAIT MOBILES: Standard 16:9 Widescreen Horizontal Alignment (No 90deg rotation hack) */
-@media (orientation: portrait) {
-  #subpage-exxclusive {
-    width: 100vw !important;
-    height: 100vh !important;
-    transform: none !important;
-  }
-
-  #subpage-exxclusive .oled-curved-frame-wrap {
     width: 94vw !important;
-    max-width: 520px !important;
-    height: 52.88vw !important;
-    max-height: 292px !important;
-    aspect-ratio: 16 / 9 !important;
-    margin-top: -10vh !important;
-    z-index: 5 !important;
-  }
-
-  #subpage-exxclusive .oled-ambilight-canvas-wrap {
-    width: 98vw !important;
-    max-width: 550px !important;
-    height: 55.12vw !important;
-    max-height: 310px !important;
-    aspect-ratio: 16 / 9 !important;
-    margin-top: -10vh !important;
-    z-index: 2 !important;
-  }
-
-  #subpage-exxclusive .oled-auditorium-floor {
-    height: 42vh !important;
-    bottom: 0 !important;
-  }
-
-  #subpage-exxclusive .oled-cinema-seats-row {
-    height: 15vh !important;
-    min-height: 65px !important;
-    max-height: 95px !important;
-    bottom: 0 !important;
-    z-index: 8 !important;
+    max-width: 96vw !important;
+    height: 88vh !important;
+    max-height: 90vh !important;
   }
 
   #subpage-exxclusive .oled-cinema-exit-btn {
     top: 16px !important;
-    right: 18px !important;
+    right: 22px !important;
   }
 
   #subpage-exxclusive .oled-audio-badge {
     top: 16px !important;
-    left: 18px !important;
-  }
-
-  #subpage-exxclusive .oled-rotate-hint {
-    display: inline-flex !important;
-    position: absolute !important;
-    bottom: 16% !important;
-    z-index: 20 !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 9px 18px !important;
-    border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.12) !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    backdrop-filter: blur(24px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
-    color: #ffffff !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.6px !important;
-    cursor: pointer !important;
-    text-transform: uppercase !important;
-    animation: oledRotateHintPulse 2.8s infinite ease-in-out !important;
-    transition: transform 0.2s ease, background 0.2s ease !important;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-  }
-
-  #subpage-exxclusive .oled-rotate-hint:active {
-    transform: scale(0.94) !important;
-    background: rgba(255, 255, 255, 0.22) !important;
-  }
-}
-
-@keyframes oledRotateHintPulse {
-  0%, 100% {
-    transform: translateY(0);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
-  }
-  50% {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 36px rgba(255, 255, 255, 0.12);
+    left: 22px !important;
   }
 }
 
@@ -390,6 +305,168 @@ html.is-exxclusive-closing .theater-acoustic-backdrop {
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.65) 50%, #000000 100%);
   pointer-events: none;
   z-index: 2;
+}
+
+/* =========================================================
+   REAL BLACK CINEMA AUDITORIUM SIDE WALLS (LEFT & RIGHT)
+   ========================================================= */
+.cinema-real-wall {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14%;
+  min-width: 60px;
+  max-width: 150px;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.cinema-wall-left {
+  left: 0;
+  transform-origin: left center;
+  transform: perspective(850px) rotateY(26deg);
+  background: linear-gradient(90deg, #020204 0%, #06070a 40%, #0a0c12 70%, #030406 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset -20px 0 36px rgba(0, 0, 0, 0.95), 10px 0 30px rgba(0, 0, 0, 0.9);
+}
+
+.cinema-wall-right {
+  right: 0;
+  transform-origin: right center;
+  transform: perspective(850px) rotateY(-26deg);
+  background: linear-gradient(270deg, #020204 0%, #06070a 40%, #0a0c12 70%, #030406 100%);
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 20px 0 36px rgba(0, 0, 0, 0.95), -10px 0 30px rgba(0, 0, 0, 0.9);
+}
+
+/* Subtle architectural vertical columns & acoustic baffles on side walls */
+.cinema-wall-baffle {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 18px,
+    rgba(255, 255, 255, 0.02) 18px,
+    rgba(255, 255, 255, 0.02) 20px,
+    transparent 20px,
+    transparent 36px
+  );
+  opacity: 0.85;
+}
+
+.cinema-wall-column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.06) 100%);
+}
+
+.cinema-wall-left .col-1 { left: 35%; }
+.cinema-wall-left .col-2 { left: 70%; }
+.cinema-wall-right .col-1 { right: 35%; }
+.cinema-wall-right .col-2 { right: 70%; }
+
+.cinema-wall-edge-shadow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, transparent 20%, transparent 80%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+/* =========================================================
+   REAL CINEMA REFLECTIVE STAGE FLOOR (DIRECTLY UNDER DISPLAY)
+   ========================================================= */
+.oled-stage-floor-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 38%;
+  z-index: 3;
+  pointer-events: none;
+  perspective: 750px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Specular Chamfer Edge / Stage Riser Lip */
+.oled-stage-chamfer-edge {
+  position: absolute;
+  top: 0;
+  left: 3%;
+  right: 3%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 12%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.15) 88%,
+    transparent 100%
+  );
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.5), 0 2px 10px rgba(0, 0, 0, 0.9);
+  z-index: 5;
+}
+
+/* 3D Slanted Obsidian / Dark Lacquer Stage Floor Plane */
+.oled-stage-floor-plane {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #07090f 0%, #030406 45%, #000000 100%);
+  transform-origin: top center;
+  transform: rotateX(54deg);
+  box-shadow: inset 0 2px 10px rgba(255, 255, 255, 0.10);
+  overflow: hidden;
+}
+
+/* Live Video Mirror Reflection Canvas */
+.oled-floor-reflection-canvas {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88%;
+  height: 100%;
+  object-fit: fill;
+  filter: blur(5.5px) saturate(220%) brightness(0.92);
+  opacity: 0.78;
+  mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.55) 35%, rgba(0, 0, 0, 0.15) 75%, transparent 95%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.55) 35%, rgba(0, 0, 0, 0.15) 75%, transparent 95%);
+  transition: opacity 0.4s ease;
+}
+
+/* Glossy Surface Specular Overlay */
+.oled-floor-gloss-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    transparent 35%,
+    rgba(255, 255, 255, 0.03) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Ambient Floor Color Spill (Dynamic Hue Halo on Stage Floor) */
+.oled-floor-ambient-spill {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.05) 0%, transparent 75%);
+  mix-blend-mode: color-dodge;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 3;
 }
 
 /* =========================================================
@@ -704,173 +781,4 @@ html.is-exxclusive-closing .oled-curved-frame-wrap {
   letter-spacing: 0.6px;
   user-select: none;
   pointer-events: none;
-}
-
-/* =========================================================
-   AUDITORIUM STAGE FLOOR & GLOSSY LIVE VIDEO REFLECTION
-   ========================================================= */
-.oled-auditorium-floor {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 38%;
-  pointer-events: none;
-  z-index: 4;
-  overflow: hidden;
-  perspective: 750px;
-  -webkit-perspective: 750px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
-.oled-floor-surface {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  transform: rotateX(55deg);
-  transform-origin: bottom center;
-  background: linear-gradient(180deg, rgba(10, 11, 16, 0.45) 0%, rgba(3, 3, 5, 0.98) 100%);
-  overflow: hidden;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  -webkit-mask-image: linear-gradient(to bottom, black 5%, rgba(0, 0, 0, 0.65) 45%, transparent 92%);
-  mask-image: linear-gradient(to bottom, black 5%, rgba(0, 0, 0, 0.65) 45%, transparent 92%);
-}
-
-.oled-floor-reflection-canvas {
-  position: absolute;
-  top: 0;
-  left: 5%;
-  width: 90%;
-  height: 130%;
-  transform: scaleY(-1);
-  filter: blur(14px) saturate(210%) brightness(0.92);
-  opacity: 0.75;
-  mix-blend-mode: screen;
-  transition: opacity 0.5s ease;
-}
-
-.oled-floor-sheen {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.14) 0%, transparent 60%);
-  mix-blend-mode: overlay;
-  pointer-events: none;
-}
-
-.oled-floor-vignette {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, #000000 0%, transparent 22%, transparent 78%, #000000 100%);
-  pointer-events: none;
-}
-
-/* Stage Riser Platform Lip (Grounding the Curved Screen) */
-.oled-stage-riser {
-  position: absolute;
-  top: 0;
-  left: 2%;
-  right: 2%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 15%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.3) 85%, transparent 100%);
-  box-shadow: 0 0 14px rgba(255, 255, 255, 0.5), 0 2px 20px rgba(0, 0, 0, 0.85);
-  z-index: 5;
-}
-
-.oled-stage-step-glow {
-  position: absolute;
-  top: 2px;
-  left: 8%;
-  right: 8%;
-  height: 10px;
-  background: linear-gradient(180deg, rgba(255, 215, 140, 0.16) 0%, transparent 100%);
-  filter: blur(5px);
-}
-
-/* Luxury VIP Cinema Floor Aisle Pathway Lights */
-.oled-aisle-lights {
-  position: absolute;
-  bottom: 8%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 6;
-}
-
-.oled-aisle-left {
-  left: 4%;
-}
-
-.oled-aisle-right {
-  right: 4%;
-}
-
-.aisle-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #ffb84d;
-  box-shadow: 0 0 8px rgba(255, 184, 77, 0.95), 0 0 16px rgba(255, 184, 77, 0.45);
-  opacity: 0.8;
-}
-
-/* =========================================================
-   APPLE VISION PRO STYLE: FOREGROUND CINEMA SEATS SILHOUETTE
-   ========================================================= */
-.oled-cinema-seats-row {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 18%;
-  min-height: 80px;
-  max-height: 135px;
-  pointer-events: none;
-  z-index: 8;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  overflow: visible;
-  --seat-rim-opacity: 0.32;
-}
-
-.cinema-seats-svg-wrap {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.cinema-seats-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.seat-headrest {
-  fill: #08080c;
-  filter: drop-shadow(0 -3px 8px rgba(0, 0, 0, 0.95));
-}
-
-.seat-back {
-  fill: #050508;
-}
-
-.seat-rim-highlight {
-  stroke: rgba(255, 255, 255, var(--seat-rim-opacity, 0.32));
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  fill: none;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.45));
-  transition: stroke 0.15s ease-out, filter 0.15s ease-out;
-}
-
-.seats-bottom-shadow {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 45%;
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.96) 75%, #000000 100%);
 }

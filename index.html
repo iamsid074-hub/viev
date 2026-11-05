@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="css/apple-intro.css?v=7.1">
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
-  <link rel="stylesheet" href="css/exxclusive.css?v=7.5">
+  <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
 </head>
 <body>
 
@@ -1469,25 +1469,40 @@ Humne toh chaand se poochha tha, Husn ka matlab..
               </svg>
             </button>
 
-            <!-- Rotate to Landscape Hint Pill (Visible on Mobile Portrait) -->
-            <button class="oled-rotate-hint" id="oled-rotate-hint" type="button" aria-label="Rotate to Landscape for Fullscreen Cinema">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                <path d="M3 3v5h5"></path>
-                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
-                <path d="M16 21h5v-5"></path>
-              </svg>
-              <span>Rotate to Landscape ↻</span>
-            </button>
-
             <!-- Massive 3D Curved OLED Stage -->
             <div class="oled-theater-viewport" id="oled-theater-viewport">
-              <!-- Dark Luxury Acoustic Slat Wall & Overhead Theater Sconce Beams -->
+              <!-- Dark Luxury Acoustic Slat Wall & Real Black Cinema Architecture -->
               <div class="theater-acoustic-backdrop" id="theater-acoustic-backdrop" aria-hidden="true">
+                <!-- Left Real Black Cinema Wall -->
+                <div class="cinema-real-wall cinema-wall-left">
+                  <div class="cinema-wall-baffle"></div>
+                  <div class="cinema-wall-column col-1"></div>
+                  <div class="cinema-wall-column col-2"></div>
+                  <div class="cinema-wall-edge-shadow"></div>
+                </div>
+
+                <!-- Right Real Black Cinema Wall -->
+                <div class="cinema-real-wall cinema-wall-right">
+                  <div class="cinema-wall-baffle"></div>
+                  <div class="cinema-wall-column col-1"></div>
+                  <div class="cinema-wall-column col-2"></div>
+                  <div class="cinema-wall-edge-shadow"></div>
+                </div>
+
                 <div class="theater-slat-texture"></div>
                 <div class="theater-sconce-beam theater-sconce-left"></div>
                 <div class="theater-sconce-beam theater-sconce-right"></div>
                 <div class="theater-floor-horizon"></div>
+              </div>
+
+              <!-- Real Cinema Reflective Stage Floor (Directly Under Display) -->
+              <div class="oled-stage-floor-wrapper" id="oled-stage-floor-wrapper" aria-hidden="true">
+                <div class="oled-stage-chamfer-edge"></div>
+                <div class="oled-stage-floor-plane">
+                  <canvas id="oled-floor-reflection-canvas" class="oled-floor-reflection-canvas" width="320" height="180"></canvas>
+                  <div class="oled-floor-gloss-overlay"></div>
+                  <div class="oled-floor-ambient-spill" id="oled-floor-ambient-spill"></div>
+                </div>
               </div>
 
               <!-- Real-Time Dynamic Ambilight Backglow (Video-Synchronized Halo) -->
@@ -1581,87 +1596,6 @@ Humne toh chaand se poochha tha, Husn ka matlab..
                     <text x="45" y="421" class="oled-duration-time-curr" id="oled-time-curr">0:00</text>
                     <text x="955" y="421" text-anchor="end" class="oled-duration-time-total" id="oled-time-total">--:--</text>
                   </svg>
-                </div>
-              </div>
-
-              <!-- Grounded Auditorium Stage Floor with Real-Time Video Reflection -->
-              <div class="oled-auditorium-floor" id="oled-auditorium-floor" aria-hidden="true">
-                <!-- Perspective Stage Floor Surface -->
-                <div class="oled-floor-surface">
-                  <!-- Live Video Floor Mirror Reflection Canvas -->
-                  <canvas id="oled-floor-reflection-canvas" class="oled-floor-reflection-canvas" width="160" height="90"></canvas>
-                  <!-- Dark Glossy Mirror Tint & Specular Glare -->
-                  <div class="oled-floor-sheen"></div>
-                  <div class="oled-floor-vignette"></div>
-                </div>
-
-                <!-- Architectural Stage Riser / Lip & Floor Step-Lights -->
-                <div class="oled-stage-riser">
-                  <div class="oled-stage-lip-highlight"></div>
-                  <div class="oled-stage-step-glow"></div>
-                </div>
-
-                <!-- Aisle Floor Guide Step Lights (Left & Right Pathways) -->
-                <div class="oled-aisle-lights oled-aisle-left">
-                  <span class="aisle-dot"></span>
-                  <span class="aisle-dot"></span>
-                  <span class="aisle-dot"></span>
-                </div>
-                <div class="oled-aisle-lights oled-aisle-right">
-                  <span class="aisle-dot"></span>
-                  <span class="aisle-dot"></span>
-                  <span class="aisle-dot"></span>
-                </div>
-              </div>
-
-              <!-- Apple Vision Pro Style: Foreground Cinema Velvet Seats Silhouette Row -->
-              <div class="oled-cinema-seats-row" id="oled-cinema-seats-row" aria-hidden="true">
-                <div class="cinema-seats-svg-wrap">
-                  <svg viewBox="0 0 1000 150" preserveAspectRatio="none" class="cinema-seats-svg">
-                    <!-- Seat 1 (Far Left) -->
-                    <g class="cinema-seat seat-1" transform="translate(15, 38)">
-                      <path d="M 12,32 C 12,12 26,0 60,0 C 94,0 108,12 108,32 C 108,52 98,62 60,62 C 22,62 12,52 12,32 Z" class="seat-headrest"/>
-                      <path d="M 0,62 C 0,52 20,48 60,48 C 100,48 120,52 120,62 L 120,120 L 0,120 Z" class="seat-back"/>
-                      <path d="M 16,3 C 32,1 88,1 104,3" class="seat-rim-highlight"/>
-                    </g>
-                    <!-- Seat 2 (Mid-Left) -->
-                    <g class="cinema-seat seat-2" transform="translate(155, 24)">
-                      <path d="M 12,34 C 12,13 26,0 60,0 C 94,0 108,13 108,34 C 108,54 98,64 60,64 C 22,64 12,54 12,34 Z" class="seat-headrest"/>
-                      <path d="M 0,64 C 0,54 20,49 60,49 C 100,49 120,54 120,64 L 120,130 L 0,130 Z" class="seat-back"/>
-                      <path d="M 16,3 C 32,1 88,1 104,3" class="seat-rim-highlight"/>
-                    </g>
-                    <!-- Seat 3 (Center-Left) -->
-                    <g class="cinema-seat seat-3" transform="translate(295, 14)">
-                      <path d="M 12,36 C 12,14 26,0 60,0 C 94,0 108,14 108,36 C 108,58 98,68 60,68 C 22,68 12,58 12,36 Z" class="seat-headrest"/>
-                      <path d="M 0,68 C 0,56 20,51 60,51 C 100,51 120,56 120,68 L 120,140 L 0,140 Z" class="seat-back"/>
-                      <path d="M 16,3 C 32,1 88,1 104,3" class="seat-rim-highlight"/>
-                    </g>
-                    <!-- Seat 4 (Center - User VIP Center Viewport) -->
-                    <g class="cinema-seat seat-4 seat-center" transform="translate(440, 6)">
-                      <path d="M 12,38 C 12,15 28,0 60,0 C 92,0 108,15 108,38 C 108,60 98,72 60,72 C 22,72 12,60 12,38 Z" class="seat-headrest"/>
-                      <path d="M 0,72 C 0,60 20,53 60,53 C 100,53 120,60 120,72 L 120,150 L 0,150 Z" class="seat-back"/>
-                      <path d="M 16,3 C 32,1 88,1 104,3" class="seat-rim-highlight"/>
-                    </g>
-                    <!-- Seat 5 (Center-Right) -->
-                    <g class="cinema-seat seat-5" transform="translate(585, 14)">
-                      <path d="M 12,36 C 12,14 26,0 60,0 C 94,0 108,14 108,36 C 108,58 98,68 60,68 C 22,68 12,58 12,36 Z" class="seat-headrest"/>
-                      <path d="M 0,68 C 0,56 20,51 60,51 C 100,51 120,56 120,68 L 120,140 L 0,140 Z" class="seat-back"/>
-                      <path d="M 16,3 C 32,1 88,1 104,3" class="seat-rim-highlight"/>
-                    </g>
-                    <!-- Seat 6 (Mid-Right) -->
-                    <g class="cinema-seat seat-6" transform="translate(725, 24)">
-                      <path d="M 12,34 C 12,13 26,0 60,0 C 94,0 108,13 108,34 C 108,54 98,64 60,64 C 22,64 12,54 12,34 Z" class="seat-headrest"/>
-                      <path d="M 0,64 C 0,54 20,49 60,49 C 100,49 120,54 120,64 L 120,130 L 0,130 Z" class="seat-back"/>
-                      <path d="M 16,3 C 32,1 88,1 104,3" class="seat-rim-highlight"/>
-                    </g>
-                    <!-- Seat 7 (Far Right) -->
-                    <g class="cinema-seat seat-7" transform="translate(865, 38)">
-                      <path d="M 12,32 C 12,12 26,0 60,0 C 94,0 108,12 108,32 C 108,52 98,62 60,62 C 22,62 12,52 12,32 Z" class="seat-headrest"/>
-                      <path d="M 0,62 C 0,52 20,48 60,48 C 100,48 120,52 120,62 L 120,120 L 0,120 Z" class="seat-back"/>
-                      <path d="M 16,3 C 32,1 88,1 104,3" class="seat-rim-highlight"/>
-                    </g>
-                  </svg>
-                  <div class="seats-bottom-shadow"></div>
                 </div>
               </div>
             </div>
@@ -2618,7 +2552,7 @@ Humne toh chaand se poochha tha, Husn ka matlab..
   <script src="js/cinema.js?v=7.1"></script>
   <script src="js/cast-engine.js?v=7.1"></script>
   <script src="js/motion-ad.js?v=7.1"></script>
-  <script src="js/exxclusive.js?v=7.5"></script>
+  <script src="js/exxclusive.js?v=7.4"></script>
   <script src="js/app.js?v=7.1"></script>
 </body>
 </html>
