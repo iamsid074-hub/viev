@@ -586,11 +586,13 @@
 /* Dynamic Room Ambient Lighting Halo (Spills onto Curved Charcoal Wall & Ceiling Cove) */
 .lounge-ambient-bleed-wrap {
   position: absolute;
-  top: 13.5%;
+  top: 11.5%;
   left: 51.5%;
   transform: translateX(-50%);
-  width: 67%;
-  height: 51%;
+  width: 71%;
+  max-width: 1180px;
+  height: 60%;
+  max-height: 620px;
   pointer-events: none;
   z-index: 2;
   display: flex;
@@ -614,16 +616,16 @@
   opacity: 0.92;
 }
 
-/* Super Curved Display Chassis (Slightly smaller, naturally attached to charcoal wall) */
+/* Super Curved Display Chassis (Option A: Balanced 16:9 / 16:10 Cinematic Height) */
 .lounge-screen-chassis {
   position: absolute;
-  top: 15%;
+  top: 13%;
   left: 51.5%;
   transform: translateX(-50%);
-  width: 63.5%;
-  max-width: 1040px;
-  height: 48%;
-  max-height: 500px;
+  width: 67%;
+  max-width: 1120px;
+  height: 57%;
+  max-height: 590px;
   z-index: 5;
   display: flex;
   align-items: center;
@@ -893,11 +895,11 @@
   box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
 }
 
-/* Center Triad: -15s / Play / +15s (Image 2) */
+/* Center Triad: -15s / Play / +15s (Image 2 - Aligned to Screen Center) */
 .lounge-hud-center-cluster {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 41.5%;
+  left: 51.5%;
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
