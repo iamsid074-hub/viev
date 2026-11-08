@@ -104,6 +104,8 @@
   let isDraggingScrubber = false;
   let audioEqMode = 0; // 0: Dolby 3D, 1: Spatial Air, 2: Deep Bass
   const EQ_MODES = ['DOLBY 3D', 'SPATIAL AIR', 'DEEP BASS'];
+  let cinemaBootTimer = null;
+  let audioFadeTimer = null;
 
   // DOM Elements
   let introEl = null;
@@ -389,42 +391,99 @@
     if (!loungeEl || !videoEl) return;
     currentMedia = media || currentMedia;
 
+    // Clear any previous transition timers
+    if (cinemaBootTimer) {
+      clearTimeout(cinemaBootTimer);
+      cinemaBootTimer = null;
+    }
+    if (audioFadeTimer) {
+      clearInterval(audioFadeTimer);
+      audioFadeTimer = null;
+    }
+
     // Set video source
     if (videoEl.src !== media.src && !videoEl.src.endsWith(media.src)) {
       videoEl.src = media.src;
     }
 
-    // Show lounge
+    // Prepare cinema dark state for dramatic 1.4s fade-in sequence
+    videoEl.currentTime = 0;
+    videoEl.volume = 0;
+    videoEl.style.opacity = '0';
+    videoEl.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+    updatePlayPauseButton(false);
+
+    // Show lounge environment
     loungeEl.classList.add('is-active');
     isLoungeOpen = true;
 
-    // Reset controls HUD visibility
+    // Show HUD controls
     showControlsHud();
 
-    // Start video playback
-    videoEl.currentTime = 0;
-    const playPromise = videoEl.play();
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
-        setupDolbyAudioDSP();
-        updatePlayPauseButton(true);
-      }).catch(err => {
-        console.log('[Exxclusive 3.0] Autoplay prevented, waiting for user tap:', err);
-        updatePlayPauseButton(false);
-      });
-    }
+    // Start 1.4 second cinematic wait, then smoothly fade in video & audio
+    cinemaBootTimer = setTimeout(() => {
+      if (!isLoungeOpen) return;
 
-    // Start 60fps Ambilight & Floor Reflection Canvas Loop
-    startLoungeRenderLoop();
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          setupDolbyAudioDSP();
+          updatePlayPauseButton(true);
+
+          // Smooth visual fade-in
+          videoEl.style.opacity = '1';
+
+          // Smooth acoustic fade-in from 0 to target volume over 1.2s
+          const targetVol = volumeSlider ? parseFloat(volumeSlider.value) : 0.9;
+          let currentVol = 0;
+          const fadeSteps = 24;
+          const stepInterval = 1200 / fadeSteps; // ~50ms
+          const volStep = targetVol / fadeSteps;
+
+          if (audioFadeTimer) clearInterval(audioFadeTimer);
+          audioFadeTimer = setInterval(() => {
+            if (!isLoungeOpen || !videoEl) {
+              clearInterval(audioFadeTimer);
+              return;
+            }
+            currentVol = Math.min(targetVol, currentVol + volStep);
+            videoEl.volume = currentVol;
+            if (currentVol >= targetVol) {
+              clearInterval(audioFadeTimer);
+              audioFadeTimer = null;
+            }
+          }, stepInterval);
+        }).catch(err => {
+          console.log('[Exxclusive 3.0] Autoplay prevented, waiting for tap:', err);
+          updatePlayPauseButton(false);
+          videoEl.style.opacity = '1';
+          if (volumeSlider) videoEl.volume = parseFloat(volumeSlider.value);
+        });
+      }
+
+      // Start Ambilight & Floor Reflection Canvas Loop
+      startLoungeRenderLoop();
+    }, 1400);
   }
 
   function closeCurvedCinemaLounge() {
     if (!loungeEl || !videoEl) return;
+
+    if (cinemaBootTimer) {
+      clearTimeout(cinemaBootTimer);
+      cinemaBootTimer = null;
+    }
+    if (audioFadeTimer) {
+      clearInterval(audioFadeTimer);
+      audioFadeTimer = null;
+    }
+
     loungeEl.classList.remove('is-active');
     isLoungeOpen = false;
 
-    // Pause video
+    // Pause video & reset opacity
     videoEl.pause();
+    videoEl.style.opacity = '0';
     updatePlayPauseButton(false);
 
     // Stop render loop
