@@ -945,8 +945,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const userRoleBadge = document.getElementById('user-role-badge');
 
   const VALID_USERS = {
-    '3009': { role: 'digi', defaultName: 'DIGI', badge: 'Princess Digi', email: 'avneetsaini7070@gmail.com' },
-    '3011': { role: 'digi', defaultName: 'DIGI', badge: 'Princess Digi', email: 'avneetsaini7070@gmail.com' },
     '1711': { role: 'user', defaultName: 'VIRAT', badge: 'Co-Creator', email: 'iamsid074@gmail.com' }
   };
 
@@ -998,16 +996,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const tabRaw = sessionStorage.getItem('viev_auth_session');
       if (tabRaw) {
         const parsed = JSON.parse(tabRaw);
-        window.__vievActiveSession = parsed;
-        return parsed;
+        if (parsed && parsed.code === '1711') {
+          window.__vievActiveSession = parsed;
+          return parsed;
+        } else {
+          sessionStorage.removeItem('viev_auth_session');
+        }
       }
       const raw = localStorage.getItem('viev_auth_session');
       if (raw) {
         const parsed = JSON.parse(raw);
-        try { sessionStorage.setItem('viev_auth_session', raw); } catch (_) {}
-        window.__vievActiveSession = parsed;
-        return parsed;
+        if (parsed && parsed.code === '1711') {
+          try { sessionStorage.setItem('viev_auth_session', raw); } catch (_) {}
+          window.__vievActiveSession = parsed;
+          return parsed;
+        } else {
+          localStorage.removeItem('viev_auth_session');
+        }
       }
+      window.__vievActiveSession = null;
       return null;
     } catch (e) {
       return null;
@@ -1061,10 +1068,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function executeLogin(code) {
-    const userConfig = VALID_USERS[code];
-
-    if (!userConfig) {
-      // Invalid passcode
+    // STRICT MAINTENANCE LOCK: Only ID 1711 is allowed; all others locked
+    if (code !== '1711') {
       if (window.triggerHaptic) window.triggerHaptic('error');
       if (pinDisplay) {
         pinDisplay.classList.remove('shake');
@@ -1073,7 +1078,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (loginFeedback) {
-        loginFeedback.textContent = 'Incorrect Key • Try Again';
+        if (code === '3009' || code === '3011') {
+          loginFeedback.textContent = '🔒 App is locked for maintenance';
+        } else {
+          loginFeedback.textContent = 'Incorrect Key • Access Denied';
+        }
         loginFeedback.classList.remove('success');
         loginFeedback.classList.add('show');
       }
@@ -1082,9 +1091,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (passcodeInput) passcodeInput.value = '';
         updatePinDisplay('');
         if (passcodeInput) passcodeInput.focus();
-      }, 600);
+      }, 700);
       return;
     }
+
+    const userConfig = VALID_USERS[code];
 
     // Valid passcode
     if (window.triggerHaptic) window.triggerHaptic('success');
@@ -1277,10 +1288,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initial State Evaluation on DOM Load
+  // Initial State Evaluation on DOM Load: STRICT LOCK (Only ID 1711 allowed)
   const activeSession = getAuthSession();
-  if (activeSession && (activeSession.code === '3009' || activeSession.code === '3011' || activeSession.code === '1711')) {
-    // Already Logged In: Directly show Home Screen with Startup Intro
+  if (activeSession && activeSession.code === '1711') {
+    // Only Virat ID 1711: Directly show Home Screen with Startup Intro
     if (loginScreen) {
       loginScreen.classList.remove('active');
       loginScreen.classList.add('hidden');
@@ -1300,7 +1311,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   } else {
-    // Not Logged In: Maintain active system version, suppress startup splash and navbar, show Login Gateway
+    // Not Logged In or Non-1711: Purge any invalid session and lock down all screens
+    try { sessionStorage.removeItem('viev_auth_session'); } catch (_) {}
+    localStorage.removeItem('viev_auth_session');
+    window.__vievActiveSession = null;
+
     const currentVer = getSystemVersion();
     applySystemVersion(currentVer);
     if (helloSplash) {
@@ -1309,10 +1324,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.setFloatingNavVisible) {
       window.setFloatingNavVisible(false);
     }
-    if (welcomeScreen) {
-      welcomeScreen.classList.remove('active');
-      welcomeScreen.classList.add('hidden');
-    }
+    ['welcome-screen', 'music-screen', 'cinema-screen', 'settings-screen'].forEach(id => {
+      const s = document.getElementById(id);
+      if (s) {
+        s.classList.remove('active');
+        s.classList.add('hidden');
+      }
+    });
     if (loginScreen) {
       loginScreen.classList.remove('hidden');
       loginScreen.classList.add('active');

@@ -103,6 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function switchPage(targetTab, clickedBtn) {
     if (!clickedBtn) return;
+    // Strict Lock: Only authenticated ID 1711 allowed to browse tabs
+    try {
+      const raw = localStorage.getItem('viev_auth_session') || sessionStorage.getItem('viev_auth_session');
+      const sess = raw ? JSON.parse(raw) : null;
+      if (!sess || sess.code !== '1711') return;
+    } catch (_) { return; }
     if (typeof triggerHaptic === 'function') triggerHaptic('light');
     currentTab = targetTab;
 
