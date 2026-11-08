@@ -771,28 +771,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Trigger sliding animation
     settingsViewport.classList.add('is-subpage-open');
-    if (targetId === 'subpage-exxclusive') {
-      settingsViewport.classList.add('is-exxclusive-mode');
-      document.body.classList.add('is-exxclusive-active');
-      document.documentElement.classList.add('is-exxclusive-active');
-      if (typeof window.setFloatingNavVisible === 'function') {
-        window.setFloatingNavVisible(false);
-      }
-      const cinemaTab = document.getElementById('tab-cinema');
-      if (cinemaTab) {
-        cinemaTab.click();
-        return;
-      }
-      if (window.vievExxclusive && typeof window.vievExxclusive.enterCinema === 'function') {
-        window.vievExxclusive.enterCinema();
-      }
-    } else {
-      settingsViewport.classList.remove('is-exxclusive-mode');
-      document.body.classList.remove('is-exxclusive-active');
-      document.documentElement.classList.remove('is-exxclusive-active');
-      if (typeof window.setFloatingNavVisible === 'function') {
-        window.setFloatingNavVisible(true);
-      }
+    settingsViewport.classList.remove('is-exxclusive-mode');
+    document.body.classList.remove('is-exxclusive-active');
+    document.documentElement.classList.remove('is-exxclusive-active');
+    if (typeof window.setFloatingNavVisible === 'function') {
+      window.setFloatingNavVisible(true);
     }
 
     // Scroll subpage to top
