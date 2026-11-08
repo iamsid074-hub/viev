@@ -765,29 +765,12 @@ Humne toh chaand se poochha tha, Husn ka matlab..
       <!-- 3. THE LUXURY AIRBNB CURVED CHARCOAL HOME CINEMA LOUNGE (LANDSCAPE PLAYBACK) -->
       <div id="curved-charcoal-lounge" class="curved-charcoal-lounge" aria-label="Curved Cinema Lounge">
         
-        <!-- SVG Definitions for Concave Curve Clip Path & Specular Metallic Bezel Gradients -->
+        <!-- SVG Definitions for Smooth Concave Architectural Curve -->
         <svg width="0" height="0" style="position: absolute; pointer-events: none;">
           <defs>
             <clipPath id="loungeCurvedClip" clipPathUnits="objectBoundingBox">
-              <!-- Concave architectural cinema curve: subtle dip at top, subtle rise at bottom, arched sides -->
-              <path d="M 0.015,0.02
-                       C 0.25,0.06 0.75,0.06 0.985,0.02
-                       C 0.998,0.2 0.998,0.8 0.985,0.98
-                       C 0.75,0.94 0.25,0.94 0.015,0.98
-                       C 0.002,0.8 0.002,0.2 0.015,0.02 Z" />
+              <path d="M 0,0 Q 0.5,0.045 1,0 L 1,1 Q 0.5,0.955 0,1 Z" />
             </clipPath>
-            <linearGradient id="loungeTopShineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="rgba(255,255,255,0.1)"/>
-              <stop offset="30%" stop-color="rgba(255,255,255,0.7)"/>
-              <stop offset="50%" stop-color="#ffffff"/>
-              <stop offset="70%" stop-color="rgba(255,255,255,0.7)"/>
-              <stop offset="100%" stop-color="rgba(255,255,255,0.1)"/>
-            </linearGradient>
-            <linearGradient id="loungeBottomShineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="rgba(255,255,255,0.05)"/>
-              <stop offset="50%" stop-color="rgba(255,255,255,0.45)"/>
-              <stop offset="100%" stop-color="rgba(255,255,255,0.05)"/>
-            </linearGradient>
           </defs>
         </svg>
 
@@ -807,23 +790,13 @@ Humne toh chaand se poochha tha, Husn ka matlab..
             <canvas class="lounge-ambient-canvas" id="lounge-ambient-canvas"></canvas>
           </div>
 
-          <!-- Super Curved Display Chassis -->
+          <!-- Super Curved Display Chassis (Mounted onto curved charcoal wall) -->
           <div class="lounge-screen-chassis">
             <div class="lounge-screen-frame">
               <video class="lounge-video-player" id="lounge-video-player" playsinline preload="auto" crossorigin="anonymous">
                 <source src="video/exxclusive.mp4" type="video/mp4">
               </video>
             </div>
-
-            <!-- Specular Curved Titanium Bezel Frame -->
-            <svg class="lounge-bezel-svg" viewBox="0 0 100 56.25" preserveAspectRatio="none">
-              <!-- Outer curve outline -->
-              <path class="lounge-bezel-rim" d="M 1.5,1.1 C 25,3.4 75,3.4 98.5,1.1 C 99.8,11.2 99.8,45 98.5,55.1 C 75,52.8 25,52.8 1.5,55.1 C 0.2,45 0.2,11.2 1.5,1.1 Z"/>
-              <!-- Top edge specular titanium light catch -->
-              <path class="lounge-bezel-top-shine" d="M 1.5,1.1 C 25,3.4 75,3.4 98.5,1.1"/>
-              <!-- Bottom edge ground reflection light catch -->
-              <path class="lounge-bezel-bottom-shine" d="M 1.5,55.1 C 25,52.8 75,52.8 98.5,55.1"/>
-            </svg>
           </div>
 
           <!-- Polished Floor & Coffee Table Live Mirror Reflection Zone -->
