@@ -606,10 +606,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================
   function updateMediaSession(track) {
     if (!('mediaSession' in navigator) || !track) return;
-    if (!isOS13Active()) {
-      try { navigator.mediaSession.metadata = null; } catch(e) {}
-      return;
-    }
     try {
       const coverUrl = new URL(track.cover, window.location.href).href;
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -1606,6 +1602,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function initAudioVisualizer() {
     if (audioCtx) return;
+    // iOS Safari Fix: On iPhone/iPad, routing <audio> through WebAudio createMediaElementSource
+    // causes iOS to suspend audio on screen lock or after 30-60s.
+    // By keeping HTML5 audio native on iOS, playback continues in background forever without stopping!
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (isIOS) {
+      return; // Uses smooth polyrhythmic fallback wave in beatVisualizerLoop
+    }
     try {
       const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtxClass) return;
@@ -2584,7 +2588,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let wasPlayingBeforeHidden = false;
 
   function persistPlaybackState() {
-    if (!isOS13Active()) return;
     try {
       localStorage.setItem('viev_last_track_index', String(currentTrackIndex));
       localStorage.setItem('viev_last_track_time', String(Math.floor(audio.currentTime || 0)));
@@ -2592,9 +2595,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(e) {}
   }
 
-  // Handle mobile screen lock / sleep mode / tab backgrounding (OS 1.3 feature)
+  // Handle mobile screen lock / sleep mode / tab backgrounding (iPhone & Mobile background lock survival)
   document.addEventListener('visibilitychange', () => {
-    if (!isOS13Active()) return;
     if (document.hidden) {
       if (isPlaying && !audio.paused) {
         wasPlayingBeforeHidden = true;
@@ -2608,13 +2610,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Guard against mobile browser synthetic pause on screen lock (OS 1.3 feature)
+  // Guard against mobile browser synthetic pause on screen lock
   audio.addEventListener('pause', () => {
     persistPlaybackState();
-    if (!isOS13Active()) return;
     if (document.hidden && isPlaying && !userExplicitPause) {
       // Screen was locked while playing: continue background playback smoothly!
       audio.play().catch(() => {});
+    }
+  });
+
+  // Mobile Network Stall & Buffer Error Recovery for uninterrupted playback
+  audio.addEventListener('stalled', () => {
+    if (isPlaying && !userExplicitPause && audio.paused) {
+      setTimeout(() => {
+        if (isPlaying && !userExplicitPause && audio.paused) {
+          audio.play().catch(() => {});
+        }
+      }, 500);
+    }
+  });
+
+  audio.addEventListener('error', (e) => {
+    console.warn('Audio element error encountered:', e);
+    if (isPlaying && !userExplicitPause) {
+      setTimeout(() => {
+        if (isPlaying && !userExplicitPause) {
+          const curTime = audio.currentTime || 0;
+          audio.load();
+          if (curTime > 0) audio.currentTime = curTime;
+          audio.play().catch(() => {});
+        }
+      }, 800);
     }
   });
 
