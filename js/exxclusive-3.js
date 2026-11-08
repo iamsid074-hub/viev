@@ -421,7 +421,10 @@
     // Switch main floating navbar into Cinema Mode (4 tabs morph into single 'Back to Library' button)
     const floatingDock = document.getElementById('apple-floating-dock');
     const floatingNav = document.getElementById('apple-floating-navbar');
-    if (floatingDock) floatingDock.classList.add('is-cinema-mode');
+    if (floatingDock) {
+      floatingDock.classList.remove('hud-hidden');
+      floatingDock.classList.add('is-cinema-mode');
+    }
     if (floatingNav) floatingNav.classList.add('is-cinema-mode');
 
     // Show HUD controls
@@ -474,7 +477,7 @@
   }
 
   function closeCurvedCinemaLounge() {
-    if (!loungeEl || !videoEl) return;
+    if (!loungeEl || !isLoungeOpen) return;
 
     if (cinemaBootTimer) {
       clearTimeout(cinemaBootTimer);
@@ -484,37 +487,55 @@
       clearInterval(audioFadeTimer);
       audioFadeTimer = null;
     }
-
-    // Smooth theatrical exit fade-out
-    loungeEl.classList.add('is-closing');
-
-    // Revert main floating navbar from Cinema Mode back to standard 4 tabs
-    const floatingDock = document.getElementById('apple-floating-dock');
-    const floatingNav = document.getElementById('apple-floating-navbar');
-    if (floatingDock) floatingDock.classList.remove('is-cinema-mode');
-    if (floatingNav) floatingNav.classList.remove('is-cinema-mode');
-    if (window.syncCinemaTabVisibility) {
-      try { window.syncCinemaTabVisibility(); } catch (_) {}
+    if (hudInactivityTimer) {
+      clearTimeout(hudInactivityTimer);
+      hudInactivityTimer = null;
     }
 
+    // 1. Immediately cancel heavy canvas render loop to free 100% GPU/CPU for exit animation
+    if (renderRafId) {
+      cancelAnimationFrame(renderRafId);
+      renderRafId = null;
+    }
+
+    // 2. Immediately pause video
+    if (videoEl) {
+      try {
+        videoEl.pause();
+      } catch (_) {}
+    }
+
+    const floatingDock = document.getElementById('apple-floating-dock');
+    const floatingNav = document.getElementById('apple-floating-navbar');
+
+    // 3. Smooth exit transition - back button fades with lounge
+    loungeEl.classList.add('is-closing');
+    if (floatingDock) {
+      floatingDock.classList.add('hud-hidden');
+    }
+
+    // 4. Clean up after exit animation finishes (280ms)
     setTimeout(() => {
-      loungeEl.classList.remove('is-active');
-      loungeEl.classList.remove('is-closing');
+      loungeEl.classList.remove('is-active', 'is-closing');
       isLoungeOpen = false;
 
-      // Pause video & reset opacity
       if (videoEl) {
-        videoEl.pause();
+        videoEl.currentTime = 0;
         videoEl.style.opacity = '0';
         updatePlayPauseButton(false);
       }
 
-      // Stop render loop
-      if (renderRafId) {
-        cancelAnimationFrame(renderRafId);
-        renderRafId = null;
+      if (floatingDock) {
+        floatingDock.classList.remove('is-cinema-mode', 'hud-hidden');
       }
-    }, 320);
+      if (floatingNav) {
+        floatingNav.classList.remove('is-cinema-mode');
+      }
+
+      if (window.syncCinemaTabVisibility) {
+        try { window.syncCinemaTabVisibility(); } catch (_) {}
+      }
+    }, 280);
   }
 
   function updatePlayPauseButton(isPlaying) {
@@ -651,12 +672,21 @@
   function showControlsHud() {
     if (!hudEl) return;
     hudEl.classList.remove('is-hidden');
+
+    const floatingDock = document.getElementById('apple-floating-dock');
+    if (floatingDock && isLoungeOpen) {
+      floatingDock.classList.remove('hud-hidden');
+    }
+
     if (hudInactivityTimer) clearTimeout(hudInactivityTimer);
 
     // Auto-hide controls after 2.6 seconds of inactivity during playback
     hudInactivityTimer = setTimeout(() => {
       if (videoEl && !videoEl.paused && !isDraggingScrubber) {
         hudEl.classList.add('is-hidden');
+        if (floatingDock && isLoungeOpen) {
+          floatingDock.classList.add('hud-hidden');
+        }
       }
     }, 2600);
   }
@@ -867,7 +897,10 @@
     if (videoEl) {
       videoEl.addEventListener('timeupdate', updateTimelineUI);
       videoEl.addEventListener('play', () => updatePlayPauseButton(true));
-      videoEl.addEventListener('pause', () => updatePlayPauseButton(false));
+      videoEl.addEventListener('pause', () => {
+        updatePlayPauseButton(false);
+        showControlsHud();
+      });
       videoEl.addEventListener('ended', () => {
         updatePlayPauseButton(false);
         showControlsHud();

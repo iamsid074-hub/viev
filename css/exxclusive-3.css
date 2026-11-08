@@ -440,7 +440,8 @@
 
   .curved-charcoal-lounge.is-active {
     display: flex !important;
-    animation: cinemaFadeInPortrait 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    animation: cinemaFadeInPortrait 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    will-change: opacity, transform;
   }
 }
 
@@ -454,39 +455,67 @@
 
   .curved-charcoal-lounge.is-active {
     display: flex !important;
-    animation: cinemaFadeInLandscape 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    animation: cinemaFadeInLandscape 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    will-change: opacity, transform;
   }
 }
 
 @keyframes cinemaFadeInLandscape {
   0% {
     opacity: 0;
-    transform: scale(0.97);
-    filter: brightness(0.2) blur(6px);
+    transform: scale(0.98);
   }
   100% {
     opacity: 1;
     transform: scale(1);
-    filter: brightness(1) blur(0px);
   }
 }
 
 @keyframes cinemaFadeInPortrait {
   0% {
     opacity: 0;
-    transform: rotate(90deg) translateY(-100vw) scale(0.97);
-    filter: brightness(0.2) blur(6px);
+    transform: rotate(90deg) translateY(-100vw) scale(0.98);
   }
   100% {
     opacity: 1;
     transform: rotate(90deg) translateY(-100vw) scale(1);
-    filter: brightness(1) blur(0px);
   }
 }
 
 .curved-charcoal-lounge.is-closing {
-  opacity: 0 !important;
-  transition: opacity 0.35s ease-out !important;
+  animation: cinemaFadeOutLandscape 0.28s cubic-bezier(0.32, 0.72, 0, 1) forwards !important;
+  pointer-events: none !important;
+  will-change: opacity, transform;
+}
+
+@media (orientation: portrait) {
+  .curved-charcoal-lounge.is-closing {
+    animation: cinemaFadeOutPortrait 0.28s cubic-bezier(0.32, 0.72, 0, 1) forwards !important;
+    pointer-events: none !important;
+    will-change: opacity, transform;
+  }
+}
+
+@keyframes cinemaFadeOutLandscape {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes cinemaFadeOutPortrait {
+  0% {
+    opacity: 1;
+    transform: rotate(90deg) translateY(-100vw) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(90deg) translateY(-100vw) scale(0.98);
+  }
 }
 
 /* Luxury Charcoal Room Backdrop Layer */
@@ -973,14 +1002,29 @@
 
 /* Cinema Mode: Main Floating Navbar replaces 4 tabs with single 'Back to Library' button in exact same position & pill */
 .apple-floating-dock.is-cinema-mode {
-  z-index: 1000000 !important;
+  z-index: 10000000 !important;
   pointer-events: auto !important;
   opacity: 1 !important;
   visibility: visible !important;
-  transform: translateX(-50%) !important;
+  bottom: calc(var(--sab, 0px) + 26px) !important;
+  transform: translateX(-50%) translateY(0) scale(1) !important;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: opacity, transform;
+}
+
+/* Invisible Controls: When Cinema HUD hides, Back to Library smoothly hides with it */
+.apple-floating-dock.is-cinema-mode.hud-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateX(-50%) translateY(14px) scale(0.96) !important;
 }
 
 .apple-floating-navbar.is-cinema-mode {
+  height: 48px !important;
+  min-height: 48px !important;
+  max-height: 48px !important;
+  padding: 5px !important;
+  box-sizing: border-box !important;
   pointer-events: auto !important;
   opacity: 1 !important;
   visibility: visible !important;
@@ -1002,8 +1046,11 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  height: 38px;
   min-height: 38px;
-  padding: 8px 24px;
+  max-height: 38px;
+  box-sizing: border-box;
+  padding: 0 22px;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
