@@ -145,7 +145,7 @@
   let freqByteData = null;
   let renderRafId = null;
 
-  // --- 1. WEB AUDIO SYNTHESIZER: NETFLIX "TA-DUM" SIGNATURE SOUND ---
+  // --- 1. WEB AUDIO SYNTHESIZER: NETFLIX "TUDUM" DEEP CINEMA RESONANCE ---
   function playNetflixSignatureSound() {
     try {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -160,65 +160,103 @@
       masterGain.gain.setValueAtTime(0.85, now);
       masterGain.connect(audioCtx.destination);
 
-      // --- TA-DUM IMPACT 1: Sub Bass Deep Punch (60Hz -> 32Hz) ---
+      // --- TUDUM LAYER 1: Deep Hollywood Sub-Bass Drop (68Hz -> 28Hz) ---
       const subOsc = audioCtx.createOscillator();
       const subGain = audioCtx.createGain();
       subOsc.type = 'sine';
-      subOsc.frequency.setValueAtTime(75, now);
-      subOsc.frequency.exponentialRampToValueAtTime(32, now + 0.45);
+      subOsc.frequency.setValueAtTime(68, now);
+      subOsc.frequency.exponentialRampToValueAtTime(28, now + 0.6);
 
-      subGain.gain.setValueAtTime(0.9, now);
-      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      subGain.gain.setValueAtTime(0.001, now);
+      subGain.gain.linearRampToValueAtTime(0.95, now + 0.025);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
 
       subOsc.connect(subGain);
       subGain.connect(masterGain);
       subOsc.start(now);
-      subOsc.stop(now + 0.7);
+      subOsc.stop(now + 0.9);
 
-      // --- TA-DUM IMPACT 2: Resonant Cinema Drone (Ta-DUM accent at t + 0.22s) ---
-      const droneTime = now + 0.22;
+      // --- TUDUM LAYER 2: Resonant Cinema Drone (Ta-DUM accent at t + 0.20s) ---
+      const droneTime = now + 0.20;
       const droneOsc = audioCtx.createOscillator();
       const droneGain = audioCtx.createGain();
+      const droneFilter = audioCtx.createBiquadFilter();
+
       droneOsc.type = 'triangle';
-      droneOsc.frequency.setValueAtTime(98, droneTime);
-      droneOsc.frequency.exponentialRampToValueAtTime(48, droneTime + 1.2);
+      droneOsc.frequency.setValueAtTime(84, droneTime);
+      droneOsc.frequency.exponentialRampToValueAtTime(42, droneTime + 1.2);
+
+      droneFilter.type = 'lowpass';
+      droneFilter.frequency.setValueAtTime(380, droneTime);
 
       droneGain.gain.setValueAtTime(0.001, droneTime);
-      droneGain.gain.linearRampToValueAtTime(0.8, droneTime + 0.05);
-      droneGain.gain.exponentialRampToValueAtTime(0.001, droneTime + 1.6);
+      droneGain.gain.linearRampToValueAtTime(0.7, droneTime + 0.06);
+      droneGain.gain.exponentialRampToValueAtTime(0.001, droneTime + 1.5);
 
-      droneOsc.connect(droneGain);
+      droneOsc.connect(droneFilter);
+      droneFilter.connect(droneGain);
       droneGain.connect(masterGain);
       droneOsc.start(droneTime);
-      droneOsc.stop(droneTime + 1.7);
+      droneOsc.stop(droneTime + 1.6);
 
-      // --- METALLIC SHIMMER CHORD: Rising Cinema Bloom (t + 0.26s) ---
-      const shimmerNotes = [261.63, 329.63, 392.00, 523.25, 659.25]; // C major spatial chord
+      // --- TUDUM LAYER 3: Ethereal Spatial Shimmer Bloom (t + 0.28s) ---
+      const shimmerNotes = [261.63, 392.00, 523.25]; // Warm harmonic triad
       shimmerNotes.forEach((freq, idx) => {
         const shimOsc = audioCtx.createOscillator();
         const shimGain = audioCtx.createGain();
-        const bandPass = audioCtx.createBiquadFilter();
+        const shimFilter = audioCtx.createBiquadFilter();
 
-        shimOsc.type = idx % 2 === 0 ? 'sawtooth' : 'sine';
-        shimOsc.frequency.setValueAtTime(freq, droneTime + (idx * 0.02));
+        shimOsc.type = 'sine';
+        shimOsc.frequency.setValueAtTime(freq, droneTime + (idx * 0.03));
 
-        bandPass.type = 'bandpass';
-        bandPass.frequency.setValueAtTime(freq * 1.5, droneTime);
-        bandPass.Q.setValueAtTime(3.0, droneTime);
+        shimFilter.type = 'lowpass';
+        shimFilter.frequency.setValueAtTime(1400, droneTime);
 
         shimGain.gain.setValueAtTime(0.001, droneTime);
-        shimGain.gain.linearRampToValueAtTime(0.12, droneTime + 0.15);
-        shimGain.gain.exponentialRampToValueAtTime(0.0001, droneTime + 1.4);
+        shimGain.gain.linearRampToValueAtTime(0.12, droneTime + 0.18);
+        shimGain.gain.exponentialRampToValueAtTime(0.0001, droneTime + 1.3);
 
-        shimOsc.connect(bandPass);
-        bandPass.connect(shimGain);
+        shimOsc.connect(shimFilter);
+        shimFilter.connect(shimGain);
         shimGain.connect(masterGain);
 
         shimOsc.start(droneTime);
-        shimOsc.stop(droneTime + 1.5);
+        shimOsc.stop(droneTime + 1.4);
       });
     } catch (e) {
       console.warn('[Exxclusive 3.0] Audio synthesis skipped or blocked by browser policy:', e);
+    }
+  }
+
+  // Phase 1: 3-Color Vertical Laser Ribbon Convergence Lines
+  function buildConvergenceLines() {
+    const container = document.getElementById('netflix-lines-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const colors = ['red', 'purple', 'cyan'];
+    const totalLines = 36;
+
+    for (let i = 0; i < totalLines; i++) {
+      const line = document.createElement('div');
+      const color = colors[i % 3];
+      line.className = `netflix-vertical-line color-${color}`;
+
+      // Even spread with subtle organic clustering
+      const pct = (i / (totalLines - 1)) * 100;
+      const jitter = (Math.sin(i * 77) * 2.2);
+      const leftPos = Math.max(1.5, Math.min(98.5, pct + jitter));
+      line.style.left = `${leftPos.toFixed(1)}%`;
+
+      // Variable widths: 1.2px to 3.2px
+      const widths = [1.2, 2.0, 2.6, 3.2];
+      line.style.width = `${widths[i % widths.length]}px`;
+
+      // Organic wave delay (0 to 180ms)
+      const delay = (i % 8) * 0.024;
+      line.style.animationDelay = `${delay.toFixed(3)}s`;
+
+      container.appendChild(line);
     }
   }
 
@@ -228,19 +266,20 @@
     introEl.classList.add('is-dismissed');
     setTimeout(() => {
       introEl.style.display = 'none';
-    }, 700);
+    }, 600);
   }
 
   function triggerIntroAnimation() {
     if (!introEl) return;
+    buildConvergenceLines();
     introEl.style.display = 'flex';
     introEl.classList.remove('is-dismissed');
     playNetflixSignatureSound();
 
-    // Auto dismiss after signature intro animation completes (2.4s)
+    // Auto dismiss after signature intro animation completes (2.5s)
     setTimeout(() => {
       dismissIntro();
-    }, 2400);
+    }, 2500);
   }
 
   // --- 2. DOLBY CINEMA 3D DSP ACOUSTIC CHAIN ---
