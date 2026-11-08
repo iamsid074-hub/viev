@@ -778,6 +778,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof window.setFloatingNavVisible === 'function') {
         window.setFloatingNavVisible(false);
       }
+      const cinemaTab = document.getElementById('tab-cinema');
+      if (cinemaTab) {
+        cinemaTab.click();
+        return;
+      }
       if (window.vievExxclusive && typeof window.vievExxclusive.enterCinema === 'function') {
         window.vievExxclusive.enterCinema();
       }

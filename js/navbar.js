@@ -162,19 +162,18 @@ document.addEventListener('DOMContentLoaded', () => {
       edgeAura.classList.toggle('is-hidden', targetTab !== 'home');
     }
 
-    // Open YouTube Home feed directly when YouTube tab is selected
+    // Exxclusive OS 3.0 Cinema & Smart Library activation
     if (targetTab === 'cinema') {
-      if (typeof window.openCinemaLounge === 'function') {
-        window.openCinemaLounge('All', false);
+      if (typeof window.onExxclusiveTabActivated === 'function') {
+        window.onExxclusiveTabActivated();
+      }
+    } else {
+      if (typeof window.onExxclusiveTabDeactivated === 'function') {
+        window.onExxclusiveTabDeactivated();
       }
     }
 
-    // Update Cinema Mini PiP visibility
-    if (window.vievCinema && typeof window.vievCinema.updateMiniPlayerVisibility === 'function') {
-      window.vievCinema.updateMiniPlayerVisibility(targetTab);
-    }
-
-    // Pause Exxclusive curved video when switching tabs away from settings
+    // Pause legacy video when switching away from settings
     if (targetTab !== 'settings' && window.vievExxclusive && typeof window.vievExxclusive.pauseVideo === 'function') {
       window.vievExxclusive.pauseVideo();
     }
