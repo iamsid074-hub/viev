@@ -442,6 +442,12 @@
     transform: rotate(90deg) translateY(-100vw) !important;
     transform-origin: top left !important;
   }
+
+  .lounge-hud-bottom-bar {
+    bottom: 10px !important;
+    left: 18px !important;
+    right: 18px !important;
+  }
 }
 
 /* NATURAL LANDSCAPE (Desktop, Tablets, or Rotated Mobiles) */
@@ -471,11 +477,11 @@
 /* Dynamic Room Ambient Lighting Halo (Spills onto Curved Charcoal Wall & Ceiling Cove) */
 .lounge-ambient-bleed-wrap {
   position: absolute;
-  top: 12%;
-  left: 52%;
+  top: 10%;
+  left: 50%;
   transform: translateX(-50%);
-  width: 72%;
-  height: 55%;
+  width: 90%;
+  height: 61%;
   pointer-events: none;
   z-index: 2;
   display: flex;
@@ -485,8 +491,8 @@
 
 .lounge-ambient-canvas {
   position: absolute;
-  width: 106%;
-  height: 106%;
+  width: 104%;
+  height: 104%;
   border-radius: 20px;
   filter: blur(52px) saturate(220%) brightness(1.25);
   opacity: 0;
@@ -499,16 +505,15 @@
   opacity: 0.92;
 }
 
-/* Super Curved Display Chassis (Leaves left flower pot completely clear, 52% height) */
+/* Super Curved Display Chassis (Seamless alignment with reference screen) */
 .lounge-screen-chassis {
   position: absolute;
-  top: 13.5%;
-  left: 52%;
+  top: 10.4%;
+  left: 50%;
   transform: translateX(-50%);
-  width: 68.5%;
-  max-width: 1120px;
-  height: 52%;
-  max-height: 540px;
+  width: 89.8%;
+  max-width: 1400px;
+  height: 60.8%;
   z-index: 5;
   display: flex;
   align-items: center;
@@ -520,24 +525,14 @@
   transform-style: preserve-3d;
 }
 
-/* Real Physical Curved OLED Bezel Chassis Frame (Option B: Minimal 2mm Micro-Bezel) */
+/* Real Physical Curved OLED Bezel Chassis Frame */
 .lounge-screen-chassis-bezel {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 2.5px 3px;
+  padding: 0;
   box-sizing: border-box;
-  background: #08080a;
-  border-radius: 12px;
-  /* Ultra-thin razor 2mm titanium micro-bezel */
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-top: 1.5px solid rgba(255, 255, 255, 0.50);
-  border-bottom: 1.5px solid rgba(0, 0, 0, 0.95);
-  box-shadow: 
-    0 0 0 1px rgba(0, 0, 0, 0.98),
-    0 18px 45px rgba(0, 0, 0, 0.95),
-    0 36px 90px rgba(0, 0, 0, 0.88),
-    inset 0 1px 1px rgba(255, 255, 255, 0.28);
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -557,7 +552,7 @@
   -webkit-clip-path: url(#loungeCurvedClip);
   background: #000000;
   border: none;
-  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.9);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.95);
   transform: translateZ(0);
 }
 
@@ -638,10 +633,6 @@
   inset: 0;
   pointer-events: none;
   z-index: 15;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 16px 24px;
   box-sizing: border-box;
   opacity: 1;
   transition: opacity 0.35s ease;
@@ -793,12 +784,18 @@
   transform: scale(0.94);
 }
 
-/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill */
+/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Firmly anchored to the bottom edge) */
 .lounge-hud-bottom-bar {
+  position: absolute;
+  bottom: 14px;
+  left: 24px;
+  right: 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
+  gap: 6px;
+  width: auto;
+  pointer-events: auto;
+  z-index: 16;
 }
 
 .lounge-hud-bottom-row-right {
