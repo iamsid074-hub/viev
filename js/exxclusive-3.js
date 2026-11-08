@@ -270,13 +270,25 @@
     }
   }
 
+  // Phase 3: Fluid Staggered Library Card Cascade Reveal
+  function triggerLibraryCardCascade() {
+    const cards = document.querySelectorAll('.aura-media-card');
+    cards.forEach((card, idx) => {
+      card.classList.remove('is-cascading');
+      card.style.animationDelay = `${(idx * 0.045).toFixed(3)}s`;
+      void card.offsetWidth;
+      card.classList.add('is-cascading');
+    });
+  }
+
   // Dismiss intro and reveal Smart Library
   function dismissIntro() {
     if (!introEl || introEl.classList.contains('is-dismissed')) return;
     introEl.classList.add('is-dismissed');
+    triggerLibraryCardCascade();
     setTimeout(() => {
       introEl.style.display = 'none';
-    }, 600);
+    }, 550);
   }
 
   function triggerIntroAnimation() {
@@ -286,10 +298,10 @@
     introEl.classList.remove('is-dismissed');
     playNetflixSignatureSound();
 
-    // Auto dismiss after signature intro animation completes (2.5s)
+    // Auto dismiss seamlessly into library cascade at 1.45s (perfect punchy timing)
     setTimeout(() => {
       dismissIntro();
-    }, 2500);
+    }, 1450);
   }
 
   // --- 2. DOLBY CINEMA 3D DSP ACOUSTIC CHAIN ---
