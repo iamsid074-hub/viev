@@ -18,7 +18,8 @@
       category: ['4k', 'romantic', 'atmospheric'],
       badge: '4K UHD',
       duration: '4:12',
-      poster: 'song/Chhod Diya.jpg',
+      poster: 'https://img.youtube.com/vi/7DzWXIE4Pj0/maxresdefault.jpg',
+      posterFallback: 'song/Chhod Diya.jpg',
       src: 'video/exxclusive.mp4',
       isFeatured: true
     },
@@ -360,7 +361,7 @@
     mediaGridEl.innerHTML = filtered.map(item => `
       <div class="aura-media-card" data-media-id="${item.id}" role="button" tabindex="0">
         <div class="aura-card-thumb-wrap">
-          <img src="${item.poster}" alt="${item.title}" class="aura-card-img" loading="lazy" onerror="this.src='song/virat_plays_avatar.png'">
+          <img src="${item.poster}" alt="${item.title}" class="aura-card-img" loading="lazy" onerror="this.src='${item.posterFallback || 'song/virat_plays_avatar.png'}'">
           <div class="aura-card-badge-top">${item.badge}</div>
           <div class="aura-card-duration-bottom">${item.duration}</div>
         </div>
@@ -767,6 +768,7 @@
   // Tab switch hook: trigger signature intro on first visit
   let hasVisitedCinema = false;
   window.onExxclusiveTabActivated = function () {
+    renderMediaGrid();
     if (!hasVisitedCinema) {
       hasVisitedCinema = true;
       triggerIntroAnimation();
