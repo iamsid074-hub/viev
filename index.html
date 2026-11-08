@@ -765,11 +765,15 @@ Humne toh chaand se poochha tha, Husn ka matlab..
       <!-- 3. THE LUXURY AIRBNB CURVED CHARCOAL HOME CINEMA LOUNGE (LANDSCAPE PLAYBACK) -->
       <div id="curved-charcoal-lounge" class="curved-charcoal-lounge" aria-label="Curved Cinema Lounge">
         
-        <!-- SVG Definitions for Smooth Concave Architectural Curve -->
+        <!-- SVG Definitions for Deep 3D Concave Curve (Option B) -->
         <svg width="0" height="0" style="position: absolute; pointer-events: none;">
           <defs>
             <clipPath id="loungeCurvedClip" clipPathUnits="objectBoundingBox">
-              <path d="M 0,0 Q 0.5,0.045 1,0 L 1,1 Q 0.5,0.955 0,1 Z" />
+              <path d="M 0,0
+                       C 0.25,0.085 0.75,0.085 1,0
+                       C 0.992,0.3 0.992,0.7 1,1
+                       C 0.75,0.915 0.25,0.915 0,1
+                       C 0.008,0.7 0.008,0.3 0,0 Z" />
             </clipPath>
           </defs>
         </svg>
@@ -811,19 +815,8 @@ Humne toh chaand se poochha tha, Husn ka matlab..
           <!-- LIQUID GLASS UI (IMAGE 2 REPLICA) -->
           <div class="lounge-glass-hud" id="lounge-glass-hud">
             
-            <!-- Top Bar: Volume Glass Pill (Top Left kept clean) -->
-            <div class="lounge-hud-top-bar">
-              <div class="lounge-top-left-actions"></div>
-
-              <!-- Floating Volume Scrubber Pill (Image 2) -->
-              <div class="lounge-volume-glass-pill">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"></polygon>
-                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                </svg>
-                <input type="range" class="lounge-volume-slider" id="lounge-volume-slider" min="0" max="1" step="0.05" value="0.9" aria-label="Volume">
-              </div>
-            </div>
+            <!-- Top Area Clean (Volume option removed as requested) -->
+            <div class="lounge-hud-top-bar" style="display: none;"></div>
 
             <!-- Center Triad: -15s Jump / Glowing Play-Pause / +15s Jump (Image 2) -->
             <div class="lounge-hud-center-cluster">
