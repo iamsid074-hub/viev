@@ -453,21 +453,17 @@
   }
 }
 
-/* Luxury Charcoal Room Backdrop Layer (16:9 Aspect-Locked for 100% Pixel-Perfect Fit on User's Room Image) */
+/* Luxury Charcoal Room Backdrop Layer */
 .lounge-room-stage {
   position: relative;
   width: 100%;
   height: 100%;
-  max-width: 177.78vh;
-  max-height: 56.25vw;
-  aspect-ratio: 16 / 9;
-  margin: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url('../images/cinema_lounge_charcoal.png?v=3.5'), url('images/cinema_lounge_charcoal.png?v=3.5');
+  background-image: url('../images/cinema_lounge_charcoal.png'), url('images/cinema_lounge_charcoal.png');
   background-position: center center;
-  background-size: 100% 100%;
+  background-size: cover;
   background-repeat: no-repeat;
   overflow: hidden;
 }
@@ -475,11 +471,11 @@
 /* Dynamic Room Ambient Lighting Halo (Spills onto Curved Charcoal Wall & Ceiling Cove) */
 .lounge-ambient-bleed-wrap {
   position: absolute;
-  top: 10%;
-  left: 50%;
+  top: 12%;
+  left: 52%;
   transform: translateX(-50%);
-  width: 90%;
-  height: 61%;
+  width: 72%;
+  height: 55%;
   pointer-events: none;
   z-index: 2;
   display: flex;
@@ -489,8 +485,8 @@
 
 .lounge-ambient-canvas {
   position: absolute;
-  width: 104%;
-  height: 104%;
+  width: 106%;
+  height: 106%;
   border-radius: 20px;
   filter: blur(52px) saturate(220%) brightness(1.25);
   opacity: 0;
@@ -503,40 +499,48 @@
   opacity: 0.92;
 }
 
-/* Super Curved Display Chassis (Seamless alignment with reference screen in user's image) */
+/* Super Curved Display Chassis (Leaves left flower pot completely clear, 52% height) */
 .lounge-screen-chassis {
   position: absolute;
-  top: 10.4%;
-  left: 50%;
+  top: 13.5%;
+  left: 52%;
   transform: translateX(-50%);
-  width: 89.8%;
-  max-width: 1400px;
-  height: 60.8%;
+  width: 68.5%;
+  max-width: 1120px;
+  height: 52%;
+  max-height: 540px;
   z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: visible;
   user-select: none;
-  perspective: 900px;
+  perspective: 1200px;
   perspective-origin: center center;
   transform-style: preserve-3d;
 }
 
-/* Real Physical Curved OLED Bezel Chassis Frame (Seamlessly adopts the user's room image titanium bezel) */
+/* Real Physical Curved OLED Bezel Chassis Frame */
 .lounge-screen-chassis-bezel {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 0;
+  padding: 5px 6px;
   box-sizing: border-box;
-  background: transparent;
+  background: #0d0d10;
+  border-radius: 18px;
+  /* Dark titanium casing rim with specular chamfer lighting */
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-top-color: rgba(255, 255, 255, 0.35);
+  border-bottom-color: rgba(0, 0, 0, 0.9);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.95),
+    0 16px 45px rgba(0, 0, 0, 0.92),
+    0 32px 85px rgba(0, 0, 0, 0.85),
+    inset 0 1px 1px rgba(255, 255, 255, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
-  clip-path: url(#loungeCurvedClip);
-  -webkit-clip-path: url(#loungeCurvedClip);
-  transform-style: preserve-3d;
 }
 
 /* True 3D Architectural Concave Curve Silhouette */
@@ -544,13 +548,13 @@
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   clip-path: url(#loungeCurvedClip);
   -webkit-clip-path: url(#loungeCurvedClip);
   background: #000000;
-  border: none;
-  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.95);
+  border: 2px solid #08080a;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.85);
   transform: translateZ(0);
 }
 
@@ -564,20 +568,20 @@
   border-radius: inherit;
   background: 
     linear-gradient(90deg, 
-      rgba(0, 0, 0, 0.35) 0%, 
-      rgba(0, 0, 0, 0.08) 8%, 
-      transparent 20%, 
-      transparent 80%, 
-      rgba(0, 0, 0, 0.08) 92%, 
-      rgba(0, 0, 0, 0.35) 100%
+      rgba(0, 0, 0, 0.30) 0%, 
+      rgba(0, 0, 0, 0.08) 12%, 
+      transparent 24%, 
+      transparent 76%, 
+      rgba(0, 0, 0, 0.08) 88%, 
+      rgba(0, 0, 0, 0.30) 100%
     ),
     linear-gradient(180deg,
-      rgba(255, 255, 255, 0.10) 0%,
-      transparent 14%,
-      transparent 86%,
+      rgba(255, 255, 255, 0.09) 0%,
+      transparent 12%,
+      transparent 88%,
       rgba(0, 0, 0, 0.40) 100%
     );
-  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.6);
 }
 
 /* Video Player: Fills the entire panoramic 3D curved screen (no letterboxing) */
@@ -587,7 +591,7 @@
   object-fit: cover !important;
   display: block;
   background: #000000;
-  transform: scale(1.02);
+  transform: scale(1.015);
 }
 
 /* Polished Floor & Coffee Table Live Mirror Reflection */
@@ -633,8 +637,8 @@
   z-index: 15;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 20px 28px;
+  justify-content: space-between;
+  padding: 16px 24px;
   box-sizing: border-box;
   opacity: 1;
   transition: opacity 0.35s ease;
@@ -786,25 +790,12 @@
   transform: scale(0.94);
 }
 
-/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Permanently pinned to bottom edge) */
+/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill */
 .lounge-hud-bottom-bar {
-  position: absolute;
-  bottom: 22px;
-  left: 32px;
-  right: 32px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  pointer-events: auto;
-  z-index: 16;
-}
-
-@media (max-width: 768px) {
-  .lounge-hud-bottom-bar {
-    bottom: 14px;
-    left: 18px;
-    right: 18px;
-  }
+  width: 100%;
 }
 
 .lounge-hud-bottom-row-right {
@@ -850,28 +841,19 @@
 .lounge-timeline-bar-box {
   position: relative;
   flex: 1;
-  height: 36px;
+  height: 24px;
   display: flex;
   align-items: center;
   cursor: pointer;
-  touch-action: none;
-  user-select: none;
 }
 
 .lounge-timeline-track {
   width: 100%;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.22);
-  border-radius: 999px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.24);
+  border-radius: 2px;
   position: relative;
   overflow: visible;
-  transition: height 0.15s ease, background 0.15s ease;
-}
-
-.lounge-timeline-bar-box:hover .lounge-timeline-track,
-.lounge-timeline-bar-box:active .lounge-timeline-track {
-  height: 7px;
-  background: rgba(255, 255, 255, 0.35);
 }
 
 .lounge-timeline-fill {
@@ -880,10 +862,9 @@
   left: 0;
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #ff2d55 0%, #ffffff 100%);
-  border-radius: 999px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.85);
-  transition: none !important;
+  background: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
 }
 
 .lounge-timeline-dot {
@@ -891,18 +872,12 @@
   top: 50%;
   left: 0%;
   transform: translate(-50%, -50%);
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 0 14px rgba(255, 255, 255, 1), 0 2px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.95);
   pointer-events: none;
-  transition: none !important;
-}
-
-.lounge-timeline-bar-box:hover .lounge-timeline-dot,
-.lounge-timeline-bar-box:active .lounge-timeline-dot {
-  transform: translate(-50%, -50%) scale(1.28);
 }
 
 .lounge-time-countdown {

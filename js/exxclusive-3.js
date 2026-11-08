@@ -612,11 +612,6 @@
         }
       }
 
-      // 60 FPS Continuous Butter-Smooth Scrubber Sync
-      if (videoEl && !videoEl.paused && !isDraggingScrubber) {
-        updateTimelineUI();
-      }
-
       renderRafId = requestAnimationFrame(renderLoop);
     }
 
@@ -760,83 +755,34 @@
       });
     }
 
-    // Timeline Scrubbing (Ultra-Smooth 60/120 FPS Orientation-Aware Engine)
+    // Timeline Scrubbing
     if (timelineTrack) {
-      function getScrubFraction(e) {
-        if (!timelineTrack) return 0;
+      const handleScrub = (clientX) => {
+        if (!videoEl || !videoEl.duration) return;
         const rect = timelineTrack.getBoundingClientRect();
-        let clientX = e.clientX;
-        let clientY = e.clientY;
-        if (e.touches && e.touches.length > 0) {
-          clientX = e.touches[0].clientX;
-          clientY = e.touches[0].clientY;
-        } else if (e.changedTouches && e.changedTouches.length > 0) {
-          clientX = e.changedTouches[0].clientX;
-          clientY = e.changedTouches[0].clientY;
-        }
-        if (clientX === undefined) clientX = 0;
-        if (clientY === undefined) clientY = 0;
-
-        // Check if lounge is rotated 90deg (in mobile portrait mode, rect.height is the track length)
-        if (rect.width >= rect.height) {
-          if (rect.width <= 0) return 0;
-          return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-        } else {
-          if (rect.height <= 0) return 0;
-          return Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-        }
-      }
-
-      const applyScrub = (e) => {
-        if (!videoEl || !videoEl.duration || !isFinite(videoEl.duration)) return;
-        const frac = getScrubFraction(e);
-        const targetTime = frac * videoEl.duration;
-
-        // Instant visual feedback for track and remaining time
-        const pct = frac * 100;
-        if (timelineFill) timelineFill.style.width = `${pct}%`;
-        if (timelineDot) timelineDot.style.left = `${pct}%`;
-        if (timeCountdown) timeCountdown.textContent = formatCountdownTime(targetTime, videoEl.duration);
-
-        // Update video playback position directly
-        videoEl.currentTime = targetTime;
+        const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        videoEl.currentTime = pos * videoEl.duration;
+        updateTimelineUI();
       };
 
-      const onScrubStart = (e) => {
+      timelineTrack.addEventListener('pointerdown', (e) => {
         isDraggingScrubber = true;
         showControlsHud();
-        if (e.cancelable) e.preventDefault();
-        applyScrub(e);
-        if (e.pointerId && timelineTrack.setPointerCapture) {
-          try { timelineTrack.setPointerCapture(e.pointerId); } catch (_) {}
-        }
-      };
+        handleScrub(e.clientX);
+      });
 
-      const onScrubMove = (e) => {
-        if (!isDraggingScrubber) return;
-        if (e.cancelable) e.preventDefault();
-        applyScrub(e);
-      };
-
-      const onScrubEnd = (e) => {
+      window.addEventListener('pointermove', (e) => {
         if (isDraggingScrubber) {
-          applyScrub(e);
+          handleScrub(e.clientX);
+        }
+      });
+
+      window.addEventListener('pointerup', () => {
+        if (isDraggingScrubber) {
           isDraggingScrubber = false;
           showControlsHud();
         }
-      };
-
-      // Pointer events with desktop & mobile stylus support
-      timelineTrack.addEventListener('pointerdown', onScrubStart);
-      window.addEventListener('pointermove', onScrubMove, { passive: false });
-      window.addEventListener('pointerup', onScrubEnd);
-      window.addEventListener('pointercancel', onScrubEnd);
-
-      // Dedicated Touch listeners for resilient mobile dragging without browser scroll hijacking
-      timelineTrack.addEventListener('touchstart', onScrubStart, { passive: false });
-      window.addEventListener('touchmove', onScrubMove, { passive: false });
-      window.addEventListener('touchend', onScrubEnd, { passive: false });
-      window.addEventListener('touchcancel', onScrubEnd, { passive: false });
+      });
     }
 
     // Video events
