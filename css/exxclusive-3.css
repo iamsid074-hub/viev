@@ -1006,10 +1006,16 @@
   pointer-events: auto !important;
   opacity: 1 !important;
   visibility: visible !important;
-  bottom: calc(var(--sab, 0px) + 26px) !important;
+  bottom: calc(var(--sab, 0px) + 46px) !important;
   transform: translateX(-50%) translateY(0) scale(1) !important;
   transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
   will-change: opacity, transform;
+}
+
+@media (max-width: 768px) {
+  .apple-floating-dock.is-cinema-mode {
+    bottom: calc(var(--sab, 0px) + 38px) !important;
+  }
 }
 
 /* Invisible Controls: When Cinema HUD hides, Back to Library smoothly hides with it */
@@ -1029,6 +1035,17 @@
   opacity: 1 !important;
   visibility: visible !important;
   cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
+}
+
+.apple-floating-navbar.is-cinema-mode:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  transform: scale(1.03) !important;
+}
+
+.apple-floating-navbar.is-cinema-mode:active {
+  transform: scale(0.96) !important;
 }
 
 .apple-floating-navbar.is-cinema-mode .nav-tab-btn,
@@ -1041,6 +1058,7 @@
   display: inline-flex !important;
 }
 
+/* Single Layer Back to Library Button: Transparent inside navbar capsule, zero duplicate borders */
 .nav-cinema-back-btn {
   display: none;
   align-items: center;
@@ -1052,8 +1070,9 @@
   box-sizing: border-box;
   padding: 0 22px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   color: #ffffff;
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif);
   font-size: 13.5px;
@@ -1062,10 +1081,7 @@
   cursor: pointer;
   outline: none;
   user-select: none;
-  box-shadow: 
-    0 4px 14px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0.5px rgba(255, 255, 255, 0.35);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
 
 .nav-cinema-back-btn svg {
@@ -1073,22 +1089,7 @@
   transition: transform 0.2s ease;
 }
 
-.nav-cinema-back-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.32);
-  transform: scale(1.03);
-  color: #ffffff;
-  box-shadow: 
-    0 6px 18px rgba(0, 0, 0, 0.45),
-    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.5);
-}
-
 .nav-cinema-back-btn:hover svg {
   transform: translateX(-2px);
-}
-
-.nav-cinema-back-btn:active {
-  transform: scale(0.96);
-  background: rgba(255, 255, 255, 0.24);
 }
 
