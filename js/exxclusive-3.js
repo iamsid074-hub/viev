@@ -110,11 +110,13 @@
   // Video Source & YouTube State
   let currentSource = 'library'; // 'library' | 'youtube'
   let ytFeedVideos = [];
+  let ytLoadedIds = new Set();
   let ytPage = 1;
   let ytIsLoading = false;
   let currentYtQuery = 'all';
   let isYtPlaying = false;
   let ytDebounceTimer = null;
+  let ytScrollThrottleTimer = null;
 
   // DOM Elements
   let introEl = null;
@@ -475,13 +477,139 @@
       return window.VIRAT_YOUTUBE_FEED;
     }
     return [
-      { id: 'c64I9HNpiOY', title: 'Ek Dil Ek Jaan • Padmaavat (Deepika Padukone, Shahid Kapoor)', channel: 'T-Series', views: '112M views', duration: '5:10', thumb: 'https://i.ytimg.com/vi/c64I9HNpiOY/hqdefault.jpg' },
-      { id: 'BddP6PYo2gs', title: 'Kesariya • Brahmāstra (Arijit Singh, Ranbir Kapoor)', channel: 'Sony Music India', views: '640M views', duration: '4:28', thumb: 'https://i.ytimg.com/vi/BddP6PYo2gs/hqdefault.jpg' },
-      { id: 'E_SbwSe15y0', title: 'Ve Haaniyaan • Ravi Dubey & Sargun Mehta', channel: 'Dreamiyata Music', views: '396M views', duration: '4:05', thumb: 'https://i.ytimg.com/vi/E_SbwSe15y0/hqdefault.jpg' },
-      { id: 'Z4aMdO8K0XE', title: "India's Got Latent Episode 8 • Samay Raina & MC Stan", channel: 'Samay Raina', views: '48M views', duration: '42:15', thumb: 'https://i.ytimg.com/vi/Z4aMdO8K0XE/hqdefault.jpg' },
-      { id: 'GsOBaZh6cZo', title: 'So Swaezy • Yo Yo Honey Singh & Hommie Dilliwala', channel: 'Yo Yo Honey Singh', views: '26M views', duration: '3:45', thumb: 'https://i.ytimg.com/vi/GsOBaZh6cZo/hqdefault.jpg' },
-      { id: '7DzWXIE4Pj0', title: 'Chhod Diya • Kanika Kapoor & Arijit Singh', channel: 'Zee Music Company', views: '185M views', duration: '4:12', thumb: 'https://i.ytimg.com/vi/7DzWXIE4Pj0/hqdefault.jpg' }
+      { id: 'c64I9HNpiOY', title: 'Ek Dil Ek Jaan • Padmaavat (Deepika Padukone, Shahid Kapoor)', channel: 'T-Series', views: '112M views', pub: '2 years ago', duration: '5:10', thumb: 'https://i.ytimg.com/vi/c64I9HNpiOY/hqdefault.jpg', avatar: 'song/virat_plays_avatar.png' },
+      { id: 'BddP6PYo2gs', title: 'Kesariya • Brahmāstra (Arijit Singh, Ranbir Kapoor)', channel: 'Sony Music India', views: '640M views', pub: '1 year ago', duration: '4:28', thumb: 'https://i.ytimg.com/vi/BddP6PYo2gs/hqdefault.jpg', avatar: 'song/virat_plays_avatar.png' },
+      { id: 'E_SbwSe15y0', title: 'Ve Haaniyaan • Ravi Dubey & Sargun Mehta', channel: 'Dreamiyata Music', views: '396M views', pub: '8 months ago', duration: '4:05', thumb: 'https://i.ytimg.com/vi/E_SbwSe15y0/hqdefault.jpg', avatar: 'song/virat_plays_avatar.png' },
+      { id: 'Z4aMdO8K0XE', title: "India's Got Latent Episode 8 • Samay Raina & MC Stan", channel: 'Samay Raina', views: '48M views', pub: '1 month ago', duration: '42:15', thumb: 'https://i.ytimg.com/vi/Z4aMdO8K0XE/hqdefault.jpg', avatar: 'song/virat_plays_avatar.png' },
+      { id: 'GsOBaZh6cZo', title: 'So Swaezy • Yo Yo Honey Singh & Hommie Dilliwala', channel: 'Yo Yo Honey Singh', views: '26M views', pub: '3 weeks ago', duration: '3:45', thumb: 'https://i.ytimg.com/vi/GsOBaZh6cZo/hqdefault.jpg', avatar: 'song/virat_plays_avatar.png' },
+      { id: '7DzWXIE4Pj0', title: 'Chhod Diya • Kanika Kapoor & Arijit Singh', channel: 'Zee Music Company', views: '185M views', pub: '3 years ago', duration: '4:12', thumb: 'https://i.ytimg.com/vi/7DzWXIE4Pj0/hqdefault.jpg', avatar: 'song/virat_plays_avatar.png' }
     ];
+  }
+
+  function getFallbackBatch(query, page, count = 6) {
+    const pool = getFallbackVideos();
+    let filtered = pool;
+    if (query && query !== 'all') {
+      const qLower = query.toLowerCase().trim();
+      const tokens = qLower.split(/\s+/).filter(Boolean);
+      filtered = pool.filter(v => {
+        const text = ((v.title || '') + ' ' + (v.channel || '')).toLowerCase();
+        return tokens.some(t => text.includes(t));
+      });
+      if (filtered.length === 0) filtered = pool;
+    }
+
+    const total = filtered.length;
+    if (total === 0) return [];
+
+    const startIndex = ((page - 1) * count) % total;
+    let batch = filtered.slice(startIndex, startIndex + count);
+    if (batch.length < count) {
+      batch = batch.concat(filtered.slice(0, count - batch.length));
+    }
+    return batch.map(v => ({
+      id: v.id,
+      title: v.title || 'YouTube Video',
+      channel: v.channel || 'YouTube',
+      views: v.views || '100K views',
+      pub: v.pub || '',
+      duration: v.duration || 'HD',
+      thumb: v.thumb || `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+      avatar: v.avatar || 'song/virat_plays_avatar.png'
+    }));
+  }
+
+  function generateYtCardHtml(vid) {
+    const thumbUrl = vid.thumb || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`;
+    const avatarUrl = vid.avatar || 'song/virat_plays_avatar.png';
+    const channel = (vid.channel || 'YouTube').replace(/"/g, '&quot;');
+    const title = (vid.title || 'YouTube Video').replace(/"/g, '&quot;');
+    const views = vid.views || '';
+    const pub = vid.pub || '';
+    const duration = vid.duration || 'HD';
+
+    return `
+      <div class="aura-yt-card" data-video-id="${vid.id}" role="button" tabindex="0">
+        <div class="aura-yt-thumb-wrap">
+          <img src="${thumbUrl}" alt="${title}" class="aura-yt-thumb-img" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg'">
+          <div class="aura-yt-badge-top">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span>YOUTUBE</span>
+          </div>
+          <div class="aura-yt-duration">${duration}</div>
+        </div>
+        <div class="aura-yt-details-row">
+          <img src="${avatarUrl}" class="aura-yt-avatar" alt="${channel}" onerror="this.src='song/virat_plays_avatar.png'">
+          <div class="aura-yt-info">
+            <h3 class="aura-yt-title">${title}</h3>
+            <div class="aura-yt-meta">
+              <span class="aura-yt-channel">${channel}</span>
+              ${views ? `<span class="aura-yt-dot">•</span><span class="aura-yt-views">${views}</span>` : ''}
+              ${pub ? `<span class="aura-yt-dot">•</span><span class="aura-yt-pub">${pub}</span>` : ''}
+            </div>
+          </div>
+          <div class="aura-yt-more-btn" aria-label="More options">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="12" cy="19" r="2"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function attachYtCardClickListener(card) {
+    if (!card) return;
+    card.addEventListener('click', () => {
+      const id = card.getAttribute('data-video-id');
+      const vid = ytFeedVideos.find(v => v.id === id);
+      if (vid) {
+        openCurvedCinemaLounge({
+          id: 'yt-' + vid.id,
+          youtubeId: vid.id,
+          type: 'youtube',
+          title: vid.title,
+          sub: (vid.channel || 'YouTube') + (vid.views ? ' • ' + vid.views : ''),
+          poster: vid.thumb || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`,
+          duration: vid.duration || 'HD'
+        });
+      }
+    });
+  }
+
+  function appendYouTubeCards(videos) {
+    const ytGridEl = document.getElementById('aura-yt-feed-grid');
+    if (!ytGridEl || !videos || videos.length === 0) return;
+
+    const temp = document.createElement('div');
+    temp.innerHTML = videos.map(generateYtCardHtml).join('');
+
+    const children = Array.from(temp.children);
+    children.forEach(card => {
+      attachYtCardClickListener(card);
+      ytGridEl.appendChild(card);
+    });
+  }
+
+  function renderYouTubeGrid() {
+    const ytGridEl = document.getElementById('aura-yt-feed-grid');
+    if (!ytGridEl) return;
+
+    if (ytFeedVideos.length === 0) {
+      ytGridEl.innerHTML = `
+        <div style="padding: 48px 16px; text-align: center; color: rgba(255,255,255,0.4);">
+          <div style="font-size: 32px; margin-bottom: 8px;">🎬</div>
+          <div style="font-size: 15px; font-weight: 600; color: #fff;">No YouTube videos found</div>
+          <div style="font-size: 12px; margin-top: 4px;">Try searching another keyword or song.</div>
+        </div>
+      `;
+      return;
+    }
+
+    ytGridEl.innerHTML = ytFeedVideos.map(generateYtCardHtml).join('');
+    ytGridEl.querySelectorAll('.aura-yt-card').forEach(attachYtCardClickListener);
   }
 
   async function loadYouTubeFeed(query = 'all', append = false) {
@@ -493,118 +621,82 @@
 
     if (!append) {
       ytPage = 1;
+      ytLoadedIds.clear();
+      ytFeedVideos = [];
       if (loaderEl) loaderEl.style.display = 'none';
 
-      // 0ms instant display from memory/catalog
-      const initialPool = getFallbackVideos();
-      const filtered = query === 'all' ? initialPool : initialPool.filter(v => 
-        (v.title + ' ' + (v.channel || '')).toLowerCase().includes(query.toLowerCase())
-      );
-      ytFeedVideos = filtered.length > 0 ? filtered.slice(0, 16) : initialPool.slice(0, 16);
+      // 0ms instant display of first 6 real mobile cards
+      const initialBatch = getFallbackBatch(query, 1, 6);
+      initialBatch.forEach(v => ytLoadedIds.add(v.id));
+      ytFeedVideos = [...initialBatch];
       renderYouTubeGrid();
     } else {
       if (loaderEl) loaderEl.style.display = 'flex';
     }
 
-    // Live search / feed fetch
+    // Try live fetch with 2s timeout
+    let liveVideos = [];
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 2000);
       const qParam = query === 'all' ? 'trending music hindi' : query;
       const apiUrl = `/api/youtube/search?q=${encodeURIComponent(qParam)}&page=${ytPage}`;
-      const res = await fetch(apiUrl);
-      if (res.ok) {
+      const res = await fetch(apiUrl, { signal: controller.signal });
+      clearTimeout(timer);
+
+      if (res && res.ok) {
         const data = await res.json();
-        if (data && data.videos && data.videos.length > 0) {
-          const newVids = data.videos.map(v => ({
+        if (data && Array.isArray(data.videos) && data.videos.length > 0) {
+          liveVideos = data.videos.map(v => ({
             id: v.id,
             title: v.title || 'YouTube Video',
             channel: v.channel || 'YouTube',
-            views: v.views || '',
+            views: v.views || 'Trending',
+            pub: v.pub || '',
             duration: v.duration || 'HD',
-            thumb: v.thumb || `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`
+            thumb: v.thumb || `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`,
+            avatar: v.avatar || 'song/virat_plays_avatar.png'
           }));
-
-          if (append) {
-            const existingIds = new Set(ytFeedVideos.map(v => v.id));
-            const unique = newVids.filter(v => !existingIds.has(v.id));
-            ytFeedVideos.push(...unique);
-          } else {
-            ytFeedVideos = newVids;
-          }
-          renderYouTubeGrid();
         }
       }
     } catch (_) {
-      // Offline fallback: paginate local pool
-      if (append) {
-        const pool = getFallbackVideos();
-        const start = ((ytPage - 1) * 8) % pool.length;
-        const slice = pool.slice(start, start + 8);
-        if (slice.length > 0) {
-          ytFeedVideos.push(...slice);
+      // Live search failed or offline, fallback handles smoothly
+    }
+
+    // Determine batch to display
+    let newBatch = [];
+    if (liveVideos.length > 0) {
+      newBatch = liveVideos.filter(v => !ytLoadedIds.has(v.id));
+    }
+    // If live produced nothing new, take from local catalog
+    if (newBatch.length === 0) {
+      const fallbackList = getFallbackBatch(query, ytPage + 1, 6);
+      newBatch = fallbackList.filter(v => !ytLoadedIds.has(v.id));
+      if (newBatch.length === 0) {
+        newBatch = fallbackList; // Wrap-around for infinite scroll
+      }
+    }
+
+    // Add minimal 350ms delay for smooth animation when scrolling
+    if (append) {
+      await new Promise(r => setTimeout(r, 350));
+    }
+
+    if (newBatch.length > 0) {
+      newBatch.forEach(v => ytLoadedIds.add(v.id));
+      if (!append) {
+        if (liveVideos.length > 0) {
+          ytFeedVideos = newBatch.slice(0, 8);
           renderYouTubeGrid();
         }
+      } else {
+        ytFeedVideos.push(...newBatch);
+        appendYouTubeCards(newBatch);
       }
-    } finally {
-      ytIsLoading = false;
-      if (loaderEl) loaderEl.style.display = 'none';
-    }
-  }
-
-  function renderYouTubeGrid() {
-    const ytGridEl = document.getElementById('aura-yt-feed-grid');
-    if (!ytGridEl) return;
-
-    if (ytFeedVideos.length === 0) {
-      ytGridEl.innerHTML = `
-        <div style="grid-column: 1 / -1; padding: 48px 16px; text-align: center; color: rgba(255,255,255,0.4);">
-          <div style="font-size: 32px; margin-bottom: 8px;">🎬</div>
-          <div style="font-size: 15px; font-weight: 600; color: #fff;">No YouTube videos found</div>
-          <div style="font-size: 12px; margin-top: 4px;">Try searching another keyword or song.</div>
-        </div>
-      `;
-      return;
     }
 
-    ytGridEl.innerHTML = ytFeedVideos.map(vid => `
-      <div class="aura-media-card aura-yt-card" data-video-id="${vid.id}" role="button" tabindex="0">
-        <div class="aura-card-thumb-wrap">
-          <img src="${vid.thumb || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`}" alt="${vid.title}" class="aura-card-img" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg'">
-          <div class="aura-card-badge-top yt-badge">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            <span>YOUTUBE</span>
-          </div>
-          <div class="aura-card-duration-bottom">${vid.duration || 'HD'}</div>
-          <div class="aura-card-play-hover">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="6 3 20 12 6 21 6 3"></polygon>
-            </svg>
-          </div>
-        </div>
-        <div class="aura-card-meta">
-          <h4 class="aura-card-title">${vid.title}</h4>
-          <span class="aura-card-sub">${vid.channel || 'YouTube'}${vid.views ? ' • ' + vid.views : ''}</span>
-        </div>
-      </div>
-    `).join('');
-
-    // Attach click listeners to cards
-    ytGridEl.querySelectorAll('.aura-yt-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const id = card.getAttribute('data-video-id');
-        const vid = ytFeedVideos.find(v => v.id === id);
-        if (vid) {
-          openCurvedCinemaLounge({
-            id: 'yt-' + vid.id,
-            youtubeId: vid.id,
-            type: 'youtube',
-            title: vid.title,
-            sub: (vid.channel || 'YouTube') + (vid.views ? ' • ' + vid.views : ''),
-            poster: vid.thumb || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`,
-            duration: vid.duration || 'HD'
-          });
-        }
-      });
-    });
+    ytIsLoading = false;
+    if (loaderEl) loaderEl.style.display = 'none';
   }
 
   function setVideoSource(source) {
@@ -691,17 +783,30 @@
     // Show HUD controls
     showControlsHud();
 
+    const extYtBtn = document.getElementById('lounge-yt-external-btn');
+
     if (isYouTube) {
-      // YOUTUBE MODE: Play in curved concave iframe with no-referrer
+      // YOUTUBE MODE: Play in curved concave iframe with strict-origin-when-cross-origin
       if (videoEl) {
         try { videoEl.pause(); } catch (_) {}
         videoEl.style.display = 'none';
       }
+      const ytId = currentMedia.youtubeId || extractYouTubeId(currentMedia.src);
+
       if (ytPlayer) {
         ytPlayer.style.display = 'block';
-        const ytId = currentMedia.youtubeId || extractYouTubeId(currentMedia.src);
-        ytPlayer.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3`;
+        // youtube-nocookie.com avoids cookie/anti-tracker conflicts and passes origin
+        const originParam = (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null')
+          ? `&origin=${encodeURIComponent(window.location.origin)}`
+          : '';
+        ytPlayer.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1${originParam}`;
       }
+
+      if (extYtBtn) {
+        extYtBtn.href = `https://www.youtube.com/watch?v=${ytId}`;
+        extYtBtn.style.display = 'inline-flex';
+      }
+
       isYtPlaying = true;
       updatePlayPauseButton(true);
 
@@ -709,6 +814,7 @@
         renderStaticPosterToAmbient(currentMedia.poster);
       }
     } else {
+      if (extYtBtn) extYtBtn.style.display = 'none';
       // DIRECT MP4 4K MASTER MODE
       if (ytPlayer) {
         ytPlayer.src = '';
@@ -802,6 +908,8 @@
       ytPlayer.src = '';
       ytPlayer.style.display = 'none';
     }
+    const extYtBtn = document.getElementById('lounge-yt-external-btn');
+    if (extYtBtn) extYtBtn.style.display = 'none';
     isYtPlaying = false;
 
     if (videoEl) {
@@ -1219,14 +1327,22 @@
       });
     });
 
-    // YouTube Infinite Scroll on Library container
+    // YouTube Infinite Scroll on Library container (Throttled, smooth appending, zero stutter)
     if (libraryEl) {
       libraryEl.addEventListener('scroll', () => {
         if (currentSource !== 'youtube' || ytIsLoading) return;
-        if (libraryEl.scrollTop + libraryEl.clientHeight >= libraryEl.scrollHeight - 350) {
-          ytPage++;
-          loadYouTubeFeed(currentYtQuery, true);
-        }
+        if (ytScrollThrottleTimer) return;
+
+        ytScrollThrottleTimer = setTimeout(() => {
+          ytScrollThrottleTimer = null;
+          if (currentSource !== 'youtube' || ytIsLoading) return;
+
+          const scrollDistanceToBottom = libraryEl.scrollHeight - (libraryEl.scrollTop + libraryEl.clientHeight);
+          if (scrollDistanceToBottom < 480) {
+            ytPage++;
+            loadYouTubeFeed(currentYtQuery, true);
+          }
+        }, 180);
       });
     }
 
