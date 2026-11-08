@@ -413,7 +413,8 @@
     videoEl.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
     updatePlayPauseButton(false);
 
-    // Show lounge environment
+    // Show lounge environment with opening fade animation
+    loungeEl.classList.remove('is-closing');
     loungeEl.classList.add('is-active');
     isLoungeOpen = true;
 
@@ -478,19 +479,26 @@
       audioFadeTimer = null;
     }
 
-    loungeEl.classList.remove('is-active');
-    isLoungeOpen = false;
+    // Smooth theatrical exit fade-out
+    loungeEl.classList.add('is-closing');
+    setTimeout(() => {
+      loungeEl.classList.remove('is-active');
+      loungeEl.classList.remove('is-closing');
+      isLoungeOpen = false;
 
-    // Pause video & reset opacity
-    videoEl.pause();
-    videoEl.style.opacity = '0';
-    updatePlayPauseButton(false);
+      // Pause video & reset opacity
+      if (videoEl) {
+        videoEl.pause();
+        videoEl.style.opacity = '0';
+        updatePlayPauseButton(false);
+      }
 
-    // Stop render loop
-    if (renderRafId) {
-      cancelAnimationFrame(renderRafId);
-      renderRafId = null;
-    }
+      // Stop render loop
+      if (renderRafId) {
+        cancelAnimationFrame(renderRafId);
+        renderRafId = null;
+      }
+    }, 320);
   }
 
   function updatePlayPauseButton(isPlaying) {
@@ -654,7 +662,7 @@
     timelineFill = document.getElementById('lounge-timeline-fill');
     timelineDot = document.getElementById('lounge-timeline-dot');
     timeCountdown = document.getElementById('lounge-time-countdown');
-    exitBtn = document.getElementById('lounge-exit-btn');
+    exitBtn = document.getElementById('cinema-nav-back-btn') || document.getElementById('lounge-exit-btn');
     searchInput = document.getElementById('aura-search-input');
     searchClearBtn = document.getElementById('aura-search-clear-btn');
     mediaGridEl = document.getElementById('aura-media-grid');
@@ -861,7 +869,7 @@
     // Lounge Stage Tap: Show / Toggle HUD
     if (loungeEl) {
       loungeEl.addEventListener('pointerdown', (e) => {
-        if (e.target.closest('.lounge-glass-hud > *') || e.target.closest('.lounge-exit-btn')) {
+        if (e.target.closest('.lounge-glass-hud > *') || e.target.closest('.cinema-floating-dock') || e.target.closest('.lounge-exit-btn')) {
           return;
         }
         if (hudEl && hudEl.classList.contains('is-hidden')) {

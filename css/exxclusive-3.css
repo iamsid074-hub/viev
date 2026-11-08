@@ -424,12 +424,7 @@
   overflow: hidden;
   box-sizing: border-box;
   opacity: 0;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.curved-charcoal-lounge.is-active {
-  display: flex !important;
-  opacity: 1 !important;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* PORTRAIT MOBILES: Rotate 90deg to enforce Landscape Cinema */
@@ -442,6 +437,11 @@
     transform: rotate(90deg) translateY(-100vw) !important;
     transform-origin: top left !important;
   }
+
+  .curved-charcoal-lounge.is-active {
+    display: flex !important;
+    animation: cinemaFadeInPortrait 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
 }
 
 /* NATURAL LANDSCAPE (Desktop, Tablets, or Rotated Mobiles) */
@@ -451,6 +451,42 @@
     height: 100vh !important;
     transform: none !important;
   }
+
+  .curved-charcoal-lounge.is-active {
+    display: flex !important;
+    animation: cinemaFadeInLandscape 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  }
+}
+
+@keyframes cinemaFadeInLandscape {
+  0% {
+    opacity: 0;
+    transform: scale(0.97);
+    filter: brightness(0.2) blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1) blur(0px);
+  }
+}
+
+@keyframes cinemaFadeInPortrait {
+  0% {
+    opacity: 0;
+    transform: rotate(90deg) translateY(-100vw) scale(0.97);
+    filter: brightness(0.2) blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(90deg) translateY(-100vw) scale(1);
+    filter: brightness(1) blur(0px);
+  }
+}
+
+.curved-charcoal-lounge.is-closing {
+  opacity: 0 !important;
+  transition: opacity 0.35s ease-out !important;
 }
 
 /* Luxury Charcoal Room Backdrop Layer */
@@ -807,24 +843,24 @@
   transform: scale(0.94);
 }
 
-/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Permanently pinned to bottom edge) */
+/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Positioned cleanly above Cinema Navbar Dock) */
 .lounge-hud-bottom-bar {
   position: absolute;
-  bottom: 20px;
-  left: 28px;
-  right: 28px;
+  bottom: 74px;
+  left: 32px;
+  right: 32px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   pointer-events: auto;
   z-index: 16;
 }
 
 @media (max-width: 768px) {
   .lounge-hud-bottom-bar {
-    bottom: 12px;
-    left: 16px;
-    right: 16px;
+    bottom: 68px;
+    left: 18px;
+    right: 18px;
   }
 }
 
@@ -935,30 +971,71 @@
   text-align: right;
 }
 
-/* Exit Cinema Lounge Button (Top-Right) */
-.lounge-exit-btn {
+/* Custom Cinema Floating Liquid Glass Nav Dock (Replaces top-right cross with single 'Back to Library' action) */
+.cinema-floating-dock {
   position: absolute;
-  top: 18px;
-  right: 24px;
-  z-index: 25;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.26);
-  color: #ffffff;
-  display: flex;
+  bottom: calc(var(--sab, 0px) + 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
-  transition: transform 0.2s ease, background 0.2s ease;
+  z-index: 25;
+  pointer-events: auto;
+  user-select: none;
+  animation: cinemaDockFadeIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.lounge-exit-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: scale(1.08);
+@keyframes cinemaDockFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.cinema-nav-back-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px; /* Same 48px height as main floating navbar */
+  padding: 0 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+  backdrop-filter: blur(36px) saturate(220%) brightness(1.1);
+  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.1);
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.65),
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0.8px rgba(255, 255, 255, 0.1);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cinema-nav-back-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.08) 100%);
+  border-color: rgba(255, 255, 255, 0.36);
+  box-shadow: 
+    0 20px 48px rgba(0, 0, 0, 0.75),
+    0 0 24px rgba(255, 255, 255, 0.22),
+    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.7);
+  transform: scale(1.04);
+}
+
+.cinema-nav-back-btn:active {
+  transform: scale(0.95);
 }
 
