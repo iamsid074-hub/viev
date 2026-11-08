@@ -228,35 +228,45 @@
     }
   }
 
-  // Phase 1: 3-Color Vertical Laser Ribbon Convergence Lines
-  function buildConvergenceLines() {
-    const container = document.getElementById('netflix-lines-container');
-    if (!container) return;
-    container.innerHTML = '';
+  // Phase 2: 3D Multi-Color Ribbon Burst & Streaming Zoom
+  function buildRibbonBurst() {
+    const stage = document.getElementById('netflix-ribbon-stage');
+    if (!stage) return;
+    stage.innerHTML = '';
 
     const colors = ['red', 'purple', 'cyan'];
-    const totalLines = 36;
+    const totalRibbons = 54; // 18 red, 18 purple, 18 cyan
 
-    for (let i = 0; i < totalLines; i++) {
-      const line = document.createElement('div');
+    for (let i = 0; i < totalRibbons; i++) {
+      const ribbon = document.createElement('div');
       const color = colors[i % 3];
-      line.className = `netflix-vertical-line color-${color}`;
+      ribbon.className = `netflix-burst-ribbon color-${color}`;
 
-      // Even spread with subtle organic clustering
-      const pct = (i / (totalLines - 1)) * 100;
-      const jitter = (Math.sin(i * 77) * 2.2);
-      const leftPos = Math.max(1.5, Math.min(98.5, pct + jitter));
-      line.style.left = `${leftPos.toFixed(1)}%`;
+      // Calculate spread angle & 3D ray offsets from center
+      const spreadFactor = (i - (totalRibbons / 2)) / (totalRibbons / 2); // -1 to +1
+      
+      const xStart = (spreadFactor * 24).toFixed(1);
+      const xMid = (spreadFactor * 160).toFixed(1);
+      const xEnd = (spreadFactor * 420).toFixed(1);
+      const xExit = (spreadFactor * 780).toFixed(1);
 
-      // Variable widths: 1.2px to 3.2px
-      const widths = [1.2, 2.0, 2.6, 3.2];
-      line.style.width = `${widths[i % widths.length]}px`;
+      ribbon.style.setProperty('--x-start', `${xStart}px`);
+      ribbon.style.setProperty('--x-mid', `${xMid}px`);
+      ribbon.style.setProperty('--x-end', `${xEnd}px`);
+      ribbon.style.setProperty('--x-exit', `${xExit}px`);
 
-      // Organic wave delay (0 to 180ms)
-      const delay = (i % 8) * 0.024;
-      line.style.animationDelay = `${delay.toFixed(3)}s`;
+      // Centered anchor
+      ribbon.style.left = '50%';
 
-      container.appendChild(line);
+      // Variable widths (some sleek laser lines, some wider light sheets)
+      const widths = [1.8, 2.5, 3.8, 5.5];
+      ribbon.style.width = `${widths[i % widths.length]}px`;
+
+      // Rapid staggered wave delay (0ms to 240ms)
+      const delay = (i % 9) * 0.026;
+      ribbon.style.animationDelay = `${delay.toFixed(3)}s`;
+
+      stage.appendChild(ribbon);
     }
   }
 
@@ -271,7 +281,7 @@
 
   function triggerIntroAnimation() {
     if (!introEl) return;
-    buildConvergenceLines();
+    buildRibbonBurst();
     introEl.style.display = 'flex';
     introEl.classList.remove('is-dismissed');
     playNetflixSignatureSound();

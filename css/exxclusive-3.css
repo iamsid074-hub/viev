@@ -6,7 +6,7 @@
    - Real-Time Adaptive Ambilight, Floor Reflections & Liquid Glass UI
    ========================================================= */
 
-/* --- 1. NETFLIX-STYLE CINEMATIC OPENING ANIMATION (PHASE 1: 3-COLOR CONVERGENCE) --- */
+/* --- 1. NETFLIX-STYLE CINEMATIC OPENING ANIMATION (PHASE 2: 3D MULTI-COLOR RIBBON BURST) --- */
 .exxclusive-netflix-intro {
   position: fixed;
   inset: 0;
@@ -21,122 +21,93 @@
   overflow: hidden;
   opacity: 1;
   pointer-events: auto;
+  perspective: 750px;
+  perspective-origin: 50% 50%;
   transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .exxclusive-netflix-intro.is-dismissed {
   opacity: 0;
   pointer-events: none;
-  transform: scale(1.04);
+  transform: scale(1.08);
 }
 
-/* Phase 1: The Multi-Line Container */
-.netflix-lines-container {
+/* Phase 2: 3D Ribbon Stage */
+.netflix-ribbon-stage {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
   overflow: hidden;
-  perspective: 900px;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Individual Vertical Laser Ribbon Line */
-.netflix-vertical-line {
+/* Individual 3D Streaming Ribbon */
+.netflix-burst-ribbon {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  opacity: 0;
+  top: -25%;
+  bottom: -25%;
+  width: 3px;
   transform-origin: center center;
-  will-change: transform, opacity;
-  animation: netflixLineConverge 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+  opacity: 0;
+  animation: netflixRibbon3DZoom 1.35s cubic-bezier(0.12, 0.8, 0.25, 1) forwards;
 }
 
-/* Color 1: Crimson Red */
-.netflix-vertical-line.color-red {
-  background: linear-gradient(180deg, transparent 0%, #ff0055 20%, #e50914 50%, #ff0055 80%, transparent 100%);
+/* Color 1: Neon Crimson Red */
+.netflix-burst-ribbon.color-red {
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 0, 85, 0.3) 15%, #ff0055 50%, rgba(229, 9, 20, 0.3) 85%, transparent 100%);
   box-shadow: 
-    0 0 10px rgba(255, 0, 85, 0.9),
-    0 0 24px rgba(229, 9, 20, 0.6);
+    0 0 16px rgba(255, 0, 85, 0.95),
+    0 0 36px rgba(229, 9, 20, 0.7);
 }
 
-/* Color 2: Electric Purple / Violet */
-.netflix-vertical-line.color-purple {
-  background: linear-gradient(180deg, transparent 0%, #a855f7 20%, #7c3aed 50%, #a855f7 80%, transparent 100%);
+/* Color 2: Electric Violet / Purple */
+.netflix-burst-ribbon.color-purple {
+  background: linear-gradient(180deg, transparent 0%, rgba(168, 85, 247, 0.3) 15%, #a855f7 50%, rgba(124, 58, 237, 0.3) 85%, transparent 100%);
   box-shadow: 
-    0 0 10px rgba(168, 85, 247, 0.9),
-    0 0 24px rgba(124, 58, 237, 0.6);
+    0 0 16px rgba(168, 85, 247, 0.95),
+    0 0 36px rgba(124, 58, 237, 0.7);
 }
 
 /* Color 3: Neon Cyan / Ice Blue */
-.netflix-vertical-line.color-cyan {
-  background: linear-gradient(180deg, transparent 0%, #00f0ff 20%, #0070f3 50%, #00f0ff 80%, transparent 100%);
+.netflix-burst-ribbon.color-cyan {
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 240, 255, 0.3) 15%, #00f0ff 50%, rgba(0, 112, 243, 0.3) 85%, transparent 100%);
   box-shadow: 
-    0 0 10px rgba(0, 240, 255, 0.9),
-    0 0 24px rgba(0, 112, 243, 0.6);
+    0 0 16px rgba(0, 240, 255, 0.95),
+    0 0 36px rgba(0, 112, 243, 0.7);
 }
 
-@keyframes netflixLineConverge {
+/* 3D Zoom Towards Camera Keyframes */
+@keyframes netflixRibbon3DZoom {
   0% {
     opacity: 0;
-    transform: scaleY(0) scaleX(0.5);
+    transform: translate3d(var(--x-start, 0px), 0, -650px) scale(0.1);
+    filter: blur(2px);
   }
-  20% {
-    opacity: 1;
-    transform: scaleY(0.7) scaleX(1.3);
-  }
-  50% {
+  18% {
     opacity: 0.95;
-    transform: scaleY(1.05) scaleX(1);
+    transform: translate3d(var(--x-mid, 0px), 0, -200px) scale(0.7);
+    filter: blur(0px);
   }
-  80% {
-    opacity: 0.85;
-    transform: scaleY(1) scaleX(0.9);
-  }
-  100% {
-    opacity: 0.45;
-    transform: scaleY(1) scaleX(0.8);
-  }
-}
-
-/* Anamorphic Horizontal Laser Flare */
-.netflix-flare-streak {
-  position: absolute;
-  width: 140%;
-  height: 2.5px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 0, 85, 0.8) 20%, 
-    rgba(168, 85, 247, 0.9) 35%, 
-    #ffffff 50%, 
-    rgba(0, 240, 255, 0.9) 65%, 
-    rgba(0, 112, 243, 0.8) 80%, 
-    transparent 100%);
-  filter: drop-shadow(0 0 20px #ffffff) drop-shadow(0 0 35px #a855f7);
-  opacity: 0;
-  transform: scaleX(0.05);
-  animation: netflixFlareIgnite 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
-  pointer-events: none;
-  z-index: 3;
-}
-
-@keyframes netflixFlareIgnite {
-  0% {
-    opacity: 0;
-    transform: scaleX(0.05);
-  }
-  30% {
+  62% {
     opacity: 1;
-    transform: scaleX(0.75);
+    transform: translate3d(var(--x-end, 0px), 0, 180px) scale(2.4);
+    filter: blur(0px);
   }
-  65% {
-    opacity: 0.9;
-    transform: scaleX(1.1);
+  86% {
+    opacity: 0.75;
+    transform: translate3d(var(--x-exit, 0px), 0, 480px) scale(4.8);
+    filter: blur(6px);
   }
   100% {
     opacity: 0;
-    transform: scaleX(1.4);
+    transform: translate3d(var(--x-exit, 0px), 0, 700px) scale(6.5);
+    filter: blur(16px);
   }
 }
 
@@ -146,45 +117,45 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 4;
+  z-index: 5;
+  transform-style: preserve-3d;
 }
 
 .netflix-brand-title {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Outfit", sans-serif;
-  font-size: 38px;
+  font-size: 40px;
   font-weight: 900;
-  letter-spacing: 14px;
+  letter-spacing: 16px;
   text-transform: uppercase;
   color: #ffffff;
   margin: 0;
-  background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.6) 100%);
+  background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.65) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.45));
+  filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.6));
   opacity: 0;
-  transform: scale(0.92);
-  animation: netflixTitleIgnite 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  animation: netflixTitleBurst 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
 }
 
-@keyframes netflixTitleIgnite {
+@keyframes netflixTitleBurst {
   0% {
     opacity: 0;
-    transform: scale(0.88);
-    filter: blur(8px);
+    transform: translateZ(-250px) scale(0.65);
+    filter: blur(14px);
   }
-  35% {
+  28% {
     opacity: 1;
-    transform: scale(1.02);
+    transform: translateZ(60px) scale(1.08);
     filter: blur(0px);
   }
-  75% {
+  68% {
     opacity: 1;
-    transform: scale(1);
+    transform: translateZ(0px) scale(1);
     filter: blur(0px);
   }
   100% {
-    opacity: 0.95;
-    transform: scale(1.03);
+    opacity: 0.9;
+    transform: translateZ(90px) scale(1.1);
   }
 }
 
@@ -192,21 +163,21 @@
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 6px;
+  letter-spacing: 7px;
   text-transform: uppercase;
   color: #ff0055;
-  margin-top: 10px;
+  margin-top: 12px;
   opacity: 0;
-  animation: netflixSubIgnite 1.4s ease-out 0.45s forwards;
+  animation: netflixSubBurst 1.5s ease-out 0.3s forwards;
 }
 
-@keyframes netflixSubIgnite {
+@keyframes netflixSubBurst {
   0% {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   100% {
-    opacity: 0.85;
+    opacity: 0.9;
     transform: translateY(0);
   }
 }
