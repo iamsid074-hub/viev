@@ -422,6 +422,11 @@
           <img src="${item.poster}" alt="${item.title}" class="aura-card-img" loading="lazy" onerror="this.src='${item.posterFallback || 'song/virat_plays_avatar.png'}'">
           <div class="aura-card-badge-top">${item.badge}</div>
           <div class="aura-card-duration-bottom">${item.duration}</div>
+          <div class="aura-card-play-hover">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="6 3 20 12 6 21 6 3"></polygon>
+            </svg>
+          </div>
         </div>
         <div class="aura-card-meta">
           <h4 class="aura-card-title">${item.title}</h4>
@@ -963,7 +968,15 @@
       });
     }
 
-    // Exit Button
+    // Exit Buttons (Both Top-Right HUD button and Floating Nav button)
+    const loungeTopBackBtn = document.getElementById('lounge-top-back-btn');
+    if (loungeTopBackBtn) {
+      loungeTopBackBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeCurvedCinemaLounge();
+      });
+    }
+
     if (exitBtn) {
       exitBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -974,7 +987,7 @@
     // Lounge Stage Tap: Show / Toggle HUD
     if (loungeEl) {
       loungeEl.addEventListener('pointerdown', (e) => {
-        if (e.target.closest('.lounge-glass-hud > *') || e.target.closest('#apple-floating-dock') || e.target.closest('.cinema-floating-dock') || e.target.closest('.lounge-exit-btn') || e.target.closest('#nav-cinema-back-btn')) {
+        if (e.target.closest('.lounge-glass-hud > *') || e.target.closest('#apple-floating-dock') || e.target.closest('.cinema-floating-dock') || e.target.closest('.lounge-exit-btn') || e.target.closest('#nav-cinema-back-btn') || e.target.closest('#lounge-top-back-btn')) {
           return;
         }
         if (hudEl && hudEl.classList.contains('is-hidden')) {
