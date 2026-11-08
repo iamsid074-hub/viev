@@ -843,12 +843,12 @@
   transform: scale(0.94);
 }
 
-/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Positioned cleanly above Cinema Navbar Dock) */
+/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Firmly anchored to the bottom edge) */
 .lounge-hud-bottom-bar {
   position: absolute;
-  bottom: 74px;
-  left: 32px;
-  right: 32px;
+  bottom: 18px;
+  left: 28px;
+  right: 28px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -858,7 +858,7 @@
 
 @media (max-width: 768px) {
   .lounge-hud-bottom-bar {
-    bottom: 68px;
+    bottom: 14px;
     left: 18px;
     right: 18px;
   }
@@ -971,71 +971,77 @@
   text-align: right;
 }
 
-/* Custom Cinema Floating Liquid Glass Nav Dock (Replaces top-right cross with single 'Back to Library' action) */
-.cinema-floating-dock {
-  position: absolute;
-  bottom: calc(var(--sab, 0px) + 16px);
-  left: 50%;
-  transform: translateX(-50%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 25;
-  pointer-events: auto;
-  user-select: none;
-  animation: cinemaDockFadeIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* Cinema Mode: Main Floating Navbar replaces 4 tabs with single 'Back to Library' button in exact same position & pill */
+.apple-floating-dock.is-cinema-mode {
+  z-index: 1000000 !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateX(-50%) !important;
 }
 
-@keyframes cinemaDockFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(16px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
+.apple-floating-navbar.is-cinema-mode {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  cursor: pointer;
 }
 
-.cinema-nav-back-btn {
-  position: relative;
-  display: inline-flex;
+.apple-floating-navbar.is-cinema-mode .nav-tab-btn,
+.apple-floating-navbar.is-cinema-mode .nav-indicator-pill,
+.apple-floating-dock.is-cinema-mode .music-floating-orb {
+  display: none !important;
+}
+
+.apple-floating-navbar.is-cinema-mode .nav-cinema-back-btn {
+  display: inline-flex !important;
+}
+
+.nav-cinema-back-btn {
+  display: none;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px; /* Same 48px height as main floating navbar */
-  padding: 0 24px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  min-height: 38px;
+  padding: 8px 24px;
   border-radius: 9999px;
-  backdrop-filter: blur(36px) saturate(220%) brightness(1.1);
-  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.1);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif);
   font-size: 13.5px;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.25px;
   cursor: pointer;
   outline: none;
+  user-select: none;
   box-shadow: 
-    0 16px 40px rgba(0, 0, 0, 0.65),
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0.8px rgba(255, 255, 255, 0.1);
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, box-shadow 0.2s ease;
+    0 4px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.cinema-nav-back-btn:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.08) 100%);
-  border-color: rgba(255, 255, 255, 0.36);
-  box-shadow: 
-    0 20px 48px rgba(0, 0, 0, 0.75),
-    0 0 24px rgba(255, 255, 255, 0.22),
-    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.7);
-  transform: scale(1.04);
+.nav-cinema-back-btn svg {
+  stroke-width: 2.5;
+  transition: transform 0.2s ease;
 }
 
-.cinema-nav-back-btn:active {
-  transform: scale(0.95);
+.nav-cinema-back-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.32);
+  transform: scale(1.03);
+  color: #ffffff;
+  box-shadow: 
+    0 6px 18px rgba(0, 0, 0, 0.45),
+    inset 0 1.2px 0.5px rgba(255, 255, 255, 0.5);
+}
+
+.nav-cinema-back-btn:hover svg {
+  transform: translateX(-2px);
+}
+
+.nav-cinema-back-btn:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.24);
 }
 

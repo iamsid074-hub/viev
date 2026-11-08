@@ -418,6 +418,12 @@
     loungeEl.classList.add('is-active');
     isLoungeOpen = true;
 
+    // Switch main floating navbar into Cinema Mode (4 tabs morph into single 'Back to Library' button)
+    const floatingDock = document.getElementById('apple-floating-dock');
+    const floatingNav = document.getElementById('apple-floating-navbar');
+    if (floatingDock) floatingDock.classList.add('is-cinema-mode');
+    if (floatingNav) floatingNav.classList.add('is-cinema-mode');
+
     // Show HUD controls
     showControlsHud();
 
@@ -481,6 +487,16 @@
 
     // Smooth theatrical exit fade-out
     loungeEl.classList.add('is-closing');
+
+    // Revert main floating navbar from Cinema Mode back to standard 4 tabs
+    const floatingDock = document.getElementById('apple-floating-dock');
+    const floatingNav = document.getElementById('apple-floating-navbar');
+    if (floatingDock) floatingDock.classList.remove('is-cinema-mode');
+    if (floatingNav) floatingNav.classList.remove('is-cinema-mode');
+    if (window.syncCinemaTabVisibility) {
+      try { window.syncCinemaTabVisibility(); } catch (_) {}
+    }
+
     setTimeout(() => {
       loungeEl.classList.remove('is-active');
       loungeEl.classList.remove('is-closing');
@@ -662,7 +678,7 @@
     timelineFill = document.getElementById('lounge-timeline-fill');
     timelineDot = document.getElementById('lounge-timeline-dot');
     timeCountdown = document.getElementById('lounge-time-countdown');
-    exitBtn = document.getElementById('cinema-nav-back-btn') || document.getElementById('lounge-exit-btn');
+    exitBtn = document.getElementById('nav-cinema-back-btn') || document.getElementById('cinema-nav-back-btn') || document.getElementById('lounge-exit-btn');
     searchInput = document.getElementById('aura-search-input');
     searchClearBtn = document.getElementById('aura-search-clear-btn');
     mediaGridEl = document.getElementById('aura-media-grid');
@@ -869,7 +885,7 @@
     // Lounge Stage Tap: Show / Toggle HUD
     if (loungeEl) {
       loungeEl.addEventListener('pointerdown', (e) => {
-        if (e.target.closest('.lounge-glass-hud > *') || e.target.closest('.cinema-floating-dock') || e.target.closest('.lounge-exit-btn')) {
+        if (e.target.closest('.lounge-glass-hud > *') || e.target.closest('#apple-floating-dock') || e.target.closest('.cinema-floating-dock') || e.target.closest('.lounge-exit-btn') || e.target.closest('#nav-cinema-back-btn')) {
           return;
         }
         if (hudEl && hudEl.classList.contains('is-hidden')) {
