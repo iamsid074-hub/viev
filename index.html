@@ -657,130 +657,215 @@ Humne toh chaand se poochha tha, Husn ka matlab..
 
       <!-- 2. AURA SMART MEDIA LIBRARY (PORTRAIT MODE) -->
       <div id="exxclusive-smart-library" class="exxclusive-smart-library">
-        <!-- Header & Brand Row -->
+        <!-- Header & Brand Row with Source Switcher -->
         <header class="aura-library-header">
           <div class="aura-brand-cluster">
             <span class="aura-brand-wordmark">aura</span>
           </div>
+
+          <!-- Video Source Selector (Added Videos vs YouTube Feed) -->
+          <div class="aura-header-right-action">
+            <div class="aura-source-switcher" id="aura-source-switcher">
+              <button type="button" class="aura-source-btn" id="aura-source-toggle-btn" aria-haspopup="true" aria-expanded="false" title="Switch Video Source">
+                <span class="aura-source-btn-icon" id="aura-source-active-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 2v20M8 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path>
+                  </svg>
+                </span>
+                <span class="aura-source-btn-label" id="aura-source-active-label">Added Videos</span>
+                <svg class="aura-source-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              
+              <!-- Liquid Glass Source Dropdown Menu -->
+              <div class="aura-source-menu" id="aura-source-menu">
+                <button type="button" class="aura-source-menu-item active" data-source="library" id="source-opt-library">
+                  <div class="source-item-icon">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                      <path d="M16 2v20M8 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path>
+                    </svg>
+                  </div>
+                  <div class="source-item-meta">
+                    <span class="source-item-title">Added Videos</span>
+                    <span class="source-item-desc">Curated 4K Music Videos</span>
+                  </div>
+                  <span class="source-item-check">✓</span>
+                </button>
+
+                <button type="button" class="aura-source-menu-item" data-source="youtube" id="source-opt-youtube">
+                  <div class="source-item-icon yt-icon">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                  </div>
+                  <div class="source-item-meta">
+                    <span class="source-item-title">YouTube</span>
+                    <span class="source-item-desc">Browser Feed & Search</span>
+                  </div>
+                  <span class="source-item-check">✓</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </header>
 
-        <!-- Glass Search Pill Box -->
-        <div class="aura-search-pill-box">
-          <svg class="aura-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="aura-search-input" class="aura-search-input" placeholder="Search 4K masters, songs, artists..." autocomplete="off">
-          <button type="button" id="aura-search-clear-btn" class="aura-search-clear-btn" aria-label="Clear Search">✕</button>
+        <!-- VIEW 1: ADDED VIDEOS / CURATED 4K LIBRARY -->
+        <div id="aura-view-library" class="aura-source-view active">
+          <!-- Glass Search Pill Box -->
+          <div class="aura-search-pill-box">
+            <svg class="aura-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="aura-search-input" class="aura-search-input" placeholder="Search 4K masters, songs, artists..." autocomplete="off">
+            <button type="button" id="aura-search-clear-btn" class="aura-search-clear-btn" aria-label="Clear Search">✕</button>
+          </div>
+
+          <!-- Filter Chips Horizontal Bar -->
+          <div class="aura-filters-scroll" role="tablist">
+            <button type="button" class="aura-filter-chip active" data-filter="all">All</button>
+            <button type="button" class="aura-filter-chip" data-filter="4k">4K Master</button>
+            <button type="button" class="aura-filter-chip" data-filter="dolby">Dolby 3D</button>
+            <button type="button" class="aura-filter-chip" data-filter="romantic">Romantic</button>
+            <button type="button" class="aura-filter-chip" data-filter="atmospheric">Atmospheric</button>
+            <button type="button" class="aura-filter-chip" data-filter="trending">Trending</button>
+          </div>
+
+          <!-- Dynamic Media Cards Grid -->
+          <div class="aura-media-grid" id="aura-media-grid">
+            <div class="aura-media-card" data-media-id="chhod-diya" role="button" tabindex="0">
+              <div class="aura-card-thumb-wrap">
+                <img src="https://img.youtube.com/vi/7DzWXIE4Pj0/maxresdefault.jpg" alt="Chhod Diya" class="aura-card-img" onerror="this.src='song/Chhod Diya.jpg'">
+                <div class="aura-card-badge-top">4K UHD</div>
+                <div class="aura-card-duration-bottom">4:12</div>
+                <div class="aura-card-play-hover">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </div>
+              </div>
+              <div class="aura-card-meta">
+                <h4 class="aura-card-title">Chhod Diya • Kanika Kapoor & Arijit Singh</h4>
+                <span class="aura-card-sub">Baazaar • 4K Remastered Dolby Atmos</span>
+              </div>
+            </div>
+            <div class="aura-media-card" data-media-id="kesariya" role="button" tabindex="0">
+              <div class="aura-card-thumb-wrap">
+                <img src="song/Kesariya.jpg" alt="Kesariya" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
+                <div class="aura-card-badge-top">4K MASTER</div>
+                <div class="aura-card-duration-bottom">4:28</div>
+                <div class="aura-card-play-hover">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </div>
+              </div>
+              <div class="aura-card-meta">
+                <h4 class="aura-card-title">Kesariya • Arijit Singh</h4>
+                <span class="aura-card-sub">Brahmāstra • 4K HDR TrueColor</span>
+              </div>
+            </div>
+            <div class="aura-media-card" data-media-id="sawan-aaya-hai" role="button" tabindex="0">
+              <div class="aura-card-thumb-wrap">
+                <img src="song/Sawan Aaya Hai.jpg" alt="Sawan Aaya Hai" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
+                <div class="aura-card-badge-top">DOLBY 3D</div>
+                <div class="aura-card-duration-bottom">4:45</div>
+                <div class="aura-card-play-hover">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </div>
+              </div>
+              <div class="aura-card-meta">
+                <h4 class="aura-card-title">Sawan Aaya Hai • Creature 3D</h4>
+                <span class="aura-card-sub">Arijit Singh • Dolby Cinema 3D Binaural</span>
+              </div>
+            </div>
+            <div class="aura-media-card" data-media-id="sooiyan" role="button" tabindex="0">
+              <div class="aura-card-thumb-wrap">
+                <img src="song/Sooiyan.jpg" alt="Sooiyan" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
+                <div class="aura-card-badge-top">1080P</div>
+                <div class="aura-card-duration-bottom">3:58</div>
+                <div class="aura-card-play-hover">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </div>
+              </div>
+              <div class="aura-card-meta">
+                <h4 class="aura-card-title">Sooiyan • Guddu Rangeela</h4>
+                <span class="aura-card-sub">Arijit Singh & Chinmayi • Acoustic Spatial</span>
+              </div>
+            </div>
+            <div class="aura-media-card" data-media-id="yaad-hai-na" role="button" tabindex="0">
+              <div class="aura-card-thumb-wrap">
+                <img src="song/Yaad Hai Na.jpg" alt="Yaad Hai Na" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
+                <div class="aura-card-badge-top">4K UHD</div>
+                <div class="aura-card-duration-bottom">4:03</div>
+                <div class="aura-card-play-hover">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </div>
+              </div>
+              <div class="aura-card-meta">
+                <h4 class="aura-card-title">Yaad Hai Na • Raaz Reboot</h4>
+                <span class="aura-card-sub">Arijit Singh • 4K Ultra Wide Soundscape</span>
+              </div>
+            </div>
+            <div class="aura-media-card" data-media-id="ek-dil-ek-jaan" role="button" tabindex="0">
+              <div class="aura-card-thumb-wrap">
+                <img src="song/Screenshot 2026-10-24 224316.png" alt="Ek Dil Ek Jaan" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
+                <div class="aura-card-badge-top">4K MASTER</div>
+                <div class="aura-card-duration-bottom">5:10</div>
+                <div class="aura-card-play-hover">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                  </svg>
+                </div>
+              </div>
+              <div class="aura-card-meta">
+                <h4 class="aura-card-title">Ek Dil Ek Jaan • Padmaavat</h4>
+                <span class="aura-card-sub">Deepika Padukone & Shahid Kapoor • Epic Cinema</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Filter Chips Horizontal Bar -->
-        <div class="aura-filters-scroll" role="tablist">
-          <button type="button" class="aura-filter-chip active" data-filter="all">All</button>
-          <button type="button" class="aura-filter-chip" data-filter="4k">4K Master</button>
-          <button type="button" class="aura-filter-chip" data-filter="dolby">Dolby 3D</button>
-          <button type="button" class="aura-filter-chip" data-filter="romantic">Romantic</button>
-          <button type="button" class="aura-filter-chip" data-filter="atmospheric">Atmospheric</button>
-          <button type="button" class="aura-filter-chip" data-filter="trending">Trending</button>
-        </div>
+        <!-- VIEW 2: YOUTUBE BROWSER-BASED INFINITE FEED -->
+        <div id="aura-view-youtube" class="aura-source-view" style="display: none;">
+          <!-- YouTube Glass Search Pill Box -->
+          <div class="aura-search-pill-box yt-search-pill-box">
+            <svg class="aura-search-icon yt-red-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="aura-yt-search-input" class="aura-search-input" placeholder="Search YouTube or paste video link..." autocomplete="off">
+            <button type="button" id="aura-yt-search-clear-btn" class="aura-search-clear-btn" aria-label="Clear Search">✕</button>
+          </div>
 
-        <!-- Dynamic Media Cards Grid -->
-        <div class="aura-media-grid" id="aura-media-grid">
-          <div class="aura-media-card" data-media-id="chhod-diya" role="button" tabindex="0">
-            <div class="aura-card-thumb-wrap">
-              <img src="https://img.youtube.com/vi/7DzWXIE4Pj0/maxresdefault.jpg" alt="Chhod Diya" class="aura-card-img" onerror="this.src='song/Chhod Diya.jpg'">
-              <div class="aura-card-badge-top">4K UHD</div>
-              <div class="aura-card-duration-bottom">4:12</div>
-              <div class="aura-card-play-hover">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                </svg>
-              </div>
-            </div>
-            <div class="aura-card-meta">
-              <h4 class="aura-card-title">Chhod Diya • Kanika Kapoor & Arijit Singh</h4>
-              <span class="aura-card-sub">Baazaar • 4K Remastered Dolby Atmos</span>
-            </div>
+          <!-- YouTube Quick Topic Chips -->
+          <div class="aura-filters-scroll yt-filters-scroll" role="tablist" id="aura-yt-chips">
+            <button type="button" class="aura-filter-chip yt-chip active" data-query="all">All</button>
+            <button type="button" class="aura-filter-chip yt-chip" data-query="trending music hindi">Songs</button>
+            <button type="button" class="aura-filter-chip yt-chip" data-query="Samay Raina Indias Got Latent">India's Got Latent</button>
+            <button type="button" class="aura-filter-chip yt-chip" data-query="Arijit Singh latest songs">Arijit Singh</button>
+            <button type="button" class="aura-filter-chip yt-chip" data-query="Yo Yo Honey Singh">Honey Singh</button>
+            <button type="button" class="aura-filter-chip yt-chip" data-query="trending india">Trending</button>
           </div>
-          <div class="aura-media-card" data-media-id="kesariya" role="button" tabindex="0">
-            <div class="aura-card-thumb-wrap">
-              <img src="song/Kesariya.jpg" alt="Kesariya" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-              <div class="aura-card-badge-top">4K MASTER</div>
-              <div class="aura-card-duration-bottom">4:28</div>
-              <div class="aura-card-play-hover">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                </svg>
-              </div>
-            </div>
-            <div class="aura-card-meta">
-              <h4 class="aura-card-title">Kesariya • Arijit Singh</h4>
-              <span class="aura-card-sub">Brahmāstra • 4K HDR TrueColor</span>
-            </div>
+
+          <!-- YouTube Infinite Feed Grid -->
+          <div class="aura-media-grid aura-yt-feed-grid" id="aura-yt-feed-grid">
+            <!-- Real YouTube videos rendered dynamically -->
           </div>
-          <div class="aura-media-card" data-media-id="sawan-aaya-hai" role="button" tabindex="0">
-            <div class="aura-card-thumb-wrap">
-              <img src="song/Sawan Aaya Hai.jpg" alt="Sawan Aaya Hai" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-              <div class="aura-card-badge-top">DOLBY 3D</div>
-              <div class="aura-card-duration-bottom">4:45</div>
-              <div class="aura-card-play-hover">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                </svg>
-              </div>
-            </div>
-            <div class="aura-card-meta">
-              <h4 class="aura-card-title">Sawan Aaya Hai • Creature 3D</h4>
-              <span class="aura-card-sub">Arijit Singh • Dolby Cinema 3D Binaural</span>
-            </div>
-          </div>
-          <div class="aura-media-card" data-media-id="sooiyan" role="button" tabindex="0">
-            <div class="aura-card-thumb-wrap">
-              <img src="song/Sooiyan.jpg" alt="Sooiyan" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-              <div class="aura-card-badge-top">1080P</div>
-              <div class="aura-card-duration-bottom">3:58</div>
-              <div class="aura-card-play-hover">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                </svg>
-              </div>
-            </div>
-            <div class="aura-card-meta">
-              <h4 class="aura-card-title">Sooiyan • Guddu Rangeela</h4>
-              <span class="aura-card-sub">Arijit Singh & Chinmayi • Acoustic Spatial</span>
-            </div>
-          </div>
-          <div class="aura-media-card" data-media-id="yaad-hai-na" role="button" tabindex="0">
-            <div class="aura-card-thumb-wrap">
-              <img src="song/Yaad Hai Na.jpg" alt="Yaad Hai Na" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-              <div class="aura-card-badge-top">4K UHD</div>
-              <div class="aura-card-duration-bottom">4:03</div>
-              <div class="aura-card-play-hover">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                </svg>
-              </div>
-            </div>
-            <div class="aura-card-meta">
-              <h4 class="aura-card-title">Yaad Hai Na • Raaz Reboot</h4>
-              <span class="aura-card-sub">Arijit Singh • 4K Ultra Wide Soundscape</span>
-            </div>
-          </div>
-          <div class="aura-media-card" data-media-id="ek-dil-ek-jaan" role="button" tabindex="0">
-            <div class="aura-card-thumb-wrap">
-              <img src="song/Screenshot 2026-10-24 224316.png" alt="Ek Dil Ek Jaan" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-              <div class="aura-card-badge-top">4K MASTER</div>
-              <div class="aura-card-duration-bottom">5:10</div>
-              <div class="aura-card-play-hover">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                </svg>
-              </div>
-            </div>
-            <div class="aura-card-meta">
-              <h4 class="aura-card-title">Ek Dil Ek Jaan • Padmaavat</h4>
-              <span class="aura-card-sub">Deepika Padukone & Shahid Kapoor • Epic Cinema</span>
-            </div>
+
+          <!-- Infinite scroll loader -->
+          <div class="aura-yt-loader" id="aura-yt-loader" style="display: none;">
+            <div class="aura-yt-spinner"></div>
+            <span>Loading more videos...</span>
           </div>
         </div>
       </div>
@@ -812,6 +897,14 @@ Humne toh chaand se poochha tha, Husn ka matlab..
                 <video class="lounge-video-player" id="lounge-video-player" playsinline preload="auto" crossorigin="anonymous">
                   <source src="video/exxclusive.mp4" type="video/mp4">
                 </video>
+                <!-- Real YouTube Video Player Iframe (With no-referrer for seamless global playback) -->
+                <iframe class="lounge-youtube-player" id="lounge-youtube-player"
+                  title="Cinema YouTube Player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen
+                  referrerpolicy="no-referrer"
+                  style="display: none;">
+                </iframe>
               </div>
             </div>
           </div>

@@ -172,6 +172,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
+  position: relative;
+  z-index: 50;
 }
 
 .aura-brand-cluster {
@@ -188,6 +190,234 @@
   background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Header Right Source Switcher */
+.aura-header-right-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aura-source-switcher {
+  position: relative;
+  user-select: none;
+}
+
+.aura-source-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
+}
+
+.aura-source-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: scale(1.03);
+}
+
+.aura-source-btn:active {
+  transform: scale(0.97);
+}
+
+.aura-source-btn-icon {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+}
+
+.aura-source-btn-icon.is-yt {
+  color: #ff3b30;
+}
+
+.aura-source-chevron {
+  opacity: 0.6;
+  transition: transform 0.22s ease;
+}
+
+.aura-source-switcher.is-open .aura-source-chevron {
+  transform: rotate(180deg);
+}
+
+/* Liquid Glass Popover Menu */
+.aura-source-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgba(22, 22, 26, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px) scale(0.96);
+  transform-origin: top right;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.aura-source-switcher.is-open .aura-source-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.aura-source-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  outline: none;
+  text-align: left;
+  transition: background 0.15s ease, transform 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.aura-source-menu-item:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.aura-source-menu-item.active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.source-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.source-item-icon.yt-icon {
+  color: #ff3b30;
+  background: rgba(255, 59, 48, 0.15);
+}
+
+.source-item-meta {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.source-item-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.source-item-desc {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.source-item-check {
+  font-size: 13px;
+  font-weight: 700;
+  color: #34c759;
+  opacity: 0;
+  margin-left: 4px;
+}
+
+.aura-source-menu-item.active .source-item-check {
+  opacity: 1;
+}
+
+/* Source View Containers */
+.aura-source-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.aura-source-view.active {
+  display: flex;
+  animation: auraViewFadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes auraViewFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.yt-red-icon {
+  color: #ff3b30 !important;
+}
+
+.aura-card-badge-top.yt-badge {
+  background: rgba(255, 0, 0, 0.85);
+  border-color: rgba(255, 255, 255, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.aura-card-badge-top.yt-badge::before {
+  display: none;
+}
+
+/* YouTube Infinite Feed Loader */
+.aura-yt-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 0 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.aura-yt-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #ff3b30;
+  border-radius: 50%;
+  animation: auraYtSpin 0.7s linear infinite;
+}
+
+@keyframes auraYtSpin {
+  to { transform: rotate(360deg); }
 }
 
 /* Glass Search Bar */
@@ -726,6 +956,21 @@
   display: block;
   background: #000000;
   transform: scale(1.015);
+}
+
+/* YouTube IFrame Player: Conforming directly to 3D curved concave screen */
+.lounge-youtube-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border: none;
+  background: #000000;
+  transform: scale(1.015);
+  clip-path: url(#loungeCurvedClip);
+  -webkit-clip-path: url(#loungeCurvedClip);
+  z-index: 4;
 }
 
 /* Polished Floor & Coffee Table Live Mirror Reflection */

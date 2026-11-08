@@ -107,6 +107,15 @@
   let cinemaBootTimer = null;
   let audioFadeTimer = null;
 
+  // Video Source & YouTube State
+  let currentSource = 'library'; // 'library' | 'youtube'
+  let ytFeedVideos = [];
+  let ytPage = 1;
+  let ytIsLoading = false;
+  let currentYtQuery = 'all';
+  let isYtPlaying = false;
+  let ytDebounceTimer = null;
+
   // DOM Elements
   let introEl = null;
   let libraryEl = null;
@@ -447,10 +456,213 @@
     });
   }
 
+  // --- YOUTUBE BROWSER-BASED INFINITE FEED & SOURCE SWITCHER ---
+  function extractYouTubeId(url) {
+    if (!url) return null;
+    url = url.trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
+    const m1 = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+    if (m1) return m1[1];
+    const m2 = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    if (m2) return m2[1];
+    const m3 = url.match(/\/(embed|shorts)\/([a-zA-Z0-9_-]{11})/);
+    if (m3) return m3[2];
+    return null;
+  }
+
+  function getFallbackVideos() {
+    if (window.VIRAT_YOUTUBE_FEED && Array.isArray(window.VIRAT_YOUTUBE_FEED) && window.VIRAT_YOUTUBE_FEED.length > 0) {
+      return window.VIRAT_YOUTUBE_FEED;
+    }
+    return [
+      { id: 'c64I9HNpiOY', title: 'Ek Dil Ek Jaan • Padmaavat (Deepika Padukone, Shahid Kapoor)', channel: 'T-Series', views: '112M views', duration: '5:10', thumb: 'https://i.ytimg.com/vi/c64I9HNpiOY/hqdefault.jpg' },
+      { id: 'BddP6PYo2gs', title: 'Kesariya • Brahmāstra (Arijit Singh, Ranbir Kapoor)', channel: 'Sony Music India', views: '640M views', duration: '4:28', thumb: 'https://i.ytimg.com/vi/BddP6PYo2gs/hqdefault.jpg' },
+      { id: 'E_SbwSe15y0', title: 'Ve Haaniyaan • Ravi Dubey & Sargun Mehta', channel: 'Dreamiyata Music', views: '396M views', duration: '4:05', thumb: 'https://i.ytimg.com/vi/E_SbwSe15y0/hqdefault.jpg' },
+      { id: 'Z4aMdO8K0XE', title: "India's Got Latent Episode 8 • Samay Raina & MC Stan", channel: 'Samay Raina', views: '48M views', duration: '42:15', thumb: 'https://i.ytimg.com/vi/Z4aMdO8K0XE/hqdefault.jpg' },
+      { id: 'GsOBaZh6cZo', title: 'So Swaezy • Yo Yo Honey Singh & Hommie Dilliwala', channel: 'Yo Yo Honey Singh', views: '26M views', duration: '3:45', thumb: 'https://i.ytimg.com/vi/GsOBaZh6cZo/hqdefault.jpg' },
+      { id: '7DzWXIE4Pj0', title: 'Chhod Diya • Kanika Kapoor & Arijit Singh', channel: 'Zee Music Company', views: '185M views', duration: '4:12', thumb: 'https://i.ytimg.com/vi/7DzWXIE4Pj0/hqdefault.jpg' }
+    ];
+  }
+
+  async function loadYouTubeFeed(query = 'all', append = false) {
+    if (ytIsLoading) return;
+    ytIsLoading = true;
+    currentYtQuery = query;
+
+    const loaderEl = document.getElementById('aura-yt-loader');
+
+    if (!append) {
+      ytPage = 1;
+      if (loaderEl) loaderEl.style.display = 'none';
+
+      // 0ms instant display from memory/catalog
+      const initialPool = getFallbackVideos();
+      const filtered = query === 'all' ? initialPool : initialPool.filter(v => 
+        (v.title + ' ' + (v.channel || '')).toLowerCase().includes(query.toLowerCase())
+      );
+      ytFeedVideos = filtered.length > 0 ? filtered.slice(0, 16) : initialPool.slice(0, 16);
+      renderYouTubeGrid();
+    } else {
+      if (loaderEl) loaderEl.style.display = 'flex';
+    }
+
+    // Live search / feed fetch
+    try {
+      const qParam = query === 'all' ? 'trending music hindi' : query;
+      const apiUrl = `/api/youtube/search?q=${encodeURIComponent(qParam)}&page=${ytPage}`;
+      const res = await fetch(apiUrl);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.videos && data.videos.length > 0) {
+          const newVids = data.videos.map(v => ({
+            id: v.id,
+            title: v.title || 'YouTube Video',
+            channel: v.channel || 'YouTube',
+            views: v.views || '',
+            duration: v.duration || 'HD',
+            thumb: v.thumb || `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`
+          }));
+
+          if (append) {
+            const existingIds = new Set(ytFeedVideos.map(v => v.id));
+            const unique = newVids.filter(v => !existingIds.has(v.id));
+            ytFeedVideos.push(...unique);
+          } else {
+            ytFeedVideos = newVids;
+          }
+          renderYouTubeGrid();
+        }
+      }
+    } catch (_) {
+      // Offline fallback: paginate local pool
+      if (append) {
+        const pool = getFallbackVideos();
+        const start = ((ytPage - 1) * 8) % pool.length;
+        const slice = pool.slice(start, start + 8);
+        if (slice.length > 0) {
+          ytFeedVideos.push(...slice);
+          renderYouTubeGrid();
+        }
+      }
+    } finally {
+      ytIsLoading = false;
+      if (loaderEl) loaderEl.style.display = 'none';
+    }
+  }
+
+  function renderYouTubeGrid() {
+    const ytGridEl = document.getElementById('aura-yt-feed-grid');
+    if (!ytGridEl) return;
+
+    if (ytFeedVideos.length === 0) {
+      ytGridEl.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 48px 16px; text-align: center; color: rgba(255,255,255,0.4);">
+          <div style="font-size: 32px; margin-bottom: 8px;">🎬</div>
+          <div style="font-size: 15px; font-weight: 600; color: #fff;">No YouTube videos found</div>
+          <div style="font-size: 12px; margin-top: 4px;">Try searching another keyword or song.</div>
+        </div>
+      `;
+      return;
+    }
+
+    ytGridEl.innerHTML = ytFeedVideos.map(vid => `
+      <div class="aura-media-card aura-yt-card" data-video-id="${vid.id}" role="button" tabindex="0">
+        <div class="aura-card-thumb-wrap">
+          <img src="${vid.thumb || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`}" alt="${vid.title}" class="aura-card-img" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg'">
+          <div class="aura-card-badge-top yt-badge">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            <span>YOUTUBE</span>
+          </div>
+          <div class="aura-card-duration-bottom">${vid.duration || 'HD'}</div>
+          <div class="aura-card-play-hover">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="6 3 20 12 6 21 6 3"></polygon>
+            </svg>
+          </div>
+        </div>
+        <div class="aura-card-meta">
+          <h4 class="aura-card-title">${vid.title}</h4>
+          <span class="aura-card-sub">${vid.channel || 'YouTube'}${vid.views ? ' • ' + vid.views : ''}</span>
+        </div>
+      </div>
+    `).join('');
+
+    // Attach click listeners to cards
+    ytGridEl.querySelectorAll('.aura-yt-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const id = card.getAttribute('data-video-id');
+        const vid = ytFeedVideos.find(v => v.id === id);
+        if (vid) {
+          openCurvedCinemaLounge({
+            id: 'yt-' + vid.id,
+            youtubeId: vid.id,
+            type: 'youtube',
+            title: vid.title,
+            sub: (vid.channel || 'YouTube') + (vid.views ? ' • ' + vid.views : ''),
+            poster: vid.thumb || `https://i.ytimg.com/vi/${vid.id}/hqdefault.jpg`,
+            duration: vid.duration || 'HD'
+          });
+        }
+      });
+    });
+  }
+
+  function setVideoSource(source) {
+    currentSource = source;
+    const sourceSwitcherEl = document.getElementById('aura-source-switcher');
+    const sourceActiveLabel = document.getElementById('aura-source-active-label');
+    const sourceActiveIcon = document.getElementById('aura-source-active-icon');
+    const sourceOptLibrary = document.getElementById('source-opt-library');
+    const sourceOptYoutube = document.getElementById('source-opt-youtube');
+    const viewLibraryEl = document.getElementById('aura-view-library');
+    const viewYoutubeEl = document.getElementById('aura-view-youtube');
+
+    if (sourceSwitcherEl) sourceSwitcherEl.classList.remove('is-open');
+
+    if (source === 'youtube') {
+      if (sourceActiveLabel) sourceActiveLabel.textContent = 'YouTube';
+      if (sourceActiveIcon) {
+        sourceActiveIcon.className = 'aura-source-btn-icon is-yt';
+        sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
+      }
+      if (sourceOptLibrary) sourceOptLibrary.classList.remove('active');
+      if (sourceOptYoutube) sourceOptYoutube.classList.add('active');
+
+      if (viewLibraryEl) viewLibraryEl.style.display = 'none';
+      if (viewYoutubeEl) {
+        viewYoutubeEl.style.display = 'flex';
+        viewYoutubeEl.classList.add('active');
+      }
+
+      if (ytFeedVideos.length === 0) {
+        loadYouTubeFeed('all');
+      }
+    } else {
+      if (sourceActiveLabel) sourceActiveLabel.textContent = 'Added Videos';
+      if (sourceActiveIcon) {
+        sourceActiveIcon.className = 'aura-source-btn-icon';
+        sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 2v20M8 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path></svg>`;
+      }
+      if (sourceOptLibrary) sourceOptLibrary.classList.add('active');
+      if (sourceOptYoutube) sourceOptYoutube.classList.remove('active');
+
+      if (viewYoutubeEl) {
+        viewYoutubeEl.style.display = 'none';
+        viewYoutubeEl.classList.remove('active');
+      }
+      if (viewLibraryEl) {
+        viewLibraryEl.style.display = 'flex';
+        viewLibraryEl.classList.add('active');
+      }
+    }
+  }
+
   // --- 4. LUXURY AIRBNB CURVED CHARCOAL HOME CINEMA LOUNGE ---
   function openCurvedCinemaLounge(media) {
-    if (!loungeEl || !videoEl) return;
+    if (!loungeEl) return;
     currentMedia = media || currentMedia;
+    const ytPlayer = document.getElementById('lounge-youtube-player');
+    const isYouTube = currentMedia && (currentMedia.type === 'youtube' || !!currentMedia.youtubeId);
 
     // Clear any previous transition timers
     if (cinemaBootTimer) {
@@ -461,18 +673,6 @@
       clearInterval(audioFadeTimer);
       audioFadeTimer = null;
     }
-
-    // Set video source
-    if (videoEl.src !== media.src && !videoEl.src.endsWith(media.src)) {
-      videoEl.src = media.src;
-    }
-
-    // Prepare cinema dark state for dramatic 1.4s fade-in sequence
-    videoEl.currentTime = 0;
-    videoEl.volume = 0;
-    videoEl.style.opacity = '0';
-    videoEl.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
-    updatePlayPauseButton(false);
 
     // Show lounge environment with opening fade animation
     loungeEl.classList.remove('is-closing');
@@ -491,50 +691,87 @@
     // Show HUD controls
     showControlsHud();
 
-    // Start 1.4 second cinematic wait, then smoothly fade in video & audio
-    cinemaBootTimer = setTimeout(() => {
-      if (!isLoungeOpen) return;
-
-      const playPromise = videoEl.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          setupDolbyAudioDSP();
-          updatePlayPauseButton(true);
-
-          // Smooth visual fade-in
-          videoEl.style.opacity = '1';
-
-          // Smooth acoustic fade-in from 0 to target volume over 1.2s
-          const targetVol = volumeSlider ? parseFloat(volumeSlider.value) : 0.9;
-          let currentVol = 0;
-          const fadeSteps = 24;
-          const stepInterval = 1200 / fadeSteps; // ~50ms
-          const volStep = targetVol / fadeSteps;
-
-          if (audioFadeTimer) clearInterval(audioFadeTimer);
-          audioFadeTimer = setInterval(() => {
-            if (!isLoungeOpen || !videoEl) {
-              clearInterval(audioFadeTimer);
-              return;
-            }
-            currentVol = Math.min(targetVol, currentVol + volStep);
-            videoEl.volume = currentVol;
-            if (currentVol >= targetVol) {
-              clearInterval(audioFadeTimer);
-              audioFadeTimer = null;
-            }
-          }, stepInterval);
-        }).catch(err => {
-          console.log('[Exxclusive 3.0] Autoplay prevented, waiting for tap:', err);
-          updatePlayPauseButton(false);
-          videoEl.style.opacity = '1';
-          if (volumeSlider) videoEl.volume = parseFloat(volumeSlider.value);
-        });
+    if (isYouTube) {
+      // YOUTUBE MODE: Play in curved concave iframe with no-referrer
+      if (videoEl) {
+        try { videoEl.pause(); } catch (_) {}
+        videoEl.style.display = 'none';
       }
+      if (ytPlayer) {
+        ytPlayer.style.display = 'block';
+        const ytId = currentMedia.youtubeId || extractYouTubeId(currentMedia.src);
+        ytPlayer.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3`;
+      }
+      isYtPlaying = true;
+      updatePlayPauseButton(true);
 
-      // Start Ambilight & Floor Reflection Canvas Loop
-      startLoungeRenderLoop();
-    }, 1400);
+      if (currentMedia.poster) {
+        renderStaticPosterToAmbient(currentMedia.poster);
+      }
+    } else {
+      // DIRECT MP4 4K MASTER MODE
+      if (ytPlayer) {
+        ytPlayer.src = '';
+        ytPlayer.style.display = 'none';
+      }
+      if (videoEl) {
+        videoEl.style.display = 'block';
+        if (videoEl.src !== media.src && !videoEl.src.endsWith(media.src)) {
+          videoEl.src = media.src;
+        }
+
+        // Prepare cinema dark state for dramatic 1.4s fade-in sequence
+        videoEl.currentTime = 0;
+        videoEl.volume = 0;
+        videoEl.style.opacity = '0';
+        videoEl.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
+        updatePlayPauseButton(false);
+
+        cinemaBootTimer = setTimeout(() => {
+          if (!isLoungeOpen) return;
+
+          const playPromise = videoEl.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              setupDolbyAudioDSP();
+              updatePlayPauseButton(true);
+
+              // Smooth visual fade-in
+              videoEl.style.opacity = '1';
+
+              // Smooth acoustic fade-in from 0 to target volume over 1.2s
+              const targetVol = volumeSlider ? parseFloat(volumeSlider.value) : 0.9;
+              let currentVol = 0;
+              const fadeSteps = 24;
+              const stepInterval = 1200 / fadeSteps; // ~50ms
+              const volStep = targetVol / fadeSteps;
+
+              if (audioFadeTimer) clearInterval(audioFadeTimer);
+              audioFadeTimer = setInterval(() => {
+                if (!isLoungeOpen || !videoEl) {
+                  clearInterval(audioFadeTimer);
+                  return;
+                }
+                currentVol = Math.min(targetVol, currentVol + volStep);
+                videoEl.volume = currentVol;
+                if (currentVol >= targetVol) {
+                  clearInterval(audioFadeTimer);
+                  audioFadeTimer = null;
+                }
+              }, stepInterval);
+            }).catch(err => {
+              console.log('[Exxclusive 3.0] Autoplay prevented, waiting for tap:', err);
+              updatePlayPauseButton(false);
+              videoEl.style.opacity = '1';
+              if (volumeSlider) videoEl.volume = parseFloat(volumeSlider.value);
+            });
+          }
+
+          // Start Ambilight & Floor Reflection Canvas Loop
+          startLoungeRenderLoop();
+        }, 1400);
+      }
+    }
   }
 
   function closeCurvedCinemaLounge() {
@@ -559,7 +796,14 @@
       renderRafId = null;
     }
 
-    // 2. Immediately pause video
+    // 2. Immediately stop both video and YouTube iframe
+    const ytPlayer = document.getElementById('lounge-youtube-player');
+    if (ytPlayer) {
+      ytPlayer.src = '';
+      ytPlayer.style.display = 'none';
+    }
+    isYtPlaying = false;
+
     if (videoEl) {
       try {
         videoEl.pause();
@@ -599,6 +843,29 @@
     }, 280);
   }
 
+  function renderStaticPosterToAmbient(url) {
+    if (!ambilightCanvas) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        if (!ambilightCtx) ambilightCtx = ambilightCanvas.getContext('2d', { willReadFrequently: true });
+        if (ambilightCtx) ambilightCtx.drawImage(img, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
+        ambilightCanvas.classList.add('is-active');
+
+        if (!floorCtx && floorCanvas) floorCtx = floorCanvas.getContext('2d');
+        if (floorCtx && floorCanvas) {
+          floorCtx.save();
+          floorCtx.translate(0, floorCanvas.height);
+          floorCtx.scale(1, -1);
+          floorCtx.drawImage(img, 0, 0, floorCanvas.width, floorCanvas.height);
+          floorCtx.restore();
+        }
+      } catch (_) {}
+    };
+    img.src = url;
+  }
+
   function updatePlayPauseButton(isPlaying) {
     if (!centerPlayBtn) return;
     if (isPlaying) {
@@ -618,6 +885,15 @@
   }
 
   function togglePlayPause() {
+    const ytPlayer = document.getElementById('lounge-youtube-player');
+    const isYouTube = currentMedia && (currentMedia.type === 'youtube' || !!currentMedia.youtubeId);
+    if (isYouTube && ytPlayer && ytPlayer.contentWindow) {
+      isYtPlaying = !isYtPlaying;
+      const cmd = isYtPlaying ? 'playVideo' : 'pauseVideo';
+      ytPlayer.contentWindow.postMessage(JSON.stringify({ event: 'command', func: cmd, args: [] }), '*');
+      updatePlayPauseButton(isYtPlaying);
+      return;
+    }
     if (!videoEl) return;
     if (videoEl.paused) {
       setupDolbyAudioDSP();
@@ -832,6 +1108,128 @@
       });
     });
 
+    // Video Source Switcher (Added Videos vs YouTube)
+    const sourceSwitcherEl = document.getElementById('aura-source-switcher');
+    const sourceToggleBtn = document.getElementById('aura-source-toggle-btn');
+    const sourceOptLibrary = document.getElementById('source-opt-library');
+    const sourceOptYoutube = document.getElementById('source-opt-youtube');
+
+    if (sourceToggleBtn && sourceSwitcherEl) {
+      sourceToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sourceSwitcherEl.classList.toggle('is-open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (sourceSwitcherEl && !sourceSwitcherEl.contains(e.target)) {
+          sourceSwitcherEl.classList.remove('is-open');
+        }
+      });
+    }
+
+    if (sourceOptLibrary) {
+      sourceOptLibrary.addEventListener('click', () => {
+        setVideoSource('library');
+      });
+    }
+
+    if (sourceOptYoutube) {
+      sourceOptYoutube.addEventListener('click', () => {
+        setVideoSource('youtube');
+      });
+    }
+
+    // YouTube Search & Category Chips
+    const ytSearchInput = document.getElementById('aura-yt-search-input');
+    const ytSearchClearBtn = document.getElementById('aura-yt-search-clear-btn');
+    const ytChips = Array.from(document.querySelectorAll('#aura-yt-chips .yt-chip'));
+
+    if (ytSearchInput) {
+      ytSearchInput.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (ytSearchClearBtn) {
+          ytSearchClearBtn.style.display = val.length > 0 ? 'block' : 'none';
+        }
+
+        // Direct YouTube link pasted? Play immediately in cinema lounge!
+        const pastedId = extractYouTubeId(val);
+        if (pastedId) {
+          openCurvedCinemaLounge({
+            id: 'yt-' + pastedId,
+            youtubeId: pastedId,
+            type: 'youtube',
+            title: 'YouTube Stream',
+            sub: 'Direct Playback',
+            poster: `https://i.ytimg.com/vi/${pastedId}/hqdefault.jpg`,
+            duration: 'Live / HD'
+          });
+          return;
+        }
+
+        if (ytDebounceTimer) clearTimeout(ytDebounceTimer);
+        ytDebounceTimer = setTimeout(() => {
+          ytPage = 1;
+          loadYouTubeFeed(val || 'all');
+        }, 300);
+      });
+
+      ytSearchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const val = ytSearchInput.value.trim();
+          const pastedId = extractYouTubeId(val);
+          if (pastedId) {
+            openCurvedCinemaLounge({
+              id: 'yt-' + pastedId,
+              youtubeId: pastedId,
+              type: 'youtube',
+              title: 'YouTube Stream',
+              sub: 'Direct Playback',
+              poster: `https://i.ytimg.com/vi/${pastedId}/hqdefault.jpg`,
+              duration: 'Live / HD'
+            });
+          } else {
+            ytPage = 1;
+            loadYouTubeFeed(val || 'all');
+          }
+        }
+      });
+    }
+
+    if (ytSearchClearBtn) {
+      ytSearchClearBtn.addEventListener('click', () => {
+        if (ytSearchInput) ytSearchInput.value = '';
+        ytSearchClearBtn.style.display = 'none';
+        ytPage = 1;
+        loadYouTubeFeed('all');
+      });
+    }
+
+    ytChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        ytChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const q = chip.getAttribute('data-query') || 'all';
+        ytPage = 1;
+        if (ytSearchInput) {
+          ytSearchInput.value = '';
+          if (ytSearchClearBtn) ytSearchClearBtn.style.display = 'none';
+        }
+        loadYouTubeFeed(q);
+      });
+    });
+
+    // YouTube Infinite Scroll on Library container
+    if (libraryEl) {
+      libraryEl.addEventListener('scroll', () => {
+        if (currentSource !== 'youtube' || ytIsLoading) return;
+        if (libraryEl.scrollTop + libraryEl.clientHeight >= libraryEl.scrollHeight - 350) {
+          ytPage++;
+          loadYouTubeFeed(currentYtQuery, true);
+        }
+      });
+    }
+
     // Lounge Controls
     if (centerPlayBtn) {
       centerPlayBtn.addEventListener('click', (e) => {
@@ -1007,7 +1405,13 @@
   // Tab switch hook: trigger signature intro on first visit
   let hasVisitedCinema = false;
   window.onExxclusiveTabActivated = function () {
-    renderMediaGrid();
+    if (currentSource === 'youtube') {
+      if (ytFeedVideos.length === 0) {
+        loadYouTubeFeed(currentYtQuery || 'all');
+      }
+    } else {
+      renderMediaGrid();
+    }
     if (!hasVisitedCinema) {
       hasVisitedCinema = true;
       triggerIntroAnimation();
