@@ -228,80 +228,75 @@
     }
   }
 
-  // Phase 2: 3D Multi-Color Ribbon Burst & Streaming Zoom
+  // Zero-Lag 3D Multi-Color Ribbon Stream (24 Ultra-Optimized Hardware-Accelerated Lines)
   function buildRibbonBurst() {
     const stage = document.getElementById('netflix-ribbon-stage');
     if (!stage) return;
     stage.innerHTML = '';
 
     const colors = ['red', 'purple', 'cyan'];
-    const totalRibbons = 54; // 18 red, 18 purple, 18 cyan
+    const totalRibbons = 24; // 8 red, 8 purple, 8 cyan - 60 FPS rock solid
 
     for (let i = 0; i < totalRibbons; i++) {
       const ribbon = document.createElement('div');
       const color = colors[i % 3];
       ribbon.className = `netflix-burst-ribbon color-${color}`;
 
-      // Calculate spread angle & 3D ray offsets from center
-      const spreadFactor = (i - (totalRibbons / 2)) / (totalRibbons / 2); // -1 to +1
+      // Fan-out horizontally from center
+      const spreadFactor = (i - (totalRibbons / 2)) / (totalRibbons / 2);
       
-      const xStart = (spreadFactor * 24).toFixed(1);
-      const xMid = (spreadFactor * 160).toFixed(1);
-      const xEnd = (spreadFactor * 420).toFixed(1);
-      const xExit = (spreadFactor * 780).toFixed(1);
+      const xStart = (spreadFactor * 20).toFixed(1);
+      const xMid = (spreadFactor * 120).toFixed(1);
+      const xEnd = (spreadFactor * 320).toFixed(1);
+      const xExit = (spreadFactor * 580).toFixed(1);
 
       ribbon.style.setProperty('--x-start', `${xStart}px`);
       ribbon.style.setProperty('--x-mid', `${xMid}px`);
       ribbon.style.setProperty('--x-end', `${xEnd}px`);
       ribbon.style.setProperty('--x-exit', `${xExit}px`);
 
-      // Centered anchor
       ribbon.style.left = '50%';
 
-      // Variable widths (some sleek laser lines, some wider light sheets)
-      const widths = [1.8, 2.5, 3.8, 5.5];
+      const widths = [2, 2.8, 3.5];
       ribbon.style.width = `${widths[i % widths.length]}px`;
 
-      // Rapid staggered wave delay (0ms to 240ms)
-      const delay = (i % 9) * 0.026;
+      // Fast staggered delay
+      const delay = (i % 6) * 0.022;
       ribbon.style.animationDelay = `${delay.toFixed(3)}s`;
 
       stage.appendChild(ribbon);
     }
   }
 
-  // Phase 3: Fluid Staggered Library Card Cascade Reveal
-  function triggerLibraryCardCascade() {
-    const cards = document.querySelectorAll('.aura-media-card');
-    cards.forEach((card, idx) => {
-      card.classList.remove('is-cascading');
-      card.style.animationDelay = `${(idx * 0.045).toFixed(3)}s`;
-      void card.offsetWidth;
-      card.classList.add('is-cascading');
-    });
-  }
-
   // Dismiss intro and reveal Smart Library
   function dismissIntro() {
     if (!introEl || introEl.classList.contains('is-dismissed')) return;
     introEl.classList.add('is-dismissed');
-    triggerLibraryCardCascade();
     setTimeout(() => {
       introEl.style.display = 'none';
-    }, 550);
+    }, 450);
   }
 
   function triggerIntroAnimation() {
     if (!introEl) return;
     buildRibbonBurst();
+
+    // Reset title animation state
+    const titleEl = document.getElementById('netflix-brand-title');
+    if (titleEl) {
+      titleEl.style.animation = 'none';
+      void titleEl.offsetHeight; // Reset single element
+      titleEl.style.animation = '';
+    }
+
     introEl.style.display = 'flex';
     introEl.classList.remove('is-dismissed');
     playNetflixSignatureSound();
 
-    // Auto dismiss seamlessly into library cascade at 1.45s (perfect punchy timing)
+    // Auto dismiss after lines burst + grand EXXCLUSIVE display finishes (1.8s)
     setTimeout(() => {
       dismissIntro();
-    }, 1450);
+    }, 1800);
   }
 
   // --- 2. DOLBY CINEMA 3D DSP ACOUSTIC CHAIN ---

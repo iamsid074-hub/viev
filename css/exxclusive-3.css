@@ -6,7 +6,7 @@
    - Real-Time Adaptive Ambilight, Floor Reflections & Liquid Glass UI
    ========================================================= */
 
-/* --- 1. NETFLIX-STYLE CINEMATIC OPENING ANIMATION (PHASE 3: 3D RIBBONS + TUNNEL DISSOLVE CASCADE) --- */
+/* --- 1. NETFLIX-STYLE CINEMATIC OPENING ANIMATION (ZERO-LAG 3D LINES -> GRAND 'EXXCLUSIVE' REVEAL) --- */
 .exxclusive-netflix-intro {
   position: fixed;
   inset: 0;
@@ -15,60 +15,22 @@
   background: #000000;
   z-index: 999999;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   opacity: 1;
   pointer-events: auto;
-  perspective: 750px;
+  perspective: 650px;
   perspective-origin: 50% 50%;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.4s ease-out;
 }
 
 .exxclusive-netflix-intro.is-dismissed {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(1.1);
-  filter: blur(8px);
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), filter 0.45s ease;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
-/* Phase 3: Radiant Chromatic Dispersion Tunnel Bloom */
-.netflix-tunnel-bloom {
-  position: absolute;
-  inset: -20%;
-  width: 140%;
-  height: 140%;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 0, 85, 0.35) 0%, rgba(168, 85, 247, 0.28) 32%, rgba(0, 240, 255, 0.22) 58%, transparent 80%);
-  filter: blur(52px);
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.65);
-  animation: netflixTunnelBloomExpand 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
-  z-index: 2;
-}
-
-@keyframes netflixTunnelBloomExpand {
-  0% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  35% {
-    opacity: 0.85;
-    transform: scale(1.15);
-  }
-  75% {
-    opacity: 0.95;
-    transform: scale(1.6);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2.2);
-  }
-}
-
-/* 3D Ribbon Stage */
+/* 3D Lines Stage: Lightweight, Zero-Blur, Locked 60/120 FPS */
 .netflix-ribbon-stage {
   position: absolute;
   inset: 0;
@@ -82,157 +44,100 @@
   justify-content: center;
 }
 
-/* Individual 3D Streaming Ribbon */
+/* Individual 3D Streaming Line (No expensive blur shaders) */
 .netflix-burst-ribbon {
   position: absolute;
-  top: -25%;
-  bottom: -25%;
-  width: 3px;
+  top: -20%;
+  bottom: -20%;
+  width: 2.5px;
   transform-origin: center center;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
   opacity: 0;
-  animation: netflixRibbon3DZoom 1.35s cubic-bezier(0.12, 0.8, 0.25, 1) forwards;
+  animation: netflixRibbon3DZoom 0.72s cubic-bezier(0.12, 0.8, 0.25, 1) forwards;
 }
 
 /* Color 1: Neon Crimson Red */
 .netflix-burst-ribbon.color-red {
-  background: linear-gradient(180deg, transparent 0%, rgba(255, 0, 85, 0.3) 15%, #ff0055 50%, rgba(229, 9, 20, 0.3) 85%, transparent 100%);
-  box-shadow: 
-    0 0 16px rgba(255, 0, 85, 0.95),
-    0 0 36px rgba(229, 9, 20, 0.7);
+  background: linear-gradient(180deg, transparent 0%, #ff0055 30%, #e50914 50%, #ff0055 70%, transparent 100%);
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.9);
 }
 
-/* Color 2: Electric Violet / Purple */
+/* Color 2: Electric Purple / Violet */
 .netflix-burst-ribbon.color-purple {
-  background: linear-gradient(180deg, transparent 0%, rgba(168, 85, 247, 0.3) 15%, #a855f7 50%, rgba(124, 58, 237, 0.3) 85%, transparent 100%);
-  box-shadow: 
-    0 0 16px rgba(168, 85, 247, 0.95),
-    0 0 36px rgba(124, 58, 237, 0.7);
+  background: linear-gradient(180deg, transparent 0%, #a855f7 30%, #7c3aed 50%, #a855f7 70%, transparent 100%);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.9);
 }
 
 /* Color 3: Neon Cyan / Ice Blue */
 .netflix-burst-ribbon.color-cyan {
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 240, 255, 0.3) 15%, #00f0ff 50%, rgba(0, 112, 243, 0.3) 85%, transparent 100%);
-  box-shadow: 
-    0 0 16px rgba(0, 240, 255, 0.95),
-    0 0 36px rgba(0, 112, 243, 0.7);
+  background: linear-gradient(180deg, transparent 0%, #00f0ff 30%, #0070f3 50%, #00f0ff 70%, transparent 100%);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.9);
 }
 
-/* 3D Zoom Towards Camera Keyframes */
+/* Pure Hardware-Accelerated 3D Transform (Zero Blur, Zero Lag) */
 @keyframes netflixRibbon3DZoom {
   0% {
     opacity: 0;
-    transform: translate3d(var(--x-start, 0px), 0, -650px) scale(0.1);
-    filter: blur(2px);
+    transform: translate3d(var(--x-start, 0px), 0, -500px) scale(0.15);
   }
-  18% {
-    opacity: 0.95;
-    transform: translate3d(var(--x-mid, 0px), 0, -200px) scale(0.7);
-    filter: blur(0px);
-  }
-  62% {
+  20% {
     opacity: 1;
-    transform: translate3d(var(--x-end, 0px), 0, 180px) scale(2.4);
-    filter: blur(0px);
+    transform: translate3d(var(--x-mid, 0px), 0, -150px) scale(0.7);
   }
-  86% {
-    opacity: 0.75;
-    transform: translate3d(var(--x-exit, 0px), 0, 480px) scale(4.8);
-    filter: blur(6px);
+  65% {
+    opacity: 0.95;
+    transform: translate3d(var(--x-end, 0px), 0, 180px) scale(2.2);
+  }
+  90% {
+    opacity: 0.6;
+    transform: translate3d(var(--x-exit, 0px), 0, 420px) scale(4.2);
   }
   100% {
     opacity: 0;
-    transform: translate3d(var(--x-exit, 0px), 0, 700px) scale(6.5);
-    filter: blur(16px);
+    transform: translate3d(var(--x-exit, 0px), 0, 600px) scale(5.5);
   }
 }
 
+/* Logo Brand: Positioned dead center across the screen */
 .netflix-logo-brand {
-  position: relative;
+  position: absolute;
+  inset: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 5;
-  transform-style: preserve-3d;
+  pointer-events: none;
 }
 
+/* Grand EXXCLUSIVE Reveal: Big, Bold, Pristine across the full screen when animation finishes */
 .netflix-brand-title {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Outfit", sans-serif;
-  font-size: 40px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Montserrat", "Arial Black", sans-serif;
+  font-size: clamp(38px, 10vw, 92px);
   font-weight: 900;
-  letter-spacing: 16px;
+  letter-spacing: clamp(10px, 3vw, 28px);
   text-transform: uppercase;
   color: #ffffff;
   margin: 0;
-  background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.65) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.6));
+  text-align: center;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
   opacity: 0;
-  animation: netflixTitleBurst 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  transform: scale(0.90);
+  will-change: transform, opacity;
+  text-shadow: 0 0 35px rgba(255, 255, 255, 0.45), 0 0 80px rgba(255, 0, 85, 0.25);
+  animation: exxclusiveGrandReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.72s forwards;
 }
 
-@keyframes netflixTitleBurst {
+@keyframes exxclusiveGrandReveal {
   0% {
     opacity: 0;
-    transform: translateZ(-250px) scale(0.65);
-    filter: blur(14px);
-  }
-  28% {
-    opacity: 1;
-    transform: translateZ(60px) scale(1.08);
-    filter: blur(0px);
-  }
-  68% {
-    opacity: 1;
-    transform: translateZ(0px) scale(1);
-    filter: blur(0px);
+    transform: scale(0.85);
   }
   100% {
-    opacity: 0.9;
-    transform: translateZ(90px) scale(1.1);
+    opacity: 1;
+    transform: scale(1);
   }
-}
-
-.netflix-brand-sub {
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 7px;
-  text-transform: uppercase;
-  color: #ff0055;
-  margin-top: 12px;
-  opacity: 0;
-  animation: netflixSubBurst 1.5s ease-out 0.3s forwards;
-}
-
-@keyframes netflixSubBurst {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 0.9;
-    transform: translateY(0);
-  }
-}
-
-.netflix-skip-hint {
-  position: absolute;
-  bottom: calc(var(--sab, 0px) + 28px);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  z-index: 5;
 }
 
 /* --- 2. AURA SMART LIBRARY (PORTRAIT MODE) --- */
@@ -443,25 +348,6 @@
 
 .aura-media-card:active {
   transform: scale(0.97);
-}
-
-/* Phase 3: Fluid Staggered Card Cascade Animation */
-.aura-media-card.is-cascading {
-  animation: auraCardCascadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: opacity, transform, filter;
-}
-
-@keyframes auraCardCascadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(28px) scale(0.96);
-    filter: blur(6px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0px);
-  }
 }
 
 .aura-card-thumb-wrap {
