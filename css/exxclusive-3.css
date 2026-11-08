@@ -442,12 +442,6 @@
     transform: rotate(90deg) translateY(-100vw) !important;
     transform-origin: top left !important;
   }
-
-  .lounge-hud-bottom-bar {
-    bottom: 10px !important;
-    left: 18px !important;
-    right: 18px !important;
-  }
 }
 
 /* NATURAL LANDSCAPE (Desktop, Tablets, or Rotated Mobiles) */
@@ -523,22 +517,67 @@
   perspective: 900px;
   perspective-origin: center center;
   transform-style: preserve-3d;
+  filter: drop-shadow(0 22px 50px rgba(0, 0, 0, 0.96)) drop-shadow(0 6px 18px rgba(0, 0, 0, 0.88));
 }
 
-/* Real Physical Curved OLED Bezel Chassis Frame */
+/* Subtle contact shadow on charcoal wall beneath the curved screen */
+.lounge-screen-chassis::after {
+  content: '';
+  position: absolute;
+  bottom: -16px;
+  left: 12%;
+  right: 12%;
+  height: 18px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.8) 0%, transparent 75%);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Real Physical Curved OLED Titanium Chassis Frame */
 .lounge-screen-chassis-bezel {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 0;
+  padding: 8px 10px;
   box-sizing: border-box;
-  background: transparent;
+  background: 
+    linear-gradient(135deg, #22242b 0%, #3e424f 18%, #1f2026 42%, #4d5261 68%, #282a33 88%, #15161a 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0%, transparent 15%, transparent 85%, rgba(255, 255, 255, 0.12) 100%);
+  background-blend-mode: overlay;
+  border-radius: 14px;
+  /* Premium Natural Brushed Titanium Bezel with Chamfered Edges */
+  border: 1.5px solid #55596b;
+  border-top: 2.5px solid #a2a8bc; /* Top specular rim reflection */
+  border-bottom: 2.5px solid #0d0e12; /* Underside dark shadow */
+  border-left: 2px solid #6b7084;
+  border-right: 2px solid #6b7084;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.45),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.85),
+    inset 0 0 8px rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   clip-path: url(#loungeCurvedClip);
   -webkit-clip-path: url(#loungeCurvedClip);
   transform-style: preserve-3d;
+}
+
+/* Subtle micro-dot hardware status LED at bottom center of titanium bezel */
+.lounge-screen-chassis-bezel::before {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.95), 0 0 12px rgba(255, 255, 255, 0.5);
+  z-index: 10;
+  pointer-events: none;
 }
 
 /* True 3D Architectural Concave Curve Silhouette */
@@ -551,8 +590,10 @@
   clip-path: url(#loungeCurvedClip);
   -webkit-clip-path: url(#loungeCurvedClip);
   background: #000000;
-  border: none;
-  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.95);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.95),
+    inset 0 0 24px rgba(0, 0, 0, 0.9);
   transform: translateZ(0);
 }
 
@@ -633,6 +674,10 @@
   inset: 0;
   pointer-events: none;
   z-index: 15;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px 28px;
   box-sizing: border-box;
   opacity: 1;
   transition: opacity 0.35s ease;
@@ -784,18 +829,25 @@
   transform: scale(0.94);
 }
 
-/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Firmly anchored to the bottom edge) */
+/* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Permanently pinned to bottom edge) */
 .lounge-hud-bottom-bar {
   position: absolute;
-  bottom: 14px;
-  left: 24px;
-  right: 24px;
+  bottom: 22px;
+  left: 32px;
+  right: 32px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  width: auto;
+  gap: 10px;
   pointer-events: auto;
   z-index: 16;
+}
+
+@media (max-width: 768px) {
+  .lounge-hud-bottom-bar {
+    bottom: 14px;
+    left: 18px;
+    right: 18px;
+  }
 }
 
 .lounge-hud-bottom-row-right {
