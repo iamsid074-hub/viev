@@ -281,22 +281,22 @@
     if (!introEl) return;
     buildRibbonBurst();
 
-    // Reset title animation state
-    const titleEl = document.getElementById('netflix-brand-title');
-    if (titleEl) {
-      titleEl.style.animation = 'none';
-      void titleEl.offsetHeight; // Reset single element
-      titleEl.style.animation = '';
-    }
+    // Re-trigger letter-by-letter cascade animation
+    const letters = document.querySelectorAll('.netflix-brand-title .intro-letter');
+    letters.forEach(letter => {
+      letter.style.animation = 'none';
+      void letter.offsetHeight;
+      letter.style.animation = '';
+    });
 
     introEl.style.display = 'flex';
     introEl.classList.remove('is-dismissed');
     playNetflixSignatureSound();
 
-    // Auto dismiss after lines burst + grand EXXCLUSIVE display finishes (1.8s)
+    // Auto dismiss after letter cascade completes and holds proudly (2.4s)
     setTimeout(() => {
       dismissIntro();
-    }, 1800);
+    }, 2400);
   }
 
   // --- 2. DOLBY CINEMA 3D DSP ACOUSTIC CHAIN ---
