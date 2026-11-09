@@ -144,6 +144,18 @@
   let audioEqBtn = null;
   let audioEqLabel = null;
 
+  // Special Cinema Strip Lighting System
+  let stripWrapEl = null;
+  let stripSvgEl = null;
+  let stripGradStop1 = null;
+  let stripGradStop2 = null;
+  let stripGradStop3 = null;
+  let stripPillBtn = null;
+  let stripPillLabel = null;
+  let stripPillDot = null;
+  let ceilingStripEl = null;
+  let currentStripOption = parseInt(localStorage.getItem('viev_cinema_strip_opt') || '1', 10);
+
   // Web Audio & Dolby DSP
   let audioCtx = null;
   let mediaSource = null;
@@ -1042,6 +1054,77 @@
     }
   }
 
+  // --- SPECIAL CINEMA STRIP LIGHTING ENGINE ---
+  function setCinemaStripOption(opt) {
+    const validOpt = (opt === 1 || opt === 2 || opt === 3) ? opt : 1;
+    currentStripOption = validOpt;
+    try {
+      localStorage.setItem('viev_cinema_strip_opt', validOpt.toString());
+    } catch (_) {}
+
+    if (stripWrapEl) {
+      stripWrapEl.classList.remove('strip-mode-1', 'strip-mode-2', 'strip-mode-3');
+      stripWrapEl.classList.add(`strip-mode-${validOpt}`);
+    }
+
+    if (loungeEl) {
+      if (validOpt === 3) {
+        loungeEl.classList.add('strip-mode-3');
+      } else {
+        loungeEl.classList.remove('strip-mode-3');
+      }
+    }
+
+    if (stripPillLabel) {
+      if (validOpt === 1) stripPillLabel.textContent = 'Strip: Halo (Opt 1)';
+      else if (validOpt === 2) stripPillLabel.textContent = 'Strip: Underglow (Opt 2)';
+      else if (validOpt === 3) stripPillLabel.textContent = 'Strip: Dual Cove (Opt 3)';
+    }
+  }
+
+  function updateCinemaStripColors(c1, c2, c3, isIntermission) {
+    if (!stripWrapEl) return;
+
+    if (isIntermission) {
+      stripWrapEl.classList.add('is-intermission');
+      const amber1 = '#ffb049';
+      const amber2 = '#ff8833';
+      const amber3 = '#ffa726';
+
+      if (stripGradStop1) stripGradStop1.setAttribute('stop-color', amber1);
+      if (stripGradStop2) stripGradStop2.setAttribute('stop-color', amber2);
+      if (stripGradStop3) stripGradStop3.setAttribute('stop-color', amber3);
+
+      document.documentElement.style.setProperty('--strip-c1', amber1);
+      document.documentElement.style.setProperty('--strip-c2', amber2);
+      document.documentElement.style.setProperty('--strip-c3', amber3);
+      if (stripPillDot) {
+        stripPillDot.style.background = amber1;
+        stripPillDot.style.boxShadow = `0 0 8px ${amber1}`;
+      }
+      return;
+    }
+
+    stripWrapEl.classList.remove('is-intermission');
+
+    if (c1) {
+      if (stripGradStop1) stripGradStop1.setAttribute('stop-color', c1);
+      document.documentElement.style.setProperty('--strip-c1', c1);
+      if (stripPillDot) {
+        stripPillDot.style.background = c1;
+        stripPillDot.style.boxShadow = `0 0 8px ${c1}`;
+      }
+    }
+    if (c2) {
+      if (stripGradStop2) stripGradStop2.setAttribute('stop-color', c2);
+      document.documentElement.style.setProperty('--strip-c2', c2);
+    }
+    if (c3) {
+      if (stripGradStop3) stripGradStop3.setAttribute('stop-color', c3);
+      document.documentElement.style.setProperty('--strip-c3', c3);
+    }
+  }
+
   function renderDynamicYouTubeAmbient(now) {
     if (!ambilightCtx || !ambilightCanvas) return;
     const w = ambilightCanvas.width;
@@ -1094,6 +1177,9 @@
     ambilightCanvas.style.filter = `blur(54px) saturate(240%) brightness(${breathe.toFixed(2)})`;
     ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
     ambilightCanvas.classList.add('is-active');
+
+    // Real-time Strip Lighting sync with live YouTube palette
+    updateCinemaStripColors(p.color1, p.color2, p.color3, false);
   }
 
   function updatePlayPauseButton(isPlaying) {
@@ -1124,8 +1210,10 @@
       updatePlayPauseButton(isYtPlaying);
       if (isYtPlaying) {
         showControlsHud();
+        updateCinemaStripColors(ytAmbientPalette.color1, ytAmbientPalette.color2, ytAmbientPalette.color3, false);
         startLoungeRenderLoop();
       } else {
+        updateCinemaStripColors(null, null, null, true);
         if (ambilightCanvas) {
           ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
         }
@@ -1137,9 +1225,11 @@
       setupDolbyAudioDSP();
       videoEl.play();
       updatePlayPauseButton(true);
+      updateCinemaStripColors(null, null, null, false);
     } else {
       videoEl.pause();
       updatePlayPauseButton(false);
+      updateCinemaStripColors(null, null, null, true);
     }
   }
 
@@ -1199,6 +1289,12 @@
           if (ambilightCtx && ambilightCanvas) {
             try {
               ambilightCtx.drawImage(videoEl, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
+              const d1 = ambilightCtx.getImageData(4, 4, 1, 1).data;
+              const d2 = ambilightCtx.getImageData(32, 18, 1, 1).data;
+              const d3 = ambilightCtx.getImageData(58, 30, 1, 1).data;
+              if (d1[0] + d1[1] + d1[2] + d2[0] + d2[1] + d2[2] > 20) {
+                updateCinemaStripColors(`rgb(${d1[0]},${d1[1]},${d1[2]})`, `rgb(${d2[0]},${d2[1]},${d2[2]})`, `rgb(${d3[0]},${d3[1]},${d3[2]})`, false);
+              }
             } catch (_) {}
           }
 
@@ -1277,6 +1373,30 @@
     quickCinemaBtn = document.getElementById('aura-quick-cinema-btn');
     audioEqBtn = document.getElementById('lounge-eq-pill-btn');
     audioEqLabel = document.getElementById('lounge-eq-pill-label');
+
+    // Special Cinema Strip Lighting Elements
+    stripWrapEl = document.getElementById('lounge-screen-strip-wrap');
+    stripSvgEl = document.getElementById('lounge-strip-svg');
+    stripGradStop1 = document.getElementById('stripGradStop1');
+    stripGradStop2 = document.getElementById('stripGradStop2');
+    stripGradStop3 = document.getElementById('stripGradStop3');
+    stripPillBtn = document.getElementById('lounge-strip-pill-btn');
+    stripPillLabel = document.getElementById('lounge-strip-pill-label');
+    stripPillDot = document.getElementById('strip-pill-dot');
+    ceilingStripEl = document.getElementById('lounge-ceiling-strip');
+
+    if (stripPillBtn) {
+      stripPillBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const nextOpt = (currentStripOption % 3) + 1;
+        setCinemaStripOption(nextOpt);
+        if (window.vievHaptics && window.vievHaptics.impactLight) {
+          window.vievHaptics.impactLight();
+        }
+      });
+    }
+
+    setCinemaStripOption(currentStripOption);
 
     // Canvas internal buffer resolutions (optimized for 60fps blur)
     if (ambilightCanvas) {
@@ -1642,11 +1762,13 @@
             isYtPlaying = true;
             updatePlayPauseButton(true);
             showControlsHud();
+            updateCinemaStripColors(ytAmbientPalette.color1, ytAmbientPalette.color2, ytAmbientPalette.color3, false);
             startLoungeRenderLoop();
           } else if (data.info === 2 || data.info === 0) {
             isYtPlaying = false;
             updatePlayPauseButton(false);
             showControlsHud();
+            updateCinemaStripColors(null, null, null, true);
             if (ambilightCanvas) {
               ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
             }
@@ -1702,7 +1824,14 @@
     openLounge: openCurvedCinemaLounge,
     closeLounge: closeCurvedCinemaLounge,
     playIntro: triggerIntroAnimation,
-    getMedia: () => EXXCLUSIVE_MEDIA
+    getMedia: () => EXXCLUSIVE_MEDIA,
+    setStripOption: setCinemaStripOption,
+    getStripOption: () => currentStripOption
+  };
+
+  window.vievCinemaStrip = {
+    setOption: setCinemaStripOption,
+    getOption: () => currentStripOption
   };
 
   if (document.readyState === 'loading') {

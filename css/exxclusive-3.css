@@ -997,6 +997,230 @@
   opacity: 0.92;
 }
 
+/* =========================================================
+   SPECIAL CINEMA STRIP LIGHTING ENGINE (AMBILIGHT ARCHITECTURE)
+   ========================================================= */
+:root {
+  --strip-c1: #ff2d55;
+  --strip-c2: #af52de;
+  --strip-c3: #5856d6;
+}
+
+/* Ceiling Cove Strip (Option 3 Dual Mode) */
+.lounge-ceiling-strip {
+  display: none;
+  position: absolute;
+  top: 1.5%;
+  left: 8%;
+  right: 8%;
+  height: 4px;
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity 0.5s ease;
+}
+
+.curved-charcoal-lounge.strip-mode-3 .lounge-ceiling-strip {
+  display: block;
+}
+
+.ceiling-strip-line {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent 0%, var(--strip-c1) 20%, #ffffff 50%, var(--strip-c2) 80%, transparent 100%);
+  box-shadow: 0 0 10px var(--strip-c1), 0 0 24px var(--strip-c2);
+  opacity: 0.92;
+  transition: all 0.4s ease;
+}
+
+.ceiling-strip-wash {
+  position: absolute;
+  top: -8px;
+  left: -8%;
+  right: -8%;
+  height: 75px;
+  background: radial-gradient(ellipse at 50% 15%, var(--strip-c1) 0%, var(--strip-c2) 40%, transparent 75%);
+  filter: blur(24px);
+  opacity: 0.60;
+  transition: all 0.4s ease;
+}
+
+/* Screen Strip Wrapper */
+.lounge-screen-strip-wrap {
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+  z-index: 1;
+  display: block;
+  transition: opacity 0.45s ease, filter 0.45s ease;
+  will-change: transform, opacity, filter;
+}
+
+.lounge-strip-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Path 1: Wide Diffused Ambient Wall Wash */
+.strip-path-ambient {
+  fill: none;
+  stroke: url(#loungeStripGradient);
+  stroke-width: 32px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.72;
+  filter: blur(16px);
+  vector-effect: non-scaling-stroke;
+  transition: opacity 0.4s ease;
+}
+
+/* Path 2: Concentrated Neon Blade Glow */
+.strip-path-blade {
+  fill: none;
+  stroke: url(#loungeStripGradient);
+  stroke-width: 6.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.95;
+  filter: blur(3px);
+  vector-effect: non-scaling-stroke;
+  transition: opacity 0.4s ease;
+}
+
+/* Path 3: Razor Sharp 1.8mm Luminous Micro-Core */
+.strip-path-core {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.8px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.94;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.92));
+  vector-effect: non-scaling-stroke;
+}
+
+/* Bottom Blade Underglow for Option 2 */
+.lounge-bottom-blade-strip {
+  display: none;
+  position: absolute;
+  bottom: -4px;
+  left: 2%;
+  right: 2%;
+  height: 5px;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.lounge-bottom-blade-strip .bottom-blade-core {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent 0%, var(--strip-c1) 15%, #ffffff 50%, var(--strip-c2) 85%, transparent 100%);
+  box-shadow: 0 0 10px var(--strip-c1), 0 0 22px var(--strip-c2);
+  opacity: 0.95;
+}
+
+.lounge-bottom-blade-strip .bottom-blade-wash {
+  position: absolute;
+  top: 100%;
+  left: -8%;
+  right: -8%;
+  height: 60px;
+  background: radial-gradient(ellipse at top, var(--strip-c1) 0%, var(--strip-c2) 40%, transparent 75%);
+  filter: blur(16px);
+  opacity: 0.85;
+}
+
+/* Mode Switches */
+/* Option 1: Screen Perimeter Floating Halo (Active by default) */
+.lounge-screen-strip-wrap.strip-mode-1 .lounge-strip-svg {
+  display: block;
+}
+.lounge-screen-strip-wrap.strip-mode-1 .lounge-bottom-blade-strip {
+  display: none;
+}
+
+/* Option 2: Bottom Blade Underglow Console */
+.lounge-screen-strip-wrap.strip-mode-2 .lounge-strip-svg {
+  display: none;
+}
+.lounge-screen-strip-wrap.strip-mode-2 .lounge-bottom-blade-strip {
+  display: block;
+}
+
+/* Option 3: Dual Screen Perimeter + Ceiling Cove */
+.lounge-screen-strip-wrap.strip-mode-3 .lounge-strip-svg {
+  display: block;
+}
+.lounge-screen-strip-wrap.strip-mode-3 .lounge-bottom-blade-strip {
+  display: none;
+}
+
+/* Theater Intermission Effect (When Paused) */
+.lounge-screen-strip-wrap.is-intermission .strip-path-ambient {
+  opacity: 0.50;
+  filter: blur(18px);
+}
+.lounge-screen-strip-wrap.is-intermission .strip-path-blade {
+  opacity: 0.80;
+  filter: blur(4px);
+}
+.lounge-screen-strip-wrap.is-intermission .strip-path-core {
+  stroke: #fff5e6;
+  opacity: 0.85;
+}
+.lounge-screen-strip-wrap.is-intermission .bottom-blade-core {
+  background: linear-gradient(90deg, transparent 0%, #ffb049 20%, #ffffff 50%, #ff8833 80%, transparent 100%);
+  box-shadow: 0 0 10px #ffb049, 0 0 20px #ff8833;
+}
+.lounge-screen-strip-wrap.is-intermission .bottom-blade-wash {
+  background: radial-gradient(ellipse at top, rgba(255, 176, 73, 0.7) 0%, rgba(255, 136, 51, 0.4) 40%, transparent 75%);
+}
+
+/* Glassmorphic Strip Lighting Control Pill in HUD */
+.lounge-strip-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 13px;
+  background: rgba(22, 22, 28, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  color: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  outline: none;
+}
+.lounge-strip-pill-btn:hover {
+  background: rgba(36, 36, 46, 0.85);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+.lounge-strip-pill-btn:active {
+  transform: scale(0.95);
+}
+.strip-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--strip-c1, #ff2d55);
+  box-shadow: 0 0 8px var(--strip-c1, #ff2d55);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
 /* Super Curved Display Chassis: True 16:9 Cinematic Golden Ratio (Option A: 0% Crop, 100% Fit) */
 .lounge-screen-chassis {
   position: absolute;
@@ -1037,6 +1261,7 @@
 /* Real Physical Curved OLED Bezel Chassis Frame (Slimmed Down Minimal Bezels) */
 .lounge-screen-chassis-bezel {
   position: relative;
+  z-index: 3;
   width: 100%;
   height: 100%;
   padding: 2.5px 3px;
