@@ -890,38 +890,53 @@ Humne toh chaand se poochha tha, Husn ka matlab..
             <canvas class="lounge-ambient-canvas" id="lounge-ambient-canvas"></canvas>
           </div>
 
-          <!-- Architectural Ceiling Cove Strip Light (Active in Option 3) -->
-          <div class="lounge-ceiling-strip" id="lounge-ceiling-strip" aria-hidden="true">
-            <div class="ceiling-strip-line"></div>
-            <div class="ceiling-strip-wash"></div>
+          <!-- DISCO ARCHITECTURAL 4-CORNER RUNNING BEAM LASER SYSTEM -->
+          <div class="lounge-architectural-lasers" id="lounge-architectural-lasers" aria-hidden="true">
+            <svg class="corner-lasers-svg" viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <filter id="laserBloom" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="16" result="blurWide" />
+                  <feGaussianBlur stdDeviation="5" result="blurTight" />
+                  <feMerge>
+                    <feMergeNode in="blurWide" />
+                    <feMergeNode in="blurTight" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Corner 1: Left Tall Arched Rim -->
+              <g class="laser-corner-group" id="laser-corner-1" data-corner="left">
+                <path class="laser-track track-bloom" d="M 62,740 L 62,250 Q 62,60 0,40" />
+                <path class="laser-track track-blade" d="M 62,740 L 62,250 Q 62,60 0,40" />
+                <path class="laser-track track-core"  d="M 62,740 L 62,250 Q 62,60 0,40" />
+              </g>
+
+              <!-- Corner 2: Top Recessed Ceiling Cove Oval -->
+              <g class="laser-corner-group" id="laser-corner-2" data-corner="ceiling">
+                <path class="laser-track track-bloom" d="M 340,15 Q 836,120 1332,15" />
+                <path class="laser-track track-blade" d="M 340,15 Q 836,120 1332,15" />
+                <path class="laser-track track-core"  d="M 340,15 Q 836,120 1332,15" />
+              </g>
+
+              <!-- Corner 3: Right Bookshelf Vertical Seam -->
+              <g class="laser-corner-group" id="laser-corner-3" data-corner="right">
+                <path class="laser-track track-bloom" d="M 1575,200 L 1575,730" />
+                <path class="laser-track track-blade" d="M 1575,200 L 1575,730" />
+                <path class="laser-track track-core"  d="M 1575,200 L 1575,730" />
+              </g>
+
+              <!-- Corner 4: Bottom Floor-Wall Crevice -->
+              <g class="laser-corner-group" id="laser-corner-4" data-corner="floor">
+                <path class="laser-track track-bloom" d="M 90,735 Q 836,702 1582,735" />
+                <path class="laser-track track-blade" d="M 90,735 Q 836,702 1582,735" />
+                <path class="laser-track track-core"  d="M 90,735 Q 836,702 1582,735" />
+              </g>
+            </svg>
           </div>
 
           <!-- Super Curved Display Chassis (Mounted naturally with physical bezel) -->
           <div class="lounge-screen-chassis">
-            <!-- Special Cinema Strip Lighting System (Option 1: Perimeter Floating Halo) -->
-            <div class="lounge-screen-strip-wrap strip-mode-1" id="lounge-screen-strip-wrap" aria-hidden="true">
-              <svg class="lounge-strip-svg" id="lounge-strip-svg" viewBox="0 0 1000 562.5" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="loungeStripGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop id="stripGradStop1" offset="0%" stop-color="#ff2d55" />
-                    <stop id="stripGradStop2" offset="50%" stop-color="#af52de" />
-                    <stop id="stripGradStop3" offset="100%" stop-color="#0070f3" />
-                  </linearGradient>
-                </defs>
-                <!-- Deep Wall Wash Halo -->
-                <path class="strip-path-ambient" d="M 4,4 Q 500,25.3 996,4 L 996,558.5 Q 500,537.2 4,558.5 Z" />
-                <!-- Neon Blade Glow -->
-                <path class="strip-path-blade" d="M 4,4 Q 500,25.3 996,4 L 996,558.5 Q 500,537.2 4,558.5 Z" />
-                <!-- Razor Sharp Luminous Micro-Core Tube -->
-                <path class="strip-path-core" d="M 4,4 Q 500,25.3 996,4 L 996,558.5 Q 500,537.2 4,558.5 Z" />
-              </svg>
-              <!-- Horizontal Bottom Underglow Blade for Option 2 -->
-              <div class="lounge-bottom-blade-strip" id="lounge-bottom-blade-strip">
-                <div class="bottom-blade-core"></div>
-                <div class="bottom-blade-wash"></div>
-              </div>
-            </div>
-
             <div class="lounge-screen-chassis-bezel">
               <div class="lounge-screen-frame">
                 <video class="lounge-video-player" id="lounge-video-player" playsinline preload="auto" crossorigin="anonymous">
@@ -945,9 +960,9 @@ Humne toh chaand se poochha tha, Husn ka matlab..
             <!-- Top Area: Back to Library positioned at Top-Right -->
             <div class="lounge-hud-top-bar" id="lounge-hud-top-bar">
               <div class="lounge-top-left-actions">
-                <button type="button" class="lounge-strip-pill-btn" id="lounge-strip-pill-btn" title="Cycle Strip Lighting Option (Option 1 / 2 / 3)" aria-label="Cycle Strip Lighting Position">
-                  <span class="strip-pill-dot" id="strip-pill-dot"></span>
-                  <span class="strip-pill-label" id="lounge-strip-pill-label">Strip: Halo (Opt 1)</span>
+                <button type="button" class="lounge-laser-pill-btn" id="lounge-laser-pill-btn" title="Toggle Disco Architectural Lasers" aria-label="Toggle Disco Laser Sync">
+                  <span class="laser-pill-pulse" id="laser-pill-pulse"></span>
+                  <span class="laser-pill-label" id="lounge-laser-pill-label">Disco Lasers: Beat Sync</span>
                 </button>
               </div>
               <button type="button" class="lounge-top-back-btn" id="lounge-top-back-btn" aria-label="Back to Library">

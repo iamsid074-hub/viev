@@ -144,17 +144,25 @@
   let audioEqBtn = null;
   let audioEqLabel = null;
 
-  // Special Cinema Strip Lighting System
-  let stripWrapEl = null;
-  let stripSvgEl = null;
-  let stripGradStop1 = null;
-  let stripGradStop2 = null;
-  let stripGradStop3 = null;
-  let stripPillBtn = null;
-  let stripPillLabel = null;
-  let stripPillDot = null;
-  let ceilingStripEl = null;
-  let currentStripOption = parseInt(localStorage.getItem('viev_cinema_strip_opt') || '1', 10);
+  // DISCO ARCHITECTURAL 4-CORNER RUNNING BEAM LASER SYSTEM
+  let laserCorners = { left: null, ceiling: null, right: null, floor: null };
+  let laserCornerLengths = { left: 750, ceiling: 1020, right: 530, floor: 1500 };
+  let laserPillBtn = null;
+  let laserPillLabel = null;
+  let laserPillPulse = null;
+  let isLaserSyncEnabled = true;
+  let lastLaserTriggerTime = 0;
+  let discoPaletteIndex = 0;
+  let discoPatternStep = 0;
+
+  const DISCO_PALETTES = [
+    { c1: '#00f0ff', c2: '#b000ff' }, // Cyber Cyan & Electric Violet
+    { c1: '#ff0055', c2: '#ffcc00' }, // Tokyo Hot Pink & Laser Gold
+    { c1: '#00ff88', c2: '#00ccff' }, // Electric Mint & Ice Blue
+    { c1: '#ff3300', c2: '#ff00aa' }, // Solar Flare & Deep Magenta
+    { c1: '#7928ca', c2: '#ff0080' }, // Midnight Club
+    { c1: '#ffffff', c2: '#00f0ff' }  // White Hot Strobe & Cyan
+  ];
 
   // Web Audio & Dolby DSP
   let audioCtx = null;
@@ -936,6 +944,9 @@
       ambilightCanvas.style.transform = 'scale(1)';
     }
 
+    // Deactivate and reset all disco corner lasers
+    Object.values(laserCorners).forEach(el => el && el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active'));
+
     if (videoEl) {
       try {
         videoEl.pause();
@@ -1054,74 +1065,129 @@
     }
   }
 
-  // --- SPECIAL CINEMA STRIP LIGHTING ENGINE ---
-  function setCinemaStripOption(opt) {
-    const validOpt = (opt === 1 || opt === 2 || opt === 3) ? opt : 1;
-    currentStripOption = validOpt;
-    try {
-      localStorage.setItem('viev_cinema_strip_opt', validOpt.toString());
-    } catch (_) {}
+  // --- DISCO ARCHITECTURAL 4-CORNER RUNNING BEAM LASER ENGINE ---
+  function initArchitecturalLasers() {
+    laserCorners.left = document.getElementById('laser-corner-1');
+    laserCorners.ceiling = document.getElementById('laser-corner-2');
+    laserCorners.right = document.getElementById('laser-corner-3');
+    laserCorners.floor = document.getElementById('laser-corner-4');
 
-    if (stripWrapEl) {
-      stripWrapEl.classList.remove('strip-mode-1', 'strip-mode-2', 'strip-mode-3');
-      stripWrapEl.classList.add(`strip-mode-${validOpt}`);
-    }
+    laserPillBtn = document.getElementById('lounge-laser-pill-btn');
+    laserPillLabel = document.getElementById('lounge-laser-pill-label');
+    laserPillPulse = document.getElementById('laser-pill-pulse');
 
-    if (loungeEl) {
-      if (validOpt === 3) {
-        loungeEl.classList.add('strip-mode-3');
-      } else {
-        loungeEl.classList.remove('strip-mode-3');
+    // Dynamically calculate exact SVG path lengths
+    Object.keys(laserCorners).forEach(key => {
+      const g = laserCorners[key];
+      if (g) {
+        const path = g.querySelector('.track-core') || g.querySelector('path');
+        if (path && path.getTotalLength) {
+          try {
+            laserCornerLengths[key] = Math.round(path.getTotalLength());
+          } catch (_) {}
+        }
       }
-    }
+    });
 
-    if (stripPillLabel) {
-      if (validOpt === 1) stripPillLabel.textContent = 'Strip: Halo (Opt 1)';
-      else if (validOpt === 2) stripPillLabel.textContent = 'Strip: Underglow (Opt 2)';
-      else if (validOpt === 3) stripPillLabel.textContent = 'Strip: Dual Cove (Opt 3)';
+    if (laserPillBtn) {
+      laserPillBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDiscoLaserSync();
+        if (window.vievHaptics && window.vievHaptics.impactLight) {
+          window.vievHaptics.impactLight();
+        }
+      });
     }
   }
 
-  function updateCinemaStripColors(c1, c2, c3, isIntermission) {
-    if (!stripWrapEl) return;
+  function toggleDiscoLaserSync(forcedState) {
+    if (forcedState !== undefined) {
+      isLaserSyncEnabled = !!forcedState;
+    } else {
+      isLaserSyncEnabled = !isLaserSyncEnabled;
+    }
 
-    if (isIntermission) {
-      stripWrapEl.classList.add('is-intermission');
-      const amber1 = '#ffb049';
-      const amber2 = '#ff8833';
-      const amber3 = '#ffa726';
-
-      if (stripGradStop1) stripGradStop1.setAttribute('stop-color', amber1);
-      if (stripGradStop2) stripGradStop2.setAttribute('stop-color', amber2);
-      if (stripGradStop3) stripGradStop3.setAttribute('stop-color', amber3);
-
-      document.documentElement.style.setProperty('--strip-c1', amber1);
-      document.documentElement.style.setProperty('--strip-c2', amber2);
-      document.documentElement.style.setProperty('--strip-c3', amber3);
-      if (stripPillDot) {
-        stripPillDot.style.background = amber1;
-        stripPillDot.style.boxShadow = `0 0 8px ${amber1}`;
+    if (laserPillBtn) {
+      if (isLaserSyncEnabled) {
+        laserPillBtn.classList.remove('is-disabled');
+        if (laserPillLabel) laserPillLabel.textContent = 'Disco Lasers: Beat Sync';
+      } else {
+        laserPillBtn.classList.add('is-disabled');
+        if (laserPillLabel) laserPillLabel.textContent = 'Disco Lasers: OFF';
       }
+    }
+  }
+
+  function triggerLaserBeam(cornerKey, reverse = false, durationMs = 520) {
+    if (!isLaserSyncEnabled) return;
+    const el = laserCorners[cornerKey];
+    if (!el) return;
+
+    const length = laserCornerLengths[cornerKey] || 800;
+    const beamLen = Math.max(160, Math.round(length * 0.35));
+    const palette = DISCO_PALETTES[discoPaletteIndex];
+
+    el.style.setProperty('--beam-c1', palette.c1);
+    el.style.setProperty('--beam-c2', palette.c2);
+    el.style.setProperty('--dash-start', `${length + beamLen}`);
+    el.style.setProperty('--dash-end', `${-beamLen}`);
+    el.style.setProperty('--chase-duration', `${(durationMs / 1000).toFixed(2)}s`);
+
+    const tracks = el.querySelectorAll('.laser-track');
+    tracks.forEach(track => {
+      track.style.strokeDasharray = `${beamLen} ${length * 2}`;
+    });
+
+    // Reset and trigger CSS animation
+    el.classList.remove('is-chasing', 'is-chasing-rev');
+    void el.offsetWidth; // force reflow for instantaneous re-trigger
+    el.classList.add('is-active');
+    el.classList.add(reverse ? 'is-chasing-rev' : 'is-chasing');
+
+    clearTimeout(el._laserTimer);
+    el._laserTimer = setTimeout(() => {
+      el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active');
+    }, durationMs + 40);
+  }
+
+  function fireDiscoBurst(intensity = 1.0) {
+    if (!isLaserSyncEnabled || !isLoungeOpen) return;
+
+    // Advance to next disco palette for sensational color changes on each beat
+    discoPaletteIndex = (discoPaletteIndex + 1) % DISCO_PALETTES.length;
+    discoPatternStep = (discoPatternStep + 1) % 4;
+
+    if (intensity > 1.35) {
+      // MASSIVE BEAT DROP: All 4 corners rush simultaneously!
+      triggerLaserBeam('left', false, 480);
+      triggerLaserBeam('ceiling', false, 540);
+      triggerLaserBeam('right', false, 460);
+      triggerLaserBeam('floor', false, 560);
       return;
     }
 
-    stripWrapEl.classList.remove('is-intermission');
-
-    if (c1) {
-      if (stripGradStop1) stripGradStop1.setAttribute('stop-color', c1);
-      document.documentElement.style.setProperty('--strip-c1', c1);
-      if (stripPillDot) {
-        stripPillDot.style.background = c1;
-        stripPillDot.style.boxShadow = `0 0 8px ${c1}`;
-      }
-    }
-    if (c2) {
-      if (stripGradStop2) stripGradStop2.setAttribute('stop-color', c2);
-      document.documentElement.style.setProperty('--strip-c2', c2);
-    }
-    if (c3) {
-      if (stripGradStop3) stripGradStop3.setAttribute('stop-color', c3);
-      document.documentElement.style.setProperty('--strip-c3', c3);
+    switch (discoPatternStep) {
+      case 0:
+        // Pattern A: Left Arch shoots up -> Ceiling Cove cascades across
+        triggerLaserBeam('left', false, 460);
+        setTimeout(() => triggerLaserBeam('ceiling', false, 500), 160);
+        break;
+      case 1:
+        // Pattern B: Floor crevice sweeps -> Shoots up Right Shelf
+        triggerLaserBeam('floor', false, 500);
+        setTimeout(() => triggerLaserBeam('right', true, 440), 160);
+        break;
+      case 2:
+        // Pattern C: Dual Vertical Surge (Left & Right simultaneously)
+        triggerLaserBeam('left', false, 450);
+        triggerLaserBeam('right', false, 450);
+        break;
+      case 3:
+      default:
+        // Pattern D: Ceiling Cove Laser Sweep + Floor Crevice Flash
+        triggerLaserBeam('ceiling', false, 480);
+        triggerLaserBeam('floor', false, 520);
+        break;
     }
   }
 
@@ -1178,8 +1244,18 @@
     ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
     ambilightCanvas.classList.add('is-active');
 
-    // Real-time Strip Lighting sync with live YouTube palette
-    updateCinemaStripColors(p.color1, p.color2, p.color3, false);
+    // Disco Architectural Lasers: Rhythmic Musical Drops & Beat Chase Sync (YouTube)
+    if (isLaserSyncEnabled && isYtPlaying) {
+      const nowMs = performance.now();
+      if (nowMs - lastLaserTriggerTime > 900) {
+        // Multi-frequency harmonic oscillator simulating live musical kicks & hook drops
+        const beatOsc = Math.sin(nowMs * 0.0052) * 0.6 + Math.cos(nowMs * 0.0026) * 0.4;
+        if (beatOsc > 0.40) {
+          lastLaserTriggerTime = nowMs;
+          fireDiscoBurst(beatOsc > 0.72 ? 1.45 : 1.0);
+        }
+      }
+    }
   }
 
   function updatePlayPauseButton(isPlaying) {
@@ -1210,10 +1286,9 @@
       updatePlayPauseButton(isYtPlaying);
       if (isYtPlaying) {
         showControlsHud();
-        updateCinemaStripColors(ytAmbientPalette.color1, ytAmbientPalette.color2, ytAmbientPalette.color3, false);
         startLoungeRenderLoop();
       } else {
-        updateCinemaStripColors(null, null, null, true);
+        Object.values(laserCorners).forEach(el => el && el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active'));
         if (ambilightCanvas) {
           ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
         }
@@ -1225,11 +1300,10 @@
       setupDolbyAudioDSP();
       videoEl.play();
       updatePlayPauseButton(true);
-      updateCinemaStripColors(null, null, null, false);
     } else {
       videoEl.pause();
       updatePlayPauseButton(false);
-      updateCinemaStripColors(null, null, null, true);
+      Object.values(laserCorners).forEach(el => el && el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active'));
     }
   }
 
@@ -1289,25 +1363,31 @@
           if (ambilightCtx && ambilightCanvas) {
             try {
               ambilightCtx.drawImage(videoEl, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
-              const d1 = ambilightCtx.getImageData(4, 4, 1, 1).data;
-              const d2 = ambilightCtx.getImageData(32, 18, 1, 1).data;
-              const d3 = ambilightCtx.getImageData(58, 30, 1, 1).data;
-              if (d1[0] + d1[1] + d1[2] + d2[0] + d2[1] + d2[2] > 20) {
-                updateCinemaStripColors(`rgb(${d1[0]},${d1[1]},${d1[2]})`, `rgb(${d2[0]},${d2[1]},${d2[2]})`, `rgb(${d3[0]},${d3[1]},${d3[2]})`, false);
-              }
             } catch (_) {}
           }
 
-          // C. Audio-Reactive Ambilight Pulse (MP4)
-          if (analyserNode && freqByteData && ambilightCanvas) {
+          // C. Audio-Reactive Beat Laser Chase (MP4)
+          if (analyserNode && freqByteData) {
             try {
               analyserNode.getByteFrequencyData(freqByteData);
-              // Sub-bass frequency average (bins 0 - 3)
               const bassEnergy = (freqByteData[0] + freqByteData[1] + freqByteData[2] + freqByteData[3]) / 4;
-              const scale = 1.0 + (bassEnergy / 255) * 0.14;
-              const brightness = 1.1 + (bassEnergy / 255) * 0.45;
-              ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
-              ambilightCanvas.style.filter = `blur(64px) saturate(240%) brightness(${brightness.toFixed(2)})`;
+              const snareEnergy = (freqByteData[8] + freqByteData[9]) / 2;
+              const beatEnergy = bassEnergy * 0.75 + snareEnergy * 0.25;
+
+              // Dynamic Audio Pulse for Ambilight Canvas
+              if (ambilightCanvas) {
+                const scale = 1.0 + (bassEnergy / 255) * 0.14;
+                const brightness = 1.1 + (bassEnergy / 255) * 0.45;
+                ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
+                ambilightCanvas.style.filter = `blur(64px) saturate(240%) brightness(${brightness.toFixed(2)})`;
+              }
+
+              // Real-time Running Beam Chase on Superb Timing / Beats
+              const nowPerf = performance.now();
+              if (beatEnergy > 145 && (nowPerf - lastLaserTriggerTime > 380) && isLaserSyncEnabled) {
+                lastLaserTriggerTime = nowPerf;
+                fireDiscoBurst(beatEnergy / 150);
+              }
             } catch (_) {}
           }
         }
@@ -1374,29 +1454,8 @@
     audioEqBtn = document.getElementById('lounge-eq-pill-btn');
     audioEqLabel = document.getElementById('lounge-eq-pill-label');
 
-    // Special Cinema Strip Lighting Elements
-    stripWrapEl = document.getElementById('lounge-screen-strip-wrap');
-    stripSvgEl = document.getElementById('lounge-strip-svg');
-    stripGradStop1 = document.getElementById('stripGradStop1');
-    stripGradStop2 = document.getElementById('stripGradStop2');
-    stripGradStop3 = document.getElementById('stripGradStop3');
-    stripPillBtn = document.getElementById('lounge-strip-pill-btn');
-    stripPillLabel = document.getElementById('lounge-strip-pill-label');
-    stripPillDot = document.getElementById('strip-pill-dot');
-    ceilingStripEl = document.getElementById('lounge-ceiling-strip');
-
-    if (stripPillBtn) {
-      stripPillBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const nextOpt = (currentStripOption % 3) + 1;
-        setCinemaStripOption(nextOpt);
-        if (window.vievHaptics && window.vievHaptics.impactLight) {
-          window.vievHaptics.impactLight();
-        }
-      });
-    }
-
-    setCinemaStripOption(currentStripOption);
+    // Disco Architectural 4-Corner Running Beam Lasers
+    initArchitecturalLasers();
 
     // Canvas internal buffer resolutions (optimized for 60fps blur)
     if (ambilightCanvas) {
@@ -1762,13 +1821,12 @@
             isYtPlaying = true;
             updatePlayPauseButton(true);
             showControlsHud();
-            updateCinemaStripColors(ytAmbientPalette.color1, ytAmbientPalette.color2, ytAmbientPalette.color3, false);
             startLoungeRenderLoop();
           } else if (data.info === 2 || data.info === 0) {
             isYtPlaying = false;
             updatePlayPauseButton(false);
             showControlsHud();
-            updateCinemaStripColors(null, null, null, true);
+            Object.values(laserCorners).forEach(el => el && el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active'));
             if (ambilightCanvas) {
               ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
             }
@@ -1825,13 +1883,14 @@
     closeLounge: closeCurvedCinemaLounge,
     playIntro: triggerIntroAnimation,
     getMedia: () => EXXCLUSIVE_MEDIA,
-    setStripOption: setCinemaStripOption,
-    getStripOption: () => currentStripOption
+    fireDiscoBurst: fireDiscoBurst,
+    toggleLasers: toggleDiscoLaserSync
   };
 
-  window.vievCinemaStrip = {
-    setOption: setCinemaStripOption,
-    getOption: () => currentStripOption
+  window.vievDiscoLasers = {
+    fireBurst: fireDiscoBurst,
+    toggle: toggleDiscoLaserSync,
+    triggerCorner: triggerLaserBeam
   };
 
   if (document.readyState === 'loading') {
