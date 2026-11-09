@@ -749,40 +749,16 @@
     }
   }
 
-  // Calculate pixel-perfect edge-to-edge covering for YouTube iframe to eliminate all black bars
+  // True 16:9 Cinema Fitting (Option A): Video matches 16:9 curved screen bezel-to-bezel with zero crop
   function fitYouTubePlayerToScreen() {
     const ytPlayer = document.getElementById('lounge-youtube-player');
-    const screenFrame = document.querySelector('.lounge-screen-frame');
-    if (!ytPlayer || !screenFrame) return;
-
-    const rect = screenFrame.getBoundingClientRect();
-    const W = rect.width;
-    const H = rect.height;
-    if (!W || !H) return;
-
-    const targetRatio = 16 / 9;
-    let playerW, playerH;
-
-    if (W / H >= targetRatio) {
-      // Screen frame is wider than 16:9: scale height up so width fills 100% and there are zero side black bars
-      playerW = W;
-      playerH = W / targetRatio;
-    } else {
-      // Screen frame is taller than 16:9: scale width up so height fills 100% and there are zero top/bottom black bars
-      playerH = H;
-      playerW = H * targetRatio;
-    }
-
-    // 3.5% slight overscan to seamlessly eliminate all black borders & conform to curved clip-path
-    playerW = Math.ceil(playerW * 1.035);
-    playerH = Math.ceil(playerH * 1.035);
-
-    ytPlayer.style.width = playerW + 'px';
-    ytPlayer.style.height = playerH + 'px';
+    if (!ytPlayer) return;
+    ytPlayer.style.width = '100%';
+    ytPlayer.style.height = '100%';
     ytPlayer.style.position = 'absolute';
-    ytPlayer.style.left = '50%';
-    ytPlayer.style.top = '50%';
-    ytPlayer.style.transform = 'translate(-50%, -50%)';
+    ytPlayer.style.left = '0';
+    ytPlayer.style.top = '0';
+    ytPlayer.style.transform = 'none';
   }
 
   // --- 4. LUXURY AIRBNB CURVED CHARCOAL HOME CINEMA LOUNGE ---

@@ -966,13 +966,14 @@
 /* Dynamic Room Ambient Lighting Halo (Spills onto Curved Charcoal Wall & Ceiling Cove) */
 .lounge-ambient-bleed-wrap {
   position: absolute;
-  top: 11.5%;
+  top: 10.5%;
   left: 51.5%;
   transform: translateX(-50%);
-  width: 71%;
-  max-width: 1180px;
-  height: 60%;
-  max-height: 620px;
+  height: 62%;
+  max-height: 630px;
+  aspect-ratio: 16 / 9;
+  width: auto;
+  max-width: 90vw;
   pointer-events: none;
   z-index: 2;
   display: flex;
@@ -996,16 +997,17 @@
   opacity: 0.92;
 }
 
-/* Super Curved Display Chassis (Option A: Balanced 16:9 / 16:10 Cinematic Height) */
+/* Super Curved Display Chassis: True 16:9 Cinematic Golden Ratio (Option A: 0% Crop, 100% Fit) */
 .lounge-screen-chassis {
   position: absolute;
-  top: 13%;
+  top: 12%;
   left: 51.5%;
   transform: translateX(-50%);
-  width: 67%;
-  max-width: 1120px;
-  height: 57%;
-  max-height: 590px;
+  height: 59%;
+  max-height: 600px;
+  aspect-ratio: 16 / 9;
+  width: auto;
+  max-width: 86vw;
   z-index: 5;
   display: flex;
   align-items: center;
@@ -1108,12 +1110,13 @@
   transform: scale(1.015);
 }
 
-/* YouTube IFrame Player: Conforming directly to 3D curved concave screen with zero black bars */
+/* YouTube IFrame Player: 16:9 True Cinema Curved Screen (0% Crop, 100% Fit) */
 .lounge-youtube-player {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
   border: none;
   background: #000000;
   clip-path: url(#loungeCurvedClip);
