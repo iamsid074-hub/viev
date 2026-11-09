@@ -144,9 +144,9 @@
   let audioEqBtn = null;
   let audioEqLabel = null;
 
-  // DISCO ARCHITECTURAL 4-CORNER RUNNING BEAM LASER SYSTEM
-  let laserCorners = { left: null, ceiling: null, right: null, floor: null };
-  let laserCornerLengths = { left: 750, ceiling: 1020, right: 530, floor: 1500 };
+  // DISCO ARCHITECTURAL RUNNING BEAM LASER SYSTEM
+  let laserCorners = { left: null, ceiling: null, right: null };
+  let laserCornerLengths = { left: 750, ceiling: 1020, right: 530 };
   let laserPillBtn = null;
   let laserPillLabel = null;
   let laserPillPulse = null;
@@ -1070,7 +1070,6 @@
     laserCorners.left = document.getElementById('laser-corner-1');
     laserCorners.ceiling = document.getElementById('laser-corner-2');
     laserCorners.right = document.getElementById('laser-corner-3');
-    laserCorners.floor = document.getElementById('laser-corner-4');
 
     laserPillBtn = document.getElementById('lounge-laser-pill-btn');
     laserPillLabel = document.getElementById('lounge-laser-pill-label');
@@ -1158,11 +1157,10 @@
     discoPatternStep = (discoPatternStep + 1) % 4;
 
     if (intensity > 1.35) {
-      // MASSIVE BEAT DROP: All 4 corners rush simultaneously!
+      // MASSIVE BEAT DROP: All corners rush simultaneously!
       triggerLaserBeam('left', false, 480);
       triggerLaserBeam('ceiling', false, 540);
       triggerLaserBeam('right', false, 460);
-      triggerLaserBeam('floor', false, 560);
       return;
     }
 
@@ -1173,9 +1171,9 @@
         setTimeout(() => triggerLaserBeam('ceiling', false, 500), 160);
         break;
       case 1:
-        // Pattern B: Floor crevice sweeps -> Shoots up Right Shelf
-        triggerLaserBeam('floor', false, 500);
-        setTimeout(() => triggerLaserBeam('right', true, 440), 160);
+        // Pattern B: Right Shelf vertical drop -> Ceiling flash
+        triggerLaserBeam('right', false, 440);
+        setTimeout(() => triggerLaserBeam('ceiling', false, 480), 160);
         break;
       case 2:
         // Pattern C: Dual Vertical Surge (Left & Right simultaneously)
@@ -1184,9 +1182,8 @@
         break;
       case 3:
       default:
-        // Pattern D: Ceiling Cove Laser Sweep + Floor Crevice Flash
+        // Pattern D: Ceiling Cove Laser Sweep
         triggerLaserBeam('ceiling', false, 480);
-        triggerLaserBeam('floor', false, 520);
         break;
     }
   }
