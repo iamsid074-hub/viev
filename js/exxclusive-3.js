@@ -125,8 +125,7 @@
   let videoEl = null;
   let ambilightCanvas = null;
   let ambilightCtx = null;
-  let floorCanvas = null;
-  let floorCtx = null;
+  let ytAmbientPalette = { color1: '#ff2d55', color2: '#ff9500', color3: '#5856d6' };
   let hudEl = null;
   let centerPlayBtn = null;
   let stepBackBtn = null;
@@ -821,9 +820,9 @@
       isYtPlaying = true;
       updatePlayPauseButton(true);
 
-      if (currentMedia.poster) {
-        renderStaticPosterToAmbient(currentMedia.poster);
-      }
+      // Start Real-Time Intelligent Dynamic YouTube Ambient Lighting
+      updateYouTubePalette(currentMedia);
+      startLoungeRenderLoop();
     } else {
       // DIRECT MP4 4K MASTER MODE
       if (ytPlayer) {
@@ -920,6 +919,11 @@
     }
     isYtPlaying = false;
 
+    if (ambilightCanvas) {
+      ambilightCanvas.classList.remove('is-active');
+      ambilightCanvas.style.transform = 'scale(1)';
+    }
+
     if (videoEl) {
       try {
         videoEl.pause();
@@ -959,27 +963,137 @@
     }, 280);
   }
 
-  function renderStaticPosterToAmbient(url) {
-    if (!ambilightCanvas) return;
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      try {
-        if (!ambilightCtx) ambilightCtx = ambilightCanvas.getContext('2d', { willReadFrequently: true });
-        if (ambilightCtx) ambilightCtx.drawImage(img, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
-        ambilightCanvas.classList.add('is-active');
+  // --- INTELLIGENT DYNAMIC YOUTUBE AMBIENT LIGHTING ENGINE ---
+  function updateYouTubePalette(media) {
+    if (!media) return;
+    const title = (media.title || '').toLowerCase();
+    const sub = (media.sub || '').toLowerCase();
+    const combo = title + ' ' + sub;
 
-        if (!floorCtx && floorCanvas) floorCtx = floorCanvas.getContext('2d');
-        if (floorCtx && floorCanvas) {
-          floorCtx.save();
-          floorCtx.translate(0, floorCanvas.height);
-          floorCtx.scale(1, -1);
-          floorCtx.drawImage(img, 0, 0, floorCanvas.width, floorCanvas.height);
-          floorCtx.restore();
-        }
-      } catch (_) {}
-    };
-    img.src = url;
+    // A. Intelligent Genre & Artist-Aware Signature Palettes
+    if (combo.includes('latent') || combo.includes('samay') || combo.includes('comedy') || combo.includes('stan')) {
+      ytAmbientPalette = {
+        color1: 'rgb(142, 68, 240)',  // Electric studio violet
+        color2: 'rgb(24, 140, 255)',  // Vivid cyan blue
+        color3: 'rgb(255, 45, 120)'   // Neon pink accent
+      };
+    } else if (combo.includes('honey') || combo.includes('swaezy') || combo.includes('party') || combo.includes('hip hop') || combo.includes('badshah')) {
+      ytAmbientPalette = {
+        color1: 'rgb(46, 213, 115)',  // Neon lime green
+        color2: 'rgb(255, 71, 87)',   // Crimson punch
+        color3: 'rgb(255, 168, 1)'    // Amber gold
+      };
+    } else if (combo.includes('arijit') || combo.includes('kesariya') || combo.includes('ve haaniyaan') || combo.includes('chhod diya') || combo.includes('dil') || combo.includes('ishq') || combo.includes('romantic')) {
+      ytAmbientPalette = {
+        color1: 'rgb(255, 59, 92)',   // Warm ruby crimson
+        color2: 'rgb(255, 159, 26)',  // Sunset golden amber
+        color3: 'rgb(108, 92, 231)'   // Deep acoustic indigo
+      };
+    } else if (combo.includes('padmaavat') || combo.includes('classical') || combo.includes('sufi') || combo.includes('shreya')) {
+      ytAmbientPalette = {
+        color1: 'rgb(255, 159, 26)',  // Royal saffron
+        color2: 'rgb(235, 77, 75)',   // Deep vermilion
+        color3: 'rgb(249, 202, 36)'   // Shimmering gold
+      };
+    } else {
+      // Deterministic harmonious chromatic hash based on media ID + title
+      let hash = 0;
+      const seed = (media.id || '') + (media.title || '') + (media.youtubeId || '');
+      for (let i = 0; i < seed.length; i++) {
+        hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+        hash |= 0;
+      }
+      const baseHue = Math.abs(hash) % 360;
+      const hue1 = baseHue;
+      const hue2 = (baseHue + 50) % 360;
+      const hue3 = (baseHue + 170) % 360;
+      ytAmbientPalette = {
+        color1: `hsl(${hue1}, 90%, 54%)`,
+        color2: `hsl(${hue2}, 95%, 48%)`,
+        color3: `hsl(${hue3}, 85%, 45%)`
+      };
+    }
+
+    // B. Also attempt safe thumbnail color sampling (if CORS allows)
+    const posterUrl = media.poster || (media.youtubeId ? `https://i.ytimg.com/vi/${media.youtubeId}/hqdefault.jpg` : '');
+    if (posterUrl) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const off = document.createElement('canvas');
+          off.width = 16;
+          off.height = 9;
+          const ctx = off.getContext('2d');
+          ctx.drawImage(img, 0, 0, 16, 9);
+          const p1 = ctx.getImageData(3, 4, 1, 1).data;
+          const p2 = ctx.getImageData(12, 4, 1, 1).data;
+          const p3 = ctx.getImageData(8, 2, 1, 1).data;
+          if (p1[0] + p1[1] + p1[2] > 30) {
+            ytAmbientPalette = {
+              color1: `rgb(${p1[0]}, ${p1[1]}, ${p1[2]})`,
+              color2: `rgb(${p2[0]}, ${p2[1]}, ${p2[2]})`,
+              color3: `rgb(${p3[0]}, ${p3[1]}, ${p3[2]})`
+            };
+          }
+        } catch (_) {}
+      };
+      img.src = posterUrl;
+    }
+  }
+
+  function renderDynamicYouTubeAmbient(now) {
+    if (!ambilightCtx || !ambilightCanvas) return;
+    const w = ambilightCanvas.width;
+    const h = ambilightCanvas.height;
+
+    const t = now * 0.001;
+    const p = ytAmbientPalette;
+
+    // Organic floating light anchors with sinusoidal cinematic motion
+    const x1 = w * (0.30 + 0.16 * Math.sin(t * 0.70));
+    const y1 = h * (0.45 + 0.18 * Math.cos(t * 0.50));
+    const r1 = w * (0.55 + 0.10 * Math.sin(t * 0.90));
+
+    const x2 = w * (0.70 - 0.16 * Math.cos(t * 0.75));
+    const y2 = h * (0.45 + 0.18 * Math.sin(t * 0.60));
+    const r2 = w * (0.55 + 0.10 * Math.cos(t * 0.85));
+
+    const x3 = w * (0.50 + 0.15 * Math.sin(t * 0.45));
+    const y3 = h * (0.22 + 0.10 * Math.cos(t * 0.65));
+    const r3 = w * 0.48;
+
+    ambilightCtx.clearRect(0, 0, w, h);
+
+    // Anchor 1: Left Wall Glow
+    const g1 = ambilightCtx.createRadialGradient(x1, y1, 0, x1, y1, r1);
+    g1.addColorStop(0, p.color1);
+    g1.addColorStop(1, 'rgba(0,0,0,0)');
+    ambilightCtx.fillStyle = g1;
+    ambilightCtx.fillRect(0, 0, w, h);
+
+    // Anchor 2: Right Wall Glow (Screen blend)
+    ambilightCtx.globalCompositeOperation = 'screen';
+    const g2 = ambilightCtx.createRadialGradient(x2, y2, 0, x2, y2, r2);
+    g2.addColorStop(0, p.color2);
+    g2.addColorStop(1, 'rgba(0,0,0,0)');
+    ambilightCtx.fillStyle = g2;
+    ambilightCtx.fillRect(0, 0, w, h);
+
+    // Anchor 3: Cove Ceiling Accent
+    const g3 = ambilightCtx.createRadialGradient(x3, y3, 0, x3, y3, r3);
+    g3.addColorStop(0, p.color3);
+    g3.addColorStop(1, 'rgba(0,0,0,0)');
+    ambilightCtx.fillStyle = g3;
+    ambilightCtx.fillRect(0, 0, w, h);
+    ambilightCtx.globalCompositeOperation = 'source-over';
+
+    // Cinematic breathing bloom
+    const breathe = 1.15 + 0.20 * Math.sin(t * 1.30);
+    const scale = 1.02 + 0.03 * Math.cos(t * 0.90);
+    ambilightCanvas.style.filter = `blur(54px) saturate(240%) brightness(${breathe.toFixed(2)})`;
+    ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
+    ambilightCanvas.classList.add('is-active');
   }
 
   function updatePlayPauseButton(isPlaying) {
@@ -1008,6 +1122,14 @@
       const cmd = isYtPlaying ? 'playVideo' : 'pauseVideo';
       ytPlayer.contentWindow.postMessage(JSON.stringify({ event: 'command', func: cmd, args: [] }), '*');
       updatePlayPauseButton(isYtPlaying);
+      if (isYtPlaying) {
+        showControlsHud();
+        startLoungeRenderLoop();
+      } else {
+        if (ambilightCanvas) {
+          ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
+        }
+      }
       return;
     }
     if (!videoEl) return;
@@ -1047,16 +1169,13 @@
     if (timeCountdown) timeCountdown.textContent = formatCountdownTime(curr, dur);
   }
 
-  // --- 5. REAL-TIME AMBILIGHT & LIVE FLOOR REFLECTION ENGINE ---
+  // --- 5. REAL-TIME AMBILIGHT ENGINE (MP4 + YOUTUBE) ---
   function startLoungeRenderLoop() {
     if (renderRafId) cancelAnimationFrame(renderRafId);
 
-    // Initialize canvases
+    // Initialize canvas
     if (ambilightCanvas && !ambilightCtx) {
       ambilightCtx = ambilightCanvas.getContext('2d', { willReadFrequently: true });
-    }
-    if (floorCanvas && !floorCtx) {
-      floorCtx = floorCanvas.getContext('2d', { willReadFrequently: true });
     }
 
     if (ambilightCanvas) ambilightCanvas.classList.add('is-active');
@@ -1070,32 +1189,20 @@
       if (now - lastDraw > 32) {
         lastDraw = now;
 
-        if (videoEl && !videoEl.paused && videoEl.readyState >= 2) {
-          // A. Real-Time Adaptive Ambilight Canvas
+        const isYouTube = currentMedia && (currentMedia.type === 'youtube' || !!currentMedia.youtubeId);
+
+        if (isYouTube && isYtPlaying) {
+          // A. Real-Time Intelligent Dynamic YouTube Ambient Lighting
+          renderDynamicYouTubeAmbient(now);
+        } else if (videoEl && !videoEl.paused && videoEl.readyState >= 2) {
+          // B. Real-Time Adaptive Ambilight Canvas (MP4)
           if (ambilightCtx && ambilightCanvas) {
             try {
               ambilightCtx.drawImage(videoEl, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
             } catch (_) {}
           }
 
-          // B. Real-Time Glossy Floor Live Mirror Reflection Canvas
-          if (floorCtx && floorCanvas) {
-            try {
-              // Draw bottom portion of video, flipped vertically with glossy blur
-              floorCtx.save();
-              floorCtx.clearRect(0, 0, floorCanvas.width, floorCanvas.height);
-              floorCtx.translate(0, floorCanvas.height);
-              floorCtx.scale(1, -1);
-              floorCtx.drawImage(
-                videoEl,
-                0, videoEl.videoHeight * 0.45, videoEl.videoWidth, videoEl.videoHeight * 0.55,
-                0, 0, floorCanvas.width, floorCanvas.height
-              );
-              floorCtx.restore();
-            } catch (_) {}
-          }
-
-          // C. Audio-Reactive Ambilight Pulse
+          // C. Audio-Reactive Ambilight Pulse (MP4)
           if (analyserNode && freqByteData && ambilightCanvas) {
             try {
               analyserNode.getByteFrequencyData(freqByteData);
@@ -1110,7 +1217,7 @@
         }
       }
 
-      // 60 FPS Continuous Butter-Smooth Scrubber Sync
+      // 60 FPS Continuous Butter-Smooth Scrubber Sync (MP4)
       if (videoEl && !videoEl.paused && !isDraggingScrubber) {
         updateTimelineUI();
       }
@@ -1153,7 +1260,6 @@
     loungeEl = document.getElementById('curved-charcoal-lounge');
     videoEl = document.getElementById('lounge-video-player');
     ambilightCanvas = document.getElementById('lounge-ambient-canvas');
-    floorCanvas = document.getElementById('lounge-floor-canvas');
     hudEl = document.getElementById('lounge-glass-hud');
     centerPlayBtn = document.getElementById('lounge-play-btn');
     stepBackBtn = document.getElementById('lounge-step-back-btn');
@@ -1176,10 +1282,6 @@
     if (ambilightCanvas) {
       ambilightCanvas.width = 64;
       ambilightCanvas.height = 36;
-    }
-    if (floorCanvas) {
-      floorCanvas.width = 160;
-      floorCanvas.height = 90;
     }
 
     // Intro skip / dismissal
@@ -1540,10 +1642,14 @@
             isYtPlaying = true;
             updatePlayPauseButton(true);
             showControlsHud();
+            startLoungeRenderLoop();
           } else if (data.info === 2 || data.info === 0) {
             isYtPlaying = false;
             updatePlayPauseButton(false);
             showControlsHud();
+            if (ambilightCanvas) {
+              ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
+            }
           }
         }
       } catch (_) {}
