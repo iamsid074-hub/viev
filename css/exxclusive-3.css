@@ -963,7 +963,7 @@
   overflow: hidden;
 }
 
-/* Dynamic Room Ambient Lighting Halo (Spills onto Curved Charcoal Wall & Ceiling Cove) */
+/* Subtle Room Ambient Lighting Rim Bleed (Refined, controlled halo for music videos) */
 .lounge-ambient-bleed-wrap {
   position: absolute;
   top: 12%;
@@ -984,19 +984,19 @@
 
 .lounge-ambient-canvas {
   position: absolute;
-  width: 130%;
-  height: 130%;
-  border-radius: 40px;
-  filter: blur(60px) saturate(220%) brightness(1.30);
+  width: 108%;
+  height: 108%;
+  border-radius: 24px;
+  filter: blur(32px) saturate(180%) brightness(1.02);
   opacity: 0;
   mix-blend-mode: screen;
-  transition: opacity 0.6s ease, transform 0.12s ease-out;
+  transition: opacity 0.5s ease, transform 0.12s ease-out;
   will-change: transform, opacity, filter;
   pointer-events: none;
 }
 
 .lounge-ambient-canvas.is-active {
-  opacity: 0.95;
+  opacity: 0.72;
 }
 
 /* =========================================================

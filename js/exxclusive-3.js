@@ -832,8 +832,15 @@
       isYtPlaying = true;
       updatePlayPauseButton(true);
 
-      // Start Real-Time Intelligent Dynamic YouTube Ambient Lighting & 3-second Theatre Dim
-      updateYouTubePalette(currentMedia);
+      // Disable ambient canvas glow completely for YouTube videos
+      if (ambilightCanvas) {
+        ambilightCanvas.classList.remove('is-active');
+        ambilightCanvas.style.opacity = '0';
+      }
+      if (ambilightCtx && ambilightCanvas) {
+        ambilightCtx.clearRect(0, 0, ambilightCanvas.width, ambilightCanvas.height);
+      }
+
       startLoungeRenderLoop();
       scheduleTheatreDim();
     } else {
@@ -1197,10 +1204,15 @@
         showControlsHud();
         startLoungeRenderLoop();
         scheduleTheatreDim();
+        if (ambilightCanvas) {
+          ambilightCanvas.classList.remove('is-active');
+          ambilightCanvas.style.opacity = '0';
+        }
       } else {
         restoreRoomLighting();
         if (ambilightCanvas) {
-          ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
+          ambilightCanvas.classList.remove('is-active');
+          ambilightCanvas.style.opacity = '0';
         }
       }
       return;
@@ -1266,29 +1278,35 @@
 
         const isYouTube = currentMedia && (currentMedia.type === 'youtube' || !!currentMedia.youtubeId);
 
-        if (isYouTube && isYtPlaying) {
-          // A. Real-Time Intelligent Dynamic YouTube Ambient Lighting
-          renderDynamicYouTubeAmbient(now);
+        if (isYouTube) {
+          // Zero ambient glow for YouTube videos
+          if (ambilightCanvas && ambilightCanvas.classList.contains('is-active')) {
+            ambilightCanvas.classList.remove('is-active');
+            ambilightCanvas.style.opacity = '0';
+          }
         } else if (videoEl && !videoEl.paused && videoEl.readyState >= 2) {
-          // B. Real-Time Adaptive Ambilight Canvas (MP4)
+          // Adaptive Ambilight Canvas (MP4)
           if (ambilightCtx && ambilightCanvas) {
             try {
               ambilightCtx.drawImage(videoEl, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
+              if (!ambilightCanvas.classList.contains('is-active')) {
+                ambilightCanvas.classList.add('is-active');
+                ambilightCanvas.style.opacity = '';
+              }
             } catch (_) {}
           }
 
-          // C. Audio-Reactive Cove Lighting Pulse (MP4 - ONLY on active sound, NO false triggers)
+          // Subtle Audio-Reactive Edge Bleed (MP4 - tightened refined pulse)
           if (analyserNode && freqByteData && videoEl && !videoEl.paused && !videoEl.muted && videoEl.volume > 0.05) {
             try {
               analyserNode.getByteFrequencyData(freqByteData);
               const bassEnergy = (freqByteData[0] + freqByteData[1] + freqByteData[2] + freqByteData[3]) / 4;
 
-              // Dynamic Audio Pulse for Ambilight Canvas
               if (ambilightCanvas) {
-                const scale = 1.0 + (bassEnergy / 255) * 0.12;
-                const brightness = 1.1 + (bassEnergy / 255) * 0.35;
+                const scale = 1.0 + (bassEnergy / 255) * 0.035;
+                const brightness = 0.92 + (bassEnergy / 255) * 0.16;
                 ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
-                ambilightCanvas.style.filter = `blur(64px) saturate(240%) brightness(${brightness.toFixed(2)})`;
+                ambilightCanvas.style.filter = `blur(32px) saturate(180%) brightness(${brightness.toFixed(2)})`;
               }
             } catch (_) {}
           }
@@ -1727,13 +1745,18 @@
             showControlsHud();
             startLoungeRenderLoop();
             scheduleTheatreDim();
+            if (ambilightCanvas) {
+              ambilightCanvas.classList.remove('is-active');
+              ambilightCanvas.style.opacity = '0';
+            }
           } else if (data.info === 2 || data.info === 0) {
             isYtPlaying = false;
             updatePlayPauseButton(false);
             showControlsHud();
             restoreRoomLighting();
             if (ambilightCanvas) {
-              ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
+              ambilightCanvas.classList.remove('is-active');
+              ambilightCanvas.style.opacity = '0';
             }
           }
         }
