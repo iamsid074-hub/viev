@@ -125,7 +125,13 @@
   let videoEl = null;
   let ambilightCanvas = null;
   let ambilightCtx = null;
-  let ytAmbientPalette = { color1: '#ff2d55', color2: '#ff9500', color3: '#5856d6' };
+  let ytAmbientPalette = {
+    left: 'rgb(88, 86, 214)',
+    right: 'rgb(88, 86, 214)',
+    top: 'rgb(100, 110, 245)',
+    bottom: 'rgb(70, 90, 220)',
+    center: 'rgb(88, 86, 214)'
+  };
   let hudEl = null;
   let centerPlayBtn = null;
   let stepBackBtn = null;
@@ -974,40 +980,48 @@
     }, 280);
   }
 
-  // --- INTELLIGENT DYNAMIC YOUTUBE AMBIENT LIGHTING ENGINE ---
+  // --- BALANCED FULL-PERIMETER DYNAMIC YOUTUBE AMBIENT LIGHTING ENGINE ---
   function updateYouTubePalette(media) {
     if (!media) return;
     const title = (media.title || '').toLowerCase();
     const sub = (media.sub || '').toLowerCase();
     const combo = title + ' ' + sub;
 
-    // A. Intelligent Genre & Artist-Aware Signature Palettes
+    // 1. Initial Balanced Cinema Duotone (Symmetrical luminance on Left & Right - NO warm amber strips)
     if (combo.includes('latent') || combo.includes('samay') || combo.includes('comedy') || combo.includes('stan')) {
       ytAmbientPalette = {
-        color1: 'rgb(142, 68, 240)',  // Electric studio violet
-        color2: 'rgb(24, 140, 255)',  // Vivid cyan blue
-        color3: 'rgb(255, 45, 120)'   // Neon pink accent
+        left: 'rgb(142, 68, 240)',   // Studio violet
+        right: 'rgb(142, 68, 240)',  // Balanced studio violet
+        top: 'rgb(80, 140, 255)',    // Electric blue
+        bottom: 'rgb(210, 50, 150)', // Soft magenta
+        center: 'rgb(120, 80, 240)'
       };
     } else if (combo.includes('honey') || combo.includes('swaezy') || combo.includes('party') || combo.includes('hip hop') || combo.includes('badshah')) {
       ytAmbientPalette = {
-        color1: 'rgb(46, 213, 115)',  // Neon lime green
-        color2: 'rgb(255, 71, 87)',   // Crimson punch
-        color3: 'rgb(255, 168, 1)'    // Amber gold
+        left: 'rgb(36, 195, 145)',   // Emerald cyan
+        right: 'rgb(36, 195, 145)',  // Balanced emerald cyan
+        top: 'rgb(60, 140, 240)',    // Sapphire blue
+        bottom: 'rgb(220, 60, 120)', // Soft crimson
+        center: 'rgb(40, 160, 170)'
       };
     } else if (combo.includes('arijit') || combo.includes('kesariya') || combo.includes('ve haaniyaan') || combo.includes('chhod diya') || combo.includes('dil') || combo.includes('ishq') || combo.includes('romantic')) {
       ytAmbientPalette = {
-        color1: 'rgb(255, 59, 92)',   // Warm ruby crimson
-        color2: 'rgb(255, 159, 26)',  // Sunset golden amber
-        color3: 'rgb(108, 92, 231)'   // Deep acoustic indigo
+        left: 'rgb(220, 50, 100)',   // Deep cinematic ruby
+        right: 'rgb(220, 50, 100)',  // Balanced cinematic ruby (NO amber strip)
+        top: 'rgb(130, 80, 235)',    // Acoustic indigo
+        bottom: 'rgb(175, 45, 120)', // Soft magenta
+        center: 'rgb(185, 50, 120)'
       };
     } else if (combo.includes('padmaavat') || combo.includes('classical') || combo.includes('sufi') || combo.includes('shreya')) {
       ytAmbientPalette = {
-        color1: 'rgb(255, 159, 26)',  // Royal saffron
-        color2: 'rgb(235, 77, 75)',   // Deep vermilion
-        color3: 'rgb(249, 202, 36)'   // Shimmering gold
+        left: 'rgb(195, 65, 80)',    // Royal velvet crimson
+        right: 'rgb(195, 65, 80)',   // Balanced royal velvet crimson
+        top: 'rgb(165, 70, 170)',    // Royal plum
+        bottom: 'rgb(155, 55, 90)',  // Rich burgundy
+        center: 'rgb(175, 60, 100)'
       };
     } else {
-      // Deterministic harmonious chromatic hash based on media ID + title
+      // Deterministic harmonious chromatic hash with balanced left & right
       let hash = 0;
       const seed = (media.id || '') + (media.title || '') + (media.youtubeId || '');
       for (let i = 0; i < seed.length; i++) {
@@ -1015,19 +1029,23 @@
         hash |= 0;
       }
       const baseHue = Math.abs(hash) % 360;
-      const hue1 = baseHue;
-      const hue2 = (baseHue + 50) % 360;
-      const hue3 = (baseHue + 170) % 360;
+      const colorA = `hsl(${baseHue}, 80%, 52%)`;
+      const colorB = `hsl(${(baseHue + 40) % 360}, 75%, 48%)`;
       ytAmbientPalette = {
-        color1: `hsl(${hue1}, 90%, 54%)`,
-        color2: `hsl(${hue2}, 95%, 48%)`,
-        color3: `hsl(${hue3}, 85%, 45%)`
+        left: colorA,
+        right: colorA,
+        top: colorB,
+        bottom: colorB,
+        center: colorA
       };
     }
 
-    // B. Also attempt safe thumbnail color sampling (if CORS allows)
-    const posterUrl = media.poster || (media.youtubeId ? `https://i.ytimg.com/vi/${media.youtubeId}/hqdefault.jpg` : '');
-    if (posterUrl) {
+    // 2. Real-Time Thumbnail Multi-Edge Color Extraction
+    const rawPoster = media.poster || (media.youtubeId ? `https://i.ytimg.com/vi/${media.youtubeId}/hqdefault.jpg` : '');
+    if (rawPoster) {
+      const isRemote = rawPoster.startsWith('http://') || rawPoster.startsWith('https://');
+      const proxyUrl = isRemote ? `/api/proxy-image?url=${encodeURIComponent(rawPoster)}` : rawPoster;
+
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
@@ -1037,19 +1055,37 @@
           off.height = 9;
           const ctx = off.getContext('2d');
           ctx.drawImage(img, 0, 0, 16, 9);
-          const p1 = ctx.getImageData(3, 4, 1, 1).data;
-          const p2 = ctx.getImageData(12, 4, 1, 1).data;
-          const p3 = ctx.getImageData(8, 2, 1, 1).data;
-          if (p1[0] + p1[1] + p1[2] > 30) {
-            ytAmbientPalette = {
-              color1: `rgb(${p1[0]}, ${p1[1]}, ${p1[2]})`,
-              color2: `rgb(${p2[0]}, ${p2[1]}, ${p2[2]})`,
-              color3: `rgb(${p3[0]}, ${p3[1]}, ${p3[2]})`
-            };
+
+          const leftPix = ctx.getImageData(1, 4, 1, 1).data;
+          const rightPix = ctx.getImageData(14, 4, 1, 1).data;
+          const topPix = ctx.getImageData(8, 1, 1, 1).data;
+          const btmPix = ctx.getImageData(8, 7, 1, 1).data;
+          const ctrPix = ctx.getImageData(8, 4, 1, 1).data;
+
+          function boostRGB(p) {
+            let r = p[0], g = p[1], b = p[2];
+            const max = Math.max(r, g, b);
+            if (max < 25) {
+              r += 45; g += 50; b += 70;
+            } else {
+              const boost = 1.25;
+              r = Math.min(255, Math.round(r * boost));
+              g = Math.min(255, Math.round(g * boost));
+              b = Math.min(255, Math.round(b * boost));
+            }
+            return `rgb(${r}, ${g}, ${b})`;
           }
+
+          ytAmbientPalette = {
+            left: boostRGB(leftPix),
+            right: boostRGB(rightPix),
+            top: boostRGB(topPix),
+            bottom: boostRGB(btmPix),
+            center: boostRGB(ctrPix)
+          };
         } catch (_) {}
       };
-      img.src = posterUrl;
+      img.src = proxyUrl;
     }
   }
 
@@ -1080,52 +1116,55 @@
     const t = now * 0.001;
     const p = ytAmbientPalette;
 
-    // Organic floating light anchors with sinusoidal cinematic motion
-    const x1 = w * (0.30 + 0.16 * Math.sin(t * 0.70));
-    const y1 = h * (0.45 + 0.18 * Math.cos(t * 0.50));
-    const r1 = w * (0.55 + 0.10 * Math.sin(t * 0.90));
-
-    const x2 = w * (0.70 - 0.16 * Math.cos(t * 0.75));
-    const y2 = h * (0.45 + 0.18 * Math.sin(t * 0.60));
-    const r2 = w * (0.55 + 0.10 * Math.cos(t * 0.85));
-
-    const x3 = w * (0.50 + 0.15 * Math.sin(t * 0.45));
-    const y3 = h * (0.22 + 0.10 * Math.cos(t * 0.65));
-    const r3 = w * 0.48;
+    // Organic symmetrical breathing wave
+    const breathe = 1.10 + 0.12 * Math.sin(t * 1.35);
+    const drift = Math.sin(t * 0.7) * (w * 0.02);
 
     ambilightCtx.clearRect(0, 0, w, h);
 
-    // Anchor 1: Left Wall Glow
-    const g1 = ambilightCtx.createRadialGradient(x1, y1, 0, x1, y1, r1);
-    g1.addColorStop(0, p.color1);
-    g1.addColorStop(1, 'rgba(0,0,0,0)');
-    ambilightCtx.fillStyle = g1;
+    // 1. Center Core Background Halo
+    const gCenter = ambilightCtx.createRadialGradient(w * 0.5, h * 0.5, 0, w * 0.5, h * 0.5, w * 0.70);
+    gCenter.addColorStop(0, p.center || p.left);
+    gCenter.addColorStop(0.65, 'rgba(0,0,0,0.18)');
+    gCenter.addColorStop(1, 'rgba(0,0,0,0)');
+    ambilightCtx.fillStyle = gCenter;
     ambilightCtx.fillRect(0, 0, w, h);
 
-    // Anchor 2: Right Wall Glow (Screen blend)
     ambilightCtx.globalCompositeOperation = 'screen';
-    const g2 = ambilightCtx.createRadialGradient(x2, y2, 0, x2, y2, r2);
-    g2.addColorStop(0, p.color2);
-    g2.addColorStop(1, 'rgba(0,0,0,0)');
-    ambilightCtx.fillStyle = g2;
+
+    // 2. Left Wall Symmetrical Ambient Bloom
+    const gLeft = ambilightCtx.createRadialGradient(w * 0.12 + drift, h * 0.50, 0, w * 0.12 + drift, h * 0.50, w * 0.55);
+    gLeft.addColorStop(0, p.left);
+    gLeft.addColorStop(1, 'rgba(0,0,0,0)');
+    ambilightCtx.fillStyle = gLeft;
     ambilightCtx.fillRect(0, 0, w, h);
 
-    // Anchor 3: Cove Ceiling Accent
-    const g3 = ambilightCtx.createRadialGradient(x3, y3, 0, x3, y3, r3);
-    g3.addColorStop(0, p.color3);
-    g3.addColorStop(1, 'rgba(0,0,0,0)');
-    ambilightCtx.fillStyle = g3;
+    // 3. Right Wall Symmetrical Ambient Bloom (Symmetrical anchor with exact matching radius)
+    const gRight = ambilightCtx.createRadialGradient(w * 0.88 - drift, h * 0.50, 0, w * 0.88 - drift, h * 0.50, w * 0.55);
+    gRight.addColorStop(0, p.right);
+    gRight.addColorStop(1, 'rgba(0,0,0,0)');
+    ambilightCtx.fillStyle = gRight;
     ambilightCtx.fillRect(0, 0, w, h);
+
+    // 4. Top Ceiling Wall Halo
+    const gTop = ambilightCtx.createRadialGradient(w * 0.50, h * 0.10, 0, w * 0.50, h * 0.10, w * 0.48);
+    gTop.addColorStop(0, p.top);
+    gTop.addColorStop(1, 'rgba(0,0,0,0)');
+    ambilightCtx.fillStyle = gTop;
+    ambilightCtx.fillRect(0, 0, w, h);
+
+    // 5. Bottom Floor Halo
+    const gBottom = ambilightCtx.createRadialGradient(w * 0.50, h * 0.90, 0, w * 0.50, h * 0.90, w * 0.48);
+    gBottom.addColorStop(0, p.bottom);
+    gBottom.addColorStop(1, 'rgba(0,0,0,0)');
+    ambilightCtx.fillStyle = gBottom;
+    ambilightCtx.fillRect(0, 0, w, h);
+
     ambilightCtx.globalCompositeOperation = 'source-over';
 
-    // Cinematic breathing bloom
-    const breathe = 1.15 + 0.20 * Math.sin(t * 1.30);
-    const scale = 1.02 + 0.03 * Math.cos(t * 0.90);
-    ambilightCanvas.style.filter = `blur(54px) saturate(240%) brightness(${breathe.toFixed(2)})`;
-    ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
+    // Symmetrical 360-degree bloom active
+    ambilightCanvas.style.filter = `blur(60px) saturate(220%) brightness(${breathe.toFixed(2)})`;
     ambilightCanvas.classList.add('is-active');
-
-    // Smooth ambient glow active
   }
 
   function updatePlayPauseButton(isPlaying) {

@@ -966,35 +966,37 @@
 /* Dynamic Room Ambient Lighting Halo (Spills onto Curved Charcoal Wall & Ceiling Cove) */
 .lounge-ambient-bleed-wrap {
   position: absolute;
-  top: 10.5%;
+  top: 12%;
   left: 51.5%;
   transform: translateX(-50%);
-  height: 62%;
-  max-height: 630px;
+  height: 59%;
+  max-height: 600px;
   aspect-ratio: 16 / 9;
   width: auto;
-  max-width: 90vw;
+  max-width: 86vw;
   pointer-events: none;
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
 }
 
 .lounge-ambient-canvas {
   position: absolute;
-  width: 104%;
-  height: 104%;
-  border-radius: 18px;
-  filter: blur(52px) saturate(220%) brightness(1.25);
+  width: 130%;
+  height: 130%;
+  border-radius: 40px;
+  filter: blur(60px) saturate(220%) brightness(1.30);
   opacity: 0;
   mix-blend-mode: screen;
-  transition: opacity 0.6s ease, transform 0.08s ease-out;
+  transition: opacity 0.6s ease, transform 0.12s ease-out;
   will-change: transform, opacity, filter;
+  pointer-events: none;
 }
 
 .lounge-ambient-canvas.is-active {
-  opacity: 0.92;
+  opacity: 0.95;
 }
 
 /* =========================================================

@@ -484,6 +484,29 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // 1.5. Image Proxy to bypass CORS for client-side canvas ambilight sampling
+  if (pathname === '/api/proxy-image') {
+    const targetUrl = parsedUrl.query.url;
+    if (!targetUrl || (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://'))) {
+      res.writeHead(400, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+      res.end('Missing or invalid url query parameter');
+      return;
+    }
+    const client = targetUrl.startsWith('https') ? https : http;
+    client.get(targetUrl, (proxyRes) => {
+      res.writeHead(proxyRes.statusCode || 200, {
+        'Content-Type': proxyRes.headers['content-type'] || 'image/jpeg',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=86400'
+      });
+      proxyRes.pipe(res);
+    }).on('error', (err) => {
+      res.writeHead(500, { 'Content-Type': 'text/plain', 'Access-Control-Allow-Origin': '*' });
+      res.end('Proxy image error: ' + err.message);
+    });
+    return;
+  }
+
   // 2. Static File Serving
   const cleanUrl = decodeURIComponent(pathname);
   let filePath = path.join(__dirname, cleanUrl === '/' ? 'index.html' : cleanUrl);
