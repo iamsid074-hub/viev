@@ -998,164 +998,39 @@
 }
 
 /* =========================================================
-   ARCHITECTURAL DUAL HORIZON COVE LIGHTING (TOP & BOTTOM)
-   Low, Realistic, Recessed Cove Glow (Matching User Reference)
+   REALISTIC 3-SECOND CINEMA THEATRE ROOM DIMMER
+   After 3 seconds of video playback, room lights smoothly turn OFF.
+   Deep luxury cinema auditorium darkness blooms across the room,
+   while soft natural ambient light from the left arched window
+   is realistically maintained.
    ========================================================= */
-:root {
-  --cove-base-color: #ffd8a8;
-  --cove-glow-color: rgba(255, 195, 128, 0.45);
-  --cove-spill-color: rgba(255, 180, 100, 0.22);
-  --cove-intensity: 0.88;
-}
-
-.lounge-architectural-coves {
+.lounge-theatre-dimmer {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
-  z-index: 3;
-  overflow: hidden;
-  opacity: var(--cove-intensity);
-  transition: opacity 0.8s ease;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 2.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Left window centered around 4% horizontal, 46% vertical */
+  background: 
+    radial-gradient(ellipse 36% 65% at 4% 46%, 
+      rgba(4, 5, 8, 0.20) 0%, 
+      rgba(4, 5, 8, 0.50) 22%, 
+      rgba(2, 3, 5, 0.88) 55%, 
+      rgba(1, 2, 4, 0.96) 80%, 
+      rgba(1, 1, 2, 0.99) 100%
+    ),
+    linear-gradient(180deg, 
+      rgba(2, 2, 4, 0.94) 0%, 
+      rgba(2, 2, 4, 0.86) 50%, 
+      rgba(1, 1, 3, 0.98) 100%
+    );
+  mix-blend-mode: multiply;
+  will-change: opacity;
 }
 
-.cove-lights-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.cove-ribbon-group {
-  pointer-events: none;
-  transition: filter 0.6s ease;
-}
-
-/* 3 Realistic Physical Layers - Subtle, Recessed, Low Glow */
-/* Layer 1: Broad soft architectural wash on charcoal wall & floor */
-.cove-track.track-spill {
-  fill: none;
-  stroke: var(--cove-spill-color);
-  stroke-width: 22px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: blur(12px);
-  opacity: 0.55;
-  mix-blend-mode: screen;
-  vector-effect: non-scaling-stroke;
-}
-
-/* Layer 2: Medium warm diffused cove glow */
-.cove-track.track-glow {
-  fill: none;
-  stroke: var(--cove-glow-color);
-  stroke-width: 6px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: blur(3.5px);
-  opacity: 0.75;
-  mix-blend-mode: screen;
-  vector-effect: non-scaling-stroke;
-}
-
-/* Layer 3: Sleek 1.5px recessed cove light strip ribbon */
-.cove-track.track-ribbon {
-  fill: none;
-  stroke: var(--cove-base-color);
-  stroke-width: 1.5px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0.90;
-  filter: drop-shadow(0 0 2px rgba(255, 235, 205, 0.8));
-  vector-effect: non-scaling-stroke;
-}
-
-/* Running Beam Wave on True Audio Beat Drop (Smooth, NOT harsh blink) */
-.cove-ribbon-group.is-chasing .track-ribbon {
-  animation: coveBeamSurge 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-.cove-ribbon-group.is-chasing .track-glow {
-  animation: coveGlowSurge 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes coveBeamSurge {
-  0% {
-    stroke-dashoffset: var(--cove-start, 1200);
-    opacity: 0.85;
-  }
-  35% {
-    opacity: 1;
-    stroke-width: 2.2px;
-  }
-  100% {
-    stroke-dashoffset: var(--cove-end, -400);
-    opacity: 0.90;
-  }
-}
-
-@keyframes coveGlowSurge {
-  0% {
-    stroke-dashoffset: var(--cove-start, 1200);
-    opacity: 0.70;
-  }
-  35% {
-    opacity: 1;
-    filter: blur(4px);
-  }
-  100% {
-    stroke-dashoffset: var(--cove-end, -400);
-    opacity: 0.75;
-  }
-}
-
-/* Glassmorphic Cove Lights Pill */
-.lounge-cove-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 32px;
-  padding: 0 13px;
-  background: rgba(20, 20, 26, 0.68);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 9999px;
-  color: #f5f5f7;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
-  outline: none;
-}
-.lounge-cove-pill-btn:hover {
-  background: rgba(34, 34, 44, 0.85);
-  border-color: rgba(255, 212, 163, 0.4);
-  transform: translateY(-1px);
-}
-.lounge-cove-pill-btn:active {
-  transform: scale(0.95);
-}
-.cove-pill-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #ffd4a3;
-  box-shadow: 0 0 8px #ffd4a3;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-.lounge-cove-pill-btn.is-dim .cove-pill-dot {
-  background: #666;
-  box-shadow: none;
-}
-.lounge-cove-pill-btn.is-dim {
-  opacity: 0.55;
+.curved-charcoal-lounge.is-theatre-dark .lounge-theatre-dimmer {
+  opacity: 1;
 }
 
 /* Super Curved Display Chassis: True 16:9 Cinematic Golden Ratio (Option A: 0% Crop, 100% Fit) */
@@ -1294,8 +1169,8 @@
   z-index: 15;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 20px 28px;
+  justify-content: space-between;
+  padding: 24px 28px;
   box-sizing: border-box;
   opacity: 1;
   transition: opacity 0.35s ease;
@@ -1314,11 +1189,11 @@
   pointer-events: auto;
 }
 
-/* Floating Top Bar with 'Back to Library' button at Top-Right */
+/* Floating Top Bar with 'Back to Library' button shifted cleanly to Top-Right */
 .lounge-hud-top-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   width: 100%;
   pointer-events: auto;
   z-index: 20;
@@ -1331,27 +1206,27 @@
   height: 38px;
   padding: 0 16px;
   border-radius: 9999px;
-  background: transparent !important;
-  border: none !important;
+  background: rgba(18, 18, 24, 0.72) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   letter-spacing: 0.2px;
   cursor: pointer;
   outline: none;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, background 0.2s ease;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   margin-left: auto;
 }
 
 .lounge-top-back-btn:hover {
-  transform: scale(1.05);
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(35, 35, 45, 0.88) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-1px);
 }
 
 .lounge-top-back-btn:active {
@@ -1617,123 +1492,13 @@
   text-align: right;
 }
 
-/* Cinema Mode: Main Floating Navbar replaces 4 tabs with single 'Back to Library' button shifted to top-right */
-.apple-floating-dock.is-cinema-mode {
-  z-index: 10000000 !important;
-  pointer-events: auto !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  top: calc(var(--sat, 0px) + 24px) !important;
-  right: 28px !important;
-  bottom: auto !important;
-  left: auto !important;
-  transform: translateY(0) scale(1) !important;
-  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  will-change: opacity, transform;
-}
-
-@media (max-width: 768px) {
-  .apple-floating-dock.is-cinema-mode {
-    top: calc(var(--sat, 0px) + 18px) !important;
-    right: 18px !important;
-  }
-}
-
-@media (orientation: portrait) and (max-width: 768px) {
-  .apple-floating-dock.is-cinema-mode {
-    top: 24px !important;
-    right: calc(var(--sat, 0px) + 20px) !important;
-    transform: rotate(90deg) !important;
-    transform-origin: top right !important;
-  }
-}
-
-/* Invisible Controls: When Cinema HUD hides, Back to Library smoothly hides with it */
-.apple-floating-dock.is-cinema-mode.hud-hidden {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform: translateY(-12px) scale(0.96) !important;
-}
-
-@media (orientation: portrait) and (max-width: 768px) {
-  .apple-floating-dock.is-cinema-mode.hud-hidden {
-    transform: rotate(90deg) translateY(-12px) scale(0.96) !important;
-  }
-}
-
-.apple-floating-navbar.is-cinema-mode {
-  height: 48px !important;
-  min-height: 48px !important;
-  max-height: 48px !important;
-  padding: 5px !important;
-  box-sizing: border-box !important;
-  pointer-events: auto !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  cursor: pointer;
-  background: transparent !important;
-  border: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
-}
-
-.apple-floating-navbar.is-cinema-mode:hover {
-  background: transparent !important;
-  border-color: transparent !important;
-  transform: scale(1.05) !important;
-}
-
-.apple-floating-navbar.is-cinema-mode:active {
-  transform: scale(0.95) !important;
-}
-
-.apple-floating-navbar.is-cinema-mode .nav-tab-btn,
-.apple-floating-navbar.is-cinema-mode .nav-indicator-pill,
-.apple-floating-dock.is-cinema-mode .music-floating-orb {
+/* Cinema Mode: Hide global floating dock completely so bottom timeline & duration bar never overlap */
+.apple-floating-dock.is-cinema-mode,
+.curved-charcoal-lounge.is-active ~ #apple-floating-dock,
+body.has-cinema-open #apple-floating-dock {
   display: none !important;
-}
-
-.apple-floating-navbar.is-cinema-mode .nav-cinema-back-btn {
-  display: inline-flex !important;
-}
-
-/* Single Layer Back to Library Button: Transparent inside navbar capsule, zero duplicate borders */
-.nav-cinema-back-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 38px;
-  min-height: 38px;
-  max-height: 38px;
-  box-sizing: border-box;
-  padding: 0 22px;
-  border-radius: 9999px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  color: #ffffff;
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.25px;
-  cursor: pointer;
-  outline: none;
-  user-select: none;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.85));
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
-}
-
-.nav-cinema-back-btn svg {
-  stroke-width: 2.5;
-  transition: transform 0.2s ease;
-}
-
-.nav-cinema-back-btn:hover svg {
-  transform: translateX(-2px);
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 

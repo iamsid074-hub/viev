@@ -144,14 +144,8 @@
   let audioEqBtn = null;
   let audioEqLabel = null;
 
-  // ARCHITECTURAL DUAL HORIZON COVE LIGHTING (TOP & BOTTOM)
-  let coveTopRibbon = null;
-  let coveBottomRibbon = null;
-  let covePillBtn = null;
-  let covePillLabel = null;
-  let covePillDot = null;
-  let isCoveLightingOn = true;
-  let lastCoveTriggerTime = 0;
+  // Realistic 3-Second Cinema Theatre Dimming
+  let theatreDimTimer = null;
 
   // Web Audio & Dolby DSP
   let audioCtx = null;
@@ -786,12 +780,15 @@
       audioFadeTimer = null;
     }
 
+    // Reset room dimming to initial warm ambient state
+    restoreRoomLighting();
+
     // Show lounge environment with opening fade animation
     loungeEl.classList.remove('is-closing');
     loungeEl.classList.add('is-active');
     isLoungeOpen = true;
 
-    // Switch main floating navbar into Cinema Mode (4 tabs morph into single 'Back to Library' button)
+    // Switch main floating navbar into Cinema Mode
     const floatingDock = document.getElementById('apple-floating-dock');
     const floatingNav = document.getElementById('apple-floating-navbar');
     if (floatingDock) {
@@ -829,9 +826,10 @@
       isYtPlaying = true;
       updatePlayPauseButton(true);
 
-      // Start Real-Time Intelligent Dynamic YouTube Ambient Lighting
+      // Start Real-Time Intelligent Dynamic YouTube Ambient Lighting & 3-second Theatre Dim
       updateYouTubePalette(currentMedia);
       startLoungeRenderLoop();
+      scheduleTheatreDim();
     } else {
       // DIRECT MP4 4K MASTER MODE
       if (ytPlayer) {
@@ -859,6 +857,7 @@
             playPromise.then(() => {
               setupDolbyAudioDSP();
               updatePlayPauseButton(true);
+              scheduleTheatreDim();
 
               // Smooth visual fade-in
               videoEl.style.opacity = '1';
@@ -933,9 +932,8 @@
       ambilightCanvas.style.transform = 'scale(1)';
     }
 
-    // Reset all architectural cove lighting waves
-    if (coveTopRibbon) coveTopRibbon.classList.remove('is-chasing');
-    if (coveBottomRibbon) coveBottomRibbon.classList.remove('is-chasing');
+    // Reset room lighting
+    restoreRoomLighting();
 
     if (videoEl) {
       try {
@@ -1055,62 +1053,23 @@
     }
   }
 
-  // --- ARCHITECTURAL DUAL HORIZON COVE LIGHTING ---
-  function initArchitecturalCoves() {
-    coveTopRibbon = document.getElementById('cove-top-ribbon');
-    coveBottomRibbon = document.getElementById('cove-bottom-ribbon');
-    covePillBtn = document.getElementById('lounge-cove-pill-btn');
-    covePillLabel = document.getElementById('lounge-cove-pill-label');
-    covePillDot = document.getElementById('cove-pill-dot');
-
-    if (covePillBtn) {
-      covePillBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleCoveLighting();
-        if (window.vievHaptics && window.vievHaptics.impactLight) {
-          window.vievHaptics.impactLight();
-        }
-      });
-    }
-  }
-
-  function toggleCoveLighting(forcedState) {
-    if (forcedState !== undefined) {
-      isCoveLightingOn = !!forcedState;
-    } else {
-      isCoveLightingOn = !isCoveLightingOn;
-    }
-
-    const covesWrap = document.getElementById('lounge-architectural-coves');
-    if (covesWrap) {
-      covesWrap.style.opacity = isCoveLightingOn ? '0.88' : '0';
-    }
-
-    if (covePillBtn) {
-      if (isCoveLightingOn) {
-        covePillBtn.classList.remove('is-dim');
-        if (covePillLabel) covePillLabel.textContent = 'Cove Lights: Luxury Warm';
-      } else {
-        covePillBtn.classList.add('is-dim');
-        if (covePillLabel) covePillLabel.textContent = 'Cove Lights: OFF';
+  // --- REALISTIC 3-SECOND CINEMA THEATRE ROOM DIMMING ---
+  function scheduleTheatreDim() {
+    clearTimeout(theatreDimTimer);
+    if (!isLoungeOpen) return;
+    theatreDimTimer = setTimeout(() => {
+      if (!isLoungeOpen) return;
+      const isVideoPlaying = (videoEl && !videoEl.paused && !videoEl.ended);
+      if (isYtPlaying || isVideoPlaying) {
+        if (loungeEl) loungeEl.classList.add('is-theatre-dark');
       }
-    }
+    }, 3000);
   }
 
-  function triggerCoveAudioWave() {
-    // Only fire if cove lighting is on, lounge is open, and video is actively producing audio
-    if (!isCoveLightingOn || !isLoungeOpen) return;
-
-    [coveTopRibbon, coveBottomRibbon].forEach(ribbon => {
-      if (!ribbon) return;
-      ribbon.classList.remove('is-chasing');
-      void ribbon.offsetWidth; // force reflow for smooth re-trigger
-      ribbon.classList.add('is-chasing');
-      clearTimeout(ribbon._chaseTimer);
-      ribbon._chaseTimer = setTimeout(() => {
-        ribbon.classList.remove('is-chasing');
-      }, 700);
-    });
+  function restoreRoomLighting() {
+    clearTimeout(theatreDimTimer);
+    theatreDimTimer = null;
+    if (loungeEl) loungeEl.classList.remove('is-theatre-dark');
   }
 
   function renderDynamicYouTubeAmbient(now) {
@@ -1166,10 +1125,7 @@
     ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
     ambilightCanvas.classList.add('is-active');
 
-    // Smooth, gentle ambient sync for YouTube (NO random blinking, calm luxury warmth)
-    if (coveTopRibbon && p.color1) {
-      document.documentElement.style.setProperty('--cove-base-color', p.color1);
-    }
+    // Smooth ambient glow active
   }
 
   function updatePlayPauseButton(isPlaying) {
@@ -1201,8 +1157,9 @@
       if (isYtPlaying) {
         showControlsHud();
         startLoungeRenderLoop();
+        scheduleTheatreDim();
       } else {
-        Object.values(laserCorners).forEach(el => el && el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active'));
+        restoreRoomLighting();
         if (ambilightCanvas) {
           ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
         }
@@ -1214,11 +1171,11 @@
       setupDolbyAudioDSP();
       videoEl.play();
       updatePlayPauseButton(true);
+      scheduleTheatreDim();
     } else {
       videoEl.pause();
       updatePlayPauseButton(false);
-      if (coveTopRibbon) coveTopRibbon.classList.remove('is-chasing');
-      if (coveBottomRibbon) coveBottomRibbon.classList.remove('is-chasing');
+      restoreRoomLighting();
     }
   }
 
@@ -1294,13 +1251,6 @@
                 ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
                 ambilightCanvas.style.filter = `blur(64px) saturate(240%) brightness(${brightness.toFixed(2)})`;
               }
-
-              // Real-time gentle running cove wave ONLY on actual energetic kicks (> 170)
-              const nowPerf = performance.now();
-              if (bassEnergy > 170 && (nowPerf - lastCoveTriggerTime > 650) && isCoveLightingOn) {
-                lastCoveTriggerTime = nowPerf;
-                triggerCoveAudioWave();
-              }
             } catch (_) {}
           }
         }
@@ -1366,9 +1316,6 @@
     quickCinemaBtn = document.getElementById('aura-quick-cinema-btn');
     audioEqBtn = document.getElementById('lounge-eq-pill-btn');
     audioEqLabel = document.getElementById('lounge-eq-pill-label');
-
-    // Architectural Dual Horizon Cove Lighting (Top & Bottom)
-    initArchitecturalCoves();
 
     // Canvas internal buffer resolutions (optimized for 60fps blur)
     if (ambilightCanvas) {
@@ -1675,14 +1622,19 @@
     // Video events
     if (videoEl) {
       videoEl.addEventListener('timeupdate', updateTimelineUI);
-      videoEl.addEventListener('play', () => updatePlayPauseButton(true));
+      videoEl.addEventListener('play', () => {
+        updatePlayPauseButton(true);
+        scheduleTheatreDim();
+      });
       videoEl.addEventListener('pause', () => {
         updatePlayPauseButton(false);
         showControlsHud();
+        restoreRoomLighting();
       });
       videoEl.addEventListener('ended', () => {
         updatePlayPauseButton(false);
         showControlsHud();
+        restoreRoomLighting();
       });
     }
 
@@ -1735,12 +1687,12 @@
             updatePlayPauseButton(true);
             showControlsHud();
             startLoungeRenderLoop();
+            scheduleTheatreDim();
           } else if (data.info === 2 || data.info === 0) {
             isYtPlaying = false;
             updatePlayPauseButton(false);
             showControlsHud();
-            if (coveTopRibbon) coveTopRibbon.classList.remove('is-chasing');
-            if (coveBottomRibbon) coveBottomRibbon.classList.remove('is-chasing');
+            restoreRoomLighting();
             if (ambilightCanvas) {
               ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
             }
@@ -1796,14 +1748,7 @@
     openLounge: openCurvedCinemaLounge,
     closeLounge: closeCurvedCinemaLounge,
     playIntro: triggerIntroAnimation,
-    getMedia: () => EXXCLUSIVE_MEDIA,
-    toggleCoves: toggleCoveLighting,
-    triggerCoveWave: triggerCoveAudioWave
-  };
-
-  window.vievCoveLights = {
-    toggle: toggleCoveLighting,
-    triggerWave: triggerCoveAudioWave
+    getMedia: () => EXXCLUSIVE_MEDIA
   };
 
   if (document.readyState === 'loading') {
