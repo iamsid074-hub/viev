@@ -808,6 +808,7 @@
 
     if (isYouTube) {
       // YOUTUBE MODE: Play in curved concave iframe with strict-origin-when-cross-origin
+      loungeEl.classList.add('is-youtube-mode');
       if (videoEl) {
         try { videoEl.pause(); } catch (_) {}
         videoEl.style.display = 'none';
@@ -845,6 +846,12 @@
       scheduleTheatreDim();
     } else {
       // DIRECT MP4 4K MASTER MODE
+      loungeEl.classList.remove('is-youtube-mode');
+      // Enable & activate dynamic ambient canvas for MP4 videos
+      if (ambilightCanvas) {
+        ambilightCanvas.style.opacity = '';
+        ambilightCanvas.classList.add('is-active');
+      }
       if (ytPlayer) {
         ytPlayer.src = '';
         ytPlayer.style.display = 'none';
@@ -940,8 +947,11 @@
     }
     isYtPlaying = false;
 
+    loungeEl.classList.remove('is-youtube-mode');
+
     if (ambilightCanvas) {
       ambilightCanvas.classList.remove('is-active');
+      ambilightCanvas.style.opacity = '';
       ambilightCanvas.style.transform = 'scale(1)';
     }
 
@@ -1284,14 +1294,14 @@
             ambilightCanvas.classList.remove('is-active');
             ambilightCanvas.style.opacity = '0';
           }
-        } else if (videoEl && !videoEl.paused && videoEl.readyState >= 2) {
-          // Adaptive Ambilight Canvas (MP4)
+        } else if (videoEl && !videoEl.paused) {
+          // Dynamic Adaptive Ambilight Canvas (MP4)
           if (ambilightCtx && ambilightCanvas) {
             try {
               ambilightCtx.drawImage(videoEl, 0, 0, ambilightCanvas.width, ambilightCanvas.height);
-              if (!ambilightCanvas.classList.contains('is-active')) {
-                ambilightCanvas.classList.add('is-active');
+              if (!ambilightCanvas.classList.contains('is-active') || ambilightCanvas.style.opacity === '0') {
                 ambilightCanvas.style.opacity = '';
+                ambilightCanvas.classList.add('is-active');
               }
             } catch (_) {}
           }
@@ -1303,10 +1313,10 @@
               const bassEnergy = (freqByteData[0] + freqByteData[1] + freqByteData[2] + freqByteData[3]) / 4;
 
               if (ambilightCanvas) {
-                const scale = 1.0 + (bassEnergy / 255) * 0.035;
-                const brightness = 0.92 + (bassEnergy / 255) * 0.16;
+                const scale = 1.0 + (bassEnergy / 255) * 0.04;
+                const brightness = 1.02 + (bassEnergy / 255) * 0.20;
                 ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
-                ambilightCanvas.style.filter = `blur(32px) saturate(180%) brightness(${brightness.toFixed(2)})`;
+                ambilightCanvas.style.filter = `blur(44px) saturate(210%) brightness(${brightness.toFixed(2)})`;
               }
             } catch (_) {}
           }

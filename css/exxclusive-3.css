@@ -984,10 +984,10 @@
 
 .lounge-ambient-canvas {
   position: absolute;
-  width: 108%;
-  height: 108%;
-  border-radius: 24px;
-  filter: blur(32px) saturate(180%) brightness(1.02);
+  width: 118%;
+  height: 118%;
+  border-radius: 28px;
+  filter: blur(44px) saturate(210%) brightness(1.15);
   opacity: 0;
   mix-blend-mode: screen;
   transition: opacity 0.5s ease, transform 0.12s ease-out;
@@ -996,7 +996,7 @@
 }
 
 .lounge-ambient-canvas.is-active {
-  opacity: 0.72;
+  opacity: 0.88;
 }
 
 /* =========================================================
@@ -1362,6 +1362,12 @@
 
 .lounge-glass-play-btn:active {
   transform: scale(0.94);
+}
+
+/* YouTube Mode: Hide custom timeline scrubber controls completely so YouTube native player is clean and unobstructed */
+.curved-charcoal-lounge.is-youtube-mode .lounge-hud-bottom-bar {
+  display: none !important;
+  pointer-events: none !important;
 }
 
 /* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Firmly anchored to the bottom edge) */
