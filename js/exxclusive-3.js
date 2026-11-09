@@ -144,25 +144,14 @@
   let audioEqBtn = null;
   let audioEqLabel = null;
 
-  // DISCO ARCHITECTURAL RUNNING BEAM LASER SYSTEM
-  let laserCorners = { left: null, ceiling: null, right: null };
-  let laserCornerLengths = { left: 750, ceiling: 1020, right: 530 };
-  let laserPillBtn = null;
-  let laserPillLabel = null;
-  let laserPillPulse = null;
-  let isLaserSyncEnabled = true;
-  let lastLaserTriggerTime = 0;
-  let discoPaletteIndex = 0;
-  let discoPatternStep = 0;
-
-  const DISCO_PALETTES = [
-    { c1: '#00f0ff', c2: '#b000ff' }, // Cyber Cyan & Electric Violet
-    { c1: '#ff0055', c2: '#ffcc00' }, // Tokyo Hot Pink & Laser Gold
-    { c1: '#00ff88', c2: '#00ccff' }, // Electric Mint & Ice Blue
-    { c1: '#ff3300', c2: '#ff00aa' }, // Solar Flare & Deep Magenta
-    { c1: '#7928ca', c2: '#ff0080' }, // Midnight Club
-    { c1: '#ffffff', c2: '#00f0ff' }  // White Hot Strobe & Cyan
-  ];
+  // ARCHITECTURAL DUAL HORIZON COVE LIGHTING (TOP & BOTTOM)
+  let coveTopRibbon = null;
+  let coveBottomRibbon = null;
+  let covePillBtn = null;
+  let covePillLabel = null;
+  let covePillDot = null;
+  let isCoveLightingOn = true;
+  let lastCoveTriggerTime = 0;
 
   // Web Audio & Dolby DSP
   let audioCtx = null;
@@ -944,8 +933,9 @@
       ambilightCanvas.style.transform = 'scale(1)';
     }
 
-    // Deactivate and reset all disco corner lasers
-    Object.values(laserCorners).forEach(el => el && el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active'));
+    // Reset all architectural cove lighting waves
+    if (coveTopRibbon) coveTopRibbon.classList.remove('is-chasing');
+    if (coveBottomRibbon) coveBottomRibbon.classList.remove('is-chasing');
 
     if (videoEl) {
       try {
@@ -1065,33 +1055,18 @@
     }
   }
 
-  // --- DISCO ARCHITECTURAL 4-CORNER RUNNING BEAM LASER ENGINE ---
-  function initArchitecturalLasers() {
-    laserCorners.left = document.getElementById('laser-corner-1');
-    laserCorners.ceiling = document.getElementById('laser-corner-2');
-    laserCorners.right = document.getElementById('laser-corner-3');
+  // --- ARCHITECTURAL DUAL HORIZON COVE LIGHTING ---
+  function initArchitecturalCoves() {
+    coveTopRibbon = document.getElementById('cove-top-ribbon');
+    coveBottomRibbon = document.getElementById('cove-bottom-ribbon');
+    covePillBtn = document.getElementById('lounge-cove-pill-btn');
+    covePillLabel = document.getElementById('lounge-cove-pill-label');
+    covePillDot = document.getElementById('cove-pill-dot');
 
-    laserPillBtn = document.getElementById('lounge-laser-pill-btn');
-    laserPillLabel = document.getElementById('lounge-laser-pill-label');
-    laserPillPulse = document.getElementById('laser-pill-pulse');
-
-    // Dynamically calculate exact SVG path lengths
-    Object.keys(laserCorners).forEach(key => {
-      const g = laserCorners[key];
-      if (g) {
-        const path = g.querySelector('.track-core') || g.querySelector('path');
-        if (path && path.getTotalLength) {
-          try {
-            laserCornerLengths[key] = Math.round(path.getTotalLength());
-          } catch (_) {}
-        }
-      }
-    });
-
-    if (laserPillBtn) {
-      laserPillBtn.addEventListener('click', (e) => {
+    if (covePillBtn) {
+      covePillBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        toggleDiscoLaserSync();
+        toggleCoveLighting();
         if (window.vievHaptics && window.vievHaptics.impactLight) {
           window.vievHaptics.impactLight();
         }
@@ -1099,93 +1074,43 @@
     }
   }
 
-  function toggleDiscoLaserSync(forcedState) {
+  function toggleCoveLighting(forcedState) {
     if (forcedState !== undefined) {
-      isLaserSyncEnabled = !!forcedState;
+      isCoveLightingOn = !!forcedState;
     } else {
-      isLaserSyncEnabled = !isLaserSyncEnabled;
+      isCoveLightingOn = !isCoveLightingOn;
     }
 
-    if (laserPillBtn) {
-      if (isLaserSyncEnabled) {
-        laserPillBtn.classList.remove('is-disabled');
-        if (laserPillLabel) laserPillLabel.textContent = 'Disco Lasers: Beat Sync';
+    const covesWrap = document.getElementById('lounge-architectural-coves');
+    if (covesWrap) {
+      covesWrap.style.opacity = isCoveLightingOn ? '0.88' : '0';
+    }
+
+    if (covePillBtn) {
+      if (isCoveLightingOn) {
+        covePillBtn.classList.remove('is-dim');
+        if (covePillLabel) covePillLabel.textContent = 'Cove Lights: Luxury Warm';
       } else {
-        laserPillBtn.classList.add('is-disabled');
-        if (laserPillLabel) laserPillLabel.textContent = 'Disco Lasers: OFF';
+        covePillBtn.classList.add('is-dim');
+        if (covePillLabel) covePillLabel.textContent = 'Cove Lights: OFF';
       }
     }
   }
 
-  function triggerLaserBeam(cornerKey, reverse = false, durationMs = 520) {
-    if (!isLaserSyncEnabled) return;
-    const el = laserCorners[cornerKey];
-    if (!el) return;
+  function triggerCoveAudioWave() {
+    // Only fire if cove lighting is on, lounge is open, and video is actively producing audio
+    if (!isCoveLightingOn || !isLoungeOpen) return;
 
-    const length = laserCornerLengths[cornerKey] || 800;
-    const beamLen = Math.max(160, Math.round(length * 0.35));
-    const palette = DISCO_PALETTES[discoPaletteIndex];
-
-    el.style.setProperty('--beam-c1', palette.c1);
-    el.style.setProperty('--beam-c2', palette.c2);
-    el.style.setProperty('--dash-start', `${length + beamLen}`);
-    el.style.setProperty('--dash-end', `${-beamLen}`);
-    el.style.setProperty('--chase-duration', `${(durationMs / 1000).toFixed(2)}s`);
-
-    const tracks = el.querySelectorAll('.laser-track');
-    tracks.forEach(track => {
-      track.style.strokeDasharray = `${beamLen} ${length * 2}`;
+    [coveTopRibbon, coveBottomRibbon].forEach(ribbon => {
+      if (!ribbon) return;
+      ribbon.classList.remove('is-chasing');
+      void ribbon.offsetWidth; // force reflow for smooth re-trigger
+      ribbon.classList.add('is-chasing');
+      clearTimeout(ribbon._chaseTimer);
+      ribbon._chaseTimer = setTimeout(() => {
+        ribbon.classList.remove('is-chasing');
+      }, 700);
     });
-
-    // Reset and trigger CSS animation
-    el.classList.remove('is-chasing', 'is-chasing-rev');
-    void el.offsetWidth; // force reflow for instantaneous re-trigger
-    el.classList.add('is-active');
-    el.classList.add(reverse ? 'is-chasing-rev' : 'is-chasing');
-
-    clearTimeout(el._laserTimer);
-    el._laserTimer = setTimeout(() => {
-      el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active');
-    }, durationMs + 40);
-  }
-
-  function fireDiscoBurst(intensity = 1.0) {
-    if (!isLaserSyncEnabled || !isLoungeOpen) return;
-
-    // Advance to next disco palette for sensational color changes on each beat
-    discoPaletteIndex = (discoPaletteIndex + 1) % DISCO_PALETTES.length;
-    discoPatternStep = (discoPatternStep + 1) % 4;
-
-    if (intensity > 1.35) {
-      // MASSIVE BEAT DROP: All corners rush simultaneously!
-      triggerLaserBeam('left', false, 480);
-      triggerLaserBeam('ceiling', false, 540);
-      triggerLaserBeam('right', false, 460);
-      return;
-    }
-
-    switch (discoPatternStep) {
-      case 0:
-        // Pattern A: Left Arch shoots up -> Ceiling Cove cascades across
-        triggerLaserBeam('left', false, 460);
-        setTimeout(() => triggerLaserBeam('ceiling', false, 500), 160);
-        break;
-      case 1:
-        // Pattern B: Right Shelf vertical drop -> Ceiling flash
-        triggerLaserBeam('right', false, 440);
-        setTimeout(() => triggerLaserBeam('ceiling', false, 480), 160);
-        break;
-      case 2:
-        // Pattern C: Dual Vertical Surge (Left & Right simultaneously)
-        triggerLaserBeam('left', false, 450);
-        triggerLaserBeam('right', false, 450);
-        break;
-      case 3:
-      default:
-        // Pattern D: Ceiling Cove Laser Sweep
-        triggerLaserBeam('ceiling', false, 480);
-        break;
-    }
   }
 
   function renderDynamicYouTubeAmbient(now) {
@@ -1241,17 +1166,9 @@
     ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
     ambilightCanvas.classList.add('is-active');
 
-    // Disco Architectural Lasers: Rhythmic Musical Drops & Beat Chase Sync (YouTube)
-    if (isLaserSyncEnabled && isYtPlaying) {
-      const nowMs = performance.now();
-      if (nowMs - lastLaserTriggerTime > 900) {
-        // Multi-frequency harmonic oscillator simulating live musical kicks & hook drops
-        const beatOsc = Math.sin(nowMs * 0.0052) * 0.6 + Math.cos(nowMs * 0.0026) * 0.4;
-        if (beatOsc > 0.40) {
-          lastLaserTriggerTime = nowMs;
-          fireDiscoBurst(beatOsc > 0.72 ? 1.45 : 1.0);
-        }
-      }
+    // Smooth, gentle ambient sync for YouTube (NO random blinking, calm luxury warmth)
+    if (coveTopRibbon && p.color1) {
+      document.documentElement.style.setProperty('--cove-base-color', p.color1);
     }
   }
 
@@ -1300,7 +1217,8 @@
     } else {
       videoEl.pause();
       updatePlayPauseButton(false);
-      Object.values(laserCorners).forEach(el => el && el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active'));
+      if (coveTopRibbon) coveTopRibbon.classList.remove('is-chasing');
+      if (coveBottomRibbon) coveBottomRibbon.classList.remove('is-chasing');
     }
   }
 
@@ -1363,27 +1281,25 @@
             } catch (_) {}
           }
 
-          // C. Audio-Reactive Beat Laser Chase (MP4)
-          if (analyserNode && freqByteData) {
+          // C. Audio-Reactive Cove Lighting Pulse (MP4 - ONLY on active sound, NO false triggers)
+          if (analyserNode && freqByteData && videoEl && !videoEl.paused && !videoEl.muted && videoEl.volume > 0.05) {
             try {
               analyserNode.getByteFrequencyData(freqByteData);
               const bassEnergy = (freqByteData[0] + freqByteData[1] + freqByteData[2] + freqByteData[3]) / 4;
-              const snareEnergy = (freqByteData[8] + freqByteData[9]) / 2;
-              const beatEnergy = bassEnergy * 0.75 + snareEnergy * 0.25;
 
               // Dynamic Audio Pulse for Ambilight Canvas
               if (ambilightCanvas) {
-                const scale = 1.0 + (bassEnergy / 255) * 0.14;
-                const brightness = 1.1 + (bassEnergy / 255) * 0.45;
+                const scale = 1.0 + (bassEnergy / 255) * 0.12;
+                const brightness = 1.1 + (bassEnergy / 255) * 0.35;
                 ambilightCanvas.style.transform = `scale(${scale.toFixed(3)})`;
                 ambilightCanvas.style.filter = `blur(64px) saturate(240%) brightness(${brightness.toFixed(2)})`;
               }
 
-              // Real-time Running Beam Chase on Superb Timing / Beats
+              // Real-time gentle running cove wave ONLY on actual energetic kicks (> 170)
               const nowPerf = performance.now();
-              if (beatEnergy > 145 && (nowPerf - lastLaserTriggerTime > 380) && isLaserSyncEnabled) {
-                lastLaserTriggerTime = nowPerf;
-                fireDiscoBurst(beatEnergy / 150);
+              if (bassEnergy > 170 && (nowPerf - lastCoveTriggerTime > 650) && isCoveLightingOn) {
+                lastCoveTriggerTime = nowPerf;
+                triggerCoveAudioWave();
               }
             } catch (_) {}
           }
@@ -1451,8 +1367,8 @@
     audioEqBtn = document.getElementById('lounge-eq-pill-btn');
     audioEqLabel = document.getElementById('lounge-eq-pill-label');
 
-    // Disco Architectural 4-Corner Running Beam Lasers
-    initArchitecturalLasers();
+    // Architectural Dual Horizon Cove Lighting (Top & Bottom)
+    initArchitecturalCoves();
 
     // Canvas internal buffer resolutions (optimized for 60fps blur)
     if (ambilightCanvas) {
@@ -1823,7 +1739,8 @@
             isYtPlaying = false;
             updatePlayPauseButton(false);
             showControlsHud();
-            Object.values(laserCorners).forEach(el => el && el.classList.remove('is-chasing', 'is-chasing-rev', 'is-active'));
+            if (coveTopRibbon) coveTopRibbon.classList.remove('is-chasing');
+            if (coveBottomRibbon) coveBottomRibbon.classList.remove('is-chasing');
             if (ambilightCanvas) {
               ambilightCanvas.style.filter = 'blur(60px) saturate(180%) brightness(0.70)';
             }
@@ -1880,14 +1797,13 @@
     closeLounge: closeCurvedCinemaLounge,
     playIntro: triggerIntroAnimation,
     getMedia: () => EXXCLUSIVE_MEDIA,
-    fireDiscoBurst: fireDiscoBurst,
-    toggleLasers: toggleDiscoLaserSync
+    toggleCoves: toggleCoveLighting,
+    triggerCoveWave: triggerCoveAudioWave
   };
 
-  window.vievDiscoLasers = {
-    fireBurst: fireDiscoBurst,
-    toggle: toggleDiscoLaserSync,
-    triggerCorner: triggerLaserBeam
+  window.vievCoveLights = {
+    toggle: toggleCoveLighting,
+    triggerWave: triggerCoveAudioWave
   };
 
   if (document.readyState === 'loading') {

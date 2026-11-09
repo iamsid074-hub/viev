@@ -998,16 +998,17 @@
 }
 
 /* =========================================================
-   DISCO ARCHITECTURAL 4-CORNER RUNNING BEAM LASER SYSTEM
-   (Concealed in Room Corners: Left Arch, Ceiling Cove, Right Shelf, Floor Crevice)
+   ARCHITECTURAL DUAL HORIZON COVE LIGHTING (TOP & BOTTOM)
+   Low, Realistic, Recessed Cove Glow (Matching User Reference)
    ========================================================= */
 :root {
-  --beam-c1: #00f0ff;
-  --beam-c2: #b000ff;
-  --beam-c3: #ffffff;
+  --cove-base-color: #ffd8a8;
+  --cove-glow-color: rgba(255, 195, 128, 0.45);
+  --cove-spill-color: rgba(255, 180, 100, 0.22);
+  --cove-intensity: 0.88;
 }
 
-.lounge-architectural-lasers {
+.lounge-architectural-coves {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1015,9 +1016,11 @@
   pointer-events: none;
   z-index: 3;
   overflow: hidden;
+  opacity: var(--cove-intensity);
+  transition: opacity 0.8s ease;
 }
 
-.corner-lasers-svg {
+.cove-lights-svg {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1026,106 +1029,99 @@
   pointer-events: none;
 }
 
-/* Individual Corner Groups (Normally 100% Dark Stealth) */
-.laser-corner-group {
-  opacity: 0;
+.cove-ribbon-group {
   pointer-events: none;
-  transition: opacity 0.15s ease-out;
-  will-change: opacity, stroke-dashoffset;
+  transition: filter 0.6s ease;
 }
 
-.laser-corner-group.is-active {
-  opacity: 1;
-}
-
-/* 3-Layer Laser Structure: Bloom (Wide), Blade (Sleek Neon), Core (White Hot Laser) */
-.laser-track {
+/* 3 Realistic Physical Layers - Subtle, Recessed, Low Glow */
+/* Layer 1: Broad soft architectural wash on charcoal wall & floor */
+.cove-track.track-spill {
   fill: none;
-  vector-effect: non-scaling-stroke;
+  stroke: var(--cove-spill-color);
+  stroke-width: 22px;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-/* Layer 1: Ambient Wall Bloom */
-.laser-track.track-bloom {
-  stroke: var(--beam-c1, #00f0ff);
-  stroke-width: 34px;
-  opacity: 0.70;
-  filter: blur(15px);
+  filter: blur(12px);
+  opacity: 0.55;
   mix-blend-mode: screen;
+  vector-effect: non-scaling-stroke;
 }
 
-/* Layer 2: Concentrated Neon Laser Blade */
-.laser-track.track-blade {
-  stroke: var(--beam-c2, #b000ff);
-  stroke-width: 7px;
-  opacity: 0.95;
-  filter: blur(3px);
+/* Layer 2: Medium warm diffused cove glow */
+.cove-track.track-glow {
+  fill: none;
+  stroke: var(--cove-glow-color);
+  stroke-width: 6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: blur(3.5px);
+  opacity: 0.75;
   mix-blend-mode: screen;
+  vector-effect: non-scaling-stroke;
 }
 
-/* Layer 3: Ultra-Intense White Hot Laser Core */
-.laser-track.track-core {
-  stroke: #ffffff;
-  stroke-width: 2.2px;
-  opacity: 1;
-  filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 10px var(--beam-c1, #00f0ff));
+/* Layer 3: Sleek 1.5px recessed cove light strip ribbon */
+.cove-track.track-ribbon {
+  fill: none;
+  stroke: var(--cove-base-color);
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.90;
+  filter: drop-shadow(0 0 2px rgba(255, 235, 205, 0.8));
+  vector-effect: non-scaling-stroke;
 }
 
-/* Running Beam Chase Keyframe Animations */
-@keyframes laserChaseForward {
+/* Running Beam Wave on True Audio Beat Drop (Smooth, NOT harsh blink) */
+.cove-ribbon-group.is-chasing .track-ribbon {
+  animation: coveBeamSurge 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.cove-ribbon-group.is-chasing .track-glow {
+  animation: coveGlowSurge 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes coveBeamSurge {
   0% {
-    stroke-dashoffset: var(--dash-start, 1200);
-    opacity: 0;
+    stroke-dashoffset: var(--cove-start, 1200);
+    opacity: 0.85;
   }
-  15% {
+  35% {
     opacity: 1;
-  }
-  85% {
-    opacity: 1;
+    stroke-width: 2.2px;
   }
   100% {
-    stroke-dashoffset: var(--dash-end, -500);
-    opacity: 0;
+    stroke-dashoffset: var(--cove-end, -400);
+    opacity: 0.90;
   }
 }
 
-@keyframes laserChaseReverse {
+@keyframes coveGlowSurge {
   0% {
-    stroke-dashoffset: var(--dash-end, -500);
-    opacity: 0;
+    stroke-dashoffset: var(--cove-start, 1200);
+    opacity: 0.70;
   }
-  15% {
+  35% {
     opacity: 1;
-  }
-  85% {
-    opacity: 1;
+    filter: blur(4px);
   }
   100% {
-    stroke-dashoffset: var(--dash-start, 1200);
-    opacity: 0;
+    stroke-dashoffset: var(--cove-end, -400);
+    opacity: 0.75;
   }
 }
 
-.laser-corner-group.is-chasing .laser-track {
-  animation: laserChaseForward var(--chase-duration, 0.52s) cubic-bezier(0.18, 0.89, 0.32, 1) forwards;
-}
-
-.laser-corner-group.is-chasing-rev .laser-track {
-  animation: laserChaseReverse var(--chase-duration, 0.52s) cubic-bezier(0.18, 0.89, 0.32, 1) forwards;
-}
-
-/* Glassmorphic Disco Lasers Control Pill in HUD */
-.lounge-laser-pill-btn {
+/* Glassmorphic Cove Lights Pill */
+.lounge-cove-pill-btn {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   height: 32px;
   padding: 0 13px;
-  background: rgba(20, 20, 28, 0.70);
-  backdrop-filter: blur(20px) saturate(190%);
-  -webkit-backdrop-filter: blur(20px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(20, 20, 26, 0.68);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 9999px;
   color: #f5f5f7;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
@@ -1138,34 +1134,28 @@
   user-select: none;
   outline: none;
 }
-.lounge-laser-pill-btn:hover {
-  background: rgba(36, 36, 50, 0.88);
-  border-color: rgba(0, 240, 255, 0.45);
+.lounge-cove-pill-btn:hover {
+  background: rgba(34, 34, 44, 0.85);
+  border-color: rgba(255, 212, 163, 0.4);
   transform: translateY(-1px);
 }
-.lounge-laser-pill-btn:active {
+.lounge-cove-pill-btn:active {
   transform: scale(0.95);
 }
-.laser-pill-pulse {
+.cove-pill-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #00f0ff;
-  box-shadow: 0 0 8px #00f0ff;
+  background: #ffd4a3;
+  box-shadow: 0 0 8px #ffd4a3;
   transition: background 0.3s ease, box-shadow 0.3s ease;
-  animation: discoDotBlink 1.4s ease-in-out infinite alternate;
 }
-@keyframes discoDotBlink {
-  0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #00f0ff; }
-  100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 10px #b000ff; }
-}
-.lounge-laser-pill-btn.is-disabled .laser-pill-pulse {
-  background: #666666;
+.lounge-cove-pill-btn.is-dim .cove-pill-dot {
+  background: #666;
   box-shadow: none;
-  animation: none;
 }
-.lounge-laser-pill-btn.is-disabled {
-  opacity: 0.6;
+.lounge-cove-pill-btn.is-dim {
+  opacity: 0.55;
 }
 
 /* Super Curved Display Chassis: True 16:9 Cinematic Golden Ratio (Option A: 0% Crop, 100% Fit) */
