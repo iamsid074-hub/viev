@@ -749,6 +749,42 @@
     }
   }
 
+  // Calculate pixel-perfect edge-to-edge covering for YouTube iframe to eliminate all black bars
+  function fitYouTubePlayerToScreen() {
+    const ytPlayer = document.getElementById('lounge-youtube-player');
+    const screenFrame = document.querySelector('.lounge-screen-frame');
+    if (!ytPlayer || !screenFrame) return;
+
+    const rect = screenFrame.getBoundingClientRect();
+    const W = rect.width;
+    const H = rect.height;
+    if (!W || !H) return;
+
+    const targetRatio = 16 / 9;
+    let playerW, playerH;
+
+    if (W / H >= targetRatio) {
+      // Screen frame is wider than 16:9: scale height up so width fills 100% and there are zero side black bars
+      playerW = W;
+      playerH = W / targetRatio;
+    } else {
+      // Screen frame is taller than 16:9: scale width up so height fills 100% and there are zero top/bottom black bars
+      playerH = H;
+      playerW = H * targetRatio;
+    }
+
+    // 3.5% slight overscan to seamlessly eliminate all black borders & conform to curved clip-path
+    playerW = Math.ceil(playerW * 1.035);
+    playerH = Math.ceil(playerH * 1.035);
+
+    ytPlayer.style.width = playerW + 'px';
+    ytPlayer.style.height = playerH + 'px';
+    ytPlayer.style.position = 'absolute';
+    ytPlayer.style.left = '50%';
+    ytPlayer.style.top = '50%';
+    ytPlayer.style.transform = 'translate(-50%, -50%)';
+  }
+
   // --- 4. LUXURY AIRBNB CURVED CHARCOAL HOME CINEMA LOUNGE ---
   function openCurvedCinemaLounge(media) {
     if (!loungeEl) return;
@@ -783,8 +819,6 @@
     // Show HUD controls
     showControlsHud();
 
-    const extYtBtn = document.getElementById('lounge-yt-external-btn');
-
     if (isYouTube) {
       // YOUTUBE MODE: Play in curved concave iframe with strict-origin-when-cross-origin
       if (videoEl) {
@@ -800,11 +834,12 @@
           ? `&origin=${encodeURIComponent(window.location.origin)}`
           : '';
         ytPlayer.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1${originParam}`;
-      }
 
-      if (extYtBtn) {
-        extYtBtn.href = `https://www.youtube.com/watch?v=${ytId}`;
-        extYtBtn.style.display = 'inline-flex';
+        // Compute edge-to-edge covering dynamically so video fills curved screen with zero black bars
+        fitYouTubePlayerToScreen();
+        setTimeout(fitYouTubePlayerToScreen, 50);
+        setTimeout(fitYouTubePlayerToScreen, 150);
+        setTimeout(fitYouTubePlayerToScreen, 350);
       }
 
       isYtPlaying = true;
@@ -814,7 +849,6 @@
         renderStaticPosterToAmbient(currentMedia.poster);
       }
     } else {
-      if (extYtBtn) extYtBtn.style.display = 'none';
       // DIRECT MP4 4K MASTER MODE
       if (ytPlayer) {
         ytPlayer.src = '';
@@ -908,8 +942,6 @@
       ytPlayer.src = '';
       ytPlayer.style.display = 'none';
     }
-    const extYtBtn = document.getElementById('lounge-yt-external-btn');
-    if (extYtBtn) extYtBtn.style.display = 'none';
     isYtPlaying = false;
 
     if (videoEl) {
@@ -1125,9 +1157,11 @@
 
     if (hudInactivityTimer) clearTimeout(hudInactivityTimer);
 
-    // Auto-hide controls after 2.6 seconds of inactivity during playback
+    // Auto-hide controls after 2.6 seconds of inactivity during playback (Works for both MP4 & YouTube)
     hudInactivityTimer = setTimeout(() => {
-      if (videoEl && !videoEl.paused && !isDraggingScrubber) {
+      const isYouTube = currentMedia && (currentMedia.type === 'youtube' || !!currentMedia.youtubeId);
+      const isPlaying = isYouTube ? isYtPlaying : (videoEl && !videoEl.paused);
+      if (isPlaying && !isDraggingScrubber) {
         hudEl.classList.add('is-hidden');
         if (floatingDock && isLoungeOpen) {
           floatingDock.classList.add('hud-hidden');
@@ -1504,14 +1538,55 @@
         if (e.target.closest('.lounge-glass-hud > *') || e.target.closest('#apple-floating-dock') || e.target.closest('.cinema-floating-dock') || e.target.closest('.lounge-exit-btn') || e.target.closest('#nav-cinema-back-btn') || e.target.closest('#lounge-top-back-btn')) {
           return;
         }
-        if (hudEl && hudEl.classList.contains('is-hidden')) {
-          showControlsHud();
-        } else {
-          showControlsHud();
+        if (hudEl) {
+          if (hudEl.classList.contains('is-hidden')) {
+            showControlsHud();
+          } else {
+            hudEl.classList.add('is-hidden');
+            const floatingDock = document.getElementById('apple-floating-dock');
+            if (floatingDock && isLoungeOpen) floatingDock.classList.add('hud-hidden');
+            if (hudInactivityTimer) clearTimeout(hudInactivityTimer);
+          }
         }
       });
 
       loungeEl.addEventListener('mousemove', showControlsHud);
+    }
+
+    // YouTube IFrame State Synchronization (Auto-sync play/pause & trigger HUD auto-hide)
+    window.addEventListener('message', (event) => {
+      if (!event.data || typeof event.data !== 'string') return;
+      try {
+        const data = JSON.parse(event.data);
+        if (data.event === 'onStateChange') {
+          // 1: PLAYING, 2: PAUSED, 0: ENDED
+          if (data.info === 1) {
+            isYtPlaying = true;
+            updatePlayPauseButton(true);
+            showControlsHud();
+          } else if (data.info === 2 || data.info === 0) {
+            isYtPlaying = false;
+            updatePlayPauseButton(false);
+            showControlsHud();
+          }
+        }
+      } catch (_) {}
+    });
+
+    // Fit YouTube player on screen resize & orientation change
+    window.addEventListener('resize', fitYouTubePlayerToScreen);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(fitYouTubePlayerToScreen, 100);
+      setTimeout(fitYouTubePlayerToScreen, 300);
+    });
+
+    // ResizeObserver on screen frame for continuous edge-to-edge covering
+    const screenFrameEl = document.querySelector('.lounge-screen-frame');
+    if (screenFrameEl && window.ResizeObserver) {
+      const ro = new ResizeObserver(() => {
+        fitYouTubePlayerToScreen();
+      });
+      ro.observe(screenFrameEl);
     }
 
     // Render initial grid

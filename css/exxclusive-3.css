@@ -570,37 +570,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* External YouTube App Quick Launch Pill in Cinema HUD */
-.lounge-yt-external-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 9999px;
-  background: rgba(22, 22, 26, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-}
-
-.lounge-yt-external-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.38);
-  transform: scale(1.03);
-}
-
-.lounge-yt-external-btn:active {
-  transform: scale(0.97);
-}
-
 /* Glass Search Bar */
 .aura-search-pill-box {
   position: relative;
@@ -1139,16 +1108,14 @@
   transform: scale(1.015);
 }
 
-/* YouTube IFrame Player: Conforming directly to 3D curved concave screen */
+/* YouTube IFrame Player: Conforming directly to 3D curved concave screen with zero black bars */
 .lounge-youtube-player {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100% !important;
-  height: 100% !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   border: none;
   background: #000000;
-  transform: scale(1.015);
   clip-path: url(#loungeCurvedClip);
   -webkit-clip-path: url(#loungeCurvedClip);
   z-index: 4;
@@ -1206,6 +1173,11 @@
 
 .lounge-glass-hud.is-hidden {
   opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.lounge-glass-hud.is-hidden * {
+  pointer-events: none !important;
 }
 
 .lounge-glass-hud > * {
