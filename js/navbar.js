@@ -2814,6 +2814,18 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Controls Event Listeners
+  // Tap Album Artwork to Play/Pause (Clean effortless gesture)
+  if (artworkCard) {
+    artworkCard.style.cursor = 'pointer';
+    artworkCard.addEventListener('click', (e) => {
+      // Don't toggle play if interacting with lyrics card or song list card
+      if (e.target.closest('#music-lyrics-card') || e.target.closest('#music-songlist-card')) return;
+      triggerHaptic('medium');
+      togglePlay();
+      showHUD(audio.paused ? 'Paused' : 'Playing', '', audio.paused ? 'pause' : 'play');
+    });
+  }
+
   if (musicPlayBtn) {
     musicPlayBtn.addEventListener('click', () => {
       triggerHaptic('medium');

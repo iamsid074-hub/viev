@@ -2462,16 +2462,118 @@
   font-weight: 500;
 }
 
-/* Apple Playback Modes Deck & Wrapper */
-.apple-modes-deck {
-  position: relative;
+/* =========================================================
+   APPLE MUSIC: DUAL VERTICAL SIDEBARS (LEFT & RIGHT)
+   Left: Repeat, Sleep Timer, AirPlay
+   Right: Song List, Lyrics, Share
+   Open Center with Zero Volume Bar & Zero Horizontal Decks
+   ========================================================= */
+.music-vertical-controls-deck {
   width: 100%;
-  max-width: 320px;
-  margin: 8px auto 14px auto;
+  max-width: 380px;
+  margin: 12px auto 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 0 16px;
+  position: relative;
+  z-index: 20;
+  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  will-change: transform;
+}
+
+.music-vertical-center-space {
+  flex: 1;
+  min-width: 40px;
+}
+
+.music-vertical-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 25;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+  user-select: none;
+  box-sizing: border-box;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.music-vertical-bar:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 14px 36px rgba(0, 0, 0, 0.50),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.music-vertical-bar .mode-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.65);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.music-vertical-bar .mode-btn svg {
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.music-vertical-bar .mode-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(1.08);
+}
+
+.music-vertical-bar .mode-btn:active {
+  transform: scale(0.92);
+}
+
+.music-vertical-bar .mode-btn.is-active,
+.music-vertical-bar .mode-btn.is-all,
+.music-vertical-bar .mode-btn.is-one,
+.music-vertical-bar .mode-btn.active {
+  color: #ff375f;
+  background: rgba(255, 55, 95, 0.16);
+}
+
+.music-vertical-bar .mode-btn.is-active svg,
+.music-vertical-bar .mode-btn.is-all svg,
+.music-vertical-bar .mode-btn.is-one svg,
+.music-vertical-bar .mode-btn.active svg {
+  filter: drop-shadow(0 0 8px rgba(255, 55, 95, 0.7));
+}
+
+/* In Lyrics & Song List Panel Mode: pull vertical bars smoothly upwards */
+.apple-now-playing-container.is-panel-open .music-vertical-controls-deck {
+  transform: translateY(-28px);
+}
+
+/* Apple Playback Modes Deck & Wrapper (Legacy fallback) */
+.apple-modes-deck {
+  display: none !important;
 }
 
 /* Apple Playback Modes Row (Repeat, Speed, Sleep Timer, 3 Vertical Dots) */
@@ -2768,88 +2870,11 @@
   font-weight: 600;
 }
 
-/* Apple Controls Row */
-.apple-controls-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  margin-bottom: 12px;
-  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), margin-bottom 0.36s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
-}
-
-.apple-ctrl-action {
-  background: transparent;
-  border: none;
-  width: 48px;
-  height: 48px;
-  color: rgba(255, 255, 255, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: color 0.2s ease, transform 0.15s ease;
-  outline: none;
-}
-
-.apple-ctrl-action:hover {
-  color: #ffffff;
-}
-
-.apple-ctrl-action:active {
-  transform: scale(0.9);
-}
-
-.apple-play-toggle {
-  width: 68px;
-  height: 68px;
-  border: none;
-  background: transparent;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.2s var(--ease-apple);
-  outline: none;
-}
-
-.apple-play-toggle:active {
-  transform: scale(0.92);
-}
-
-/* Apple Bottom Deck (Volume Slider) */
-.apple-bottom-deck {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transform: none;
-  margin-bottom: 0;
-  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
-}
-
-/* In Lyrics & Song List Panel Mode: pull controls & volume smoothly upwards closer to timeline */
-.apple-now-playing-container.is-panel-open .apple-controls-row {
-  transform: translateY(-38px);
-  margin-bottom: 2px;
-}
-
-.apple-now-playing-container.is-panel-open .apple-bottom-deck {
-  transform: translateY(-38px);
-}
-
-/* Volume Slider */
+/* Removed Elements: Volume Deck & Center Controls Row completely removed */
+.apple-controls-row,
+.apple-bottom-deck,
 .apple-volume-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 0;
-  padding: 0 10px;
+  display: none !important;
 }
 
 .vol-icon {
