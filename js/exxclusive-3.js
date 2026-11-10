@@ -291,21 +291,6 @@
   function dismissIntro() {
     if (!introEl || introEl.classList.contains('is-dismissed')) return;
     introEl.classList.add('is-dismissed');
-
-    // Smoothly fade floating dock back in once intro completes
-    const floatingDock = document.getElementById('apple-floating-dock');
-    if (floatingDock && !isLoungeOpen) {
-      setTimeout(() => {
-        if (!isLoungeOpen && floatingDock.classList.contains('is-intro-hidden')) {
-          floatingDock.style.setProperty('transition', 'opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)', 'important');
-          floatingDock.classList.remove('is-intro-hidden');
-          setTimeout(() => {
-            floatingDock.style.removeProperty('transition');
-          }, 700);
-        }
-      }, 120);
-    }
-
     setTimeout(() => {
       introEl.style.display = 'none';
     }, 450);
@@ -313,16 +298,6 @@
 
   function triggerIntroAnimation() {
     if (!introEl) return;
-
-    // Instantly hide floating dock during intro opening animation (zero delay, zero flicker)
-    const floatingDock = document.getElementById('apple-floating-dock');
-    if (floatingDock) {
-      floatingDock.style.setProperty('transition', 'none', 'important');
-      floatingDock.classList.add('is-intro-hidden');
-      void floatingDock.offsetHeight; // Force reflow so instant hide applies immediately
-      floatingDock.style.removeProperty('transition');
-    }
-
     buildRibbonBurst();
 
     // Re-trigger letter-by-letter cascade animation
@@ -1837,11 +1812,6 @@
   window.onExxclusiveTabDeactivated = function () {
     if (isLoungeOpen) {
       closeCurvedCinemaLounge();
-    }
-    const floatingDock = document.getElementById('apple-floating-dock');
-    if (floatingDock) {
-      floatingDock.classList.remove('is-intro-hidden');
-      floatingDock.style.removeProperty('transition');
     }
   };
 

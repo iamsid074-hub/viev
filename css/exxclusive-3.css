@@ -1501,18 +1501,10 @@
 /* Cinema Mode: Hide global floating dock completely so bottom timeline & duration bar never overlap */
 .apple-floating-dock.is-cinema-mode,
 .curved-charcoal-lounge.is-active ~ #apple-floating-dock,
-body.has-cinema-open #apple-floating-dock,
-.apple-floating-dock.is-intro-hidden {
+body.has-cinema-open #apple-floating-dock {
+  display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
-  transform: translateX(-50%) translateY(20px) !important;
 }
-
-.apple-floating-dock.is-cinema-mode,
-.curved-charcoal-lounge.is-active ~ #apple-floating-dock,
-body.has-cinema-open #apple-floating-dock {
-  display: none !important;
-}
-
 
