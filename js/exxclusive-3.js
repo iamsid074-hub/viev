@@ -481,8 +481,20 @@
   }
 
   function getFallbackVideos() {
+    let isDigi = false;
+    try {
+      const sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
+      if (sess.role === 'digi' || sess.code === '3011' || sess.code === '3009') isDigi = true;
+    } catch (_) {}
+
+    if (isDigi && window.DIGI_YOUTUBE_FEED && Array.isArray(window.DIGI_YOUTUBE_FEED) && window.DIGI_YOUTUBE_FEED.length > 0) {
+      return window.DIGI_YOUTUBE_FEED;
+    }
     if (window.VIRAT_YOUTUBE_FEED && Array.isArray(window.VIRAT_YOUTUBE_FEED) && window.VIRAT_YOUTUBE_FEED.length > 0) {
       return window.VIRAT_YOUTUBE_FEED;
+    }
+    if (window.DIGI_YOUTUBE_FEED && Array.isArray(window.DIGI_YOUTUBE_FEED) && window.DIGI_YOUTUBE_FEED.length > 0) {
+      return window.DIGI_YOUTUBE_FEED;
     }
     return [
       { id: 'c64I9HNpiOY', title: 'Ek Dil Ek Jaan • Padmaavat (Deepika Padukone, Shahid Kapoor)', channel: 'T-Series', views: '112M views', pub: '2 years ago', duration: '5:10', thumb: 'https://i.ytimg.com/vi/c64I9HNpiOY/hqdefault.jpg', avatar: 'song/virat_plays_avatar.png' },
@@ -817,11 +829,12 @@
 
       if (ytPlayer) {
         ytPlayer.style.display = 'block';
-        // youtube-nocookie.com avoids cookie/anti-tracker conflicts and passes origin
+        // Use standard www.youtube.com with widget_referrer and playsinline to prevent Error 150/153 on mobile
         const originParam = (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null')
           ? `&origin=${encodeURIComponent(window.location.origin)}`
           : '';
-        ytPlayer.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1${originParam}`;
+        const refParam = `&widget_referrer=${encodeURIComponent(window.location.href)}`;
+        ytPlayer.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3${originParam}${refParam}`;
 
         // Compute edge-to-edge covering dynamically so video fills curved screen with zero black bars
         fitYouTubePlayerToScreen();

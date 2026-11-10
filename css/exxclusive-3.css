@@ -868,6 +868,13 @@
     transform-origin: top left !important;
   }
 
+  .curved-charcoal-lounge .lounge-screen-chassis,
+  .curved-charcoal-lounge .lounge-ambient-bleed-wrap {
+    max-width: 86vh !important;
+    height: 62% !important;
+    max-height: 90vw !important;
+  }
+
   .curved-charcoal-lounge.is-active {
     display: flex !important;
     animation: cinemaFadeInPortrait 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
@@ -1156,9 +1163,7 @@
   height: 100% !important;
   border: none;
   background: #000000;
-  clip-path: url(#loungeCurvedClip);
-  -webkit-clip-path: url(#loungeCurvedClip);
-  z-index: 4;
+  z-index: 10;
 }
 
 /* --- 4. LIQUID GLASS UI (IMAGE 2 SPEC) --- */
@@ -1364,10 +1369,15 @@
   transform: scale(0.94);
 }
 
-/* YouTube Mode: Hide custom timeline scrubber controls completely so YouTube native player is clean and unobstructed */
-.curved-charcoal-lounge.is-youtube-mode .lounge-hud-bottom-bar {
+/* YouTube Mode: Hide custom timeline scrubber controls & center cluster so YouTube native player is clean and directly touchable */
+.curved-charcoal-lounge.is-youtube-mode .lounge-hud-bottom-bar,
+.curved-charcoal-lounge.is-youtube-mode .lounge-hud-center-cluster {
   display: none !important;
   pointer-events: none !important;
+}
+
+.curved-charcoal-lounge.is-youtube-mode .lounge-screen-frame::after {
+  display: none !important;
 }
 
 /* Bottom Bar: Timeline Scrubber + Audio/Subtitles Pill (Firmly anchored to the bottom edge) */
