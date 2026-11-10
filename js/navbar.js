@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Control RAF loops: Pause heavy visualizer & lyrics loops when off music screen
+    // Control RAF loops & OLED video: Pause heavy visualizer & video decoding when off music screen
     if (targetTab === 'music') {
       if (typeof isPlaying !== 'undefined' && isPlaying && typeof audio !== 'undefined' && !audio.paused) {
         if (typeof currentCardView !== 'undefined' && currentCardView === 'artwork') {
@@ -209,10 +209,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof scheduleMusicIdleAnimation === 'function') {
           scheduleMusicIdleAnimation(2800);
         }
+        if (typeof artworkVideo !== 'undefined' && artworkVideo && artworkVideo.src && !document.hidden) {
+          artworkVideo.currentTime = audio.currentTime;
+          artworkVideo.play().catch(() => {});
+        }
       }
     } else {
       stopBeatVisualizer();
       stopSyncLoop();
+      if (typeof artworkVideo !== 'undefined' && artworkVideo && !artworkVideo.paused) {
+        artworkVideo.pause();
+      }
       if (typeof resetMusicIdleState === 'function') {
         resetMusicIdleState();
       }
@@ -3651,28 +3658,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function initAudioVisualizer() {
-    if (audioCtx) return;
-    // iOS Safari Fix: On iPhone/iPad, routing <audio> through WebAudio createMediaElementSource
-    // causes iOS to suspend audio on screen lock or after 30-60s.
-    // By keeping HTML5 audio native on iOS, playback continues in background forever without stopping!
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    if (isIOS) {
-      return; // Uses smooth polyrhythmic fallback wave in beatVisualizerLoop
-    }
-    try {
-      const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtxClass) return;
-      audioCtx = new AudioCtxClass();
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      analyser.smoothingTimeConstant = 0.8;
-      audioSourceNode = audioCtx.createMediaElementSource(audio);
-      audioSourceNode.connect(analyser);
-      analyser.connect(audioCtx.destination);
-    } catch (e) {
-      // Graceful fallback to real-time audio.currentTime polyrhythmic wave
-    }
+    // Keep HTML5 audio 100% native hardware pipeline on all devices (Android, iOS, Windows, macOS).
+    // Routing <audio> through WebAudio createMediaElementSource hijacks audio into software mixing,
+    // which starves on screen-lock/background tab throttling, causing audio stuttering/crackling ("fat fat ke bajna").
+    // The polyrhythmic engine in beatVisualizerLoop provides mathematically perfect 60fps ambient visualizer
+    // without hijacking the native audio pipeline.
+    return;
   }
 
   function startBeatVisualizer() {
@@ -3982,9 +3973,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (artworkGlow) artworkGlow.classList.toggle('is-paused', !playing);
     if (glassFrame) glassFrame.classList.toggle('is-paused', !playing);
 
-    // Sync OLED Video playback state
+    // Sync OLED Video playback state (only render video when visible on music screen)
     if (artworkVideo && artworkVideo.src) {
-      if (playing) {
+      if (playing && !document.hidden && currentTab === 'music') {
         artworkVideo.play().catch(() => {});
       } else {
         artworkVideo.pause();
@@ -4785,8 +4776,10 @@ document.addEventListener('DOMContentLoaded', () => {
           artworkVideo.load();
         }
         artworkVideo.currentTime = 0;
-        if (autoPlay || isPlaying) {
+        if ((autoPlay || isPlaying) && !document.hidden && currentTab === 'music') {
           artworkVideo.play().catch(() => {});
+        } else {
+          artworkVideo.pause();
         }
       }
       if (badgeOledVideo) badgeOledVideo.style.display = 'inline-flex';
@@ -4862,12 +4855,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isPlaying && !audio.paused) {
         wasPlayingBeforeHidden = true;
       }
+      if (artworkVideo && !artworkVideo.paused) {
+        artworkVideo.pause();
+      }
     } else {
       if (wasPlayingBeforeHidden && isPlaying && audio.paused && !userExplicitPause) {
         audio.play().catch(() => {});
       }
       wasPlayingBeforeHidden = false;
       updateSyncedLyrics(audio.currentTime, true);
+      if (currentTab === 'music' && artworkVideo && artworkVideo.src && isPlaying && !audio.paused) {
+        artworkVideo.currentTime = audio.currentTime;
+        artworkVideo.play().catch(() => {});
+      }
     }
   });
 
@@ -5021,8 +5021,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Live update synced lyrics line and auto-scroll
     updateSyncedLyrics(cur);
 
-    // Keep OLED Video in sync with audio
-    if (artworkVideo && artworkVideo.src && !artworkVideo.paused) {
+    // Keep OLED Video in sync with audio ONLY when visible on music screen
+    if (!document.hidden && currentTab === 'music' && artworkVideo && artworkVideo.src && !artworkVideo.paused) {
       if (Math.abs(artworkVideo.currentTime - cur) > 0.4) {
         artworkVideo.currentTime = cur;
       }
