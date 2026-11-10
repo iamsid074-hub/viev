@@ -153,10 +153,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (typeof currentCardView !== 'undefined' && currentCardView === 'lyrics') {
           startSyncLoop();
         }
+        if (typeof scheduleMusicIdleAnimation === 'function') {
+          scheduleMusicIdleAnimation(2800);
+        }
       }
     } else {
       stopBeatVisualizer();
       stopSyncLoop();
+      if (typeof resetMusicIdleState === 'function') {
+        resetMusicIdleState();
+      }
     }
 
     // Update floating companion orb visibility
@@ -380,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('resize', () => {
     const active = document.querySelector('.nav-tab-btn.active');
-    if (active) updateIndicator(active, false);
+    if (active && (!isMusicDockCollapsed || currentTab !== 'music')) updateIndicator(active, false);
   });
 
   // =========================================================
@@ -1370,6 +1376,9 @@ document.addEventListener('DOMContentLoaded', () => {
   audio.setAttribute('webkit-playsinline', '');
   audio.playsInline = true;
   const musicPlayBtn = document.getElementById('music-play-btn');
+  const musicControlsDeck = document.getElementById('music-vertical-controls-deck');
+  const musicBarLeft = document.getElementById('music-bar-left');
+  const musicBarRight = document.getElementById('music-bar-right');
   const prevBtn = document.getElementById('music-prev-btn');
   const nextBtn = document.getElementById('music-next-btn');
   const nowPlayingWrap = document.querySelector('.apple-now-playing-container');
@@ -1942,6 +1951,149 @@ document.addEventListener('DOMContentLoaded', () => {
         activeItem.classList.toggle('is-paused', !playing);
       }
     }
+
+    if (playing) {
+      if (currentTab === 'music') {
+        scheduleMusicIdleAnimation(2800);
+      }
+    } else {
+      resetMusicIdleState();
+    }
+  }
+
+  // =========================================================
+  // APPLE MUSIC: IDLE CONTROLS DIMMING & DOCK COLLAPSE SYSTEM
+  // 1. Gently dims vertical sidebars & play button during playback
+  // 2. Smoothly tucks/collapses Music tab out of floating navbar
+  // 3. Wakes immediately on interaction or audio stop (vice-versa)
+  // =========================================================
+  let musicIdleTimeout = null;
+  let isMusicDockCollapsed = false;
+  let isMusicControlsDimmed = false;
+
+  function scheduleMusicIdleAnimation(delay = 2800) {
+    if (musicIdleTimeout) {
+      clearTimeout(musicIdleTimeout);
+      musicIdleTimeout = null;
+    }
+    if (!isPlaying || audio.paused || currentTab !== 'music' || document.hidden) {
+      return;
+    }
+    musicIdleTimeout = setTimeout(() => {
+      if (!isPlaying || audio.paused || currentTab !== 'music') return;
+
+      // 1. Dim sidebars & play button if in standard artwork view
+      if (typeof currentCardView === 'undefined' || currentCardView === 'artwork') {
+        if (musicControlsDeck) {
+          musicControlsDeck.classList.add('is-playing-dimmed');
+          isMusicControlsDimmed = true;
+        }
+      }
+
+      // 2. Tucks floating navbar dock (hides music tab, narrows width, shifts down)
+      if (floatingDock && !floatingDock.classList.contains('is-music-collapsed')) {
+        floatingDock.classList.add('is-music-collapsed');
+        isMusicDockCollapsed = true;
+      }
+    }, delay);
+  }
+
+  function wakeMusicControls(andDock = false) {
+    if (musicControlsDeck && isMusicControlsDimmed) {
+      musicControlsDeck.classList.remove('is-playing-dimmed');
+      isMusicControlsDimmed = false;
+    }
+    if (andDock && isMusicDockCollapsed) {
+      restoreMusicDock();
+    } else if (isPlaying && !audio.paused && currentTab === 'music' && (typeof currentCardView === 'undefined' || currentCardView === 'artwork')) {
+      scheduleMusicIdleAnimation(3000);
+    }
+  }
+
+  function restoreMusicDock() {
+    if (musicIdleTimeout) {
+      clearTimeout(musicIdleTimeout);
+      musicIdleTimeout = null;
+    }
+    if (floatingDock) {
+      floatingDock.classList.remove('is-music-collapsed');
+    }
+    isMusicDockCollapsed = false;
+    const musicTab = document.getElementById('tab-music');
+    if (musicTab && currentTab === 'music') {
+      updateIndicator(musicTab);
+      setTimeout(() => {
+        if (currentTab === 'music' && !isMusicDockCollapsed) updateIndicator(musicTab);
+      }, 150);
+      setTimeout(() => {
+        if (currentTab === 'music' && !isMusicDockCollapsed) updateIndicator(musicTab);
+      }, 490);
+    }
+    if (isPlaying && !audio.paused && currentTab === 'music') {
+      scheduleMusicIdleAnimation(3500);
+    }
+  }
+
+  function resetMusicIdleState() {
+    if (musicIdleTimeout) {
+      clearTimeout(musicIdleTimeout);
+      musicIdleTimeout = null;
+    }
+    if (musicControlsDeck) {
+      musicControlsDeck.classList.remove('is-playing-dimmed');
+    }
+    isMusicControlsDimmed = false;
+    if (floatingDock) {
+      floatingDock.classList.remove('is-music-collapsed');
+    }
+    isMusicDockCollapsed = false;
+    const musicTab = document.getElementById('tab-music');
+    if (musicTab && currentTab === 'music') {
+      updateIndicator(musicTab);
+      setTimeout(() => {
+        if (currentTab === 'music' && !isMusicDockCollapsed) updateIndicator(musicTab);
+      }, 150);
+      setTimeout(() => {
+        if (currentTab === 'music' && !isMusicDockCollapsed) updateIndicator(musicTab);
+      }, 490);
+    }
+  }
+
+  // Interaction listeners for waking dimmed music controls & dock
+  if (musicControlsDeck) {
+    ['pointerdown', 'touchstart', 'click'].forEach(evt => {
+      musicControlsDeck.addEventListener(evt, () => wakeMusicControls(false), { passive: true });
+    });
+  }
+
+  const musicScreenEl = pageScreens && pageScreens.music;
+  if (musicScreenEl) {
+    musicScreenEl.addEventListener('pointerdown', (e) => {
+      if (floatingDock && floatingDock.contains(e.target)) return;
+      wakeMusicControls(false);
+    }, { passive: true });
+
+    musicScreenEl.addEventListener('mousemove', () => {
+      if (isMusicControlsDimmed) wakeMusicControls(false);
+    }, { passive: true });
+  }
+
+  if (floatingDock) {
+    floatingDock.addEventListener('pointerenter', () => {
+      if (isMusicDockCollapsed) restoreMusicDock();
+    });
+    floatingDock.addEventListener('pointerdown', () => {
+      if (isMusicDockCollapsed) restoreMusicDock();
+    });
+  }
+
+  const musicTabBtn = document.getElementById('tab-music');
+  if (musicTabBtn) {
+    musicTabBtn.addEventListener('transitionend', (e) => {
+      if (e.propertyName === 'max-width' && currentTab === 'music' && !isMusicDockCollapsed) {
+        updateIndicator(musicTabBtn);
+      }
+    });
   }
 
   // Native smooth scrolling for lyrics without CPU animation tick overhead
@@ -1998,6 +2150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (view === 'lyrics') {
       stopBeatVisualizer();
+      wakeMusicControls(false);
       if (artworkCard) artworkCard.classList.add('is-depth-bg');
       if (glassFrame) glassFrame.classList.add('is-depth-bg');
       if (songlistCard) songlistCard.classList.remove('is-revealed');
@@ -2012,6 +2165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (view === 'songlist') {
       stopBeatVisualizer();
       stopSyncLoop();
+      wakeMusicControls(false);
       if (artworkCard) artworkCard.classList.add('is-depth-bg');
       if (glassFrame) glassFrame.classList.add('is-depth-bg');
       if (lyricsCard) lyricsCard.classList.remove('is-revealed');
@@ -2032,6 +2186,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (modesRow) modesRow.classList.remove('is-hidden');
       if (isPlaying && !audio.paused && currentTab === 'music') {
         startBeatVisualizer();
+        scheduleMusicIdleAnimation(2800);
       }
     }
   }
