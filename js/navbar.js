@@ -23,11 +23,44 @@ document.addEventListener('DOMContentLoaded', () => {
     settings: document.getElementById('settings-screen')
   };
 
-  function updateIndicator(activeBtn) {
+  function updateIndicator(activeBtn, animate = true) {
     if (!indicator || !activeBtn) return;
-    indicator.classList.remove('no-transition');
+    if (animate) {
+      indicator.classList.remove('no-transition');
+    } else {
+      indicator.classList.add('no-transition');
+    }
     indicator.style.left = `${activeBtn.offsetLeft}px`;
     indicator.style.width = `${activeBtn.offsetWidth}px`;
+  }
+
+  let indicatorRafId = null;
+  function trackIndicatorDuringExpansion(targetBtn, onComplete) {
+    if (!indicator || !targetBtn) return;
+    if (indicatorRafId) cancelAnimationFrame(indicatorRafId);
+    indicator.style.opacity = '1';
+    indicator.classList.add('no-transition');
+    const startTime = performance.now();
+    const duration = 580; // matches 0.55s Apple spring transition
+    const targetTab = targetBtn.getAttribute('data-tab');
+
+    function frame(now) {
+      const elapsed = now - startTime;
+      if (elapsed < duration && currentTab === targetTab) {
+        indicator.style.left = `${targetBtn.offsetLeft}px`;
+        indicator.style.width = `${targetBtn.offsetWidth}px`;
+        indicatorRafId = requestAnimationFrame(frame);
+      } else {
+        if (indicator && targetBtn && currentTab === targetTab) {
+          indicator.style.left = `${targetBtn.offsetLeft}px`;
+          indicator.style.width = `${targetBtn.offsetWidth}px`;
+        }
+        if (indicator) indicator.classList.remove('no-transition');
+        indicatorRafId = null;
+        if (typeof onComplete === 'function') onComplete();
+      }
+    }
+    indicatorRafId = requestAnimationFrame(frame);
   }
 
   window.syncCinemaTabVisibility = function() {
@@ -110,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!sess || sess.code !== '1711') return;
     } catch (_) { return; }
     if (typeof triggerHaptic === 'function') triggerHaptic('light');
+    const wasDockCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
     currentTab = targetTab;
 
     // Update active tab buttons
@@ -121,8 +155,27 @@ document.addEventListener('DOMContentLoaded', () => {
     clickedBtn.classList.add('active');
     clickedBtn.setAttribute('aria-selected', 'true');
 
-    // Slide the liquid glass pill indicator smoothly
-    updateIndicator(clickedBtn);
+    if (wasDockCollapsed) {
+      if (floatingDock) floatingDock.classList.remove('is-music-collapsed');
+      isMusicDockCollapsed = false;
+
+      if (targetTab === 'music') {
+        // "openingke time bhi same cheez kar phle music ko unhide kar then instant slider ko show kar"
+        if (indicator) indicator.style.opacity = '0';
+        setTimeout(() => {
+          if (currentTab === 'music' && indicator) {
+            updateIndicator(clickedBtn, false);
+            indicator.style.opacity = '1';
+          }
+        }, 550);
+      } else {
+        // Smoothly glide and lock indicator to clickedBtn as Music unhides in Apple spring physics
+        trackIndicatorDuringExpansion(clickedBtn);
+      }
+    } else {
+      if (indicator) indicator.style.opacity = '1';
+      updateIndicator(clickedBtn);
+    }
 
     if (window.vievAirCast && typeof window.vievAirCast.notifyScreenState === 'function') {
       window.vievAirCast.notifyScreenState({
@@ -1749,11 +1802,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const trebleAttack = targetTreble > currentTreblePulse ? 0.75 : 0.22;
     currentTreblePulse += (targetTreble - currentTreblePulse) * trebleAttack;
 
-    // Push Tri-Band energies to CSS Custom Properties (isolated on glow, zero parent reflow)
+    // Dynamic Cinema-style Adaptive Ambilight scaling & brightness pulse
     if (artworkGlow) {
       artworkGlow.style.setProperty('--bass-energy', currentBassPulse.toFixed(3));
       artworkGlow.style.setProperty('--mid-energy', currentMidPulse.toFixed(3));
       artworkGlow.style.setProperty('--treble-energy', currentTreblePulse.toFixed(3));
+      const scale = 1.0 + (currentBassPulse * 0.045);
+      const brightness = 1.05 + (currentBassPulse * 0.22);
+      artworkGlow.style.transform = `scale(${scale.toFixed(3)})`;
+      if (ambilightImg) {
+        ambilightImg.style.filter = `blur(48px) saturate(220%) brightness(${brightness.toFixed(2)})`;
+      }
     }
 
     // Traveling Rim Prism acceleration: Treble hits ignite crystalline prism transit
@@ -1990,10 +2049,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // 2. Tucks floating navbar dock (hides music tab, narrows width, shifts down)
+      // 2. "shrink ho tak phle slider jo music par rhta hai usse hide kar then instant section taki lag na ho"
       if (floatingDock && !floatingDock.classList.contains('is-music-collapsed')) {
-        floatingDock.classList.add('is-music-collapsed');
-        isMusicDockCollapsed = true;
+        // Step 1: Hide indicator slider first
+        if (indicator) {
+          indicator.style.opacity = '0';
+        }
+        // Step 2: Then collapse music section
+        setTimeout(() => {
+          if (floatingDock && isPlaying && !audio.paused && currentTab === 'music') {
+            floatingDock.classList.add('is-music-collapsed');
+            isMusicDockCollapsed = true;
+          }
+        }, 120);
       }
     }, delay);
   }
@@ -2003,7 +2071,8 @@ document.addEventListener('DOMContentLoaded', () => {
       musicControlsDeck.classList.remove('is-playing-dimmed');
       isMusicControlsDimmed = false;
     }
-    if (andDock && isMusicDockCollapsed) {
+    const wasCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
+    if (andDock && wasCollapsed) {
       restoreMusicDock();
     } else if (isPlaying && !audio.paused && currentTab === 'music' && (typeof currentCardView === 'undefined' || currentCardView === 'artwork')) {
       scheduleMusicIdleAnimation(3000);
@@ -2015,19 +2084,23 @@ document.addEventListener('DOMContentLoaded', () => {
       clearTimeout(musicIdleTimeout);
       musicIdleTimeout = null;
     }
+    const wasCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
+    if (!wasCollapsed) return;
+    isMusicDockCollapsed = false;
+
+    // "openingke time bhi same cheez kar phle music ko unhide kar then instant slider ko show kar"
     if (floatingDock) {
       floatingDock.classList.remove('is-music-collapsed');
     }
-    isMusicDockCollapsed = false;
     const musicTab = document.getElementById('tab-music');
     if (musicTab && currentTab === 'music') {
-      updateIndicator(musicTab);
+      if (indicator) indicator.style.opacity = '0';
       setTimeout(() => {
-        if (currentTab === 'music' && !isMusicDockCollapsed) updateIndicator(musicTab);
-      }, 150);
-      setTimeout(() => {
-        if (currentTab === 'music' && !isMusicDockCollapsed) updateIndicator(musicTab);
-      }, 490);
+        if (currentTab === 'music' && !isMusicDockCollapsed && indicator) {
+          updateIndicator(musicTab, false);
+          indicator.style.opacity = '1';
+        }
+      }, 550);
     }
     if (isPlaying && !audio.paused && currentTab === 'music') {
       scheduleMusicIdleAnimation(3500);
@@ -2043,19 +2116,28 @@ document.addEventListener('DOMContentLoaded', () => {
       musicControlsDeck.classList.remove('is-playing-dimmed');
     }
     isMusicControlsDimmed = false;
+
+    const wasCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
     if (floatingDock) {
       floatingDock.classList.remove('is-music-collapsed');
     }
     isMusicDockCollapsed = false;
+
     const musicTab = document.getElementById('tab-music');
     if (musicTab && currentTab === 'music') {
-      updateIndicator(musicTab);
-      setTimeout(() => {
-        if (currentTab === 'music' && !isMusicDockCollapsed) updateIndicator(musicTab);
-      }, 150);
-      setTimeout(() => {
-        if (currentTab === 'music' && !isMusicDockCollapsed) updateIndicator(musicTab);
-      }, 490);
+      if (wasCollapsed) {
+        // "openingke time bhi same cheez kar phle music ko unhide kar then instant slider ko show kar"
+        if (indicator) indicator.style.opacity = '0';
+        setTimeout(() => {
+          if (currentTab === 'music' && indicator) {
+            updateIndicator(musicTab, false);
+            indicator.style.opacity = '1';
+          }
+        }, 550);
+      } else {
+        updateIndicator(musicTab);
+        if (indicator) indicator.style.opacity = '1';
+      }
     }
   }
 
@@ -2091,7 +2173,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (musicTabBtn) {
     musicTabBtn.addEventListener('transitionend', (e) => {
       if (e.propertyName === 'max-width' && currentTab === 'music' && !isMusicDockCollapsed) {
-        updateIndicator(musicTabBtn);
+        updateIndicator(musicTabBtn, false);
+        if (indicator) indicator.style.opacity = '1';
       }
     });
   }
