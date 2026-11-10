@@ -136,11 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function switchPage(targetTab, clickedBtn) {
     if (!clickedBtn) return;
-    // Strict Lock: Only authenticated ID 1711 allowed to browse tabs
+    // Allow all authenticated IDs: 1711, 3009, 3011
     try {
       const raw = localStorage.getItem('viev_auth_session') || sessionStorage.getItem('viev_auth_session');
       const sess = raw ? JSON.parse(raw) : null;
-      if (!sess || sess.code !== '1711') return;
+      if (!sess || (sess.code !== '1711' && sess.code !== '3009' && sess.code !== '3011')) return;
     } catch (_) { return; }
     if (typeof triggerHaptic === 'function') triggerHaptic('light');
     const wasDockCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
@@ -3357,11 +3357,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const sess = JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
       const role = sess.role || 'digi';
       const stored = localStorage.getItem('viev_' + role + '_os_version');
+      if (stored === '3.0') return '3.0';
+      if (stored === '2.1') return '2.1';
+      if (stored === '2.0') return '2.0';
       if (stored === '1.3') return '1.3';
       if (stored === '1.0') return '1.0';
-      return '1.1';
+      return stored || '2.1';
     } catch(e) {
-      return '1.1';
+      return '2.1';
     }
   }
 
