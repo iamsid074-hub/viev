@@ -2536,42 +2536,47 @@
 .music-center-play-cluster .apple-play-toggle {
   width: 72px;
   height: 72px;
-  border-radius: 50%;
   border: none !important;
-  background: rgba(255, 255, 255, 0.12);
+  background: transparent !important;
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   outline: none;
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, box-shadow 0.2s ease;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
   user-select: none;
   box-sizing: border-box;
   padding: 0;
 }
 
 .music-center-play-cluster .apple-play-toggle .play-icon {
-  margin-left: 3px;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+  margin-left: 4px;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.70)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.90));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
 }
 
 .music-center-play-cluster .apple-play-toggle .pause-icon {
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.70)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.90));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
 }
 
 .music-center-play-cluster .apple-play-toggle:hover {
-  background: rgba(255, 255, 255, 0.20);
+  background: transparent !important;
   border: none !important;
-  transform: scale(1.08);
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.55);
+  box-shadow: none !important;
+  transform: scale(1.14);
+}
+
+.music-center-play-cluster .apple-play-toggle:hover svg {
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.6)) drop-shadow(0 4px 18px rgba(0, 0, 0, 0.8));
 }
 
 .music-center-play-cluster .apple-play-toggle:active {
-  transform: scale(0.92);
+  transform: scale(0.90);
 }
 
 .music-vertical-bar {
@@ -5565,6 +5570,8 @@
   .music-center-play-cluster .apple-play-toggle {
     width: 64px;
     height: 64px;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   .music-center-play-cluster .apple-play-toggle svg {
