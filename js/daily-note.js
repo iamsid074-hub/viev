@@ -14,16 +14,13 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_note_chaandni_2026",
+  questionId: "digi_note_bakwass_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `Chaandni raat mein, Tera chehra yaad aaya..
-
-Har sitare mein, Tera hi aks nazar aaya..
-
-Humne toh chaand se poochha tha, Husn ka matlab..
-
-"Usne muskura ke tera naam dohraaya.."`,
+  noteText: `Kyun sunti hai tu meri bakwass itni ,, 
+aj kal kuch jyada hi bolne lga hu mai 
+mereko to dar lagjata hai kabhi kabhi 
+kahin rishte ko na torne lga hu mai`,
 
   // Note Memory Photo:
   imageUrl: "assets/daily_note.jpg",
