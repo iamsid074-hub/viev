@@ -742,620 +742,2605 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================
   const MASTER_PLAYLIST = [
     {
-      title: 'Kesariya',
-      artist: 'Arijit Singh • Pritam • Amitabh B',
-      bpm: 88,
-      src: 'song/Kesariya.mp3',
-      video: 'song/Kesariya.mp4',
-      lrcFile: 'song/Kesariya.lrc',
-      cover: 'song/Kesariya.jpg',
-      color: '#ff7043',
-      glow: 'rgba(255, 112, 67, 0.88)',
-      glowSoft: 'rgba(255, 112, 67, 0.40)',
-      lyrics: [
-        { time: 9.5, text: "Mujhko itna bataye koyi" },
-        { time: 13.8, text: "Kaise tujhse dil na lagaye koyi" },
-        { time: 18.2, text: "Rabba ne tujhko banane mein" },
-        { time: 22.5, text: "Kar di hai husn ki khaali tijoriyan" },
-        { time: 27.0, text: "Kaajal ki siyahi se likhi" },
-        { time: 31.0, text: "Hai tune jaane kitno ki love storiyan" },
-        { time: 36.5, text: "Kesariya tera ishq hai piya" },
-        { time: 41.2, text: "Rang jaaun jo main haath lagaun" },
-        { time: 45.5, text: "Din beete saara teri fikr mein" },
-        { time: 50.0, text: "Rain saari teri khair manaun" },
-        { time: 54.5, text: "Kesariya tera ishq hai piya" },
-        { time: 59.0, text: "Rang jaaun jo main haath lagaun" },
-        { time: 63.5, text: "Din beete saara teri fikr mein" },
-        { time: 68.0, text: "Rain saari teri khair manaun" },
-        { time: 73.0, text: "Patjhad ke mausam mein bhi" },
-        { time: 76.8, text: "Rangi chanar jaisi jhoome" },
-        { time: 81.0, text: "Gehne ki tarah chamke" },
-        { time: 85.5, text: "Jab dhool tere pairo ki choome" },
-        { time: 90.0, text: "Aise na dekh sajna" },
-        { time: 94.0, text: "Bura lagta hai tere bin" },
-        { time: 98.5, text: "Kangan chann chann baje" },
-        { time: 102.5, text: "Teri galiyon mein dhoome" },
-        { time: 107.0, text: "Kesariya tera ishq hai piya" },
-        { time: 112.0, text: "Rang jaaun jo main haath lagaun" },
-        { time: 116.5, text: "Din beete saara teri fikr mein" },
-        { time: 121.0, text: "Rain saari teri khair manaun" },
-        { time: 126.0, text: "Kesariya tera ishq hai piya" },
-        { time: 131.0, text: "Rang jaaun jo main haath lagaun" },
-        { time: 136.0, text: "Din beete saara teri fikr mein" },
-        { time: 142.0, text: "Rain saari teri khair manaun" }
-      ]
+        "title": "Tumhe Kitna Pyaar Karte",
+        "artist": "Arijit Singh \u2022 Mithoon \u2022 Manoj Muntashir",
+        "album": "Bawaal",
+        "bpm": 84,
+        "src": "song/Tumhe Kitna Pyaar Karte.m4a",
+        "cover": "song/covers/Tumhe Kitna Pyaar Karte.jpg",
+        "color": "#e11d48",
+        "glow": "#e11d48",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Sawan Aaya Hai',
-      artist: 'Arijit Singh • Tony Kakkar',
-      bpm: 92,
-      src: 'song/Sawan Aaya Hai.mp3',
-      video: 'song/Sawan Aaya Hai.mp4',
-      lrcFile: 'song/Sawan Aaya Hai.lrc',
-      cover: 'song/Sawan Aaya Hai.jpg',
-      color: '#00b4d8',
-      glow: 'rgba(0, 180, 216, 0.88)',
-      glowSoft: 'rgba(0, 180, 216, 0.40)',
-      lyrics: [
-        { time: 15.5, text: "Mohabbat barsa dena tu, sawan aaya hai" },
-        { time: 23.0, text: "Tere aur mere milne ka, mausam aaya hai" },
-        { time: 31.0, text: "Mohabbat barsa dena tu, sawan aaya hai" },
-        { time: 39.0, text: "Tere aur mere milne ka, mausam aaya hai" },
-        { time: 47.0, text: "Sabse chhupa ke tujhe seene se lagana hai" },
-        { time: 55.0, text: "Pyar mein tere hadd se guzar jaana hai" },
-        { time: 63.0, text: "Itna pyar kisi pe, pehli baar aaya hai" },
-        { time: 71.0, text: "Mohabbat barsa dena tu, sawan aaya hai" },
-        { time: 79.0, text: "Tere aur mere milne ka, mausam aaya hai" },
-        { time: 87.0, text: "Kyun ek pal ki bhi judai sahi jaaye na" },
-        { time: 95.0, text: "Kyun har ghadi sirf tera nasha chadh raha hai" },
-        { time: 103.0, text: "Yeh khumaar tere ishq ka hai" },
-        { time: 109.0, text: "Jo dil pe chha raha hai" },
-        { time: 115.0, text: "Mohabbat barsa dena tu, sawan aaya hai" },
-        { time: 123.0, text: "Tere aur mere milne ka, mausam aaya hai" }
-      ]
+        "title": "Aaj Se Teri",
+        "artist": "Arijit Singh \u2022 Amit Trivedi",
+        "album": "Pad Man",
+        "bpm": 96,
+        "src": "song/Aaj Se Teri.m4a",
+        "cover": "song/covers/Aaj Se Teri.jpg",
+        "color": "#f59e0b",
+        "glow": "#f59e0b",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Yaad Hai Na',
-      artist: 'Arijit Singh • Jeet Gannguli',
-      bpm: 84,
-      src: 'song/Yaad Hai Na.mp3',
-      video: 'song/Yaad Hai Na.mp4',
-      lrcFile: 'song/Yaad Hai Na.lrc',
-      cover: 'song/Yaad Hai Na.jpg',
-      color: '#9d4edd',
-      glow: 'rgba(157, 78, 221, 0.88)',
-      glowSoft: 'rgba(157, 78, 221, 0.40)',
-      lyrics: [
-        { time: 18.0, text: "Woh mere aane pe khil jaana tera" },
-        { time: 24.0, text: "Woh mere jaane pe chid jaana tera" },
-        { time: 30.5, text: "Woh mere chhone pe sharmaana tera" },
-        { time: 37.0, text: "Bheegi raaton mein behak jaana tera" },
-        { time: 43.5, text: "Yaad hai na, yaad hai na, yaad hai na..." },
-        { time: 56.5, text: "Woh mere aane pe khil jaana tera" },
-        { time: 63.0, text: "Woh mere jaane pe chid jaana tera" },
-        { time: 69.5, text: "Saath mein humne jo dekhe the sapne" },
-        { time: 76.0, text: "Lagte the saare jahaan se woh apne" },
-        { time: 82.5, text: "Tu muskuraaye toh jeeta tha main" },
-        { time: 89.0, text: "Tere bina toh adhura tha main" },
-        { time: 95.5, text: "Yaad hai na, yaad hai na, yaad hai na..." },
-        { time: 120.0, text: "Har lamha tujhko hi sochte rehna" },
-        { time: 127.0, text: "Bin bole baatein woh sab samajhna" },
-        { time: 134.0, text: "Khwabon mein तेरे hi bas kho jaana" },
-        { time: 141.0, text: "Tera hi banke hamesha rehna" },
-        { time: 148.0, text: "Yaad hai na, yaad hai na, yaad hai na..." }
-      ]
+        "title": "Aasan Nahin Yahan",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Aashiqui 2",
+        "bpm": 80,
+        "src": "song/Aasan Nahin Yahan Aashiqui 2 320 Kbps.mp3",
+        "cover": "song/covers/Aasan Nahin Yahan.jpg",
+        "color": "#c084fc",
+        "glow": "rgba(192, 132, 252, 0.88)",
+        "glowSoft": "rgba(192, 132, 252, 0.40)",
+        "lrcFile": "song/Aasan Nahin Yahan.lrc",
+        "lyrics": [
+            {
+                "time": 16.5,
+                "text": "Aasan nahi yahan aashiq ho jaana,"
+            },
+            {
+                "time": 24.5,
+                "text": "Palkon pe kaanton ko sajana..."
+            },
+            {
+                "time": 33.5,
+                "text": "Aasan nahi yahan aashiq ho jaana,"
+            },
+            {
+                "time": 41.5,
+                "text": "Palkon pe kaanton ko sajana..."
+            },
+            {
+                "time": 50,
+                "text": "Yeh ishq nahi aasan,"
+            },
+            {
+                "time": 58.5,
+                "text": "Bas itna samajh leeje"
+            },
+            {
+                "time": 67,
+                "text": "Ik aag ka darya hai,"
+            },
+            {
+                "time": 75.5,
+                "text": "Aur doob ke jaana hai"
+            },
+            {
+                "time": 84,
+                "text": "Aasan nahi yahan aashiq ho jaana..."
+            },
+            {
+                "time": 101,
+                "text": "Waqt ke saansein chalti hain tere sang,"
+            },
+            {
+                "time": 110,
+                "text": "Har dharhkan pe likha hai tera rang"
+            },
+            {
+                "time": 118.5,
+                "text": "Jo tu na mila toh adhoore hain hum,"
+            },
+            {
+                "time": 127,
+                "text": "Tere bin ab na seh paayein yeh gham"
+            }
+        ]
     },
     {
-      title: 'Chhod Diya',
-      artist: 'Arijit Singh • Kanika Kapoor',
-      bpm: 80,
-      src: 'song/Chhod Diya.mp3',
-      video: 'song/Chhod Diya.mp4',
-      lrcFile: 'song/Chhod Diya.lrc',
-      cover: 'song/Chhod Diya.jpg',
-      color: '#e63946',
-      glow: 'rgba(230, 57, 70, 0.88)',
-      glowSoft: 'rgba(230, 57, 70, 0.40)',
-      lyrics: [
-        { time: 9.0, text: "Chhod diya woh raasta" },
-        { time: 14.5, text: "Jis raaste se tum the guzre" },
-        { time: 20.5, text: "Chhod diya woh raasta" },
-        { time: 26.5, text: "Jis raaste se tum the guzre" },
-        { time: 32.5, text: "Tod diya woh aaina" },
-        { time: 38.5, text: "Jis aaine mein tum the dikhte" },
-        { time: 45.0, text: "Roz sambhalte hain hum" },
-        { time: 50.5, text: "Teri yaadon se ladte ladte" },
-        { time: 57.0, text: "Chhod diya woh raasta" },
-        { time: 63.0, text: "Jis raaste se tum the guzre" },
-        { time: 69.0, text: "Tod diya woh aaina" },
-        { time: 75.0, text: "Jis aaine mein tum the dikhte" },
-        { time: 81.0, text: "Dil ko manana aasan nahi tha" },
-        { time: 87.5, text: "Khud ko bhulana aasan nahi tha" },
-        { time: 94.0, text: "Phir bhi yeh faisla humne kiya" },
-        { time: 100.0, text: "Chhod diya woh raasta..." }
-      ]
+        "title": "Ijazat",
+        "artist": "Arijit Singh \u2022 Meet Bros",
+        "album": "One Night Stand",
+        "bpm": 88,
+        "src": "song/Ijazat.m4a",
+        "cover": "song/covers/Ijazat.jpg",
+        "color": "#ec4899",
+        "glow": "#ec4899",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Sooiyan',
-      artist: 'Arijit Singh • Chinmayi Sripada',
-      bpm: 86,
-      src: 'song/Sooiyan.mp3',
-      video: 'song/Sooiyan.mp4',
-      lrcFile: 'song/Sooiyan.lrc',
-      cover: 'song/Sooiyan.jpg',
-      color: '#06d6a0',
-      glow: 'rgba(6, 214, 160, 0.88)',
-      glowSoft: 'rgba(6, 214, 160, 0.40)',
-      lyrics: [
-        { time: 11.0, text: "Sooiyan si, sooiyan si chubhti hain" },
-        { time: 17.5, text: "Yeh aankhein judti hain" },
-        { time: 23.0, text: "Teri aankhon se jab bhi milti hain" },
-        { time: 29.5, text: "Sooiyan si, sooiyan si chubhti hain" },
-        { time: 36.0, text: "Yeh yaadein udti hain" },
-        { time: 41.5, text: "Tere aane se jab yeh khilti hain" },
-        { time: 48.0, text: "Meetha sa dard yeh de jaati hain" },
-        { time: 54.0, text: "Dheeme se paas yeh le aati hain" },
-        { time: 60.5, text: "Khwabon mein rang bharti hain" },
-        { time: 66.5, text: "Sooiyan si, sooiyan si chubhti hain" },
-        { time: 73.0, text: "Yeh raatein dhalti hain" },
-        { time: 79.0, text: "Teri saanson ki aahat milti hai" }
-      ]
+        "title": "Tera Fitoor",
+        "artist": "Arijit Singh \u2022 Himesh Reshammiya",
+        "album": "Genius",
+        "bpm": 92,
+        "src": "song/Tera Fitoor.m4a",
+        "cover": "song/covers/Tera Fitoor.jpg",
+        "color": "#8b5cf6",
+        "glow": "#8b5cf6",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Ve Haaniyaan',
-      artist: 'Danny • Avvy Sra',
-      bpm: 90,
-      src: 'song/Ve Haaniyaan.mp3',
-      lrcFile: 'song/Ve Haaniyaan.lrc',
-      cover: 'song/Screenshot 2026-10-24 224431.png',
-      color: '#ff5e7e',
-      glow: 'rgba(255, 94, 126, 0.88)',
-      glowSoft: 'rgba(255, 94, 126, 0.40)',
-      lyrics: [
-        { time: 7.5, text: "Tere kolon mainu saah milde," },
-        { time: 11.5, text: "Assi aivein ni tainu bewajah milde" },
-        { time: 15.5, text: "Tere ch koi gall ae sahiba," },
-        { time: 19.5, text: "Haan assi tainu tan milde" },
-        { time: 23.5, text: "Mainu pata nahi hunda sukoon ki," },
-        { time: 27.5, text: "Tainu mile tan pata laggeya" },
-        { time: 31.5, text: "Mit gayi meri sab tanhai," },
-        { time: 35.5, text: "Jee tere kol aa laggeya" },
-        { time: 39.5, text: "Ve haaniyaan ve dil jaaniya," },
-        { time: 43.5, text: "Tu nehde nehde reh na door kite ja" },
-        { time: 47.5, text: "Bhull gaye eh saari duniya," },
-        { time: 51.5, text: "Ke tera hi naam hai boldi zubaan" },
-        { time: 79.5, text: "Eh jo sadde naal hoya ae," },
-        { time: 83.5, text: "Khoobsurat sapna lagdae" },
-        { time: 87.5, text: "Ajnabee si kal tak jo," },
-        { time: 91.5, text: "Haan hun mainu apna lagdae" },
-        { time: 95.5, text: "Tu hi din tu hi meri raat," },
-        { time: 99.5, text: "Koyi nahi hai tere toh bina" },
-        { time: 103.5, text: "Ve haaniyaan ve dil jaaniya," },
-        { time: 107.5, text: "Tu nehde nehde reh na door kite ja" },
-        { time: 115.5, text: "Bhull gaye eh saari duniya," },
-        { time: 119.5, text: "Ke tera hi naam hai boldi zubaan" },
-        { time: 127.5, text: "Tainu vekhi jaawan main haye," },
-        { time: 131.5, text: "Ishq tere vich gaawan main" },
-        { time: 135.5, text: "Mere dil nu mil gaya raah," },
-        { time: 139.5, text: "Jad tainu gal laawan main" },
-        { time: 143.5, text: "Ke likheya si sadda milna," },
-        { time: 147.5, text: "Tu aiddan milna eh nahi si pata" },
-        { time: 151.5, text: "Ve haaniyaan ve dil jaaniya," },
-        { time: 155.5, text: "Tu nehde nehde reh na door kite ja" },
-        { time: 159.5, text: "Bhull gaye eh saari duniya," },
-        { time: 163.5, text: "Ke tera hi naam hai boldi zubaan" }
-      ]
+        "title": "Oonchi Oonchi Deewarein",
+        "artist": "Arijit Singh \u2022 Manan Bhardwaj",
+        "album": "Yaariyan 2",
+        "bpm": 85,
+        "src": "song/Oonchi Oonchi Deewarein.m4a",
+        "cover": "song/covers/Oonchi Oonchi Deewarein.jpg",
+        "color": "#10b981",
+        "glow": "#10b981",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Samjhawan',
-      artist: 'Arijit Singh • Shreya Ghoshal',
-      bpm: 76,
-      src: 'song/Samjhawan Humpty Sharma Ki Dulhania 320 Kbps.mp3',
-      lrcFile: 'song/Samjhawan.lrc',
-      cover: 'song/Screenshot 2026-10-24 224416.png',
-      color: '#ff9f24',
-      glow: 'rgba(255, 159, 36, 0.88)',
-      glowSoft: 'rgba(255, 159, 36, 0.40)',
-      lyrics: [
-        { time: 11.5, text: "Nahi jeena tere baaju," },
-        { time: 15.5, text: "Nahi jeena, nahi jeena..." },
-        { time: 31.5, text: "Main tainu samjhawan ki," },
-        { time: 35.5, text: "Na tere bina lagda jee" },
-        { time: 43.5, text: "Main tainu samjhawan ki," },
-        { time: 47.5, text: "Na tere bina lagda jee" },
-        { time: 51.5, text: "Tu ki jaane pyaar mera," },
-        { time: 55.5, text: "Main karaan intezar tera" },
-        { time: 59.5, text: "Tu dil, tuiyon jaan meri" },
-        { time: 63.5, text: "Main tainu samjhawan ki," },
-        { time: 67.5, text: "Na tere bina lagda jee" },
-        { time: 119.0, text: "Mere dil ne chun laiyaa ne," },
-        { time: 123.5, text: "Tere dil diyaan raahan" },
-        { time: 127.5, text: "Tu jo mere naal turre taan," },
-        { time: 131.5, text: "Turpe meriyaan saahan" },
-        { time: 135.5, text: "Jeena mera haye, hun hai tera," },
-        { time: 139.5, text: "Ki main karaan..." },
-        { time: 147.5, text: "Tu kar aitbaar mera," },
-        { time: 151.5, text: "Main karaan intezar tera" },
-        { time: 155.5, text: "Tu dil, tuiyon jaan meri" },
-        { time: 159.5, text: "Main tainu samjhawan ki," },
-        { time: 163.5, text: "Na tere bina lagda jee" },
-        { time: 167.5, text: "Ve changa nahion keeta beeba," },
-        { time: 175.5, text: "Dil mera tod ke" },
-        { time: 179.5, text: "Ve bada pachhtaiyaan akhaan," },
-        { time: 187.5, text: "Naal tere jod ke" }
-      ]
+        "title": "Teri Meri Kahaani",
+        "artist": "Arijit Singh \u2022 Palak Muchhal",
+        "album": "Gabbar Is Back",
+        "bpm": 90,
+        "src": "song/Teri Meri Kahaani.m4a",
+        "cover": "song/covers/Teri Meri Kahaani.jpg",
+        "color": "#f97316",
+        "glow": "#f97316",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Ishq Ka Fever',
-      artist: 'Vishal Bhardwaj • Arijit Singh',
-      bpm: 104,
-      src: 'song/Ishq Ka Fever O Romeo 320 Kbps.mp3',
-      lrcFile: 'song/Ishq Ka Fever.lrc',
-      cover: 'song/Screenshot 2026-10-24 224355.png',
-      color: '#d946ef',
-      glow: 'rgba(217, 70, 239, 0.88)',
-      glowSoft: 'rgba(217, 70, 239, 0.40)',
-      lyrics: [
-        { time: 11.5, text: "Halka-halka fever hai," },
-        { time: 17.5, text: "Saans bhi dubli lagti hai" },
-        { time: 25.5, text: "Dhoop mein jee nahi lagta," },
-        { time: 30.5, text: "Chhaanv bhi gham ki lagti hai" },
-        { time: 35.5, text: "Kya rog yeh paala hai?" },
-        { time: 40.5, text: "Mujhe ishq hua hai, ya hone wala hai" },
-        { time: 51.5, text: "Mujhe ishq hua hai, ya hone wala hai" },
-        { time: 69.5, text: "Nafz sehem ke chalti hai," },
-        { time: 75.5, text: "Hansi bhi mujrim lagti hai" },
-        { time: 83.5, text: "Kya hua hai mujhko?" },
-        { time: 87.5, text: "Kyun tanhayi achhi lagti hai?" },
-        { time: 95.5, text: "Kya tumne hi koi jaadu daala hai?" },
-        { time: 103.5, text: "Mujhe ishq hua hai, ya hone wala hai" },
-        { time: 110.5, text: "Mujhe ishq hua hai, ya hone wala hai" }
-      ]
+        "title": "Suno Na Sangemarmar",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Youngistaan",
+        "bpm": 82,
+        "src": "song/Suno Na Sangemarmar.m4a",
+        "cover": "song/covers/Suno Na Sangemarmar.jpg",
+        "color": "#38bdf8",
+        "glow": "#38bdf8",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Phir Le Aya Dil (Reprise)',
-      artist: 'Arijit Singh • Pritam',
-      bpm: 72,
-      src: 'song/Phir Le Aya Dil (Reprise) - Arijit Singh (DJJOhAL.Com).mp3',
-      lrcFile: 'song/Phir Le Aya Dil (Reprise).lrc',
-      cover: 'song/Screenshot 2026-10-24 224316.png',
-      color: '#f59e0b',
-      glow: 'rgba(245, 158, 11, 0.88)',
-      glowSoft: 'rgba(245, 158, 11, 0.40)',
-      lyrics: [
-        { time: 20.0, text: "Phir le aaya dil majboor kya keeje," },
-        { time: 34.5, text: "Raas na aaya rehna door kya keeje..." },
-        { time: 46.5, text: "Dil keh raha use maqammal kar bhi aao," },
-        { time: 54.5, text: "Woh jo adhuri si baat baaki hai," },
-        { time: 61.5, text: "Woh jo adhuri si yaad baaki hai," },
-        { time: 67.5, text: "Woh jo adhuri si yaad baaki hai..." },
-        { time: 79.5, text: "Karte hain hum aaj qabool kya keeje," },
-        { time: 91.5, text: "Ho gayi thi humse yeh bhool kya keeje..." },
-        { time: 105.5, text: "Dil keh raha use mayassar kar bhi aao," },
-        { time: 114.5, text: "Woh jo dabi si aas baaki hai," },
-        { time: 126.5, text: "Woh jo dabi si aanch baaki hai," },
-        { time: 134.5, text: "Woh jo dabi si aanch baaki hai..." },
-        { time: 170.5, text: "Kismat ko hai manzoor kya keeje," },
-        { time: 190.5, text: "Kismat ko hai manzoor kya keeje..." },
-        { time: 214.5, text: "Milte rahe hum badastoor kya keeje," },
-        { time: 226.5, text: "Dil keh raha hai use musalsal kar bhi aao..." }
-      ]
+        "title": "Tu Hi Hai Aashiqui (Duet)",
+        "artist": "Arijit Singh \u2022 Palak Muchhal",
+        "album": "Dishkiyaoon",
+        "bpm": 86,
+        "src": "song/Tu Hi Hai Aashiqui (Duet).m4a",
+        "cover": "song/covers/Tu Hi Hai Aashiqui (Duet).jpg",
+        "color": "#a855f7",
+        "glow": "#a855f7",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Tu Tu Hai Wohi',
-      artist: 'Kishore Kumar • Asha Bhosle',
-      bpm: 124,
-      src: 'song/Tu tu hai wohi dilne jise apna kaha_320(KoshalWorld.Com).mp3',
-      lrcFile: 'song/Tu Tu Hai Wohi.lrc',
-      cover: 'song/Screenshot 2026-10-24 224447.png',
-      color: '#10b981',
-      glow: 'rgba(16, 185, 129, 0.88)',
-      glowSoft: 'rgba(16, 185, 129, 0.40)',
-      lyrics: [
-        { time: 49.5, text: "La, la la la la la, la la la la la la la" },
-        { time: 55.5, text: "La, la la la la, la la la la la" },
-        { time: 61.5, text: "Tu, tu hai wohi dil ne jise apna kaha," },
-        { time: 67.5, text: "Tu hai jahan, main hoon wahan," },
-        { time: 73.5, text: "Ab to yeh jeena tere bin hai saza..." },
-        { time: 79.5, text: "Ho, mil jayein is tarah, do lehrein jis tarah," },
-        { time: 85.5, text: "Ho, mil jayein is tarah, do lehrein jis tarah," },
-        { time: 91.5, text: "Phir ho na juda, haan yeh vaada raha" },
-        { time: 133.5, text: "Main aawaaz hoon to, tu hai geet mera," },
-        { time: 139.5, text: "Jahan se niraala, manmeet mera..." },
-        { time: 145.5, text: "Mil jayein is tarah, do lehrein jis tarah," },
-        { time: 157.5, text: "Phir ho na juda, haan yeh vaada raha" },
-        { time: 163.5, text: "Tu, tu hai wohi dil ne jise apna kaha," },
-        { time: 169.5, text: "Tu hai jahan, main hoon wahan," },
-        { time: 175.5, text: "Ab to yeh jeena tere bin hai saza..." },
-        { time: 211.5, text: "Kisi mod pe bhi na yeh saath toote," },
-        { time: 217.5, text: "Mere haath se tera daaman na chhoote," },
-        { time: 229.5, text: "Kabhi khwaab mein bhi tu mujhse na roothe," },
-        { time: 235.5, text: "Mere pyaar ki koi khushiyan na loote..." },
-        { time: 241.5, text: "Mil jayein is tarah, do lehrein jis tarah," },
-        { time: 253.5, text: "Phir ho na juda, haan yeh vaada raha" }
-      ]
+        "title": "Baatein Ye Kabhi Na",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Khamoshiyan",
+        "bpm": 78,
+        "src": "song/Baatein Ye Kabhi Na.m4a",
+        "cover": "song/covers/Baatein Ye Kabhi Na.jpg",
+        "color": "#6366f1",
+        "glow": "#6366f1",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Abhi Na Jao Chhod Kar',
-      artist: 'Mohammed Rafi • Asha Bhosle',
-      bpm: 78,
-      src: 'song/Abhi Na Jao Chhod Kar Hum Dono 320 Kbps.mp3',
-      cover: 'song/Screenshot 2026-10-25 065342.png',
-      color: '#94a3b8',
-      glow: 'rgba(148, 163, 184, 0.88)',
-      glowSoft: 'rgba(148, 163, 184, 0.40)',
-      lyrics: [
-        { time: 15.0, text: "Abhi na jao chhod kar, ke dil abhi bhara nahi" },
-        { time: 25.0, text: "Abhi abhi to aaye ho, bahar ban ke chhaaye ho" },
-        { time: 35.0, text: "Hawa zara mehak to le, nazar zara behak to le" },
-        { time: 45.0, text: "Ye shaam dhal to le zara, ye dil sambhal to le zara" },
-        { time: 55.0, text: "Abhi na jao chhod kar, ke dil abhi bhara nahi" },
-        { time: 70.0, text: "Abhi to kuch kaha nahi, abhi to kuch suna nahi" },
-        { time: 80.0, text: "Suno zara hum bhi to kuch, kehna chahein tumse" },
-        { time: 90.0, text: "Nigaahon mein kuch to hai, jo kehne se reh gaya" },
-        { time: 100.0, text: "Agar ye dil chhoota abhi, toh phir ye pal kahaan mile" },
-        { time: 115.0, text: "Abhi na jao chhod kar, ke dil abhi bhara nahi" },
-        { time: 130.0, text: "Nashe mein hain ye saari raahein, teri gali ke mod pe" },
-        { time: 140.0, text: "Woh chand bhi akela hai, tere mere silsile" },
-        { time: 155.0, text: "Zara theher jao, na jao yun" },
-        { time: 170.0, text: "Abhi na jao chhod kar, ke dil abhi bhara nahi" },
-        { time: 185.0, text: "Abhi abhi to aaye ho, bahar ban ke chhaaye ho" },
-        { time: 200.0, text: "Abhi na jao chhod kar..." }
-      ]
+        "title": "Phir Na Aisi Raat Aayegi",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Laal Singh Chaddha",
+        "bpm": 84,
+        "src": "song/Phir Na Aisi Raat Aayegi.m4a",
+        "cover": "song/covers/Phir Na Aisi Raat Aayegi.jpg",
+        "color": "#f43f5e",
+        "glow": "#f43f5e",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Somewhere Only We Know',
-      artist: 'Keane',
-      bpm: 86,
-      src: 'song/Keane_-_Somewhere_Only_We_Know_CeeNaija.com_.mp3',
-      lrcFile: 'song/Somewhere Only We Know.lrc',
-      cover: 'song/Screenshot 2026-10-25 070356.png',
-      color: '#f472b6',
-      glow: 'rgba(244, 114, 182, 0.88)',
-      glowSoft: 'rgba(244, 114, 182, 0.40)',
-      lyrics: [
-        { time: 14.0, text: "I walked across an empty land" },
-        { time: 21.0, text: "I knew the pathway like the back of my hand" },
-        { time: 29.0, text: "I felt the earth beneath my feet" },
-        { time: 36.0, text: "Sat by the river and it made me complete" },
-        { time: 44.0, text: "Oh, simple thing, where have you gone?" },
-        { time: 52.0, text: "I'm getting old and I need something to rely on" },
-        { time: 60.0, text: "So tell me when you're gonna let me in" },
-        { time: 67.0, text: "I'm getting tired and I need somewhere to begin" },
-        { time: 76.0, text: "I came across a fallen tree" },
-        { time: 83.0, text: "I felt the branches of it looking at me" },
-        { time: 90.0, text: "Is this the place we used to love?" },
-        { time: 98.0, text: "Is this the place that I've been dreaming of?" },
-        { time: 106.0, text: "Oh, simple thing, where have you gone?" },
-        { time: 113.0, text: "I'm getting old and I need something to rely on" },
-        { time: 121.0, text: "So tell me when you're gonna let me in" },
-        { time: 128.0, text: "I'm getting tired and I need somewhere to begin" },
-        { time: 137.0, text: "And if you have a minute, why don't we go" },
-        { time: 142.0, text: "Talk about it somewhere only we know?" },
-        { time: 148.0, text: "This could be the end of everything" },
-        { time: 152.0, text: "So why don't we go somewhere only we know?" },
-        { time: 160.0, text: "Somewhere only we know" },
-        { time: 174.0, text: "Oh, simple thing, where have you gone?" },
-        { time: 182.0, text: "I'm getting old and I need something to rely on" },
-        { time: 190.0, text: "So tell me when you're gonna let me in" },
-        { time: 197.0, text: "I'm getting tired and I need somewhere to begin" },
-        { time: 205.0, text: "And if you have a minute, why don't we go" },
-        { time: 210.0, text: "Talk about it somewhere only we know?" },
-        { time: 216.0, text: "This could be the end of everything" },
-        { time: 221.0, text: "So why don't we go somewhere only we know?" },
-        { time: 229.0, text: "Somewhere only we know" }
-      ]
+        "title": "Ruaan",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Tiger 3",
+        "bpm": 88,
+        "src": "song/Ruaan.m4a",
+        "cover": "song/covers/Ruaan.jpg",
+        "color": "#eab308",
+        "glow": "#eab308",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Kyon',
-      artist: 'Papon • Sunidhi Chauhan',
-      bpm: 84,
-      src: 'song/Papon_Sunidhi_Chauhan_-_Kyun_na_hum_tum_(mp3.pm).mp3',
-      lrcFile: 'song/Kyon.lrc',
-      cover: 'song/Screenshot 2026-10-25 134729.png',
-      color: '#38bdf8',
-      glow: 'rgba(56, 189, 248, 0.88)',
-      glowSoft: 'rgba(56, 189, 248, 0.40)',
-      lyrics: [
-        { time: 14.0, text: "Kyon na hum tum" },
-        { time: 17.5, text: "Chale tedhe medhe se raston pe nange paaon re" },
-        { time: 27.5, text: "Kyon na hum tum" },
-        { time: 31.0, text: "Dhoondhe phoolon bhari thandi thandi dhoop ya chhaaon re" },
-        { time: 41.5, text: "Aashiyana apna baadal ki chaadar pe ho" },
-        { time: 48.0, text: "Khol dein sab darwaaze hawaon ke liye" },
-        { time: 54.5, text: "Kyon na hum tum..." },
-        { time: 68.0, text: "Halki halki si leharon pe behne lagein" },
-        { time: 75.0, text: "Kahin door kinare se kehne lagein" },
-        { time: 82.0, text: "Baatein aisi jo pehle kahi na gayi" },
-        { time: 88.5, text: "Khamoshi bhi lagne lagi madhbhari" },
-        { time: 95.5, text: "Kyon na hum tum" },
-        { time: 99.0, text: "Chale tedhe medhe se raston pe nange paaon re" },
-        { time: 109.0, text: "Kyon na hum tum" },
-        { time: 112.5, text: "Dhoondhe phoolon bhari thandi thandi dhoop ya chhaaon re" },
-        { time: 136.0, text: "Rang saare zameen ke naye lag rahe" },
-        { time: 143.0, text: "Jaise taare haathon mein aake saje" },
-        { time: 150.0, text: "Har kadam pe nayi ek bahaar mile" },
-        { time: 156.5, text: "Aankhon mein meetha sa ik khumaar mile" },
-        { time: 163.5, text: "Kyon na hum tum" },
-        { time: 167.0, text: "Chale tedhe medhe se raston pe nange paaon re" },
-        { time: 177.0, text: "Kyon na hum tum" },
-        { time: 180.5, text: "Dhoondhe phoolon bhari thandi thandi dhoop ya chhaaon re" }
-      ]
+        "title": "O Maahi",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Dunki",
+        "bpm": 82,
+        "src": "song/O Maahi.m4a",
+        "cover": "song/covers/O Maahi.jpg",
+        "color": "#ef4444",
+        "glow": "#ef4444",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Tum Hi Ho',
-      artist: 'Arijit Singh • Mithoon',
-      bpm: 92,
-      src: 'song/Tum Hi Ho Aashiqui 2 320 Kbps.mp3',
-      lrcFile: 'song/Tum Hi Ho.lrc',
-      cover: 'song/Screenshot 2026-10-25 152246.png',
-      color: '#f59e0b',
-      glow: 'rgba(245, 158, 11, 0.88)',
-      glowSoft: 'rgba(245, 158, 11, 0.40)',
-      lyrics: [
-        { time: 1.0, text: "Hum tere bin ab reh nahi sakte," },
-        { time: 7.5, text: "Tere bina kya wajood mera?" },
-        { time: 14.5, text: "Tujhse juda agar ho jayenge," },
-        { time: 21.0, text: "Toh khud se hi ho jayenge juda" },
-        { time: 28.5, text: "Kyunki tum hi ho, ab tum hi ho," },
-        { time: 35.5, text: "Zindagi ab tum hi ho" },
-        { time: 42.5, text: "Chain bhi, mera dard bhi," },
-        { time: 49.5, text: "Meri aashiqui ab tum hi ho" },
-        { time: 57.0, text: "Tera mera rishta hai kaisa," },
-        { time: 64.0, text: "Ek pal door gawaara nahi" },
-        { time: 71.0, text: "Tere liye har roz hain jeete," },
-        { time: 78.0, text: "Tujhko diya mera waqt sabhi" },
-        { time: 85.0, text: "Koyi lamha mera na ho tere bina," },
-        { time: 92.0, text: "Har saans pe naam tera..." },
-        { time: 99.0, text: "Kyunki tum hi ho, ab tum hi ho," },
-        { time: 106.0, text: "Zindagi ab tum hi ho" },
-        { time: 113.0, text: "Chain bhi, mera dard bhi," },
-        { time: 120.0, text: "Meri aashiqui ab tum hi ho" }
-      ]
+        "title": "Itni Si Baat Hain",
+        "artist": "Arijit Singh \u2022 Pritam \u2022 Antara Mitra",
+        "album": "Azhar",
+        "bpm": 94,
+        "src": "song/Itni Si Baat Hain.m4a",
+        "cover": "song/covers/Itni Si Baat Hain.jpg",
+        "color": "#0ea5e9",
+        "glow": "#0ea5e9",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Aasan Nahin Yahan',
-      artist: 'Arijit Singh • Jeet Gannguli',
-      bpm: 80,
-      src: 'song/Aasan Nahin Yahan Aashiqui 2 320 Kbps.mp3',
-      lrcFile: 'song/Aasan Nahin Yahan.lrc',
-      cover: 'song/Screenshot 2026-10-25 152454.png',
-      color: '#c084fc',
-      glow: 'rgba(192, 132, 252, 0.88)',
-      glowSoft: 'rgba(192, 132, 252, 0.40)',
-      lyrics: [
-        { time: 16.5, text: "Aasan nahi yahan aashiq ho jaana," },
-        { time: 24.5, text: "Palkon pe kaanton ko sajana..." },
-        { time: 33.5, text: "Aasan nahi yahan aashiq ho jaana," },
-        { time: 41.5, text: "Palkon pe kaanton ko sajana..." },
-        { time: 50.0, text: "Yeh ishq nahi aasan," },
-        { time: 58.5, text: "Bas itna samajh leeje" },
-        { time: 67.0, text: "Ik aag ka darya hai," },
-        { time: 75.5, text: "Aur doob ke jaana hai" },
-        { time: 84.0, text: "Aasan nahi yahan aashiq ho jaana..." },
-        { time: 101.0, text: "Waqt ke saansein chalti hain tere sang," },
-        { time: 110.0, text: "Har dharhkan pe likha hai tera rang" },
-        { time: 118.5, text: "Jo tu na mila toh adhoore hain hum," },
-        { time: 127.0, text: "Tere bin ab na seh paayein yeh gham" }
-      ]
+        "title": "Qaafirana",
+        "artist": "Arijit Singh \u2022 Amit Trivedi \u2022 Nikhita Gandhi",
+        "album": "Kedarnath",
+        "bpm": 88,
+        "src": "song/Qaafirana.m4a",
+        "cover": "song/covers/Qaafirana.jpg",
+        "color": "#14b8a6",
+        "glow": "#14b8a6",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Khairiyat',
-      artist: 'Arijit Singh • Pritam',
-      bpm: 76,
-      src: 'song/Khairiyat Chhichhore 320 Kbps.mp3',
-      lrcFile: 'song/Khairiyat.lrc',
-      cover: 'song/Screenshot 2026-10-25 152805.png',
-      color: '#38bdf8',
-      glow: 'rgba(56, 189, 248, 0.88)',
-      glowSoft: 'rgba(56, 189, 248, 0.40)',
-      lyrics: [
-        { time: 13.5, text: "Khairiyat puchho, kabhi toh kaifiyat puchho," },
-        { time: 20.0, text: "Tumhare bin deewane ka kya haal hai" },
-        { time: 27.0, text: "Dil mera dekho, na meri haisiyat puchho," },
-        { time: 33.5, text: "Tere bin ek din jaise sau saal hai" },
-        { time: 40.5, text: "Anjaam hai tay mera," },
-        { time: 44.0, text: "Hona tumhe hai mera" },
-        { time: 47.0, text: "Jitni bhi hon dooriyan filhaal hain..." },
-        { time: 54.0, text: "Yeh dooriyan filhaal hain..." },
-        { time: 61.0, text: "Khairiyat puchho, kabhi toh kaifiyat puchho," },
-        { time: 67.5, text: "Tumhare bin deewane ka kya haal hai" },
-        { time: 74.5, text: "Dil mera dekho, na meri haisiyat puchho," },
-        { time: 81.0, text: "Tere bin ek din jaise sau saal hai" },
-        { time: 88.0, text: "Baatein zaroori hain tera milna sahi hai," },
-        { time: 95.0, text: "Dil ki panahon mein tu hi toh basa hai" }
-      ]
+        "title": "Tu Hi Hai Aashiqui (Solo)",
+        "artist": "Arijit Singh",
+        "album": "Dishkiyaoon",
+        "bpm": 86,
+        "src": "song/Tu Hi Hai Aashiqui (Solo).m4a",
+        "cover": "song/covers/Tu Hi Hai Aashiqui (Solo).jpg",
+        "color": "#8b5cf6",
+        "glow": "#8b5cf6",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Binte Dil',
-      artist: 'Arijit Singh • Sanjay Leela Bhansali',
-      bpm: 98,
-      src: 'song/Binte Dil Padmaavat 320 Kbps.mp3',
-      lrcFile: 'song/Binte Dil.lrc',
-      cover: 'song/Screenshot 2026-10-25 152930.png',
-      color: '#eab308',
-      glow: 'rgba(234, 179, 8, 0.88)',
-      glowSoft: 'rgba(234, 179, 8, 0.40)',
-      lyrics: [
-        { time: 15.0, text: "Binte dil misriya mein," },
-        { time: 21.5, text: "Pesh hai khalish yeh..." },
-        { time: 29.0, text: "Binte dil misriya mein," },
-        { time: 35.5, text: "Pesh hai khalish yeh..." },
-        { time: 43.0, text: "Khaab ka jahan hai," },
-        { time: 49.5, text: "Zulfein bikhri hain shaam si" },
-        { time: 57.0, text: "Yeh junoon hai kaisa," },
-        { time: 64.0, text: "Khumaar hai kaisa jaam si" },
-        { time: 71.5, text: "Binte dil misriya mein..." },
-        { time: 85.0, text: "Qatra qatra beh raha hai fiza mein," },
-        { time: 93.0, text: "Ishq ka nasha har ek adaa mein" },
-        { time: 101.0, text: "Har lamha bekhudi ka silsila hai," },
-        { time: 109.0, text: "Rooh ko meri tera sahara mila hai" }
-      ]
+        "title": "Kabhi Jo Baadal Barse",
+        "artist": "Arijit Singh \u2022 Sharib-Toshi",
+        "album": "Jackpot",
+        "bpm": 85,
+        "src": "song/Kabhi Jo Baadal Barse.m4a",
+        "cover": "song/covers/Kabhi Jo Baadal Barse.jpg",
+        "color": "#3b82f6",
+        "glow": "#3b82f6",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Jaiye Sajana',
-      artist: 'Satinder Sartaaj • Jasmine Sandlas',
-      bpm: 108,
-      src: 'song/Jaiye Sajana Dhurandhar The Revenge 320 Kbps.mp3',
-      lrcFile: 'song/Jaiye Sajana.lrc',
-      cover: 'song/Screenshot 2026-10-26 101216.png',
-      color: '#e11d48',
-      glow: 'rgba(225, 29, 72, 0.88)',
-      glowSoft: 'rgba(225, 29, 72, 0.40)',
-      minOS: '1.1',
-      lyrics: [
-        { time: 8.0, text: "Pattalan chon digde hanjoo" },
-        { time: 14.0, text: "Akh meri phir vi roi na..." },
-        { time: 20.5, text: "Pattalan chon digde hanjoo" },
-        { time: 27.0, text: "Akh meri phir vi roi na" },
-        { time: 33.5, text: "Aisi preet la lai rabba" },
-        { time: 39.5, text: "Jaisi hor kade hoi na..." },
-        { time: 46.0, text: "Tere jaan ton main baad" },
-        { time: 51.5, text: "Ik din soi na" },
-        { time: 57.0, text: "Poora shehar begana" },
-        { time: 62.5, text: "Ethe mera koi na" },
-        { time: 68.5, text: "Phir preet kise de naal" },
-        { time: 74.5, text: "Kade hoi na" },
-        { time: 80.5, text: "Zamana zaalim taan vi roi na" },
-        { time: 87.0, text: "Saare rang vekh lae" },
-        { time: 92.5, text: "Hun koi dar nahi" },
-        { time: 98.0, text: "Jiundi rahun aashiki" },
-        { time: 103.5, text: "Eh kade na marni" },
-        { time: 109.0, text: "Saanu saariyan visar gaiyan raahvan ve" },
-        { time: 116.5, text: "Kede paase jaiye sajana..." },
-        { time: 124.0, text: "Saanu saariyan visar gaiyan raahvan ve" },
-        { time: 131.5, text: "Kede paase jaiye sajana..." }
-      ]
+        "title": "Kalank (Title Track)",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Kalank",
+        "bpm": 76,
+        "src": "song/Kalank (Title Track).m4a",
+        "cover": "song/covers/Kalank (Title Track).jpg",
+        "color": "#b91c1c",
+        "glow": "#b91c1c",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
     },
     {
-      title: 'Time Zone',
-      artist: 'Kaka',
-      bpm: 96,
-      src: 'song/Time Zone - Kaka.mp3',
-      lrcFile: 'song/Time Zone.lrc',
-      cover: 'song/Screenshot 2026-10-26 102009.png',
-      color: '#f97316',
-      glow: 'rgba(249, 115, 22, 0.88)',
-      glowSoft: 'rgba(249, 115, 22, 0.40)',
-      minOS: '1.1',
-      lyrics: [
-        { time: 4.5, text: "Ghari meri time dasse tere shehar da" },
-        { time: 9.5, text: "Aithe adhi raat te othe deed dupehr da" },
-        { time: 14.5, text: "Tere pichhe jaagne 'ch aa reha swaad" },
-        { time: 19.5, text: "Waise chheti mera dil taan kitte ni thehron da" },
-        { time: 25.0, text: "Dil kare aawan tere kol udd ke" },
-        { time: 29.5, text: "Lake de kinare baithan naal judd ke" },
-        { time: 34.5, text: "Hath phadd tera photo khichni dobara" },
-        { time: 39.0, text: "Par Insta te post ni paauni mud ke" },
-        { time: 44.0, text: "Aisi setting baithi ae apni" },
-        { time: 48.5, text: "Suiyan khadi diyan taan ni chhediyan" },
-        { time: 53.0, text: "Sacche pyaar 'chon nikalna main" },
-        { time: 57.5, text: "Mere dil diyan tod bediyan" },
-        { time: 62.0, text: "Mainu chat 'ch na bhej pappiyan" },
-        { time: 66.5, text: "Mainu paunda ae sauraana jhappiyan" }
-      ]
+        "title": "Tum Hi Ho",
+        "artist": "Arijit Singh \u2022 Mithoon",
+        "album": "Aashiqui 2",
+        "bpm": 92,
+        "src": "song/Tum Hi Ho Aashiqui 2 320 Kbps.mp3",
+        "cover": "song/covers/Tum Hi Ho.jpg",
+        "color": "#f59e0b",
+        "glow": "rgba(245, 158, 11, 0.88)",
+        "glowSoft": "rgba(245, 158, 11, 0.40)",
+        "lrcFile": "song/Tum Hi Ho.lrc",
+        "lyrics": [
+            {
+                "time": 1,
+                "text": "Hum tere bin ab reh nahi sakte,"
+            },
+            {
+                "time": 7.5,
+                "text": "Tere bina kya wajood mera?"
+            },
+            {
+                "time": 14.5,
+                "text": "Tujhse juda agar ho jayenge,"
+            },
+            {
+                "time": 21,
+                "text": "Toh khud se hi ho jayenge juda"
+            },
+            {
+                "time": 28.5,
+                "text": "Kyunki tum hi ho, ab tum hi ho,"
+            },
+            {
+                "time": 35.5,
+                "text": "Zindagi ab tum hi ho"
+            },
+            {
+                "time": 42.5,
+                "text": "Chain bhi, mera dard bhi,"
+            },
+            {
+                "time": 49.5,
+                "text": "Meri aashiqui ab tum hi ho"
+            },
+            {
+                "time": 57,
+                "text": "Tera mera rishta hai kaisa,"
+            },
+            {
+                "time": 64,
+                "text": "Ek pal door gawaara nahi"
+            },
+            {
+                "time": 71,
+                "text": "Tere liye har roz hain jeete,"
+            },
+            {
+                "time": 78,
+                "text": "Tujhko diya mera waqt sabhi"
+            },
+            {
+                "time": 85,
+                "text": "Koyi lamha mera na ho tere bina,"
+            },
+            {
+                "time": 92,
+                "text": "Har saans pe naam tera..."
+            },
+            {
+                "time": 99,
+                "text": "Kyunki tum hi ho, ab tum hi ho,"
+            },
+            {
+                "time": 106,
+                "text": "Zindagi ab tum hi ho"
+            },
+            {
+                "time": 113,
+                "text": "Chain bhi, mera dard bhi,"
+            },
+            {
+                "time": 120,
+                "text": "Meri aashiqui ab tum hi ho"
+            }
+        ]
+    },
+    {
+        "title": "Dekha Hazaro Dafaa",
+        "artist": "Arijit Singh \u2022 Palak Muchhal",
+        "album": "Rustom",
+        "bpm": 80,
+        "src": "song/Dekha Hazaro Dafaa.m4a",
+        "cover": "song/covers/Dekha Hazaro Dafaa.jpg",
+        "color": "#f59e0b",
+        "glow": "#f59e0b",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Jaan 'Nisaar",
+        "artist": "Arijit Singh \u2022 Amit Trivedi",
+        "album": "Kedarnath",
+        "bpm": 74,
+        "src": "song/Jaan 'Nisaar.m4a",
+        "cover": "song/covers/Jaan 'Nisaar.jpg",
+        "color": "#0d9488",
+        "glow": "#0d9488",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Mareez - E - Ishq",
+        "artist": "Arijit Singh \u2022 Sharib-Toshi",
+        "album": "Zid",
+        "bpm": 90,
+        "src": "song/Mareez - E - Ishq.m4a",
+        "cover": "song/covers/Mareez - E - Ishq.jpg",
+        "color": "#d97706",
+        "glow": "#d97706",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Saanson Ko",
+        "artist": "Arijit Singh \u2022 Sharib-Toshi",
+        "album": "Zid",
+        "bpm": 84,
+        "src": "song/Saanson Ko.m4a",
+        "cover": "song/covers/Saanson Ko.jpg",
+        "color": "#dc2626",
+        "glow": "#dc2626",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Lo Maan Liya",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Raaz Reboot",
+        "bpm": 82,
+        "src": "song/Lo Maan Liya.m4a",
+        "cover": "song/covers/Lo Maan Liya.jpg",
+        "color": "#4f46e5",
+        "glow": "#4f46e5",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Muskurane (Romantic)",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Citylights",
+        "bpm": 76,
+        "src": "song/Muskurane (Romantic).m4a",
+        "cover": "song/covers/Muskurane (Romantic).jpg",
+        "color": "#059669",
+        "glow": "#059669",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Roke Na Ruke Naina",
+        "artist": "Arijit Singh \u2022 Amaal Mallik",
+        "album": "Badrinath Ki Dulhania",
+        "bpm": 80,
+        "src": "song/Roke Na Ruke Naina.m4a",
+        "cover": "song/covers/Roke Na Ruke Naina.jpg",
+        "color": "#ea580c",
+        "glow": "#ea580c",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Mere Yaaraa",
+        "artist": "Arijit Singh \u2022 Neeti Mohan",
+        "album": "Sooryavanshi",
+        "bpm": 96,
+        "src": "song/Mere Yaaraa.m4a",
+        "cover": "song/covers/Mere Yaaraa.jpg",
+        "color": "#e11d48",
+        "glow": "#e11d48",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Judaai",
+        "artist": "Arijit Singh \u2022 Rekha Bhardwaj \u2022 Sachin-Jigar",
+        "album": "Badlapur",
+        "bpm": 84,
+        "src": "song/Judaai.m4a",
+        "cover": "song/covers/Judaai.jpg",
+        "color": "#7c3aed",
+        "glow": "#7c3aed",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Sajde",
+        "artist": "Arijit Singh \u2022 Shankar-Ehsaan-Loy",
+        "album": "Kill Dil",
+        "bpm": 86,
+        "src": "song/Sajde.m4a",
+        "cover": "song/covers/Sajde.jpg",
+        "color": "#ca8a04",
+        "glow": "#ca8a04",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Bolna",
+        "artist": "Arijit Singh \u2022 Asees Kaur \u2022 Tanishk Bagchi",
+        "album": "Kapoor & Sons",
+        "bpm": 82,
+        "src": "song/Bolna.m4a",
+        "cover": "song/covers/Bolna.jpg",
+        "color": "#2dd4bf",
+        "glow": "#2dd4bf",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Pal Pal Dil Ke Paas",
+        "artist": "Arijit Singh \u2022 Parampara Thakur",
+        "album": "Pal Pal Dil Ke Paas",
+        "bpm": 80,
+        "src": "song/Pal Pal Dil Ke Paas.m4a",
+        "cover": "song/covers/Pal Pal Dil Ke Paas.jpg",
+        "color": "#38bdf8",
+        "glow": "#38bdf8",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Sanam Re",
+        "artist": "Arijit Singh \u2022 Mithoon",
+        "album": "Sanam Re",
+        "bpm": 88,
+        "src": "song/Sanam Re.m4a",
+        "cover": "song/covers/Sanam Re.jpg",
+        "color": "#6366f1",
+        "glow": "#6366f1",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Tera Yaar Hoon Main",
+        "artist": "Arijit Singh \u2022 Rochak Kohli",
+        "album": "Sonu Ke Titu Ki Sweety",
+        "bpm": 84,
+        "src": "song/Tera Yaar Hoon Main.m4a",
+        "cover": "song/covers/Tera Yaar Hoon Main.jpg",
+        "color": "#f59e0b",
+        "glow": "#f59e0b",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Uska Hi Banana",
+        "artist": "Arijit Singh \u2022 Chirantan Bhatt",
+        "album": "1920 Evil Returns",
+        "bpm": 78,
+        "src": "song/Uska Hi Banana.m4a",
+        "cover": "song/covers/Uska Hi Banana.jpg",
+        "color": "#9333ea",
+        "glow": "#9333ea",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Milne Hai Mujhse Aayi",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Aashiqui 2",
+        "bpm": 128,
+        "src": "song/Milne Hai Mujhse Aayi.m4a",
+        "cover": "song/covers/Milne Hai Mujhse Aayi.jpg",
+        "color": "#0284c7",
+        "glow": "#0284c7",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Pachtaoge",
+        "artist": "Arijit Singh \u2022 B Praak",
+        "album": "Jaani Ve",
+        "bpm": 84,
+        "src": "song/Pachtaoge.m4a",
+        "cover": "song/covers/Pachtaoge.jpg",
+        "color": "#dc2626",
+        "glow": "#dc2626",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Manwa Laage",
+        "artist": "Arijit Singh \u2022 Shreya Ghoshal",
+        "album": "Happy New Year",
+        "bpm": 86,
+        "src": "song/Manwa Laage.m4a",
+        "cover": "song/covers/Manwa Laage.jpg",
+        "color": "#ec4899",
+        "glow": "#ec4899",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Soch Na Sake",
+        "artist": "Arijit Singh \u2022 Tulsi Kumar \u2022 Amaal Mallik",
+        "album": "Airlift",
+        "bpm": 82,
+        "src": "song/Soch Na Sake.m4a",
+        "cover": "song/covers/Soch Na Sake.jpg",
+        "color": "#059669",
+        "glow": "#059669",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Raaz Aankhein Teri",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Raaz Reboot",
+        "bpm": 80,
+        "src": "song/Raaz Aankhein Teri.m4a",
+        "cover": "song/covers/Raaz Aankhein Teri.jpg",
+        "color": "#b91c1c",
+        "glow": "#b91c1c",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Mera Pyar Tera Pyar",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Jalebi",
+        "bpm": 84,
+        "src": "song/Mera Pyar Tera Pyar.m4a",
+        "cover": "song/covers/Mera Pyar Tera Pyar.jpg",
+        "color": "#d97706",
+        "glow": "#d97706",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Dil Jhoom",
+        "artist": "Arijit Singh \u2022 Mithoon",
+        "album": "Gadar 2",
+        "bpm": 90,
+        "src": "song/Dil Jhoom.m4a",
+        "cover": "song/covers/Dil Jhoom.jpg",
+        "color": "#16a34a",
+        "glow": "#16a34a",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Dilliwaali Girlfriend",
+        "artist": "Arijit Singh \u2022 Sunidhi Chauhan \u2022 Pritam",
+        "album": "Yeh Jawaani Hai Deewani",
+        "bpm": 124,
+        "src": "song/Dilliwaali Girlfriend.m4a",
+        "cover": "song/covers/Dilliwaali Girlfriend.jpg",
+        "color": "#f97316",
+        "glow": "#f97316",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Tu Hi Yaar Mera",
+        "artist": "Arijit Singh \u2022 Neha Kakkar",
+        "album": "Pati Patni Aur Woh",
+        "bpm": 92,
+        "src": "song/Tu Hi Yaar Mera.m4a",
+        "cover": "song/covers/Tu Hi Yaar Mera.jpg",
+        "color": "#f43f5e",
+        "glow": "#f43f5e",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Yeh Fitoor Mera",
+        "artist": "Arijit Singh \u2022 Amit Trivedi",
+        "album": "Fitoor",
+        "bpm": 86,
+        "src": "song/Yeh Fitoor Mera.m4a",
+        "cover": "song/covers/Yeh Fitoor Mera.jpg",
+        "color": "#7c3aed",
+        "glow": "#7c3aed",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Satranga",
+        "artist": "Arijit Singh \u2022 Shreyas Puranik",
+        "album": "ANIMAL",
+        "bpm": 80,
+        "src": "song/Satranga.m4a",
+        "cover": "song/covers/Satranga.jpg",
+        "color": "#e11d48",
+        "glow": "#e11d48",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Lutt Putt Gaya",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Dunki",
+        "bpm": 118,
+        "src": "song/Lutt Putt Gaya.m4a",
+        "cover": "song/covers/Lutt Putt Gaya.jpg",
+        "color": "#ea580c",
+        "glow": "#ea580c",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Shayad",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Love Aaj Kal",
+        "bpm": 84,
+        "src": "song/Shayad.m4a",
+        "cover": "song/covers/Shayad.jpg",
+        "color": "#2563eb",
+        "glow": "#2563eb",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Thodi Jagah",
+        "artist": "Arijit Singh \u2022 Tanishk Bagchi",
+        "album": "Marjaavaan",
+        "bpm": 78,
+        "src": "song/Thodi Jagah.m4a",
+        "cover": "song/covers/Thodi Jagah.jpg",
+        "color": "#0d9488",
+        "glow": "#0d9488",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Saware",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Phantom",
+        "bpm": 84,
+        "src": "song/Saware.m4a",
+        "cover": "song/covers/Saware.jpg",
+        "color": "#64748b",
+        "glow": "#64748b",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Pasoori Nu",
+        "artist": "Arijit Singh \u2022 Tulsi Kumar",
+        "album": "Satyaprem Ki Katha",
+        "bpm": 96,
+        "src": "song/Pasoori Nu.m4a",
+        "cover": "song/covers/Pasoori Nu.jpg",
+        "color": "#ca8a04",
+        "glow": "#ca8a04",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Jhoome Jo Pathaan",
+        "artist": "Arijit Singh \u2022 Sukriti Kakar \u2022 Vishal-Shekhar",
+        "album": "Pathaan",
+        "bpm": 108,
+        "src": "song/Jhoome Jo Pathaan.m4a",
+        "cover": "song/covers/Jhoome Jo Pathaan.jpg",
+        "color": "#0284c7",
+        "glow": "#0284c7",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "What Jhumka ?",
+        "artist": "Arijit Singh \u2022 Jonita Gandhi \u2022 Pritam",
+        "album": "Rocky Aur Rani Kii Prem Kahaani",
+        "bpm": 120,
+        "src": "song/What Jhumka .m4a",
+        "cover": "song/covers/What Jhumka .jpg",
+        "color": "#db2777",
+        "glow": "#db2777",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Ve Kamleya",
+        "artist": "Arijit Singh \u2022 Shreya Ghoshal \u2022 Pritam",
+        "album": "Rocky Aur Rani Kii Prem Kahaani",
+        "bpm": 82,
+        "src": "song/Ve Kamleya.m4a",
+        "cover": "song/covers/Ve Kamleya.jpg",
+        "color": "#9333ea",
+        "glow": "#9333ea",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Aashiqui Aa Gayi",
+        "artist": "Arijit Singh \u2022 Mithoon",
+        "album": "Radhe Shyam",
+        "bpm": 88,
+        "src": "song/Aashiqui Aa Gayi.m4a",
+        "cover": "song/covers/Aashiqui Aa Gayi.jpg",
+        "color": "#f59e0b",
+        "glow": "#f59e0b",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Zaalima",
+        "artist": "Arijit Singh \u2022 Harshdeep Kaur",
+        "album": "Raees",
+        "bpm": 90,
+        "src": "song/Zaalima.m4a",
+        "cover": "song/covers/Zaalima.jpg",
+        "color": "#d97706",
+        "glow": "#d97706",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Kashmir Main Tu Kanyakumari",
+        "artist": "Arijit Singh \u2022 Sunidhi Chauhan",
+        "album": "Chennai Express",
+        "bpm": 126,
+        "src": "song/Kashmir Main Tu Kanyakumari.m4a",
+        "cover": "song/covers/Kashmir Main Tu Kanyakumari.jpg",
+        "color": "#16a34a",
+        "glow": "#16a34a",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Aayat",
+        "artist": "Arijit Singh \u2022 Sanjay Leela Bhansali",
+        "album": "Bajirao Mastani",
+        "bpm": 74,
+        "src": "song/Aayat.m4a",
+        "cover": "song/covers/Aayat.jpg",
+        "color": "#b45309",
+        "glow": "#b45309",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Binte Dil",
+        "artist": "Arijit Singh \u2022 Sanjay Leela Bhansali",
+        "album": "Padmaavat",
+        "bpm": 98,
+        "src": "song/Binte Dil Padmaavat 320 Kbps.mp3",
+        "cover": "song/covers/Binte Dil.jpg",
+        "color": "#eab308",
+        "glow": "rgba(234, 179, 8, 0.88)",
+        "glowSoft": "rgba(234, 179, 8, 0.40)",
+        "lrcFile": "song/Binte Dil.lrc",
+        "lyrics": [
+            {
+                "time": 15,
+                "text": "Binte dil misriya mein,"
+            },
+            {
+                "time": 21.5,
+                "text": "Pesh hai khalish yeh..."
+            },
+            {
+                "time": 29,
+                "text": "Binte dil misriya mein,"
+            },
+            {
+                "time": 35.5,
+                "text": "Pesh hai khalish yeh..."
+            },
+            {
+                "time": 43,
+                "text": "Khaab ka jahan hai,"
+            },
+            {
+                "time": 49.5,
+                "text": "Zulfein bikhri hain shaam si"
+            },
+            {
+                "time": 57,
+                "text": "Yeh junoon hai kaisa,"
+            },
+            {
+                "time": 64,
+                "text": "Khumaar hai kaisa jaam si"
+            },
+            {
+                "time": 71.5,
+                "text": "Binte dil misriya mein..."
+            },
+            {
+                "time": 85,
+                "text": "Qatra qatra beh raha hai fiza mein,"
+            },
+            {
+                "time": 93,
+                "text": "Ishq ka nasha har ek adaa mein"
+            },
+            {
+                "time": 101,
+                "text": "Har lamha bekhudi ka silsila hai,"
+            },
+            {
+                "time": 109,
+                "text": "Rooh ko meri tera sahara mila hai"
+            }
+        ]
+    },
+    {
+        "title": "Phir Kabhi",
+        "artist": "Arijit Singh \u2022 Amaal Mallik",
+        "album": "M.S. Dhoni: The Untold Story",
+        "bpm": 84,
+        "src": "song/Phir Kabhi.m4a",
+        "cover": "song/covers/Phir Kabhi.jpg",
+        "color": "#2563eb",
+        "glow": "#2563eb",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Tera Chehra",
+        "artist": "Arijit Singh \u2022 Himesh Reshammiya",
+        "album": "Sanam Teri Kasam",
+        "bpm": 82,
+        "src": "song/Tera Chehra.m4a",
+        "cover": "song/covers/Tera Chehra.jpg",
+        "color": "#dc2626",
+        "glow": "#dc2626",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Pal",
+        "artist": "Arijit Singh \u2022 Shreya Ghoshal",
+        "album": "Jalebi",
+        "bpm": 84,
+        "src": "song/Pal.m4a",
+        "cover": "song/covers/Pal.jpg",
+        "color": "#f43f5e",
+        "glow": "#f43f5e",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "O Saathi",
+        "artist": "Arijit Singh \u2022 Mithoon",
+        "album": "Shab",
+        "bpm": 80,
+        "src": "song/O Saathi.m4a",
+        "cover": "song/covers/O Saathi.jpg",
+        "color": "#475569",
+        "glow": "#475569",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Dil Ke Paas",
+        "artist": "Arijit Singh \u2022 Tulsi Kumar",
+        "album": "Wajah Tum Ho",
+        "bpm": 86,
+        "src": "song/Dil Ke Paas.m4a",
+        "cover": "song/covers/Dil Ke Paas.jpg",
+        "color": "#6366f1",
+        "glow": "#6366f1",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Humdard",
+        "artist": "Arijit Singh \u2022 Mithoon",
+        "album": "Ek Villain",
+        "bpm": 88,
+        "src": "song/Humdard.m4a",
+        "cover": "song/covers/Humdard.jpg",
+        "color": "#0ea5e9",
+        "glow": "#0ea5e9",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Hai Dil Ye Mera",
+        "artist": "Arijit Singh \u2022 Mithoon",
+        "album": "Hate Story 2",
+        "bpm": 82,
+        "src": "song/Hai Dil Ye Mera.m4a",
+        "cover": "song/covers/Hai Dil Ye Mera.jpg",
+        "color": "#991b1b",
+        "glow": "#991b1b",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Raat Bhar",
+        "artist": "Arijit Singh \u2022 Shreya Ghoshal",
+        "album": "Heropanti",
+        "bpm": 124,
+        "src": "song/Raat Bhar.m4a",
+        "cover": "song/covers/Raat Bhar.jpg",
+        "color": "#7c3aed",
+        "glow": "#7c3aed",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Aaj Phir",
+        "artist": "Arijit Singh \u2022 Samira Koppikar",
+        "album": "Hate Story 2",
+        "bpm": 85,
+        "src": "song/Aaj Phir.m4a",
+        "cover": "song/covers/Aaj Phir.jpg",
+        "color": "#831843",
+        "glow": "#831843",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Rait Zara Si",
+        "artist": "Arijit Singh \u2022 Shashaa Tirupati \u2022 A.R. Rahman",
+        "album": "Atrangi Re",
+        "bpm": 78,
+        "src": "song/Rait Zara Si.m4a",
+        "cover": "song/covers/Rait Zara Si.jpg",
+        "color": "#d97706",
+        "glow": "#d97706",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Hum Nashe Mein Toh Nahin",
+        "artist": "Arijit Singh \u2022 Tulsi Kumar \u2022 Pritam",
+        "album": "Bhool Bhulaiyaa 2",
+        "bpm": 92,
+        "src": "song/Hum Nashe Mein Toh Nahin.m4a",
+        "cover": "song/covers/Hum Nashe Mein Toh Nahin.jpg",
+        "color": "#059669",
+        "glow": "#059669",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Ullu Ka Pattha",
+        "artist": "Arijit Singh \u2022 Nikhita Gandhi \u2022 Pritam",
+        "album": "Jagga Jasoos",
+        "bpm": 116,
+        "src": "song/Ullu Ka Pattha.m4a",
+        "cover": "song/covers/Ullu Ka Pattha.jpg",
+        "color": "#0284c7",
+        "glow": "#0284c7",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "O Bedardeya",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Tu Jhoothi Main Makkaar",
+        "bpm": 76,
+        "src": "song/O Bedardeya.m4a",
+        "cover": "song/covers/O Bedardeya.jpg",
+        "color": "#e11d48",
+        "glow": "#e11d48",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Tu Hi Hai",
+        "artist": "Arijit Singh \u2022 Amit Trivedi",
+        "album": "Dear Zindagi",
+        "bpm": 90,
+        "src": "song/Tu Hi Hai.m4a",
+        "cover": "song/covers/Tu Hi Hai.jpg",
+        "color": "#14b8a6",
+        "glow": "#14b8a6",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Tose Naina",
+        "artist": "Arijit Singh \u2022 Hanif Shaikh",
+        "album": "Mickey Virus",
+        "bpm": 84,
+        "src": "song/Tose Naina.m4a",
+        "cover": "song/covers/Tose Naina.jpg",
+        "color": "#8b5cf6",
+        "glow": "#8b5cf6",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Ghungroo",
+        "artist": "Arijit Singh \u2022 Shilpa Rao \u2022 Vishal-Shekhar",
+        "album": "War",
+        "bpm": 118,
+        "src": "song/Ghungroo.m4a",
+        "cover": "song/covers/Ghungroo.jpg",
+        "color": "#ea580c",
+        "glow": "#ea580c",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Main Tera Boyfriend",
+        "artist": "Arijit Singh \u2022 Neha Kakkar",
+        "album": "Raabta",
+        "bpm": 128,
+        "src": "song/Main Tera Boyfriend.m4a",
+        "cover": "song/covers/Main Tera Boyfriend.jpg",
+        "color": "#ec4899",
+        "glow": "#ec4899",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Phir Bhi Tumko Chaahunga",
+        "artist": "Arijit Singh \u2022 Shashaa Tirupati \u2022 Mithoon",
+        "album": "Half Girlfriend",
+        "bpm": 80,
+        "src": "song/Phir Bhi Tumko Chaahunga.m4a",
+        "cover": "song/covers/Phir Bhi Tumko Chaahunga.jpg",
+        "color": "#2563eb",
+        "glow": "#2563eb",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Tere Bina",
+        "artist": "Arijit Singh \u2022 Aakanksha Sharma",
+        "album": "1921",
+        "bpm": 82,
+        "src": "song/Tere Bina.m4a",
+        "cover": "song/covers/Tere Bina.jpg",
+        "color": "#475569",
+        "glow": "#475569",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Raabta (Kehte Hain Khuda Ne)",
+        "artist": "Arijit Singh \u2022 Shreya Ghoshal \u2022 Pritam",
+        "album": "Agent Vinod",
+        "bpm": 86,
+        "src": "song/Raabta (Kehte Hain Khuda Ne).m4a",
+        "cover": "song/covers/Raabta (Kehte Hain Khuda Ne).jpg",
+        "color": "#b91c1c",
+        "glow": "#b91c1c",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Tere Pyaar Mein",
+        "artist": "Arijit Singh \u2022 Nikhita Gandhi \u2022 Pritam",
+        "album": "Tu Jhoothi Main Makkaar",
+        "bpm": 126,
+        "src": "song/Tere Pyaar Mein.m4a",
+        "cover": "song/covers/Tere Pyaar Mein.jpg",
+        "color": "#0ea5e9",
+        "glow": "#0ea5e9",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Pyaar Hota Kayi Baar Hai",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Tu Jhoothi Main Makkaar",
+        "bpm": 122,
+        "src": "song/Pyaar Hota Kayi Baar Hai.m4a",
+        "cover": "song/covers/Pyaar Hota Kayi Baar Hai.jpg",
+        "color": "#f59e0b",
+        "glow": "#f59e0b",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Duaa",
+        "artist": "Arijit Singh \u2022 Nandini Srikar \u2022 Vishal-Shekhar",
+        "album": "Shanghai",
+        "bpm": 80,
+        "src": "song/Duaa.m4a",
+        "cover": "song/covers/Duaa.jpg",
+        "color": "#6b7280",
+        "glow": "#6b7280",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Sajni",
+        "artist": "Arijit Singh \u2022 Ram Sampath",
+        "album": "Laapataa Ladies",
+        "bpm": 88,
+        "src": "song/Sajni.m4a",
+        "cover": "song/covers/Sajni.jpg",
+        "color": "#d97706",
+        "glow": "#d97706",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Soulmate",
+        "artist": "Arijit Singh \u2022 Badshah",
+        "album": "Badshah",
+        "bpm": 94,
+        "src": "song/Soulmate.m4a",
+        "cover": "song/covers/Soulmate.jpg",
+        "color": "#ca8a04",
+        "glow": "#ca8a04",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Satyanaas",
+        "artist": "Arijit Singh \u2022 Nakash Aziz \u2022 Pritam",
+        "album": "Chandu Champion",
+        "bpm": 120,
+        "src": "song/Satyanaas.m4a",
+        "cover": "song/covers/Satyanaas.jpg",
+        "color": "#16a34a",
+        "glow": "#16a34a",
+        "glowSoft": "rgba(255, 112, 67, 0.40)"
+    },
+    {
+        "title": "Kesariya",
+        "artist": "Arijit Singh \u2022 Pritam \u2022 Amitabh B",
+        "album": "Brahm\u0101stra",
+        "bpm": 88,
+        "src": "song/Kesariya.mp3",
+        "cover": "song/Kesariya.jpg",
+        "color": "#ff7043",
+        "glow": "rgba(255, 112, 67, 0.88)",
+        "glowSoft": "rgba(255, 112, 67, 0.40)",
+        "video": "song/Kesariya.mp4",
+        "lrcFile": "song/Kesariya.lrc",
+        "lyrics": [
+            {
+                "time": 9.5,
+                "text": "Mujhko itna bataye koyi"
+            },
+            {
+                "time": 13.8,
+                "text": "Kaise tujhse dil na lagaye koyi"
+            },
+            {
+                "time": 18.2,
+                "text": "Rabba ne tujhko banane mein"
+            },
+            {
+                "time": 22.5,
+                "text": "Kar di hai husn ki khaali tijoriyan"
+            },
+            {
+                "time": 27,
+                "text": "Kaajal ki siyahi se likhi"
+            },
+            {
+                "time": 31,
+                "text": "Hai tune jaane kitno ki love storiyan"
+            },
+            {
+                "time": 36.5,
+                "text": "Kesariya tera ishq hai piya"
+            },
+            {
+                "time": 41.2,
+                "text": "Rang jaaun jo main haath lagaun"
+            },
+            {
+                "time": 45.5,
+                "text": "Din beete saara teri fikr mein"
+            },
+            {
+                "time": 50,
+                "text": "Rain saari teri khair manaun"
+            },
+            {
+                "time": 54.5,
+                "text": "Kesariya tera ishq hai piya"
+            },
+            {
+                "time": 59,
+                "text": "Rang jaaun jo main haath lagaun"
+            },
+            {
+                "time": 63.5,
+                "text": "Din beete saara teri fikr mein"
+            },
+            {
+                "time": 68,
+                "text": "Rain saari teri khair manaun"
+            },
+            {
+                "time": 73,
+                "text": "Patjhad ke mausam mein bhi"
+            },
+            {
+                "time": 76.8,
+                "text": "Rangi chanar jaisi jhoome"
+            },
+            {
+                "time": 81,
+                "text": "Gehne ki tarah chamke"
+            },
+            {
+                "time": 85.5,
+                "text": "Jab dhool tere pairo ki choome"
+            },
+            {
+                "time": 90,
+                "text": "Aise na dekh sajna"
+            },
+            {
+                "time": 94,
+                "text": "Bura lagta hai tere bin"
+            },
+            {
+                "time": 98.5,
+                "text": "Kangan chann chann baje"
+            },
+            {
+                "time": 102.5,
+                "text": "Teri galiyon mein dhoome"
+            },
+            {
+                "time": 107,
+                "text": "Kesariya tera ishq hai piya"
+            },
+            {
+                "time": 112,
+                "text": "Rang jaaun jo main haath lagaun"
+            },
+            {
+                "time": 116.5,
+                "text": "Din beete saara teri fikr mein"
+            },
+            {
+                "time": 121,
+                "text": "Rain saari teri khair manaun"
+            },
+            {
+                "time": 126,
+                "text": "Kesariya tera ishq hai piya"
+            },
+            {
+                "time": 131,
+                "text": "Rang jaaun jo main haath lagaun"
+            },
+            {
+                "time": 136,
+                "text": "Din beete saara teri fikr mein"
+            },
+            {
+                "time": 142,
+                "text": "Rain saari teri khair manaun"
+            }
+        ]
+    },
+    {
+        "title": "Sawan Aaya Hai",
+        "artist": "Arijit Singh \u2022 Tony Kakkar",
+        "album": "Creature 3D",
+        "bpm": 92,
+        "src": "song/Sawan Aaya Hai.mp3",
+        "cover": "song/covers/Sawan Aaya Hai.jpg",
+        "color": "#00b4d8",
+        "glow": "rgba(0, 180, 216, 0.88)",
+        "glowSoft": "rgba(0, 180, 216, 0.40)",
+        "video": "song/Sawan Aaya Hai.mp4",
+        "lrcFile": "song/Sawan Aaya Hai.lrc",
+        "lyrics": [
+            {
+                "time": 15.5,
+                "text": "Mohabbat barsa dena tu, sawan aaya hai"
+            },
+            {
+                "time": 23,
+                "text": "Tere aur mere milne ka, mausam aaya hai"
+            },
+            {
+                "time": 31,
+                "text": "Mohabbat barsa dena tu, sawan aaya hai"
+            },
+            {
+                "time": 39,
+                "text": "Tere aur mere milne ka, mausam aaya hai"
+            },
+            {
+                "time": 47,
+                "text": "Sabse chhupa ke tujhe seene se lagana hai"
+            },
+            {
+                "time": 55,
+                "text": "Pyar mein tere hadd se guzar jaana hai"
+            },
+            {
+                "time": 63,
+                "text": "Itna pyar kisi pe, pehli baar aaya hai"
+            },
+            {
+                "time": 71,
+                "text": "Mohabbat barsa dena tu, sawan aaya hai"
+            },
+            {
+                "time": 79,
+                "text": "Tere aur mere milne ka, mausam aaya hai"
+            },
+            {
+                "time": 87,
+                "text": "Kyun ek pal ki bhi judai sahi jaaye na"
+            },
+            {
+                "time": 95,
+                "text": "Kyun har ghadi sirf tera nasha chadh raha hai"
+            },
+            {
+                "time": 103,
+                "text": "Yeh khumaar tere ishq ka hai"
+            },
+            {
+                "time": 109,
+                "text": "Jo dil pe chha raha hai"
+            },
+            {
+                "time": 115,
+                "text": "Mohabbat barsa dena tu, sawan aaya hai"
+            },
+            {
+                "time": 123,
+                "text": "Tere aur mere milne ka, mausam aaya hai"
+            }
+        ]
+    },
+    {
+        "title": "Yaad Hai Na",
+        "artist": "Arijit Singh \u2022 Jeet Gannguli",
+        "album": "Raaz Reboot",
+        "bpm": 84,
+        "src": "song/Yaad Hai Na.mp3",
+        "cover": "song/covers/Yaad Hai Na.jpg",
+        "color": "#9d4edd",
+        "glow": "rgba(157, 78, 221, 0.88)",
+        "glowSoft": "rgba(157, 78, 221, 0.40)",
+        "video": "song/Yaad Hai Na.mp4",
+        "lrcFile": "song/Yaad Hai Na.lrc",
+        "lyrics": [
+            {
+                "time": 18,
+                "text": "Woh mere aane pe khil jaana tera"
+            },
+            {
+                "time": 24,
+                "text": "Woh mere jaane pe chid jaana tera"
+            },
+            {
+                "time": 30.5,
+                "text": "Woh mere chhone pe sharmaana tera"
+            },
+            {
+                "time": 37,
+                "text": "Bheegi raaton mein behak jaana tera"
+            },
+            {
+                "time": 43.5,
+                "text": "Yaad hai na, yaad hai na, yaad hai na..."
+            },
+            {
+                "time": 56.5,
+                "text": "Woh mere aane pe khil jaana tera"
+            },
+            {
+                "time": 63,
+                "text": "Woh mere jaane pe chid jaana tera"
+            },
+            {
+                "time": 69.5,
+                "text": "Saath mein humne jo dekhe the sapne"
+            },
+            {
+                "time": 76,
+                "text": "Lagte the saare jahaan se woh apne"
+            },
+            {
+                "time": 82.5,
+                "text": "Tu muskuraaye toh jeeta tha main"
+            },
+            {
+                "time": 89,
+                "text": "Tere bina toh adhura tha main"
+            },
+            {
+                "time": 95.5,
+                "text": "Yaad hai na, yaad hai na, yaad hai na..."
+            },
+            {
+                "time": 120,
+                "text": "Har lamha tujhko hi sochte rehna"
+            },
+            {
+                "time": 127,
+                "text": "Bin bole baatein woh sab samajhna"
+            },
+            {
+                "time": 134,
+                "text": "Khwabon mein \u0924\u0947\u0930\u0947 hi bas kho jaana"
+            },
+            {
+                "time": 141,
+                "text": "Tera hi banke hamesha rehna"
+            },
+            {
+                "time": 148,
+                "text": "Yaad hai na, yaad hai na, yaad hai na..."
+            }
+        ]
+    },
+    {
+        "title": "Chhod Diya",
+        "artist": "Arijit Singh \u2022 Kanika Kapoor",
+        "album": "Baazaar",
+        "bpm": 80,
+        "src": "song/Chhod Diya.mp3",
+        "cover": "song/covers/Chhod Diya.jpg",
+        "color": "#e63946",
+        "glow": "rgba(230, 57, 70, 0.88)",
+        "glowSoft": "rgba(230, 57, 70, 0.40)",
+        "video": "song/Chhod Diya.mp4",
+        "lrcFile": "song/Chhod Diya.lrc",
+        "lyrics": [
+            {
+                "time": 9,
+                "text": "Chhod diya woh raasta"
+            },
+            {
+                "time": 14.5,
+                "text": "Jis raaste se tum the guzre"
+            },
+            {
+                "time": 20.5,
+                "text": "Chhod diya woh raasta"
+            },
+            {
+                "time": 26.5,
+                "text": "Jis raaste se tum the guzre"
+            },
+            {
+                "time": 32.5,
+                "text": "Tod diya woh aaina"
+            },
+            {
+                "time": 38.5,
+                "text": "Jis aaine mein tum the dikhte"
+            },
+            {
+                "time": 45,
+                "text": "Roz sambhalte hain hum"
+            },
+            {
+                "time": 50.5,
+                "text": "Teri yaadon se ladte ladte"
+            },
+            {
+                "time": 57,
+                "text": "Chhod diya woh raasta"
+            },
+            {
+                "time": 63,
+                "text": "Jis raaste se tum the guzre"
+            },
+            {
+                "time": 69,
+                "text": "Tod diya woh aaina"
+            },
+            {
+                "time": 75,
+                "text": "Jis aaine mein tum the dikhte"
+            },
+            {
+                "time": 81,
+                "text": "Dil ko manana aasan nahi tha"
+            },
+            {
+                "time": 87.5,
+                "text": "Khud ko bhulana aasan nahi tha"
+            },
+            {
+                "time": 94,
+                "text": "Phir bhi yeh faisla humne kiya"
+            },
+            {
+                "time": 100,
+                "text": "Chhod diya woh raasta..."
+            }
+        ]
+    },
+    {
+        "title": "Sooiyan",
+        "artist": "Arijit Singh \u2022 Chinmayi Sripada",
+        "album": "Guddu Rangeela",
+        "bpm": 86,
+        "src": "song/Sooiyan.mp3",
+        "cover": "song/covers/Sooiyan.jpg",
+        "color": "#06d6a0",
+        "glow": "rgba(6, 214, 160, 0.88)",
+        "glowSoft": "rgba(6, 214, 160, 0.40)",
+        "video": "song/Sooiyan.mp4",
+        "lrcFile": "song/Sooiyan.lrc",
+        "lyrics": [
+            {
+                "time": 11,
+                "text": "Sooiyan si, sooiyan si chubhti hain"
+            },
+            {
+                "time": 17.5,
+                "text": "Yeh aankhein judti hain"
+            },
+            {
+                "time": 23,
+                "text": "Teri aankhon se jab bhi milti hain"
+            },
+            {
+                "time": 29.5,
+                "text": "Sooiyan si, sooiyan si chubhti hain"
+            },
+            {
+                "time": 36,
+                "text": "Yeh yaadein udti hain"
+            },
+            {
+                "time": 41.5,
+                "text": "Tere aane se jab yeh khilti hain"
+            },
+            {
+                "time": 48,
+                "text": "Meetha sa dard yeh de jaati hain"
+            },
+            {
+                "time": 54,
+                "text": "Dheeme se paas yeh le aati hain"
+            },
+            {
+                "time": 60.5,
+                "text": "Khwabon mein rang bharti hain"
+            },
+            {
+                "time": 66.5,
+                "text": "Sooiyan si, sooiyan si chubhti hain"
+            },
+            {
+                "time": 73,
+                "text": "Yeh raatein dhalti hain"
+            },
+            {
+                "time": 79,
+                "text": "Teri saanson ki aahat milti hai"
+            }
+        ]
+    },
+    {
+        "title": "Samjhawan",
+        "artist": "Arijit Singh \u2022 Shreya Ghoshal",
+        "album": "Humpty Sharma Ki Dulhania",
+        "bpm": 76,
+        "src": "song/Samjhawan Humpty Sharma Ki Dulhania 320 Kbps.mp3",
+        "cover": "song/covers/Samjhawan.jpg",
+        "color": "#ff9f24",
+        "glow": "rgba(255, 159, 36, 0.88)",
+        "glowSoft": "rgba(255, 159, 36, 0.40)",
+        "lrcFile": "song/Samjhawan.lrc",
+        "lyrics": [
+            {
+                "time": 11.5,
+                "text": "Nahi jeena tere baaju,"
+            },
+            {
+                "time": 15.5,
+                "text": "Nahi jeena, nahi jeena..."
+            },
+            {
+                "time": 31.5,
+                "text": "Main tainu samjhawan ki,"
+            },
+            {
+                "time": 35.5,
+                "text": "Na tere bina lagda jee"
+            },
+            {
+                "time": 43.5,
+                "text": "Main tainu samjhawan ki,"
+            },
+            {
+                "time": 47.5,
+                "text": "Na tere bina lagda jee"
+            },
+            {
+                "time": 51.5,
+                "text": "Tu ki jaane pyaar mera,"
+            },
+            {
+                "time": 55.5,
+                "text": "Main karaan intezar tera"
+            },
+            {
+                "time": 59.5,
+                "text": "Tu dil, tuiyon jaan meri"
+            },
+            {
+                "time": 63.5,
+                "text": "Main tainu samjhawan ki,"
+            },
+            {
+                "time": 67.5,
+                "text": "Na tere bina lagda jee"
+            },
+            {
+                "time": 119,
+                "text": "Mere dil ne chun laiyaa ne,"
+            },
+            {
+                "time": 123.5,
+                "text": "Tere dil diyaan raahan"
+            },
+            {
+                "time": 127.5,
+                "text": "Tu jo mere naal turre taan,"
+            },
+            {
+                "time": 131.5,
+                "text": "Turpe meriyaan saahan"
+            },
+            {
+                "time": 135.5,
+                "text": "Jeena mera haye, hun hai tera,"
+            },
+            {
+                "time": 139.5,
+                "text": "Ki main karaan..."
+            },
+            {
+                "time": 147.5,
+                "text": "Tu kar aitbaar mera,"
+            },
+            {
+                "time": 151.5,
+                "text": "Main karaan intezar tera"
+            },
+            {
+                "time": 155.5,
+                "text": "Tu dil, tuiyon jaan meri"
+            },
+            {
+                "time": 159.5,
+                "text": "Main tainu samjhawan ki,"
+            },
+            {
+                "time": 163.5,
+                "text": "Na tere bina lagda jee"
+            },
+            {
+                "time": 167.5,
+                "text": "Ve changa nahion keeta beeba,"
+            },
+            {
+                "time": 175.5,
+                "text": "Dil mera tod ke"
+            },
+            {
+                "time": 179.5,
+                "text": "Ve bada pachhtaiyaan akhaan,"
+            },
+            {
+                "time": 187.5,
+                "text": "Naal tere jod ke"
+            }
+        ]
+    },
+    {
+        "title": "Phir Le Aya Dil (Reprise)",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Barfi!",
+        "bpm": 72,
+        "src": "song/Phir Le Aya Dil (Reprise) - Arijit Singh (DJJOhAL.Com).mp3",
+        "cover": "song/covers/Phir Le Aya Dil (Reprise).jpg",
+        "color": "#f59e0b",
+        "glow": "rgba(245, 158, 11, 0.88)",
+        "glowSoft": "rgba(245, 158, 11, 0.40)",
+        "lrcFile": "song/Phir Le Aya Dil (Reprise).lrc",
+        "lyrics": [
+            {
+                "time": 20,
+                "text": "Phir le aaya dil majboor kya keeje,"
+            },
+            {
+                "time": 34.5,
+                "text": "Raas na aaya rehna door kya keeje..."
+            },
+            {
+                "time": 46.5,
+                "text": "Dil keh raha use maqammal kar bhi aao,"
+            },
+            {
+                "time": 54.5,
+                "text": "Woh jo adhuri si baat baaki hai,"
+            },
+            {
+                "time": 61.5,
+                "text": "Woh jo adhuri si yaad baaki hai,"
+            },
+            {
+                "time": 67.5,
+                "text": "Woh jo adhuri si yaad baaki hai..."
+            },
+            {
+                "time": 79.5,
+                "text": "Karte hain hum aaj qabool kya keeje,"
+            },
+            {
+                "time": 91.5,
+                "text": "Ho gayi thi humse yeh bhool kya keeje..."
+            },
+            {
+                "time": 105.5,
+                "text": "Dil keh raha use mayassar kar bhi aao,"
+            },
+            {
+                "time": 114.5,
+                "text": "Woh jo dabi si aas baaki hai,"
+            },
+            {
+                "time": 126.5,
+                "text": "Woh jo dabi si aanch baaki hai,"
+            },
+            {
+                "time": 134.5,
+                "text": "Woh jo dabi si aanch baaki hai..."
+            },
+            {
+                "time": 170.5,
+                "text": "Kismat ko hai manzoor kya keeje,"
+            },
+            {
+                "time": 190.5,
+                "text": "Kismat ko hai manzoor kya keeje..."
+            },
+            {
+                "time": 214.5,
+                "text": "Milte rahe hum badastoor kya keeje,"
+            },
+            {
+                "time": 226.5,
+                "text": "Dil keh raha hai use musalsal kar bhi aao..."
+            }
+        ]
+    },
+    {
+        "title": "Khairiyat",
+        "artist": "Arijit Singh \u2022 Pritam",
+        "album": "Chhichhore",
+        "bpm": 76,
+        "src": "song/Khairiyat Chhichhore 320 Kbps.mp3",
+        "cover": "song/covers/Khairiyat.jpg",
+        "color": "#38bdf8",
+        "glow": "rgba(56, 189, 248, 0.88)",
+        "glowSoft": "rgba(56, 189, 248, 0.40)",
+        "lrcFile": "song/Khairiyat.lrc",
+        "lyrics": [
+            {
+                "time": 13.5,
+                "text": "Khairiyat puchho, kabhi toh kaifiyat puchho,"
+            },
+            {
+                "time": 20,
+                "text": "Tumhare bin deewane ka kya haal hai"
+            },
+            {
+                "time": 27,
+                "text": "Dil mera dekho, na meri haisiyat puchho,"
+            },
+            {
+                "time": 33.5,
+                "text": "Tere bin ek din jaise sau saal hai"
+            },
+            {
+                "time": 40.5,
+                "text": "Anjaam hai tay mera,"
+            },
+            {
+                "time": 44,
+                "text": "Hona tumhe hai mera"
+            },
+            {
+                "time": 47,
+                "text": "Jitni bhi hon dooriyan filhaal hain..."
+            },
+            {
+                "time": 54,
+                "text": "Yeh dooriyan filhaal hain..."
+            },
+            {
+                "time": 61,
+                "text": "Khairiyat puchho, kabhi toh kaifiyat puchho,"
+            },
+            {
+                "time": 67.5,
+                "text": "Tumhare bin deewane ka kya haal hai"
+            },
+            {
+                "time": 74.5,
+                "text": "Dil mera dekho, na meri haisiyat puchho,"
+            },
+            {
+                "time": 81,
+                "text": "Tere bin ek din jaise sau saal hai"
+            },
+            {
+                "time": 88,
+                "text": "Baatein zaroori hain tera milna sahi hai,"
+            },
+            {
+                "time": 95,
+                "text": "Dil ki panahon mein tu hi toh basa hai"
+            }
+        ]
+    },
+    {
+        "title": "Ve Haaniyaan",
+        "artist": "Danny \u2022 Avvy Sra",
+        "bpm": 90,
+        "src": "song/Ve Haaniyaan.mp3",
+        "lrcFile": "song/Ve Haaniyaan.lrc",
+        "cover": "song/Screenshot 2026-10-24 224431.png",
+        "color": "#ff5e7e",
+        "glow": "rgba(255, 94, 126, 0.88)",
+        "glowSoft": "rgba(255, 94, 126, 0.40)",
+        "lyrics": [
+            {
+                "time": 7.5,
+                "text": "Tere kolon mainu saah milde,"
+            },
+            {
+                "time": 11.5,
+                "text": "Assi aivein ni tainu bewajah milde"
+            },
+            {
+                "time": 15.5,
+                "text": "Tere ch koi gall ae sahiba,"
+            },
+            {
+                "time": 19.5,
+                "text": "Haan assi tainu tan milde"
+            },
+            {
+                "time": 23.5,
+                "text": "Mainu pata nahi hunda sukoon ki,"
+            },
+            {
+                "time": 27.5,
+                "text": "Tainu mile tan pata laggeya"
+            },
+            {
+                "time": 31.5,
+                "text": "Mit gayi meri sab tanhai,"
+            },
+            {
+                "time": 35.5,
+                "text": "Jee tere kol aa laggeya"
+            },
+            {
+                "time": 39.5,
+                "text": "Ve haaniyaan ve dil jaaniya,"
+            },
+            {
+                "time": 43.5,
+                "text": "Tu nehde nehde reh na door kite ja"
+            },
+            {
+                "time": 47.5,
+                "text": "Bhull gaye eh saari duniya,"
+            },
+            {
+                "time": 51.5,
+                "text": "Ke tera hi naam hai boldi zubaan"
+            },
+            {
+                "time": 79.5,
+                "text": "Eh jo sadde naal hoya ae,"
+            },
+            {
+                "time": 83.5,
+                "text": "Khoobsurat sapna lagdae"
+            },
+            {
+                "time": 87.5,
+                "text": "Ajnabee si kal tak jo,"
+            },
+            {
+                "time": 91.5,
+                "text": "Haan hun mainu apna lagdae"
+            },
+            {
+                "time": 95.5,
+                "text": "Tu hi din tu hi meri raat,"
+            },
+            {
+                "time": 99.5,
+                "text": "Koyi nahi hai tere toh bina"
+            },
+            {
+                "time": 103.5,
+                "text": "Ve haaniyaan ve dil jaaniya,"
+            },
+            {
+                "time": 107.5,
+                "text": "Tu nehde nehde reh na door kite ja"
+            },
+            {
+                "time": 115.5,
+                "text": "Bhull gaye eh saari duniya,"
+            },
+            {
+                "time": 119.5,
+                "text": "Ke tera hi naam hai boldi zubaan"
+            },
+            {
+                "time": 127.5,
+                "text": "Tainu vekhi jaawan main haye,"
+            },
+            {
+                "time": 131.5,
+                "text": "Ishq tere vich gaawan main"
+            },
+            {
+                "time": 135.5,
+                "text": "Mere dil nu mil gaya raah,"
+            },
+            {
+                "time": 139.5,
+                "text": "Jad tainu gal laawan main"
+            },
+            {
+                "time": 143.5,
+                "text": "Ke likheya si sadda milna,"
+            },
+            {
+                "time": 147.5,
+                "text": "Tu aiddan milna eh nahi si pata"
+            },
+            {
+                "time": 151.5,
+                "text": "Ve haaniyaan ve dil jaaniya,"
+            },
+            {
+                "time": 155.5,
+                "text": "Tu nehde nehde reh na door kite ja"
+            },
+            {
+                "time": 159.5,
+                "text": "Bhull gaye eh saari duniya,"
+            },
+            {
+                "time": 163.5,
+                "text": "Ke tera hi naam hai boldi zubaan"
+            }
+        ]
+    },
+    {
+        "title": "Ishq Ka Fever",
+        "artist": "Vishal Bhardwaj \u2022 Arijit Singh",
+        "bpm": 104,
+        "src": "song/Ishq Ka Fever O Romeo 320 Kbps.mp3",
+        "lrcFile": "song/Ishq Ka Fever.lrc",
+        "cover": "song/Screenshot 2026-10-24 224355.png",
+        "color": "#d946ef",
+        "glow": "rgba(217, 70, 239, 0.88)",
+        "glowSoft": "rgba(217, 70, 239, 0.40)",
+        "lyrics": [
+            {
+                "time": 11.5,
+                "text": "Halka-halka fever hai,"
+            },
+            {
+                "time": 17.5,
+                "text": "Saans bhi dubli lagti hai"
+            },
+            {
+                "time": 25.5,
+                "text": "Dhoop mein jee nahi lagta,"
+            },
+            {
+                "time": 30.5,
+                "text": "Chhaanv bhi gham ki lagti hai"
+            },
+            {
+                "time": 35.5,
+                "text": "Kya rog yeh paala hai?"
+            },
+            {
+                "time": 40.5,
+                "text": "Mujhe ishq hua hai, ya hone wala hai"
+            },
+            {
+                "time": 51.5,
+                "text": "Mujhe ishq hua hai, ya hone wala hai"
+            },
+            {
+                "time": 69.5,
+                "text": "Nafz sehem ke chalti hai,"
+            },
+            {
+                "time": 75.5,
+                "text": "Hansi bhi mujrim lagti hai"
+            },
+            {
+                "time": 83.5,
+                "text": "Kya hua hai mujhko?"
+            },
+            {
+                "time": 87.5,
+                "text": "Kyun tanhayi achhi lagti hai?"
+            },
+            {
+                "time": 95.5,
+                "text": "Kya tumne hi koi jaadu daala hai?"
+            },
+            {
+                "time": 103.5,
+                "text": "Mujhe ishq hua hai, ya hone wala hai"
+            },
+            {
+                "time": 110.5,
+                "text": "Mujhe ishq hua hai, ya hone wala hai"
+            }
+        ]
+    },
+    {
+        "title": "Tu Tu Hai Wohi",
+        "artist": "Kishore Kumar \u2022 Asha Bhosle",
+        "bpm": 124,
+        "src": "song/Tu tu hai wohi dilne jise apna kaha_320(KoshalWorld.Com).mp3",
+        "lrcFile": "song/Tu Tu Hai Wohi.lrc",
+        "cover": "song/Screenshot 2026-10-24 224447.png",
+        "color": "#10b981",
+        "glow": "rgba(16, 185, 129, 0.88)",
+        "glowSoft": "rgba(16, 185, 129, 0.40)",
+        "lyrics": [
+            {
+                "time": 49.5,
+                "text": "La, la la la la la, la la la la la la la"
+            },
+            {
+                "time": 55.5,
+                "text": "La, la la la la, la la la la la"
+            },
+            {
+                "time": 61.5,
+                "text": "Tu, tu hai wohi dil ne jise apna kaha,"
+            },
+            {
+                "time": 67.5,
+                "text": "Tu hai jahan, main hoon wahan,"
+            },
+            {
+                "time": 73.5,
+                "text": "Ab to yeh jeena tere bin hai saza..."
+            },
+            {
+                "time": 79.5,
+                "text": "Ho, mil jayein is tarah, do lehrein jis tarah,"
+            },
+            {
+                "time": 85.5,
+                "text": "Ho, mil jayein is tarah, do lehrein jis tarah,"
+            },
+            {
+                "time": 91.5,
+                "text": "Phir ho na juda, haan yeh vaada raha"
+            },
+            {
+                "time": 133.5,
+                "text": "Main aawaaz hoon to, tu hai geet mera,"
+            },
+            {
+                "time": 139.5,
+                "text": "Jahan se niraala, manmeet mera..."
+            },
+            {
+                "time": 145.5,
+                "text": "Mil jayein is tarah, do lehrein jis tarah,"
+            },
+            {
+                "time": 157.5,
+                "text": "Phir ho na juda, haan yeh vaada raha"
+            },
+            {
+                "time": 163.5,
+                "text": "Tu, tu hai wohi dil ne jise apna kaha,"
+            },
+            {
+                "time": 169.5,
+                "text": "Tu hai jahan, main hoon wahan,"
+            },
+            {
+                "time": 175.5,
+                "text": "Ab to yeh jeena tere bin hai saza..."
+            },
+            {
+                "time": 211.5,
+                "text": "Kisi mod pe bhi na yeh saath toote,"
+            },
+            {
+                "time": 217.5,
+                "text": "Mere haath se tera daaman na chhoote,"
+            },
+            {
+                "time": 229.5,
+                "text": "Kabhi khwaab mein bhi tu mujhse na roothe,"
+            },
+            {
+                "time": 235.5,
+                "text": "Mere pyaar ki koi khushiyan na loote..."
+            },
+            {
+                "time": 241.5,
+                "text": "Mil jayein is tarah, do lehrein jis tarah,"
+            },
+            {
+                "time": 253.5,
+                "text": "Phir ho na juda, haan yeh vaada raha"
+            }
+        ]
+    },
+    {
+        "title": "Abhi Na Jao Chhod Kar",
+        "artist": "Mohammed Rafi \u2022 Asha Bhosle",
+        "bpm": 78,
+        "src": "song/Abhi Na Jao Chhod Kar Hum Dono 320 Kbps.mp3",
+        "cover": "song/Screenshot 2026-10-25 065342.png",
+        "color": "#94a3b8",
+        "glow": "rgba(148, 163, 184, 0.88)",
+        "glowSoft": "rgba(148, 163, 184, 0.40)",
+        "lyrics": [
+            {
+                "time": 15,
+                "text": "Abhi na jao chhod kar, ke dil abhi bhara nahi"
+            },
+            {
+                "time": 25,
+                "text": "Abhi abhi to aaye ho, bahar ban ke chhaaye ho"
+            },
+            {
+                "time": 35,
+                "text": "Hawa zara mehak to le, nazar zara behak to le"
+            },
+            {
+                "time": 45,
+                "text": "Ye shaam dhal to le zara, ye dil sambhal to le zara"
+            },
+            {
+                "time": 55,
+                "text": "Abhi na jao chhod kar, ke dil abhi bhara nahi"
+            },
+            {
+                "time": 70,
+                "text": "Abhi to kuch kaha nahi, abhi to kuch suna nahi"
+            },
+            {
+                "time": 80,
+                "text": "Suno zara hum bhi to kuch, kehna chahein tumse"
+            },
+            {
+                "time": 90,
+                "text": "Nigaahon mein kuch to hai, jo kehne se reh gaya"
+            },
+            {
+                "time": 100,
+                "text": "Agar ye dil chhoota abhi, toh phir ye pal kahaan mile"
+            },
+            {
+                "time": 115,
+                "text": "Abhi na jao chhod kar, ke dil abhi bhara nahi"
+            },
+            {
+                "time": 130,
+                "text": "Nashe mein hain ye saari raahein, teri gali ke mod pe"
+            },
+            {
+                "time": 140,
+                "text": "Woh chand bhi akela hai, tere mere silsile"
+            },
+            {
+                "time": 155,
+                "text": "Zara theher jao, na jao yun"
+            },
+            {
+                "time": 170,
+                "text": "Abhi na jao chhod kar, ke dil abhi bhara nahi"
+            },
+            {
+                "time": 185,
+                "text": "Abhi abhi to aaye ho, bahar ban ke chhaaye ho"
+            },
+            {
+                "time": 200,
+                "text": "Abhi na jao chhod kar..."
+            }
+        ]
+    },
+    {
+        "title": "Somewhere Only We Know",
+        "artist": "Keane",
+        "bpm": 86,
+        "src": "song/Keane_-_Somewhere_Only_We_Know_CeeNaija.com_.mp3",
+        "lrcFile": "song/Somewhere Only We Know.lrc",
+        "cover": "song/Screenshot 2026-10-25 070356.png",
+        "color": "#f472b6",
+        "glow": "rgba(244, 114, 182, 0.88)",
+        "glowSoft": "rgba(244, 114, 182, 0.40)",
+        "lyrics": [
+            {
+                "time": 14,
+                "text": "I walked across an empty land"
+            },
+            {
+                "time": 21,
+                "text": "I knew the pathway like the back of my hand"
+            },
+            {
+                "time": 29,
+                "text": "I felt the earth beneath my feet"
+            },
+            {
+                "time": 36,
+                "text": "Sat by the river and it made me complete"
+            },
+            {
+                "time": 44,
+                "text": "Oh, simple thing, where have you gone?"
+            },
+            {
+                "time": 52,
+                "text": "I'm getting old and I need something to rely on"
+            },
+            {
+                "time": 60,
+                "text": "So tell me when you're gonna let me in"
+            },
+            {
+                "time": 67,
+                "text": "I'm getting tired and I need somewhere to begin"
+            },
+            {
+                "time": 76,
+                "text": "I came across a fallen tree"
+            },
+            {
+                "time": 83,
+                "text": "I felt the branches of it looking at me"
+            },
+            {
+                "time": 90,
+                "text": "Is this the place we used to love?"
+            },
+            {
+                "time": 98,
+                "text": "Is this the place that I've been dreaming of?"
+            },
+            {
+                "time": 106,
+                "text": "Oh, simple thing, where have you gone?"
+            },
+            {
+                "time": 113,
+                "text": "I'm getting old and I need something to rely on"
+            },
+            {
+                "time": 121,
+                "text": "So tell me when you're gonna let me in"
+            },
+            {
+                "time": 128,
+                "text": "I'm getting tired and I need somewhere to begin"
+            },
+            {
+                "time": 137,
+                "text": "And if you have a minute, why don't we go"
+            },
+            {
+                "time": 142,
+                "text": "Talk about it somewhere only we know?"
+            },
+            {
+                "time": 148,
+                "text": "This could be the end of everything"
+            },
+            {
+                "time": 152,
+                "text": "So why don't we go somewhere only we know?"
+            },
+            {
+                "time": 160,
+                "text": "Somewhere only we know"
+            },
+            {
+                "time": 174,
+                "text": "Oh, simple thing, where have you gone?"
+            },
+            {
+                "time": 182,
+                "text": "I'm getting old and I need something to rely on"
+            },
+            {
+                "time": 190,
+                "text": "So tell me when you're gonna let me in"
+            },
+            {
+                "time": 197,
+                "text": "I'm getting tired and I need somewhere to begin"
+            },
+            {
+                "time": 205,
+                "text": "And if you have a minute, why don't we go"
+            },
+            {
+                "time": 210,
+                "text": "Talk about it somewhere only we know?"
+            },
+            {
+                "time": 216,
+                "text": "This could be the end of everything"
+            },
+            {
+                "time": 221,
+                "text": "So why don't we go somewhere only we know?"
+            },
+            {
+                "time": 229,
+                "text": "Somewhere only we know"
+            }
+        ]
+    },
+    {
+        "title": "Kyon",
+        "artist": "Papon \u2022 Sunidhi Chauhan",
+        "bpm": 84,
+        "src": "song/Papon_Sunidhi_Chauhan_-_Kyun_na_hum_tum_(mp3.pm).mp3",
+        "lrcFile": "song/Kyon.lrc",
+        "cover": "song/Screenshot 2026-10-25 134729.png",
+        "color": "#38bdf8",
+        "glow": "rgba(56, 189, 248, 0.88)",
+        "glowSoft": "rgba(56, 189, 248, 0.40)",
+        "lyrics": [
+            {
+                "time": 14,
+                "text": "Kyon na hum tum"
+            },
+            {
+                "time": 17.5,
+                "text": "Chale tedhe medhe se raston pe nange paaon re"
+            },
+            {
+                "time": 27.5,
+                "text": "Kyon na hum tum"
+            },
+            {
+                "time": 31,
+                "text": "Dhoondhe phoolon bhari thandi thandi dhoop ya chhaaon re"
+            },
+            {
+                "time": 41.5,
+                "text": "Aashiyana apna baadal ki chaadar pe ho"
+            },
+            {
+                "time": 48,
+                "text": "Khol dein sab darwaaze hawaon ke liye"
+            },
+            {
+                "time": 54.5,
+                "text": "Kyon na hum tum..."
+            },
+            {
+                "time": 68,
+                "text": "Halki halki si leharon pe behne lagein"
+            },
+            {
+                "time": 75,
+                "text": "Kahin door kinare se kehne lagein"
+            },
+            {
+                "time": 82,
+                "text": "Baatein aisi jo pehle kahi na gayi"
+            },
+            {
+                "time": 88.5,
+                "text": "Khamoshi bhi lagne lagi madhbhari"
+            },
+            {
+                "time": 95.5,
+                "text": "Kyon na hum tum"
+            },
+            {
+                "time": 99,
+                "text": "Chale tedhe medhe se raston pe nange paaon re"
+            },
+            {
+                "time": 109,
+                "text": "Kyon na hum tum"
+            },
+            {
+                "time": 112.5,
+                "text": "Dhoondhe phoolon bhari thandi thandi dhoop ya chhaaon re"
+            },
+            {
+                "time": 136,
+                "text": "Rang saare zameen ke naye lag rahe"
+            },
+            {
+                "time": 143,
+                "text": "Jaise taare haathon mein aake saje"
+            },
+            {
+                "time": 150,
+                "text": "Har kadam pe nayi ek bahaar mile"
+            },
+            {
+                "time": 156.5,
+                "text": "Aankhon mein meetha sa ik khumaar mile"
+            },
+            {
+                "time": 163.5,
+                "text": "Kyon na hum tum"
+            },
+            {
+                "time": 167,
+                "text": "Chale tedhe medhe se raston pe nange paaon re"
+            },
+            {
+                "time": 177,
+                "text": "Kyon na hum tum"
+            },
+            {
+                "time": 180.5,
+                "text": "Dhoondhe phoolon bhari thandi thandi dhoop ya chhaaon re"
+            }
+        ]
+    },
+    {
+        "title": "Jaiye Sajana",
+        "artist": "Satinder Sartaaj \u2022 Jasmine Sandlas",
+        "bpm": 108,
+        "src": "song/Jaiye Sajana Dhurandhar The Revenge 320 Kbps.mp3",
+        "lrcFile": "song/Jaiye Sajana.lrc",
+        "cover": "song/Screenshot 2026-10-26 101216.png",
+        "color": "#e11d48",
+        "glow": "rgba(225, 29, 72, 0.88)",
+        "glowSoft": "rgba(225, 29, 72, 0.40)",
+        "minOS": "1.1",
+        "lyrics": [
+            {
+                "time": 8,
+                "text": "Pattalan chon digde hanjoo"
+            },
+            {
+                "time": 14,
+                "text": "Akh meri phir vi roi na..."
+            },
+            {
+                "time": 20.5,
+                "text": "Pattalan chon digde hanjoo"
+            },
+            {
+                "time": 27,
+                "text": "Akh meri phir vi roi na"
+            },
+            {
+                "time": 33.5,
+                "text": "Aisi preet la lai rabba"
+            },
+            {
+                "time": 39.5,
+                "text": "Jaisi hor kade hoi na..."
+            },
+            {
+                "time": 46,
+                "text": "Tere jaan ton main baad"
+            },
+            {
+                "time": 51.5,
+                "text": "Ik din soi na"
+            },
+            {
+                "time": 57,
+                "text": "Poora shehar begana"
+            },
+            {
+                "time": 62.5,
+                "text": "Ethe mera koi na"
+            },
+            {
+                "time": 68.5,
+                "text": "Phir preet kise de naal"
+            },
+            {
+                "time": 74.5,
+                "text": "Kade hoi na"
+            },
+            {
+                "time": 80.5,
+                "text": "Zamana zaalim taan vi roi na"
+            },
+            {
+                "time": 87,
+                "text": "Saare rang vekh lae"
+            },
+            {
+                "time": 92.5,
+                "text": "Hun koi dar nahi"
+            },
+            {
+                "time": 98,
+                "text": "Jiundi rahun aashiki"
+            },
+            {
+                "time": 103.5,
+                "text": "Eh kade na marni"
+            },
+            {
+                "time": 109,
+                "text": "Saanu saariyan visar gaiyan raahvan ve"
+            },
+            {
+                "time": 116.5,
+                "text": "Kede paase jaiye sajana..."
+            },
+            {
+                "time": 124,
+                "text": "Saanu saariyan visar gaiyan raahvan ve"
+            },
+            {
+                "time": 131.5,
+                "text": "Kede paase jaiye sajana..."
+            }
+        ]
+    },
+    {
+        "title": "Time Zone",
+        "artist": "Kaka",
+        "bpm": 96,
+        "src": "song/Time Zone - Kaka.mp3",
+        "lrcFile": "song/Time Zone.lrc",
+        "cover": "song/Screenshot 2026-10-26 102009.png",
+        "color": "#f97316",
+        "glow": "rgba(249, 115, 22, 0.88)",
+        "glowSoft": "rgba(249, 115, 22, 0.40)",
+        "minOS": "1.1",
+        "lyrics": [
+            {
+                "time": 4.5,
+                "text": "Ghari meri time dasse tere shehar da"
+            },
+            {
+                "time": 9.5,
+                "text": "Aithe adhi raat te othe deed dupehr da"
+            },
+            {
+                "time": 14.5,
+                "text": "Tere pichhe jaagne 'ch aa reha swaad"
+            },
+            {
+                "time": 19.5,
+                "text": "Waise chheti mera dil taan kitte ni thehron da"
+            },
+            {
+                "time": 25,
+                "text": "Dil kare aawan tere kol udd ke"
+            },
+            {
+                "time": 29.5,
+                "text": "Lake de kinare baithan naal judd ke"
+            },
+            {
+                "time": 34.5,
+                "text": "Hath phadd tera photo khichni dobara"
+            },
+            {
+                "time": 39,
+                "text": "Par Insta te post ni paauni mud ke"
+            },
+            {
+                "time": 44,
+                "text": "Aisi setting baithi ae apni"
+            },
+            {
+                "time": 48.5,
+                "text": "Suiyan khadi diyan taan ni chhediyan"
+            },
+            {
+                "time": 53,
+                "text": "Sacche pyaar 'chon nikalna main"
+            },
+            {
+                "time": 57.5,
+                "text": "Mere dil diyan tod bediyan"
+            },
+            {
+                "time": 62,
+                "text": "Mainu chat 'ch na bhej pappiyan"
+            },
+            {
+                "time": 66.5,
+                "text": "Mainu paunda ae sauraana jhappiyan"
+            }
+        ]
     }
-  ];
+];
 
   // Dynamic active playlist synced to OS version (1.0 vs 1.1)
   const PLAYLIST = [];
