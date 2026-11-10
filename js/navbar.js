@@ -2013,6 +2013,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (playing) {
       if (currentTab === 'music') {
+        hideMusicBars(400);
         scheduleMusicIdleAnimation(2800);
       }
     } else {
@@ -2021,14 +2022,49 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================
-  // APPLE MUSIC: IDLE CONTROLS DIMMING & DOCK COLLAPSE SYSTEM
-  // 1. Gently dims vertical sidebars & play button during playback
-  // 2. Smoothly tucks/collapses Music tab out of floating navbar
-  // 3. Wakes immediately on interaction or audio stop (vice-versa)
+  // APPLE MUSIC: DUAL VERTICAL BARS AUTOHIDE & DOCK COLLAPSE
+  // 1. Autohides both vertical sidebars smoothly on song start
+  // 2. Play/Pause button remains visible in the center
+  // 3. Floating dock tucks smoothly without glitching
+  // 4. Wakes immediately on screen tap, or on audio stop
   // =========================================================
   let musicIdleTimeout = null;
+  let musicBarsHideTimeout = null;
   let isMusicDockCollapsed = false;
-  let isMusicControlsDimmed = false;
+  let areMusicBarsHidden = false;
+
+  function hideMusicBars(delay = 400) {
+    if (musicBarsHideTimeout) {
+      clearTimeout(musicBarsHideTimeout);
+      musicBarsHideTimeout = null;
+    }
+    if (!isPlaying || audio.paused || currentTab !== 'music') return;
+    if (typeof currentCardView !== 'undefined' && currentCardView !== 'artwork') return;
+
+    musicBarsHideTimeout = setTimeout(() => {
+      if (!isPlaying || audio.paused || currentTab !== 'music') return;
+      if (typeof currentCardView !== 'undefined' && currentCardView !== 'artwork') return;
+      if (musicControlsDeck) {
+        musicControlsDeck.classList.add('is-bars-hidden');
+      }
+      areMusicBarsHidden = true;
+    }, delay);
+  }
+
+  function showMusicBars(autoHideAfter = 3000) {
+    if (musicBarsHideTimeout) {
+      clearTimeout(musicBarsHideTimeout);
+      musicBarsHideTimeout = null;
+    }
+    if (musicControlsDeck) {
+      musicControlsDeck.classList.remove('is-bars-hidden');
+    }
+    areMusicBarsHidden = false;
+
+    if (autoHideAfter > 0 && isPlaying && !audio.paused && currentTab === 'music' && (typeof currentCardView === 'undefined' || currentCardView === 'artwork')) {
+      hideMusicBars(autoHideAfter);
+    }
+  }
 
   function scheduleMusicIdleAnimation(delay = 2800) {
     if (musicIdleTimeout) {
@@ -2041,13 +2077,8 @@ document.addEventListener('DOMContentLoaded', () => {
     musicIdleTimeout = setTimeout(() => {
       if (!isPlaying || audio.paused || currentTab !== 'music') return;
 
-      // 1. Dim sidebars & play button if in standard artwork view
-      if (typeof currentCardView === 'undefined' || currentCardView === 'artwork') {
-        if (musicControlsDeck) {
-          musicControlsDeck.classList.add('is-playing-dimmed');
-          isMusicControlsDimmed = true;
-        }
-      }
+      // 1. Ensure sidebars are hidden
+      hideMusicBars(0);
 
       // 2. "shrink ho tak phle slider jo music par rhta hai usse hide kar then instant section taki lag na ho"
       if (floatingDock && !floatingDock.classList.contains('is-music-collapsed')) {
@@ -2064,19 +2095,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 120);
       }
     }, delay);
-  }
-
-  function wakeMusicControls(andDock = false) {
-    if (musicControlsDeck && isMusicControlsDimmed) {
-      musicControlsDeck.classList.remove('is-playing-dimmed');
-      isMusicControlsDimmed = false;
-    }
-    const wasCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
-    if (andDock && wasCollapsed) {
-      restoreMusicDock();
-    } else if (isPlaying && !audio.paused && currentTab === 'music' && (typeof currentCardView === 'undefined' || currentCardView === 'artwork')) {
-      scheduleMusicIdleAnimation(3000);
-    }
   }
 
   function restoreMusicDock() {
@@ -2112,10 +2130,14 @@ document.addEventListener('DOMContentLoaded', () => {
       clearTimeout(musicIdleTimeout);
       musicIdleTimeout = null;
     }
-    if (musicControlsDeck) {
-      musicControlsDeck.classList.remove('is-playing-dimmed');
+    if (musicBarsHideTimeout) {
+      clearTimeout(musicBarsHideTimeout);
+      musicBarsHideTimeout = null;
     }
-    isMusicControlsDimmed = false;
+    if (musicControlsDeck) {
+      musicControlsDeck.classList.remove('is-bars-hidden');
+    }
+    areMusicBarsHidden = false;
 
     const wasCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
     if (floatingDock) {
@@ -2141,10 +2163,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Interaction listeners for waking dimmed music controls & dock
-  if (musicControlsDeck) {
+  // Interaction listeners for sidebars
+  if (musicBarLeft) {
     ['pointerdown', 'touchstart', 'click'].forEach(evt => {
-      musicControlsDeck.addEventListener(evt, () => wakeMusicControls(false), { passive: true });
+      musicBarLeft.addEventListener(evt, () => showMusicBars(3500), { passive: true });
+    });
+  }
+
+  if (musicBarRight) {
+    ['pointerdown', 'touchstart', 'click'].forEach(evt => {
+      musicBarRight.addEventListener(evt, () => showMusicBars(3500), { passive: true });
     });
   }
 
@@ -2152,11 +2180,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (musicScreenEl) {
     musicScreenEl.addEventListener('pointerdown', (e) => {
       if (floatingDock && floatingDock.contains(e.target)) return;
-      wakeMusicControls(false);
-    }, { passive: true });
-
-    musicScreenEl.addEventListener('mousemove', () => {
-      if (isMusicControlsDimmed) wakeMusicControls(false);
+      if (musicPlayBtn && musicPlayBtn.contains(e.target)) return;
+      showMusicBars(3000);
     }, { passive: true });
   }
 
@@ -2233,7 +2258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (view === 'lyrics') {
       stopBeatVisualizer();
-      wakeMusicControls(false);
+      showMusicBars(0);
       if (artworkCard) artworkCard.classList.add('is-depth-bg');
       if (glassFrame) glassFrame.classList.add('is-depth-bg');
       if (songlistCard) songlistCard.classList.remove('is-revealed');
@@ -2248,7 +2273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (view === 'songlist') {
       stopBeatVisualizer();
       stopSyncLoop();
-      wakeMusicControls(false);
+      showMusicBars(0);
       if (artworkCard) artworkCard.classList.add('is-depth-bg');
       if (glassFrame) glassFrame.classList.add('is-depth-bg');
       if (lyricsCard) lyricsCard.classList.remove('is-revealed');
@@ -2269,6 +2294,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (modesRow) modesRow.classList.remove('is-hidden');
       if (isPlaying && !audio.paused && currentTab === 'music') {
         startBeatVisualizer();
+        hideMusicBars(800);
         scheduleMusicIdleAnimation(2800);
       }
     }
@@ -3065,7 +3091,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (musicPlayBtn) {
-    musicPlayBtn.addEventListener('click', () => {
+    musicPlayBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      musicPlayBtn.blur();
       triggerHaptic('medium');
       togglePlay();
     });
