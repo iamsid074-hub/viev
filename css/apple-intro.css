@@ -2514,11 +2514,32 @@
   will-change: transform;
 }
 
-/* Autohide dual vertical sidebars during active song playback */
-.music-vertical-controls-deck.is-bars-hidden .music-vertical-bar {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform: translateY(8px) scale(0.92) !important;
+/* Subtle Dimming during Active Song Playback for Screen Cleanliness */
+.music-vertical-controls-deck.is-playing-dimmed .music-vertical-bar {
+  opacity: 0.35 !important;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
+}
+
+.music-vertical-controls-deck.is-playing-dimmed .music-center-play-cluster .apple-play-toggle {
+  opacity: 0.40 !important;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Brighten immediately when directly interacting or hovering on bars or play button */
+.music-vertical-controls-deck.is-playing-dimmed .music-vertical-bar:hover,
+.music-vertical-controls-deck.is-playing-dimmed .music-vertical-bar:focus-within,
+.music-vertical-controls-deck.is-playing-dimmed .music-vertical-bar:active {
+  opacity: 1 !important;
+}
+
+.music-vertical-controls-deck.is-playing-dimmed .music-center-play-cluster .apple-play-toggle:hover,
+.music-vertical-controls-deck.is-playing-dimmed .music-center-play-cluster .apple-play-toggle:active {
+  opacity: 1 !important;
+}
+
+.music-vertical-controls-deck.is-interacting .music-vertical-bar,
+.music-vertical-controls-deck.is-interacting .music-center-play-cluster .apple-play-toggle {
+  opacity: 1 !important;
 }
 
 /* Center Play/Pause Action Cluster */
