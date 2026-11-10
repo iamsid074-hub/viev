@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/liquid-glass.css?v=7.1">
-  <link rel="stylesheet" href="css/apple-intro.css?v=7.3">
+  <link rel="stylesheet" href="css/apple-intro.css?v=7.4">
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
@@ -413,8 +413,17 @@ Humne toh chaand se poochha tha, Husn ka matlab..
             </button>
           </div>
 
-          <!-- Open Center Space (Clean, open breathing space) -->
-          <div class="music-vertical-center-space" aria-hidden="true"></div>
+          <!-- Center Play / Pause Action Button -->
+          <div class="music-center-play-cluster" id="music-center-play-cluster">
+            <button class="apple-play-toggle" id="music-play-btn" aria-label="Play or Pause" title="Play / Pause">
+              <svg class="play-icon" width="38" height="38" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              <svg class="pause-icon" width="38" height="38" viewBox="0 0 24 24" fill="currentColor" style="display:none;">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
+            </button>
+          </div>
 
           <!-- Right Vertical Bar: Song List, Lyrics, Share -->
           <div class="music-vertical-bar music-bar-right" id="music-bar-right" aria-label="Media Features">

@@ -2161,7 +2161,8 @@
 /* =========================================================
    SONG LIST PANEL EXPANSION & DETACHED SEARCH PILL
    ========================================================= */
-.apple-now-playing-container.is-songlist-mode .apple-track-info-row {
+.apple-now-playing-container.is-songlist-mode .apple-track-info-row,
+.apple-now-playing-container.is-songlist-mode .apple-scrubber-section {
   display: none !important;
 }
 
@@ -2483,9 +2484,57 @@
   will-change: transform;
 }
 
-.music-vertical-center-space {
+/* Center Play/Pause Action Cluster */
+.music-center-play-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 1;
-  min-width: 40px;
+}
+
+.music-center-play-cluster .apple-play-toggle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 
+    0 12px 34px rgba(0, 0, 0, 0.45),
+    inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.music-center-play-cluster .apple-play-toggle .play-icon {
+  margin-left: 3px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+.music-center-play-cluster .apple-play-toggle .pause-icon {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+.music-center-play-cluster .apple-play-toggle:hover {
+  background: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.38);
+  transform: scale(1.08);
+  box-shadow: 
+    0 16px 42px rgba(0, 0, 0, 0.55),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.music-center-play-cluster .apple-play-toggle:active {
+  transform: scale(0.92);
 }
 
 .music-vertical-bar {
@@ -5465,42 +5514,25 @@
     height: 36px;
   }
 
-  .apple-controls-row {
-    padding: 0 20px;
-    margin-bottom: 10px;
+  .music-vertical-controls-deck {
+    max-width: 100%;
+    padding: 0 10px;
+    margin-top: 8px;
   }
 
-  .apple-play-toggle {
-    width: 64px;
-    height: 64px;
-  }
-
-  .apple-play-toggle svg {
+  .music-vertical-bar .mode-btn {
     width: 40px;
     height: 40px;
   }
 
-  .apple-ctrl-action {
-    width: 44px;
-    height: 44px;
+  .music-center-play-cluster .apple-play-toggle {
+    width: 64px;
+    height: 64px;
   }
 
-  .apple-ctrl-action svg {
-    width: 25px;
-    height: 25px;
-  }
-
-  .apple-bottom-deck {
-    gap: 8px;
-    margin-bottom: 0;
-  }
-
-  .apple-volume-row {
-    padding: 0 6px;
-  }
-
-  .apple-bottom-utilities {
-    padding: 0 16px;
+  .music-center-play-cluster .apple-play-toggle svg {
+    width: 38px;
+    height: 38px;
   }
 
   /* --- 3. SETTINGS & SUBPAGE AUDIT --- */
