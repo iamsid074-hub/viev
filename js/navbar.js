@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const floatingDock = document.getElementById('apple-floating-dock');
   const floatingOrb = document.getElementById('music-floating-orb');
   const orbCoverImg = document.getElementById('orb-cover-img');
+  const musicNavShortcuts = document.getElementById('music-screen-nav-shortcuts');
+  const musicShortcutHome = document.getElementById('music-shortcut-home');
+  const musicShortcutCinema = document.getElementById('music-shortcut-cinema');
 
   let currentTab = 'home';
   window.getCurrentTab = () => currentTab;
@@ -207,11 +210,15 @@ document.addEventListener('DOMContentLoaded', () => {
           startSyncLoop();
         }
         if (typeof scheduleMusicIdleAnimation === 'function') {
-          scheduleMusicIdleAnimation(2800);
+          scheduleMusicIdleAnimation(2000);
         }
         if (typeof artworkVideo !== 'undefined' && artworkVideo && artworkVideo.src && !document.hidden) {
           artworkVideo.currentTime = audio.currentTime;
           artworkVideo.play().catch(() => {});
+        }
+      } else {
+        if (typeof resetMusicIdleState === 'function') {
+          resetMusicIdleState();
         }
       }
     } else {
@@ -3993,7 +4000,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (playing) {
       if (currentTab === 'music') {
         dimMusicControls(500);
-        scheduleMusicIdleAnimation(2800);
+        scheduleMusicIdleAnimation(2000);
       }
     } else {
       wakeMusicControls(0);
@@ -4054,7 +4061,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function scheduleMusicIdleAnimation(delay = 2800) {
+  function scheduleMusicIdleAnimation(delay = 2000) {
     if (musicIdleTimeout) {
       clearTimeout(musicIdleTimeout);
       musicIdleTimeout = null;
@@ -4068,19 +4075,15 @@ document.addEventListener('DOMContentLoaded', () => {
       // 1. Ensure controls are dimmed
       dimMusicControls(0);
 
-      // 2. "shrink ho tak phle slider jo music par rhta hai usse hide kar then instant section taki lag na ho"
-      if (floatingDock && !floatingDock.classList.contains('is-music-collapsed')) {
-        // Step 1: Hide indicator slider first
+      // 2. Hide entire navbar dock and reveal bottom-left (< Home) and bottom-right (Exxclusive >)
+      if (floatingDock && !floatingDock.classList.contains('is-music-playing-hidden')) {
         if (indicator) {
           indicator.style.opacity = '0';
         }
-        // Step 2: Then collapse music section
-        setTimeout(() => {
-          if (floatingDock && isPlaying && !audio.paused && currentTab === 'music') {
-            floatingDock.classList.add('is-music-collapsed');
-            isMusicDockCollapsed = true;
-          }
-        }, 120);
+        floatingDock.classList.add('is-music-playing-hidden');
+      }
+      if (musicNavShortcuts) {
+        musicNavShortcuts.classList.add('is-visible');
       }
     }, delay);
   }
@@ -4090,23 +4093,27 @@ document.addEventListener('DOMContentLoaded', () => {
       clearTimeout(musicIdleTimeout);
       musicIdleTimeout = null;
     }
-    const wasCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
-    if (!wasCollapsed) return;
+    const wasHidden = (floatingDock && floatingDock.classList.contains('is-music-playing-hidden')) ||
+                      (musicNavShortcuts && musicNavShortcuts.classList.contains('is-visible')) ||
+                      isMusicDockCollapsed;
+    if (!wasHidden) return;
     isMusicDockCollapsed = false;
 
-    // "openingke time bhi same cheez kar phle music ko unhide kar then instant slider ko show kar"
     if (floatingDock) {
-      floatingDock.classList.remove('is-music-collapsed');
+      floatingDock.classList.remove('is-music-playing-hidden', 'is-music-collapsed');
+    }
+    if (musicNavShortcuts) {
+      musicNavShortcuts.classList.remove('is-visible');
     }
     const musicTab = document.getElementById('tab-music');
     if (musicTab && currentTab === 'music') {
       if (indicator) indicator.style.opacity = '0';
       setTimeout(() => {
-        if (currentTab === 'music' && !isMusicDockCollapsed && indicator) {
+        if (currentTab === 'music' && (!floatingDock || !floatingDock.classList.contains('is-music-playing-hidden')) && indicator) {
           updateIndicator(musicTab, false);
           indicator.style.opacity = '1';
         }
-      }, 550);
+      }, 350);
     }
     if (isPlaying && !audio.paused && currentTab === 'music') {
       scheduleMusicIdleAnimation(3500);
@@ -4127,27 +4134,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     isMusicControlsDimmed = false;
 
-    const wasCollapsed = isMusicDockCollapsed || (floatingDock && floatingDock.classList.contains('is-music-collapsed'));
     if (floatingDock) {
-      floatingDock.classList.remove('is-music-collapsed');
+      floatingDock.classList.remove('is-music-playing-hidden', 'is-music-collapsed');
     }
     isMusicDockCollapsed = false;
+    if (musicNavShortcuts) {
+      musicNavShortcuts.classList.remove('is-visible');
+    }
 
     const musicTab = document.getElementById('tab-music');
     if (musicTab && currentTab === 'music') {
-      if (wasCollapsed) {
-        // "openingke time bhi same cheez kar phle music ko unhide kar then instant slider ko show kar"
-        if (indicator) indicator.style.opacity = '0';
-        setTimeout(() => {
-          if (currentTab === 'music' && indicator) {
-            updateIndicator(musicTab, false);
-            indicator.style.opacity = '1';
-          }
-        }, 550);
-      } else {
-        updateIndicator(musicTab);
-        if (indicator) indicator.style.opacity = '1';
-      }
+      updateIndicator(musicTab);
+      if (indicator) indicator.style.opacity = '1';
     }
   }
 
@@ -4169,16 +4167,43 @@ document.addEventListener('DOMContentLoaded', () => {
     musicScreenEl.addEventListener('pointerdown', (e) => {
       if (floatingDock && floatingDock.contains(e.target)) return;
       if (musicPlayBtn && musicPlayBtn.contains(e.target)) return;
+      if (musicNavShortcuts && musicNavShortcuts.contains(e.target)) return;
       wakeMusicControls(3000);
+      if (floatingDock && floatingDock.classList.contains('is-music-playing-hidden')) {
+        restoreMusicDock();
+      }
     }, { passive: true });
   }
 
   if (floatingDock) {
     floatingDock.addEventListener('pointerenter', () => {
-      if (isMusicDockCollapsed) restoreMusicDock();
+      if (floatingDock.classList.contains('is-music-playing-hidden') || isMusicDockCollapsed) restoreMusicDock();
     });
     floatingDock.addEventListener('pointerdown', () => {
-      if (isMusicDockCollapsed) restoreMusicDock();
+      if (floatingDock.classList.contains('is-music-playing-hidden') || isMusicDockCollapsed) restoreMusicDock();
+    });
+  }
+
+  // Music screen corner shortcut navigation (< Home | Exxclusive >)
+  if (musicShortcutHome) {
+    musicShortcutHome.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const homeBtn = document.getElementById('tab-home');
+      if (homeBtn) {
+        switchPage('home', homeBtn);
+      }
+    });
+  }
+
+  if (musicShortcutCinema) {
+    musicShortcutCinema.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const cinemaBtn = document.getElementById('tab-cinema');
+      if (cinemaBtn) {
+        switchPage('cinema', cinemaBtn);
+      }
     });
   }
 
@@ -4283,7 +4308,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isPlaying && !audio.paused && currentTab === 'music') {
         startBeatVisualizer();
         dimMusicControls(800);
-        scheduleMusicIdleAnimation(2800);
+        scheduleMusicIdleAnimation(2000);
       }
     }
   }

@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/liquid-glass.css?v=7.1">
-  <link rel="stylesheet" href="css/apple-intro.css?v=8.9">
+  <link rel="stylesheet" href="css/apple-intro.css?v=9.0">
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
@@ -1413,6 +1413,22 @@
       </button>
     </div>
 
+    <!-- Music Screen Corner Navigation Shortcuts (Active Playback Immersion Mode) -->
+    <div class="music-screen-nav-shortcuts" id="music-screen-nav-shortcuts" aria-label="Music navigation shortcuts">
+      <button type="button" class="music-nav-shortcut-btn shortcut-left" id="music-shortcut-home" aria-label="Home">
+        <svg class="shortcut-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span class="shortcut-label">Home</span>
+      </button>
+      <button type="button" class="music-nav-shortcut-btn shortcut-right" id="music-shortcut-cinema" aria-label="Exxclusive">
+        <span class="shortcut-label">Exxclusive</span>
+        <svg class="shortcut-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
     <!-- Floating Picture-in-Picture Mini Cinema Player (Digi OS 2.0) -->
     <div class="cinema-mini-pip" id="cinema-mini-pip" aria-label="Mini Cinema Player">
       <div class="cinema-mini-thumb-wrap">
@@ -2204,7 +2220,7 @@
 
   <script src="js/apple-welcome.js?v=7.1"></script>
   <script src="js/daily-note.js?v=8.2"></script>
-  <script src="js/navbar.js?v=7.9"></script>
+  <script src="js/navbar.js?v=8.0"></script>
   <script src="js/youtube-data.js?v=7.1"></script>
   <script src="js/cinema.js?v=7.1"></script>
   <script src="js/cast-engine.js?v=7.1"></script>
