@@ -477,6 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const startTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
     const endTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.endTime) || 60.0;
+    const targetVol = 0.95;
 
     heroNoteAudio.currentTime = startTime;
     heroNoteAudio.volume = 0;
@@ -484,34 +485,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const playPromise = heroNoteAudio.play();
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        // Smooth Volume Fade-In (0 -> 1.0 in 1.2s)
-        const targetVol = 1.0;
-        const steps = 24;
-        const stepTime = 1200 / steps;
-        let currentStep = 0;
+        // Ultra-smooth exponential fade-in over 3.5s (Aram se ekdam gentle)
+        const fadeDuration = 3500;
+        const fadeStartTime = performance.now();
 
         heroAudioFadeInterval = setInterval(() => {
-          currentStep++;
-          heroNoteAudio.volume = Math.min(targetVol, (currentStep / steps) * targetVol);
-          if (currentStep >= steps) {
+          const elapsed = performance.now() - fadeStartTime;
+          const progress = Math.min(1, elapsed / fadeDuration);
+          heroNoteAudio.volume = Math.min(targetVol, Math.pow(progress, 1.4) * targetVol);
+
+          if (progress >= 1) {
             clearInterval(heroAudioFadeInterval);
             heroAudioFadeInterval = null;
+            heroNoteAudio.volume = targetVol;
           }
-        }, stepTime);
+        }, 25);
       }).catch(err => {
         console.warn('[NoteAudio] Autoplay blocked:', err);
       });
     }
 
-    // Monitor for 1:00 min (60.0s) cutoff with smooth fade-out
+    // Monitor playback timeline: gentle 5.5s fade-out towards 1:00 min (60.0s)
+    const fadeOutSpan = 5.5; // Starts at 54.5s down to 60.0s
+    const fadeOutStart = endTime - fadeOutSpan;
+
     heroNoteAudio.ontimeupdate = () => {
       const cur = heroNoteAudio.currentTime;
-      if (cur >= endTime - 2.0 && cur < endTime) {
-        // Smooth fade out in the last 2 seconds
-        const rem = endTime - cur;
-        heroNoteAudio.volume = Math.max(0, Math.min(1, rem / 2.0));
+      if (cur >= fadeOutStart && cur < endTime) {
+        // Smooth cubic ease-out fade curve
+        const progress = (endTime - cur) / fadeOutSpan;
+        heroNoteAudio.volume = Math.max(0, Math.min(targetVol, Math.pow(progress, 1.35) * targetVol));
       } else if (cur >= endTime) {
         heroNoteAudio.pause();
+        heroNoteAudio.volume = 0;
         heroNoteAudio.currentTime = startTime;
         heroNoteAudio.ontimeupdate = null;
       }
@@ -530,23 +536,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (heroNoteAudio.paused) return;
 
-    // Smooth Volume Fade-Out (current -> 0 in 500ms)
+    // Smooth relaxing fade-out over 1.8s before pausing
     const initialVol = heroNoteAudio.volume;
-    const steps = 15;
-    const stepTime = 500 / steps;
-    let currentStep = 0;
+    const fadeDuration = 1800;
+    const fadeStartTime = performance.now();
 
     heroAudioFadeInterval = setInterval(() => {
-      currentStep++;
-      const v = Math.max(0, initialVol * (1 - currentStep / steps));
-      heroNoteAudio.volume = v;
-      if (currentStep >= steps || v <= 0.02) {
+      const elapsed = performance.now() - fadeStartTime;
+      const progress = Math.min(1, elapsed / fadeDuration);
+      const newVol = Math.max(0, initialVol * Math.pow(1 - progress, 1.35));
+      heroNoteAudio.volume = newVol;
+
+      if (progress >= 1 || newVol <= 0.01) {
         clearInterval(heroAudioFadeInterval);
         heroAudioFadeInterval = null;
         heroNoteAudio.pause();
+        heroNoteAudio.volume = 0;
         heroNoteAudio.currentTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
       }
-    }, stepTime);
+    }, 25);
   }
 
   // Reveal Note Content (Magical Hero Stage + Full-Page Ambient Glow + Mangal Rang)
