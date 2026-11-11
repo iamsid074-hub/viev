@@ -16,10 +16,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/liquid-glass.css?v=7.1">
-  <link rel="stylesheet" href="css/apple-intro.css?v=8.4">
+  <link rel="stylesheet" href="css/apple-intro.css?v=8.5">
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
@@ -255,38 +255,6 @@
             </div>
           </div>
 
-          <!-- Daily Note for Digi -->
-          <div class="daily-note-wrap" id="daily-note-wrap">
-            <div class="daily-note-capsule is-revealed" id="daily-note-capsule" role="region" aria-label="Daily note for Digi">
-              <div class="note-revealed-content">
-                <div class="note-top-meta">
-                  <span class="note-tag" id="daily-note-tag">NOTE</span>
-                  <span class="note-status" id="daily-note-date">Today</span>
-                </div>
-                <!-- Note memory image displayed when unlocked -->
-                <div class="note-image-container" id="daily-note-img-wrap" style="display: none; margin-bottom: 14px; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12);">
-                  <img src="assets/daily_note.jpg" alt="Memory" id="daily-note-img" style="width: 100%; max-height: 280px; object-fit: cover; object-position: center; display: block; border-radius: 13px;">
-                </div>
-                <!-- Note text displayed when unlocked -->
-                <p class="note-body-text" id="daily-note-text" style="display: none;">
-Kash Mai Teri Jagah Hota , Or Tu Meri 
-Mai Dekhna Chahata Hun Kasi Dikhti Hai Kaya Teri 
-Na Jane Konse Vo Leela Hai Tujme Smayi 
-Jo Tujhe Sota Dekh Mujhe Thi Kheech Layi
-                </p>
-                <!-- Initial closed view (keeps page layout balanced) -->
-                <div class="note-locked-body" id="daily-note-locked-state">
-                  <svg class="locked-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22,6 12,13 2,6"></polyline>
-                  </svg>
-                  <span class="locked-label" id="daily-note-locked-label">TAP OPEN NOTE TO READ</span>
-                  <span class="locked-sub-label" id="daily-note-locked-sub" style="display: none;">no more attemps</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Note Control: Open Note / Hide Note Button -->
           <div class="cta-container revealed" id="cta-container">
             <button id="toggle-note-btn" class="liquid-btn note-toggle-btn" aria-label="Open Note">
@@ -299,6 +267,14 @@ Jo Tujhe Sota Dekh Mujhe Thi Kheech Layi
               <span id="note-btn-text">Open Note</span>
             </button>
             <span class="note-attempts-subtitle" id="note-attempts-subtitle" style="display: none;">no more attemps</span>
+          </div>
+
+          <!-- Pure Cinematic Typography Link: watch MANGAL RANG ( RAMAYANA ) -->
+          <div class="mangal-rang-cinematic-banner" id="mangal-rang-cinematic-banner" aria-label="Watch Mangal Rang Ramayana">
+            <span class="mangal-rang-watch-label">watch</span>
+            <a href="https://www.youtube.com/watch?v=z_e1d5_VVfw" target="_blank" rel="noopener noreferrer" class="mangal-rang-title-link" id="mangal-rang-title-link" aria-label="Watch Mangal Rang Ramayana on YouTube">
+              <span class="mangal-rang-main-title">MANGAL RANG ( RAMAYANA )</span>
+            </a>
           </div>
         </div>
       </div>
@@ -2224,7 +2200,7 @@ Jo Tujhe Sota Dekh Mujhe Thi Kheech Layi
   </div>
 
   <script src="js/apple-welcome.js?v=7.1"></script>
-  <script src="js/daily-note.js?v=7.8"></script>
+  <script src="js/daily-note.js?v=7.9"></script>
   <script src="js/navbar.js?v=7.9"></script>
   <script src="js/youtube-data.js?v=7.1"></script>
   <script src="js/cinema.js?v=7.1"></script>
