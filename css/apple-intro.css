@@ -8181,19 +8181,6 @@
   pointer-events: auto;
 }
 
-/* Listen in cursive (Sacramento) & small */
-.mangal-rang-listen-label {
-  font-family: 'Sacramento', cursive;
-  font-size: clamp(17px, 4.6vw, 20px);
-  font-weight: 400;
-  color: #fef08a;
-  margin-bottom: -5px;
-  line-height: 1.1;
-  text-shadow: 0 0 10px rgba(251, 191, 36, 0.45);
-  display: block;
-  letter-spacing: 0.04em;
-}
-
 .mangal-rang-title-link {
   display: flex;
   flex-direction: column;
