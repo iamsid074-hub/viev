@@ -7769,6 +7769,298 @@
   }
 }
 
+/* =========================================================
+   MAGICAL HERO DAILY NOTE THEATRE & FULL PAGE AMBIENT GLOW
+   ========================================================= */
+
+/* Full-Page Living Ambient Glow (Radiates behind widgets across entire Home Screen) */
+.welcome-note-full-ambient {
+  position: absolute;
+  inset: -60px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: 
+    radial-gradient(ellipse 90% 70% at 50% 25%, rgba(255, 120, 40, 0.38) 0%, rgba(225, 29, 72, 0.28) 42%, rgba(255, 215, 0, 0.18) 70%, transparent 90%),
+    radial-gradient(circle at 50% 65%, rgba(244, 63, 94, 0.20) 0%, transparent 60%);
+  filter: blur(48px);
+  will-change: opacity, transform;
+}
+
+.welcome-note-full-ambient.is-active {
+  opacity: 1;
+  animation: welcomeAmbientBreathe 5s infinite alternate ease-in-out;
+}
+
+@keyframes welcomeAmbientBreathe {
+  0% {
+    transform: scale(0.98);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+/* Transition inside Hero Photo Wrapper */
+.hero-photo-wrapper {
+  transition: box-shadow 0.6s ease, border-color 0.6s ease;
+}
+
+.hero-photo-wrapper.is-note-active {
+  box-shadow: 0 24px 60px rgba(255, 120, 40, 0.38), 0 0 40px rgba(225, 29, 72, 0.28);
+  border-bottom: 1.5px solid rgba(255, 215, 120, 0.45);
+}
+
+.hero-photo-img {
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), filter 0.65s ease;
+  will-change: opacity, transform, filter;
+}
+
+.hero-photo-wrapper.is-note-active .hero-photo-img {
+  opacity: 0 !important;
+  transform: scale(1.08);
+  filter: blur(28px);
+  pointer-events: none;
+}
+
+.hero-photo-wrapper.is-note-active .hero-photo-bottom-glow {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Hero Note Stage Container */
+.hero-note-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+
+.hero-photo-wrapper.is-note-active .hero-note-stage {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+  pointer-events: auto;
+}
+
+/* Layer 1: Divine Liquid Saffron-Rose Aurora Mesh */
+.hero-note-aurora-mesh {
+  position: absolute;
+  inset: -30px;
+  z-index: 1;
+  background: 
+    radial-gradient(ellipse 80% 65% at 50% 25%, rgba(255, 120, 40, 0.52) 0%, rgba(225, 29, 72, 0.38) 45%, rgba(12, 16, 26, 0.95) 90%),
+    radial-gradient(circle at 20% 80%, rgba(251, 191, 36, 0.35) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, rgba(244, 63, 94, 0.35) 0%, transparent 60%);
+  filter: blur(24px);
+  animation: noteAuroraMeshMotion 10s infinite alternate ease-in-out;
+  will-change: transform, filter;
+}
+
+@keyframes noteAuroraMeshMotion {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.06) rotate(1.5deg); }
+  100% { transform: scale(1.02) rotate(-1.5deg); }
+}
+
+/* Layer 2: Particle Starlight Canvas */
+.hero-note-particles-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Layer 3: Glassmorphism Card Frame */
+.hero-note-content-glass {
+  position: relative;
+  z-index: 4;
+  width: calc(100% - 32px);
+  max-width: 396px;
+  padding: 20px 18px 18px;
+  border-radius: 28px;
+  background: rgba(14, 18, 28, 0.62);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid rgba(255, 215, 120, 0.28);
+  box-shadow: 
+    0 18px 45px rgba(0, 0, 0, 0.75), 
+    0 0 24px rgba(255, 120, 40, 0.22),
+    inset 0 1px 1px rgba(255, 255, 255, 0.32);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Top Sacred Badge */
+.hero-note-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 13px;
+  border-radius: 999px;
+  background: rgba(255, 180, 50, 0.16);
+  border: 1px solid rgba(255, 215, 100, 0.40);
+  box-shadow: 0 0 14px rgba(255, 180, 50, 0.25);
+  margin-bottom: 14px;
+}
+
+.hero-note-badge-star {
+  font-size: 11px;
+}
+
+.hero-note-badge-text {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #fef08a;
+}
+
+/* Poetry Lines */
+.hero-note-lines-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6.5px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.hero-note-poetry-line {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Outfit", sans-serif;
+  font-size: clamp(13.5px, 3.8vw, 15px);
+  font-weight: 600;
+  line-height: 1.5;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  transform: translateY(14px);
+  will-change: opacity, transform;
+}
+
+.hero-photo-wrapper.is-note-active .hero-note-poetry-line {
+  animation: lineFloatIn 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-photo-wrapper.is-note-active .hero-note-poetry-line.line-0 { animation-delay: 0.18s; }
+.hero-photo-wrapper.is-note-active .hero-note-poetry-line.line-1 { animation-delay: 0.42s; }
+.hero-photo-wrapper.is-note-active .hero-note-poetry-line.line-2 { animation-delay: 0.68s; }
+.hero-photo-wrapper.is-note-active .hero-note-poetry-line.line-3 { animation-delay: 0.94s; }
+.hero-photo-wrapper.is-note-active .hero-note-poetry-line.line-4 { animation-delay: 1.18s; }
+
+@keyframes lineFloatIn {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Footer Section */
+.hero-note-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  gap: 8px;
+}
+
+.hero-note-music-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.88);
+  font-weight: 600;
+}
+
+.note-music-icon {
+  font-size: 11px;
+}
+
+.note-music-name {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.note-music-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10px;
+}
+
+.note-music-bars .bar {
+  width: 2px;
+  height: 100%;
+  background: #fde047;
+  border-radius: 1px;
+  animation: noteEqBar 0.8s infinite alternate ease-in-out;
+}
+
+.note-music-bars .bar-1 { animation-delay: 0.1s; }
+.note-music-bars .bar-2 { animation-delay: 0.4s; }
+.note-music-bars .bar-3 { animation-delay: 0.25s; }
+
+@keyframes noteEqBar {
+  0% { height: 3px; }
+  100% { height: 10px; }
+}
+
+.hero-note-sign-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.02em;
+}
+
+.hero-note-sign-heart {
+  color: #ff3366;
+  animation: heartPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes heartPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.22); }
+}
+
+/* When note is active, style the toggle button with warm amber/gold aura */
+.toggle-note-btn.is-note-open-active {
+  background: linear-gradient(135deg, rgba(255, 120, 40, 0.35) 0%, rgba(225, 29, 72, 0.35) 100%) !important;
+  border-color: rgba(255, 215, 120, 0.5) !important;
+  box-shadow: 0 0 24px rgba(255, 140, 50, 0.45) !important;
+}
+
 
 
 

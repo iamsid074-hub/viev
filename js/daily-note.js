@@ -29,7 +29,16 @@ kahin rishte ko na torne lga hu mai`,
   quiz: null,
 
   // Right-side date label:
-  dateLabel: "Today"
+  dateLabel: "Today",
+
+  // Audio Sync Configuration: Mangal Rang (Arijit Singh - Ramayana)
+  audio: {
+    src: "song/mangal_rang.m4a",
+    fallbackSrc: "song/mangal_rang.webm",
+    title: "Mangal Rang • Arijit Singh",
+    startTime: 29.0, // 0:29 sec
+    endTime: 60.0    // 1:00 min
+  }
 };
 // =========================================================
 
@@ -336,29 +345,236 @@ document.addEventListener('DOMContentLoaded', () => {
     quizSheet.setAttribute('aria-hidden', 'true');
   }
 
-  // Reveal Note Content
+  // =========================================================
+  // MAGICAL HERO NOTE STAGE ENGINE (Canvas Particles + Mangal Rang Audio Sync)
+  // =========================================================
+  let particleCanvas = null;
+  let particleCtx = null;
+  let particleRafId = null;
+  let particlesList = [];
+  let heroNoteAudio = null;
+  let heroAudioFadeInterval = null;
+
+  function initParticleCanvas() {
+    particleCanvas = document.getElementById('hero-note-particles-canvas');
+    if (!particleCanvas) return;
+    particleCtx = particleCanvas.getContext('2d');
+    resizeParticleCanvas();
+  }
+
+  function resizeParticleCanvas() {
+    if (!particleCanvas) return;
+    const parent = particleCanvas.parentElement;
+    if (parent) {
+      particleCanvas.width = parent.clientWidth || 360;
+      particleCanvas.height = parent.clientHeight || 380;
+    }
+  }
+
+  function createParticles() {
+    particlesList = [];
+    const count = 30;
+    const w = particleCanvas ? particleCanvas.width : 360;
+    const h = particleCanvas ? particleCanvas.height : 380;
+
+    for (let i = 0; i < count; i++) {
+      particlesList.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        size: Math.random() * 2.2 + 0.8,
+        speedY: Math.random() * 0.45 + 0.15,
+        speedX: (Math.random() - 0.5) * 0.3,
+        alpha: Math.random() * 0.7 + 0.3,
+        alphaPulse: Math.random() * 0.04 + 0.015,
+        color: Math.random() > 0.4 ? '254, 240, 138' : '255, 180, 160' // Gold or Rose
+      });
+    }
+  }
+
+  function particleRenderLoop() {
+    if (!particleCtx || !particleCanvas || !isNoteOpen) return;
+
+    particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+
+    for (let p of particlesList) {
+      p.y -= p.speedY;
+      p.x += p.speedX;
+      p.alpha += Math.sin(Date.now() * p.alphaPulse) * 0.02;
+
+      // Wrap-around
+      if (p.y < -5) {
+        p.y = particleCanvas.height + 5;
+        p.x = Math.random() * particleCanvas.width;
+      }
+      if (p.x < -5) p.x = particleCanvas.width + 5;
+      if (p.x > particleCanvas.width + 5) p.x = -5;
+
+      const currentAlpha = Math.max(0.12, Math.min(0.9, p.alpha));
+
+      particleCtx.beginPath();
+      particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      particleCtx.fillStyle = `rgba(${p.color}, ${currentAlpha.toFixed(2)})`;
+      particleCtx.shadowColor = `rgba(${p.color}, 0.8)`;
+      particleCtx.shadowBlur = 8;
+      particleCtx.fill();
+    }
+
+    particleRafId = requestAnimationFrame(particleRenderLoop);
+  }
+
+  function startHeroParticles() {
+    initParticleCanvas();
+    if (!particleCanvas || !particleCtx) return;
+    resizeParticleCanvas();
+    createParticles();
+    if (particleRafId) cancelAnimationFrame(particleRafId);
+    particleRafId = requestAnimationFrame(particleRenderLoop);
+  }
+
+  function stopHeroParticles() {
+    if (particleRafId) {
+      cancelAnimationFrame(particleRafId);
+      particleRafId = null;
+    }
+    if (particleCtx && particleCanvas) {
+      particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+    }
+  }
+
+  // Render Formatted Poetic Lines Dynamically
+  function renderHeroNoteLines() {
+    const linesWrap = document.getElementById('hero-note-lines-wrap');
+    if (!linesWrap) return;
+
+    const rawText = (DAILY_NOTE_CONFIG.noteText || '').trim();
+    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+    linesWrap.innerHTML = lines.map((line, idx) => {
+      return `<p class="hero-note-poetry-line line-${idx % 5}">${line}</p>`;
+    }).join('');
+  }
+
+  // Audio Sync Engine (Mangal Rang: 0:29s to 1:00min)
+  function initHeroNoteAudio() {
+    if (!heroNoteAudio) {
+      heroNoteAudio = document.getElementById('hero-note-audio');
+    }
+  }
+
+  function startHeroNoteAudio() {
+    initHeroNoteAudio();
+    if (!heroNoteAudio) return;
+
+    // Softly pause main music player if active so songs don't collide
+    if (typeof window.audio !== 'undefined' && window.audio && !window.audio.paused) {
+      try { window.audio.pause(); } catch(e) {}
+    }
+
+    if (heroAudioFadeInterval) {
+      clearInterval(heroAudioFadeInterval);
+      heroAudioFadeInterval = null;
+    }
+
+    const startTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
+    const endTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.endTime) || 60.0;
+
+    heroNoteAudio.currentTime = startTime;
+    heroNoteAudio.volume = 0;
+
+    const playPromise = heroNoteAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        // Smooth Volume Fade-In (0 -> 1.0 in 1.2s)
+        const targetVol = 1.0;
+        const steps = 24;
+        const stepTime = 1200 / steps;
+        let currentStep = 0;
+
+        heroAudioFadeInterval = setInterval(() => {
+          currentStep++;
+          heroNoteAudio.volume = Math.min(targetVol, (currentStep / steps) * targetVol);
+          if (currentStep >= steps) {
+            clearInterval(heroAudioFadeInterval);
+            heroAudioFadeInterval = null;
+          }
+        }, stepTime);
+      }).catch(err => {
+        console.warn('[NoteAudio] Autoplay blocked:', err);
+      });
+    }
+
+    // Monitor for 1:00 min (60.0s) cutoff with smooth fade-out
+    heroNoteAudio.ontimeupdate = () => {
+      const cur = heroNoteAudio.currentTime;
+      if (cur >= endTime - 2.0 && cur < endTime) {
+        // Smooth fade out in the last 2 seconds
+        const rem = endTime - cur;
+        heroNoteAudio.volume = Math.max(0, Math.min(1, rem / 2.0));
+      } else if (cur >= endTime) {
+        heroNoteAudio.pause();
+        heroNoteAudio.currentTime = startTime;
+        heroNoteAudio.ontimeupdate = null;
+      }
+    };
+  }
+
+  function stopHeroNoteAudio() {
+    if (!heroNoteAudio) return;
+
+    if (heroAudioFadeInterval) {
+      clearInterval(heroAudioFadeInterval);
+      heroAudioFadeInterval = null;
+    }
+
+    heroNoteAudio.ontimeupdate = null;
+
+    if (heroNoteAudio.paused) return;
+
+    // Smooth Volume Fade-Out (current -> 0 in 500ms)
+    const initialVol = heroNoteAudio.volume;
+    const steps = 15;
+    const stepTime = 500 / steps;
+    let currentStep = 0;
+
+    heroAudioFadeInterval = setInterval(() => {
+      currentStep++;
+      const v = Math.max(0, initialVol * (1 - currentStep / steps));
+      heroNoteAudio.volume = v;
+      if (currentStep >= steps || v <= 0.02) {
+        clearInterval(heroAudioFadeInterval);
+        heroAudioFadeInterval = null;
+        heroNoteAudio.pause();
+        heroNoteAudio.currentTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
+      }
+    }, stepTime);
+  }
+
+  // Reveal Note Content (Magical Hero Stage + Full-Page Ambient Glow + Mangal Rang)
   function revealNote() {
     isNoteOpen = true;
     document.getElementById('welcome-screen')?.classList.add('is-note-opened');
+
+    // 1. Activate Top Hero Stage
+    const heroWrapper = document.getElementById('hero-photo-wrapper');
+    const heroNoteStage = document.getElementById('hero-note-stage');
+    const fullAmbient = document.getElementById('welcome-note-full-ambient');
+
+    if (heroWrapper) heroWrapper.classList.add('is-note-active');
+    if (heroNoteStage) heroNoteStage.style.display = 'flex';
+    if (fullAmbient) fullAmbient.classList.add('is-active');
+
+    // 2. Render dynamic poetry lines
+    renderHeroNoteLines();
+
+    // 3. Start starlight canvas particles
+    startHeroParticles();
+
+    // 4. Start synchronized audio (0:29 to 1:00)
+    startHeroNoteAudio();
+
+    // 5. Update lower elements & Button
     if (noteCapsule) {
-      noteCapsule.classList.remove('is-locked', 'is-permanently-locked');
-    }
-    if (noteTextEl) {
-      noteTextEl.style.display = 'block';
-    }
-    if (noteImgWrap) {
-      noteImgWrap.style.display = 'block';
-    }
-    if (noteImgEl && DAILY_NOTE_CONFIG.imageUrl) {
-      noteImgEl.src = DAILY_NOTE_CONFIG.imageUrl;
-    }
-    if (lockedStateEl) {
-      lockedStateEl.style.display = 'none';
-    }
-    if (noteTagEl) {
-      noteTagEl.textContent = 'OPENED';
-      noteTagEl.classList.add('is-opened');
-      noteTagEl.classList.remove('is-locked', 'is-permanently-locked');
+      noteCapsule.style.display = 'none'; // Spotlight remains on top stage!
     }
     if (noteBtnText) {
       noteBtnText.textContent = 'Hide Note';
@@ -368,17 +584,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (toggleBtn) {
       toggleBtn.classList.remove('is-permanently-locked');
-      toggleBtn.classList.add('is-opened-mode');
+      toggleBtn.classList.add('is-opened-mode', 'is-note-open-active');
       toggleBtn.setAttribute('aria-label', 'Hide Note');
     }
     if (noteAttemptsSubtitle) {
       noteAttemptsSubtitle.style.display = 'none';
     }
+
+    if (window.triggerHaptic) window.triggerHaptic('success');
   }
 
-  // Hide Note Content (Returns to initial view, card stays visible)
+  // Hide Note Content (Smoothly morphs back to Photo + Fades Audio)
   function hideNote() {
-    setInitialLockedState();
+    isNoteOpen = false;
+    document.getElementById('welcome-screen')?.classList.remove('is-note-opened');
+
+    const heroWrapper = document.getElementById('hero-photo-wrapper');
+    const heroNoteStage = document.getElementById('hero-note-stage');
+    const fullAmbient = document.getElementById('welcome-note-full-ambient');
+
+    if (heroWrapper) heroWrapper.classList.remove('is-note-active');
+    if (fullAmbient) fullAmbient.classList.remove('is-active');
+
+    // Stop synchronized audio with smooth fade
+    stopHeroNoteAudio();
+
+    // Stop particles loop
+    stopHeroParticles();
+
+    // Reset Hero Stage after fade-out transition completes (700ms)
+    setTimeout(() => {
+      if (!isNoteOpen && heroNoteStage) {
+        heroNoteStage.style.display = 'none';
+      }
+    }, 700);
+
+    // Update Button State Below
+    if (noteBtnText) {
+      noteBtnText.textContent = 'Open Note';
+    }
+    if (noteBtnIcon) {
+      noteBtnIcon.innerHTML = hasQuiz ? ICON_LOCK : ICON_ENVELOPE;
+    }
+    if (toggleBtn) {
+      toggleBtn.classList.remove('is-opened-mode', 'is-note-open-active');
+      toggleBtn.setAttribute('aria-label', 'Open Note');
+    }
+
+    if (window.triggerHaptic) window.triggerHaptic('light');
   }
 
   // Click Handler for Button / Capsule Interaction
