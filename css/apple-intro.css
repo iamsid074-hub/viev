@@ -8169,7 +8169,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin: 20px auto 14px auto;
+  margin: 38px auto 22px auto; /* thoda neeche */
   padding: 0;
   width: 100%;
   max-width: 380px;
@@ -8181,32 +8181,35 @@
   pointer-events: auto;
 }
 
-.mangal-rang-watch-label {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Outfit", sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.40em;
-  text-transform: lowercase;
-  color: rgba(254, 240, 138, 0.75);
-  margin-bottom: 2px;
-  margin-left: 0.40em; /* optical alignment for extreme letter-spacing */
-  text-shadow: 0 0 10px rgba(251, 191, 36, 0.35);
+/* Listen in cursive (Sacramento) & small */
+.mangal-rang-listen-label {
+  font-family: 'Sacramento', cursive;
+  font-size: clamp(17px, 4.6vw, 20px);
+  font-weight: 400;
+  color: #fef08a;
+  margin-bottom: -5px;
+  line-height: 1.1;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.45);
   display: block;
+  letter-spacing: 0.04em;
 }
 
 .mangal-rang-title-link {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-decoration: none;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  padding: 2px 6px;
+  padding: 2px 8px;
   cursor: pointer;
+  gap: 3px;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
 }
 
 .mangal-rang-title-link:hover {
-  transform: scale(1.035);
+  transform: scale(1.04);
   filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.65));
 }
 
@@ -8214,18 +8217,36 @@
   transform: scale(0.97);
 }
 
-.mangal-rang-main-title {
+/* MANGAL RANG: Chota & Extra Bold */
+.mangal-rang-song-name {
   font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
-  font-size: clamp(14px, 4.3vw, 17px);
-  font-weight: 800;
-  letter-spacing: 0.22em;
+  font-size: clamp(13px, 3.8vw, 15px); /* chota */
+  font-weight: 900; /* extra bold */
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   background: linear-gradient(180deg, #fffbeb 0%, #fde047 30%, #f59e0b 70%, #d97706 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 18px rgba(245, 158, 11, 0.45));
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.5));
   will-change: transform, filter;
   white-space: nowrap;
+  display: block;
+}
+
+/* RAMAYANA: Namit Malhotra Monumental Subtitle */
+.mangal-rang-movie-name {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-size: clamp(10px, 2.9vw, 11.5px); /* chota */
+  font-weight: 900; /* extra bold */
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #fffbeb 0%, #fde047 35%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 12px rgba(245, 158, 11, 0.4));
+  will-change: transform, filter;
+  white-space: nowrap;
+  display: block;
 }
 
 
