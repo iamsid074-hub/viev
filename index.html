@@ -996,6 +996,16 @@ kahin rishte ko na torne lga hu mai
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </button>
+
+              <button class="settings-nav-pill" data-target="subpage-notifications" type="button">
+                <span class="pill-nav-title">Notifications & Alerts</span>
+                <div class="pill-nav-right">
+                  <span class="pill-status-dot default" id="notif-status-indicator"></span>
+                  <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </button>
             </div>
           </div>
 
@@ -1358,6 +1368,98 @@ kahin rishte ko na torne lga hu mai
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- SUBPAGE 6: NOTIFICATIONS & ALERTS -->
+          <div class="subpage-body-container" id="subpage-notifications" style="display: none;">
+            <h2 class="subpage-large-heading">Notifications & Alerts</h2>
+
+            <!-- Master Toggle & Status Card -->
+            <div class="settings-group-card">
+              <div class="settings-rows-list">
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Allow Notifications</span>
+                    <span class="item-desc" id="notif-status-text">Checking permission...</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Toggle Push Notifications">
+                    <input type="checkbox" id="notif-master-toggle">
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Channels & Preferences Card -->
+            <div class="settings-group-card">
+              <span class="settings-group-header-label">Notification Channels</span>
+              <div class="settings-rows-list">
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Daily Note Drops</span>
+                    <span class="item-desc">Notify instantly when Sid writes a new Daily Note</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Daily Note Notifications">
+                    <input type="checkbox" id="notif-pref-daily-note" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Song of the Day</span>
+                    <span class="item-desc">Arijit Singh track dedications & daily vibe</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Song of the Day Notifications">
+                    <input type="checkbox" id="notif-pref-song-day" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+
+                <div class="settings-item-row">
+                  <div class="item-text">
+                    <span class="item-title">Sweet Love Reminders</span>
+                    <span class="item-desc">Morning greetings & sweet surprises for Princess Digi</span>
+                  </div>
+                  <label class="apple-switch" aria-label="Sweet Love Reminders">
+                    <input type="checkbox" id="notif-pref-sweet-pings" checked>
+                    <span class="apple-switch-knob"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Diagnostics & Testing Card -->
+            <div class="settings-group-card">
+              <span class="settings-group-header-label">Diagnostics & Test</span>
+              <div class="settings-rows-list">
+                <div class="settings-item-row" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 14px 16px;">
+                  <span class="item-desc" style="color: rgba(255,255,255,0.65); font-size: 13px; line-height: 1.4;">
+                    Test how push alerts look on your phone lock-screen and dynamic status bar.
+                  </span>
+                  <button type="button" class="notif-pill-action-btn" id="notif-test-btn">
+                    <span>🔔 Send Test Notification</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sid's Quick Custom Ping Composer -->
+            <div class="settings-group-card" id="sid-composer-card">
+              <span class="settings-group-header-label">Direct Message Push</span>
+              <div class="settings-rows-list">
+                <div class="settings-item-row" style="flex-direction: column; align-items: stretch; gap: 10px; padding: 14px 16px;">
+                  <span class="item-desc" style="color: rgba(255,255,255,0.65); font-size: 13px;">
+                    Send an instant custom push alert to Digi's screen:
+                  </span>
+                  <div style="display: flex; gap: 8px;">
+                    <input type="text" id="sid-ping-text-input" placeholder="Type a message (e.g. Love you princess ❤️)..." class="notif-ping-input" />
+                    <button type="button" class="notif-send-btn" id="sid-send-ping-btn">Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
@@ -2096,6 +2198,7 @@ kahin rishte ko na torne lga hu mai
   <script src="js/motion-ad.js?v=7.1"></script>
   <script src="js/exxclusive.js?v=7.4"></script>
   <script src="js/exxclusive-3.js?v=3.7"></script>
-  <script src="js/app.js?v=7.2"></script>
+  <script src="js/push-notifications.js?v=1.0"></script>
+  <script src="js/app.js?v=7.3"></script>
 </body>
 </html>

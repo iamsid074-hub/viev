@@ -703,6 +703,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (targetId === 'subpage-software') {
         navCenterTitle.textContent = 'Software Update';
         navCenterTitle.style.display = 'block';
+      } else if (targetId === 'subpage-notifications') {
+        navCenterTitle.textContent = 'Notifications';
+        navCenterTitle.style.display = 'block';
       } else {
         navCenterTitle.textContent = '';
         navCenterTitle.style.display = 'none';
@@ -736,6 +739,10 @@ document.addEventListener('DOMContentLoaded', () => {
       triggerSoftwareUpdateCheck();
     } else if (targetId === 'subpage-favorites') {
       renderFavoriteSongs();
+    } else if (targetId === 'subpage-notifications') {
+      if (window.vievNotifications && typeof window.vievNotifications.updateUI === 'function') {
+        window.vievNotifications.updateUI();
+      }
     }
   }
 
