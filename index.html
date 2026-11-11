@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/liquid-glass.css?v=7.1">
-  <link rel="stylesheet" href="css/apple-intro.css?v=8.3">
+  <link rel="stylesheet" href="css/apple-intro.css?v=8.4">
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
@@ -159,7 +159,10 @@
 
       <!-- Full-Page Living Ambient Glow (Driven by Real Song Video across Entire Page) -->
       <div class="welcome-note-full-ambient" id="welcome-note-full-ambient" aria-hidden="true">
-        <video id="hero-note-ambient-video" class="hero-note-ambient-video" src="song/mangal_rang.mp4" playsinline webkit-playsinline muted loop preload="auto"></video>
+        <!-- Hidden Source Video (Zero Layout Cost) -->
+        <video id="hero-note-ambient-video" class="hero-note-ambient-video-source" src="song/mangal_rang.mp4" playsinline webkit-playsinline muted loop preload="auto" style="display: none;"></video>
+        <!-- Ultra-Smooth Temporal Accumulation Canvas (Zero Lag, Silky Liquid Crossfades) -->
+        <canvas id="hero-note-ambient-canvas" class="hero-note-ambient-canvas" width="96" height="54"></canvas>
         <div class="welcome-note-ambient-overlay"></div>
       </div>
 
@@ -170,8 +173,8 @@
 
         <!-- MAGICAL DAILY NOTE THEATRE STAGE (Replaces photo on Note reveal) -->
         <div class="hero-note-stage" id="hero-note-stage" aria-label="Special Daily Note Stage" style="display: none;">
-          <!-- Stage Living Ambient Video Backdrop -->
-          <video id="hero-note-stage-video" class="hero-note-stage-video" src="song/mangal_rang.mp4" playsinline webkit-playsinline muted loop preload="auto"></video>
+          <!-- Stage Living Ambient Canvas (Liquid Crossfade) -->
+          <canvas id="hero-note-stage-canvas" class="hero-note-stage-canvas" width="96" height="54"></canvas>
 
           <!-- Layer 1: Sacred Saffron-Rose Liquid Aurora Mesh -->
           <div class="hero-note-aurora-mesh" id="hero-note-aurora-mesh"></div>
@@ -180,7 +183,7 @@
           <canvas class="hero-note-particles-canvas" id="hero-note-particles-canvas"></canvas>
 
           <!-- Layer 3: Glassmorphism Poetry Presentation (Pure Note Only) -->
-          <div class="hero-note-content-glass">
+          <div class="hero-note-content-glass" id="hero-note-content-glass">
             <div class="hero-note-lines-wrap" id="hero-note-lines-wrap">
               <!-- Animated poetic lines populated dynamically -->
             </div>
@@ -2221,7 +2224,7 @@ kahin rishte ko na torne lga hu mai
   </div>
 
   <script src="js/apple-welcome.js?v=7.1"></script>
-  <script src="js/daily-note.js?v=7.6"></script>
+  <script src="js/daily-note.js?v=7.7"></script>
   <script src="js/navbar.js?v=7.9"></script>
   <script src="js/youtube-data.js?v=7.1"></script>
   <script src="js/cinema.js?v=7.1"></script>

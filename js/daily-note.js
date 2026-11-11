@@ -354,8 +354,19 @@ document.addEventListener('DOMContentLoaded', () => {
   let particlesList = [];
   let heroNoteAudio = null;
   let ambientVideo = null;
-  let stageVideo = null;
+  let ambientCanvas = null;
+  let ambientCtx = null;
+  let stageCanvas = null;
+  let stageCtx = null;
+  let ambientRafId = null;
+  let isAmbientPrimed = false;
   let heroAudioFadeInterval = null;
+
+  // Kinetic Line Sequence State
+  let notePoetryLines = [];
+  let currentSingleLineIdx = 0;
+  let lineSequenceTimer = null;
+  let lineSequenceMode = 'single'; // 'single' | 'all'
 
   function initParticleCanvas() {
     particleCanvas = document.getElementById('hero-note-particles-canvas');
@@ -443,17 +454,171 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Render Formatted Poetic Lines Dynamically
-  function renderHeroNoteLines() {
-    const linesWrap = document.getElementById('hero-note-lines-wrap');
-    if (!linesWrap) return;
-
+  // =========================================================
+  // Kinetic Sequential Line Engine ("Ek-Ek Line -> Finale All Lines")
+  // =========================================================
+  function prepareNoteLines() {
     const rawText = (DAILY_NOTE_CONFIG.noteText || '').trim();
-    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    notePoetryLines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  }
 
-    linesWrap.innerHTML = lines.map((line, idx) => {
-      return `<p class="hero-note-poetry-line line-${idx % 5}">${line}</p>`;
-    }).join('');
+  function startNoteLineSequence() {
+    prepareNoteLines();
+    stopNoteLineSequence();
+    lineSequenceMode = 'single';
+    currentSingleLineIdx = 0;
+
+    const glassCard = document.getElementById('hero-note-content-glass');
+    if (glassCard) {
+      glassCard.classList.remove('is-all-lines-mode');
+    }
+
+    if (!notePoetryLines.length) return;
+
+    // Show initial line immediately
+    renderCurrentSingleLine();
+
+    // Line duration: 4.2s each (smooth kinetic pacing)
+    const stepDuration = 4200;
+
+    const advanceNextLine = () => {
+      if (!isNoteOpen) return;
+      currentSingleLineIdx++;
+      if (currentSingleLineIdx < notePoetryLines.length) {
+        renderCurrentSingleLine();
+        lineSequenceTimer = setTimeout(advanceNextLine, stepDuration);
+      } else {
+        // Individual lines finished! Now reveal ALL lines together!
+        showAllLinesMode();
+      }
+    };
+
+    lineSequenceTimer = setTimeout(advanceNextLine, stepDuration);
+  }
+
+  function stopNoteLineSequence() {
+    if (lineSequenceTimer) {
+      clearTimeout(lineSequenceTimer);
+      lineSequenceTimer = null;
+    }
+  }
+
+  function renderCurrentSingleLine() {
+    const linesWrap = document.getElementById('hero-note-lines-wrap');
+    if (!linesWrap || !notePoetryLines.length) return;
+
+    const lineText = notePoetryLines[currentSingleLineIdx] || '';
+    const existing = linesWrap.querySelector('.hero-note-single-line');
+
+    if (existing) {
+      existing.classList.add('is-exiting');
+      setTimeout(() => {
+        if (!isNoteOpen || lineSequenceMode !== 'single') return;
+        linesWrap.innerHTML = `
+          <div class="hero-note-single-wrap">
+            <p class="hero-note-single-line">${lineText}</p>
+          </div>
+        `;
+        requestAnimationFrame(() => {
+          const el = linesWrap.querySelector('.hero-note-single-line');
+          if (el) el.classList.add('is-active');
+        });
+      }, 420);
+    } else {
+      linesWrap.innerHTML = `
+        <div class="hero-note-single-wrap">
+          <p class="hero-note-single-line is-active">${lineText}</p>
+        </div>
+      `;
+    }
+  }
+
+  function showAllLinesMode() {
+    stopNoteLineSequence();
+    lineSequenceMode = 'all';
+
+    const linesWrap = document.getElementById('hero-note-lines-wrap');
+    if (!linesWrap || !notePoetryLines.length) return;
+
+    linesWrap.innerHTML = `
+      <div class="hero-note-all-wrap">
+        ${notePoetryLines.map((line, idx) => `
+          <p class="hero-note-poetry-line line-${idx % 5}">${line}</p>
+        `).join('')}
+      </div>
+    `;
+
+    const glassCard = document.getElementById('hero-note-content-glass');
+    if (glassCard) {
+      glassCard.classList.add('is-all-lines-mode');
+    }
+  }
+
+  // =========================================================
+  // Canvas Accumulation Engine: Zero-Lag Silky Liquid Color Fades
+  // =========================================================
+  function initAmbientCanvases() {
+    if (!ambientCanvas) {
+      ambientCanvas = document.getElementById('hero-note-ambient-canvas');
+      if (ambientCanvas) ambientCtx = ambientCanvas.getContext('2d', { alpha: false });
+    }
+    if (!stageCanvas) {
+      stageCanvas = document.getElementById('hero-note-stage-canvas');
+      if (stageCanvas) stageCtx = stageCanvas.getContext('2d', { alpha: false });
+    }
+  }
+
+  function startAmbientRenderLoop() {
+    initAmbientCanvases();
+    stopAmbientRenderLoop();
+    isAmbientPrimed = false;
+
+    function renderFrame() {
+      if (!isNoteOpen) return;
+
+      if (ambientVideo && !ambientVideo.paused && ambientVideo.readyState >= 2) {
+        if (!isAmbientPrimed) {
+          // Instantly prime with the exact starting frame at 0:29
+          if (ambientCtx && ambientCanvas) {
+            ambientCtx.globalCompositeOperation = 'source-over';
+            ambientCtx.globalAlpha = 1.0;
+            ambientCtx.drawImage(ambientVideo, 0, 0, ambientCanvas.width, ambientCanvas.height);
+          }
+          if (stageCtx && stageCanvas) {
+            stageCtx.globalCompositeOperation = 'source-over';
+            stageCtx.globalAlpha = 1.0;
+            stageCtx.drawImage(ambientVideo, 0, 0, stageCanvas.width, stageCanvas.height);
+          }
+          isAmbientPrimed = true;
+        } else {
+          // Exponential decay temporal filter: 0.045 alpha per frame
+          // Hard video scene cuts melt into smooth liquid color blooms with zero abrupt shifts!
+          const blendAlpha = 0.045;
+          if (ambientCtx && ambientCanvas) {
+            ambientCtx.globalCompositeOperation = 'source-over';
+            ambientCtx.globalAlpha = blendAlpha;
+            ambientCtx.drawImage(ambientVideo, 0, 0, ambientCanvas.width, ambientCanvas.height);
+          }
+          if (stageCtx && stageCanvas) {
+            stageCtx.globalCompositeOperation = 'source-over';
+            stageCtx.globalAlpha = blendAlpha;
+            stageCtx.drawImage(ambientVideo, 0, 0, stageCanvas.width, stageCanvas.height);
+          }
+        }
+      }
+
+      ambientRafId = requestAnimationFrame(renderFrame);
+    }
+
+    ambientRafId = requestAnimationFrame(renderFrame);
+  }
+
+  function stopAmbientRenderLoop() {
+    if (ambientRafId) {
+      cancelAnimationFrame(ambientRafId);
+      ambientRafId = null;
+    }
+    isAmbientPrimed = false;
   }
 
   // Audio & Ambient Video Sync Engine (Mangal Rang: 0:29s to 1:00min)
@@ -463,9 +628,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (!ambientVideo) {
       ambientVideo = document.getElementById('hero-note-ambient-video');
-    }
-    if (!stageVideo) {
-      stageVideo = document.getElementById('hero-note-stage-video');
     }
   }
 
@@ -490,21 +652,18 @@ document.addEventListener('DOMContentLoaded', () => {
     heroNoteAudio.currentTime = startTime;
     heroNoteAudio.volume = 0;
 
-    // Start Real Ambient Video sync (Cinema Ambilight)
-    const startVid = (vid) => {
-      if (!vid) return;
+    // Start Real Ambient Video sync (Offscreen single source)
+    if (ambientVideo) {
       try {
-        vid.currentTime = startTime;
-        const p = vid.play();
+        ambientVideo.currentTime = startTime;
+        const p = ambientVideo.play();
         if (p !== undefined) {
           p.catch(err => console.warn('[AmbientVideo] Play prevented:', err));
         }
       } catch(e) {
         console.warn('[AmbientVideo] Error:', e);
       }
-    };
-    startVid(ambientVideo);
-    startVid(stageVideo);
+    }
 
     const playPromise = heroNoteAudio.play();
     if (playPromise !== undefined) {
@@ -536,15 +695,12 @@ document.addEventListener('DOMContentLoaded', () => {
     heroNoteAudio.ontimeupdate = () => {
       const cur = heroNoteAudio.currentTime;
 
-      // Keep living ambient videos strictly in sync
-      const syncVid = (vid) => {
-        if (!vid || vid.paused) return;
-        if (Math.abs(vid.currentTime - cur) > 0.35) {
-          try { vid.currentTime = cur; } catch(e) {}
+      // Keep living ambient video strictly in sync
+      if (ambientVideo && !ambientVideo.paused) {
+        if (Math.abs(ambientVideo.currentTime - cur) > 0.35) {
+          try { ambientVideo.currentTime = cur; } catch(e) {}
         }
-      };
-      syncVid(ambientVideo);
-      syncVid(stageVideo);
+      }
 
       if (cur >= fadeOutStart && cur < endTime) {
         // Smooth cubic ease-out fade curve
@@ -560,10 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ambientVideo.pause();
           ambientVideo.currentTime = startTime;
         }
-        if (stageVideo) {
-          stageVideo.pause();
-          stageVideo.currentTime = startTime;
-        }
+        stopAmbientRenderLoop();
       }
     };
   }
@@ -580,19 +733,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const startTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
 
-    const pauseVideos = () => {
+    const pauseVideoSource = () => {
       if (ambientVideo) {
         ambientVideo.pause();
         ambientVideo.currentTime = startTime;
       }
-      if (stageVideo) {
-        stageVideo.pause();
-        stageVideo.currentTime = startTime;
-      }
+      stopAmbientRenderLoop();
     };
 
     if (heroNoteAudio.paused) {
-      pauseVideos();
+      pauseVideoSource();
       return;
     }
 
@@ -613,12 +763,12 @@ document.addEventListener('DOMContentLoaded', () => {
         heroNoteAudio.pause();
         heroNoteAudio.volume = 0;
         heroNoteAudio.currentTime = startTime;
-        pauseVideos();
+        pauseVideoSource();
       }
     }, 25);
   }
 
-  // Reveal Note Content (Magical Hero Stage + Full-Page Ambient Glow + Mangal Rang)
+  // Reveal Note Content (Magical Hero Stage + Kinetic Poetry Reveal + Liquid Ambient Glow)
   function revealNote() {
     isNoteOpen = true;
     document.getElementById('welcome-screen')?.classList.add('is-note-opened');
@@ -632,14 +782,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroNoteStage) heroNoteStage.style.display = 'flex';
     if (fullAmbient) fullAmbient.classList.add('is-active');
 
-    // 2. Render dynamic poetry lines
-    renderHeroNoteLines();
+    // 2. Start kinetic sequential line reveal (one-by-one then all lines together)
+    startNoteLineSequence();
 
     // 3. Start starlight canvas particles
     startHeroParticles();
 
-    // 4. Start synchronized audio (0:29 to 1:00)
+    // 4. Start synchronized audio & living liquid canvas ambient loop
     startHeroNoteAudio();
+    startAmbientRenderLoop();
 
     // 5. Update lower elements & Button
     if (noteCapsule) {
@@ -663,7 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.triggerHaptic) window.triggerHaptic('success');
   }
 
-  // Hide Note Content (Smoothly morphs back to Photo + Fades Audio)
+  // Hide Note Content (Smoothly morphs back to Photo + Fades Audio & Ambient)
   function hideNote() {
     isNoteOpen = false;
     document.getElementById('welcome-screen')?.classList.remove('is-note-opened');
@@ -675,7 +826,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (heroWrapper) heroWrapper.classList.remove('is-note-active');
     if (fullAmbient) fullAmbient.classList.remove('is-active');
 
-    // Stop synchronized audio with smooth fade
+    // Stop line sequence
+    stopNoteLineSequence();
+
+    // Stop synchronized audio & ambient loop with smooth fade
     stopHeroNoteAudio();
 
     // Stop particles loop
@@ -701,6 +855,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (window.triggerHaptic) window.triggerHaptic('light');
+  }
+
+  // Tapping the frosted glass note card early instantly unlocks All Lines view
+  const heroNoteContentGlass = document.getElementById('hero-note-content-glass');
+  if (heroNoteContentGlass) {
+    heroNoteContentGlass.addEventListener('click', () => {
+      if (lineSequenceMode === 'single') {
+        showAllLinesMode();
+        if (window.triggerHaptic) window.triggerHaptic('light');
+      }
+    });
   }
 
   // Click Handler for Button / Capsule Interaction
