@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
-  <link rel="stylesheet" href="css/exxclusive-3.css?v=3.7">
+  <link rel="stylesheet" href="css/exxclusive-3.css?v=3.8">
 </head>
 <body>
 
@@ -829,104 +829,6 @@ kahin rishte ko na torne lga hu mai
           </div>
         </div>
       </div>
-
-      <!-- 3. THE LUXURY AIRBNB CURVED CHARCOAL HOME CINEMA LOUNGE (LANDSCAPE PLAYBACK) -->
-      <div id="curved-charcoal-lounge" class="curved-charcoal-lounge" aria-label="Curved Cinema Lounge">
-        
-        <!-- SVG Definitions for Smooth Concave Architectural Curve -->
-        <svg width="0" height="0" style="position: absolute; pointer-events: none;">
-          <defs>
-            <clipPath id="loungeCurvedClip" clipPathUnits="objectBoundingBox">
-              <path d="M 0,0 Q 0.5,0.045 1,0 L 1,1 Q 0.5,0.955 0,1 Z" />
-            </clipPath>
-          </defs>
-        </svg>
-
-        <!-- Luxury Airbnb Room Stage Backdrop -->
-        <div class="lounge-room-stage" id="lounge-room-stage">
-          
-          <!-- Realistic 3-Second Cinema Theatre Dimmer (Lights off, Left Window Ambience Maintained) -->
-          <div class="lounge-theatre-dimmer" id="lounge-theatre-dimmer" aria-hidden="true"></div>
-
-          <!-- Adaptive Ambient Light Bleed (Casting onto curved charcoal room wall & cove ceiling) -->
-          <div class="lounge-ambient-bleed-wrap">
-            <canvas class="lounge-ambient-canvas" id="lounge-ambient-canvas"></canvas>
-          </div>
-
-          <!-- Super Curved Display Chassis (Mounted naturally with physical bezel) -->
-          <div class="lounge-screen-chassis">
-            <div class="lounge-screen-chassis-bezel">
-              <div class="lounge-screen-frame">
-                <video class="lounge-video-player" id="lounge-video-player" playsinline preload="auto" crossorigin="anonymous">
-                  <source src="video/exxclusive.mp4" type="video/mp4">
-                </video>
-                <!-- Real YouTube Video Player Iframe with Universal Mobile Compatibility -->
-                <iframe class="lounge-youtube-player" id="lounge-youtube-player"
-                  title="Cinema YouTube Player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen
-                  style="display: none;">
-                </iframe>
-              </div>
-            </div>
-          </div>
-
-          <!-- LIQUID GLASS UI (IMAGE 2 REPLICA) -->
-          <div class="lounge-glass-hud" id="lounge-glass-hud">
-            
-            <!-- Top-Right Fixed Action Bar: Back to Library -->
-            <div class="lounge-hud-top-bar" id="lounge-hud-top-bar">
-              <button type="button" class="lounge-top-back-btn" id="lounge-top-back-btn" aria-label="Back to Library">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-                <span>Back to Library</span>
-              </button>
-            </div>
-
-            <!-- Center Triad: -15s Jump / Glowing Play-Pause / +15s Jump (Image 2) -->
-            <div class="lounge-hud-center-cluster">
-              <button type="button" class="lounge-glass-step-btn" id="lounge-step-back-btn" title="Jump Back 15 Seconds" aria-label="Rewind 15 seconds">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="1 4 1 10 7 10"></polyline>
-                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-                  <text x="12" y="14" text-anchor="middle" font-size="7" font-weight="800" fill="currentColor" stroke="none">15</text>
-                </svg>
-              </button>
-
-              <button type="button" class="lounge-glass-play-btn" id="lounge-play-btn" title="Play or Pause" aria-label="Play or Pause">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-              </button>
-
-              <button type="button" class="lounge-glass-step-btn" id="lounge-step-fwd-btn" title="Jump Forward 15 Seconds" aria-label="Forward 15 seconds">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="23 4 23 10 17 10"></polyline>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                  <text x="12" y="14" text-anchor="middle" font-size="7" font-weight="800" fill="currentColor" stroke="none">15</text>
-                </svg>
-              </button>
-            </div>
-
-            <!-- Bottom Controls: Scrubbing Timeline with Countdown -->
-            <div class="lounge-hud-bottom-bar">
-              <!-- Liquid Timeline Scrubber + Negative Countdown Timer (Image 2) -->
-              <div class="lounge-timeline-wrap">
-                <div class="lounge-timeline-bar-box" id="lounge-timeline-bar-box">
-                  <div class="lounge-timeline-track">
-                    <div class="lounge-timeline-fill" id="lounge-timeline-fill"></div>
-                    <div class="lounge-timeline-dot" id="lounge-timeline-dot"></div>
-                  </div>
-                </div>
-                <span class="lounge-time-countdown" id="lounge-time-countdown">-04:12</span>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </div>
     </section>
 
     <!-- SCREEN 4: DEDICATED FULL PAGE - SETTINGS -->
@@ -1644,6 +1546,104 @@ kahin rishte ko na torne lga hu mai
 
   </main>
 
+  <!-- 3. THE LUXURY AIRBNB CURVED CHARCOAL HOME CINEMA LOUNGE (FULL VIEWPORT LANDSCAPE CINEMA) -->
+  <div id="curved-charcoal-lounge" class="curved-charcoal-lounge" aria-label="Curved Cinema Lounge">
+    
+    <!-- SVG Definitions for Smooth Concave Architectural Curve -->
+    <svg width="0" height="0" style="position: absolute; pointer-events: none;">
+      <defs>
+        <clipPath id="loungeCurvedClip" clipPathUnits="objectBoundingBox">
+          <path d="M 0,0 Q 0.5,0.045 1,0 L 1,1 Q 0.5,0.955 0,1 Z" />
+        </clipPath>
+      </defs>
+    </svg>
+
+    <!-- Luxury Airbnb Room Stage Backdrop -->
+    <div class="lounge-room-stage" id="lounge-room-stage">
+      
+      <!-- Realistic 3-Second Cinema Theatre Dimmer (Lights off, Left Window Ambience Maintained) -->
+      <div class="lounge-theatre-dimmer" id="lounge-theatre-dimmer" aria-hidden="true"></div>
+
+      <!-- Adaptive Ambient Light Bleed (Casting onto curved charcoal room wall & cove ceiling) -->
+      <div class="lounge-ambient-bleed-wrap">
+        <canvas class="lounge-ambient-canvas" id="lounge-ambient-canvas"></canvas>
+      </div>
+
+      <!-- Super Curved Display Chassis (Mounted naturally with physical bezel) -->
+      <div class="lounge-screen-chassis">
+        <div class="lounge-screen-chassis-bezel">
+          <div class="lounge-screen-frame">
+            <video class="lounge-video-player" id="lounge-video-player" playsinline preload="auto" crossorigin="anonymous">
+              <source src="video/exxclusive.mp4" type="video/mp4">
+            </video>
+            <!-- Real YouTube Video Player Iframe with Universal Mobile Compatibility -->
+            <iframe class="lounge-youtube-player" id="lounge-youtube-player"
+              title="Cinema YouTube Player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+              style="display: none;">
+            </iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIQUID GLASS UI (IMAGE 2 REPLICA) -->
+      <div class="lounge-glass-hud" id="lounge-glass-hud">
+        
+        <!-- Top-Right Fixed Action Bar: Back to Library -->
+        <div class="lounge-hud-top-bar" id="lounge-hud-top-bar">
+          <button type="button" class="lounge-top-back-btn" id="lounge-top-back-btn" aria-label="Back to Library">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            <span>Back to Library</span>
+          </button>
+        </div>
+
+        <!-- Center Triad: -15s Jump / Glowing Play-Pause / +15s Jump (Image 2) -->
+        <div class="lounge-hud-center-cluster">
+          <button type="button" class="lounge-glass-step-btn" id="lounge-step-back-btn" title="Jump Back 15 Seconds" aria-label="Rewind 15 seconds">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              <text x="12" y="14" text-anchor="middle" font-size="7" font-weight="800" fill="currentColor" stroke="none">15</text>
+            </svg>
+          </button>
+
+          <button type="button" class="lounge-glass-play-btn" id="lounge-play-btn" title="Play or Pause" aria-label="Play or Pause">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+
+          <button type="button" class="lounge-glass-step-btn" id="lounge-step-fwd-btn" title="Jump Forward 15 Seconds" aria-label="Forward 15 seconds">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              <text x="12" y="14" text-anchor="middle" font-size="7" font-weight="800" fill="currentColor" stroke="none">15</text>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Bottom Controls: Scrubbing Timeline with Countdown -->
+        <div class="lounge-hud-bottom-bar">
+          <!-- Liquid Timeline Scrubber + Negative Countdown Timer (Image 2) -->
+          <div class="lounge-timeline-wrap">
+            <div class="lounge-timeline-bar-box" id="lounge-timeline-bar-box">
+              <div class="lounge-timeline-track">
+                <div class="lounge-timeline-fill" id="lounge-timeline-fill"></div>
+                <div class="lounge-timeline-dot" id="lounge-timeline-dot"></div>
+              </div>
+            </div>
+            <span class="lounge-time-countdown" id="lounge-time-countdown">-04:12</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
   <!-- MODAL 1: SETTINGS SHEET - OS 1.1 -->
   <div class="ios-modal-backdrop" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-heading">
     <div class="ios-modal-sheet">
@@ -2197,7 +2197,7 @@ kahin rishte ko na torne lga hu mai
   <script src="js/cast-engine.js?v=7.1"></script>
   <script src="js/motion-ad.js?v=7.1"></script>
   <script src="js/exxclusive.js?v=7.4"></script>
-  <script src="js/exxclusive-3.js?v=3.7"></script>
+  <script src="js/exxclusive-3.js?v=3.8"></script>
   <script src="js/push-notifications.js?v=1.0"></script>
   <script src="js/app.js?v=7.3"></script>
 </body>

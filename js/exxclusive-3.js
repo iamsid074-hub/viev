@@ -805,6 +805,8 @@
     loungeEl.classList.remove('is-closing');
     loungeEl.classList.add('is-active');
     isLoungeOpen = true;
+    document.body.classList.add('has-cinema-open');
+    document.documentElement.classList.add('has-cinema-open');
 
     // Switch main floating navbar into Cinema Mode
     const floatingDock = document.getElementById('apple-floating-dock');
@@ -982,6 +984,8 @@
 
     // 3. Smooth exit transition - back button fades with lounge
     loungeEl.classList.add('is-closing');
+    document.body.classList.remove('has-cinema-open');
+    document.documentElement.classList.remove('has-cinema-open');
     if (floatingDock) {
       floatingDock.classList.add('hud-hidden');
     }
