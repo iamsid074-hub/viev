@@ -353,11 +353,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let particleRafId = null;
   let particlesList = [];
   let heroNoteAudio = null;
+  let heroStageVideo = null;
   let ambientVideo = null;
   let ambientCanvas = null;
   let ambientCtx = null;
-  let stageCanvas = null;
-  let stageCtx = null;
   let ambientRafId = null;
   let isAmbientPrimed = false;
   let heroAudioFadeInterval = null;
@@ -562,10 +561,6 @@ document.addEventListener('DOMContentLoaded', () => {
       ambientCanvas = document.getElementById('hero-note-ambient-canvas');
       if (ambientCanvas) ambientCtx = ambientCanvas.getContext('2d', { alpha: false });
     }
-    if (!stageCanvas) {
-      stageCanvas = document.getElementById('hero-note-stage-canvas');
-      if (stageCanvas) stageCtx = stageCanvas.getContext('2d', { alpha: false });
-    }
   }
 
   function startAmbientRenderLoop() {
@@ -576,18 +571,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderFrame() {
       if (!isNoteOpen) return;
 
-      if (ambientVideo && !ambientVideo.paused && ambientVideo.readyState >= 2) {
+      const vidSource = heroStageVideo || ambientVideo;
+      if (vidSource && !vidSource.paused && vidSource.readyState >= 2) {
         if (!isAmbientPrimed) {
           // Instantly prime with the exact starting frame at 0:29
           if (ambientCtx && ambientCanvas) {
             ambientCtx.globalCompositeOperation = 'source-over';
             ambientCtx.globalAlpha = 1.0;
-            ambientCtx.drawImage(ambientVideo, 0, 0, ambientCanvas.width, ambientCanvas.height);
-          }
-          if (stageCtx && stageCanvas) {
-            stageCtx.globalCompositeOperation = 'source-over';
-            stageCtx.globalAlpha = 1.0;
-            stageCtx.drawImage(ambientVideo, 0, 0, stageCanvas.width, stageCanvas.height);
+            ambientCtx.drawImage(vidSource, 0, 0, ambientCanvas.width, ambientCanvas.height);
           }
           isAmbientPrimed = true;
         } else {
@@ -597,12 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (ambientCtx && ambientCanvas) {
             ambientCtx.globalCompositeOperation = 'source-over';
             ambientCtx.globalAlpha = blendAlpha;
-            ambientCtx.drawImage(ambientVideo, 0, 0, ambientCanvas.width, ambientCanvas.height);
-          }
-          if (stageCtx && stageCanvas) {
-            stageCtx.globalCompositeOperation = 'source-over';
-            stageCtx.globalAlpha = blendAlpha;
-            stageCtx.drawImage(ambientVideo, 0, 0, stageCanvas.width, stageCanvas.height);
+            ambientCtx.drawImage(vidSource, 0, 0, ambientCanvas.width, ambientCanvas.height);
           }
         }
       }
@@ -625,6 +611,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function initHeroNoteAudio() {
     if (!heroNoteAudio) {
       heroNoteAudio = document.getElementById('hero-note-audio');
+    }
+    if (!heroStageVideo) {
+      heroStageVideo = document.getElementById('hero-stage-video');
     }
     if (!ambientVideo) {
       ambientVideo = document.getElementById('hero-note-ambient-video');
@@ -652,18 +641,21 @@ document.addEventListener('DOMContentLoaded', () => {
     heroNoteAudio.currentTime = startTime;
     heroNoteAudio.volume = 0;
 
-    // Start Real Ambient Video sync (Offscreen single source)
-    if (ambientVideo) {
+    // Start Real Music Video in Hero Frame & Ambient Video
+    const startVid = (vid) => {
+      if (!vid) return;
       try {
-        ambientVideo.currentTime = startTime;
-        const p = ambientVideo.play();
+        vid.currentTime = startTime;
+        const p = vid.play();
         if (p !== undefined) {
-          p.catch(err => console.warn('[AmbientVideo] Play prevented:', err));
+          p.catch(err => console.warn('[VideoSync] Play prevented:', err));
         }
       } catch(e) {
-        console.warn('[AmbientVideo] Error:', e);
+        console.warn('[VideoSync] Error:', e);
       }
-    }
+    };
+    startVid(heroStageVideo);
+    startVid(ambientVideo);
 
     const playPromise = heroNoteAudio.play();
     if (playPromise !== undefined) {
@@ -695,12 +687,15 @@ document.addEventListener('DOMContentLoaded', () => {
     heroNoteAudio.ontimeupdate = () => {
       const cur = heroNoteAudio.currentTime;
 
-      // Keep living ambient video strictly in sync
-      if (ambientVideo && !ambientVideo.paused) {
-        if (Math.abs(ambientVideo.currentTime - cur) > 0.35) {
-          try { ambientVideo.currentTime = cur; } catch(e) {}
+      // Keep real hero video and ambient video strictly locked to audio
+      const syncVid = (vid) => {
+        if (!vid || vid.paused) return;
+        if (Math.abs(vid.currentTime - cur) > 0.35) {
+          try { vid.currentTime = cur; } catch(e) {}
         }
-      }
+      };
+      syncVid(heroStageVideo);
+      syncVid(ambientVideo);
 
       if (cur >= fadeOutStart && cur < endTime) {
         // Smooth cubic ease-out fade curve
@@ -712,6 +707,10 @@ document.addEventListener('DOMContentLoaded', () => {
         heroNoteAudio.currentTime = startTime;
         heroNoteAudio.ontimeupdate = null;
 
+        if (heroStageVideo) {
+          heroStageVideo.pause();
+          heroStageVideo.currentTime = startTime;
+        }
         if (ambientVideo) {
           ambientVideo.pause();
           ambientVideo.currentTime = startTime;
@@ -734,6 +733,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const startTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
 
     const pauseVideoSource = () => {
+      if (heroStageVideo) {
+        heroStageVideo.pause();
+        heroStageVideo.currentTime = startTime;
+      }
       if (ambientVideo) {
         ambientVideo.pause();
         ambientVideo.currentTime = startTime;
