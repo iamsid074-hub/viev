@@ -8220,7 +8220,7 @@
 /* MANGAL RANG: Chota & Extra Bold */
 .mangal-rang-song-name {
   font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
-  font-size: clamp(13px, 3.8vw, 15px); /* chota */
+  font-size: clamp(12.5px, 3.6vw, 14.5px); /* chota */
   font-weight: 900; /* extra bold */
   letter-spacing: 0.28em;
   text-transform: uppercase;
@@ -8233,20 +8233,21 @@
   display: block;
 }
 
-/* RAMAYANA: Namit Malhotra Monumental Subtitle */
-.mangal-rang-movie-name {
-  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
-  font-size: clamp(10px, 2.9vw, 11.5px); /* chota */
-  font-weight: 900; /* extra bold */
-  letter-spacing: 0.38em;
-  text-transform: uppercase;
-  background: linear-gradient(180deg, #fffbeb 0%, #fde047 35%, #d97706 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 12px rgba(245, 158, 11, 0.4));
-  will-change: transform, filter;
-  white-space: nowrap;
+/* Official Ramayana Logo Image (Rise of a Legend) */
+.mangal-rang-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.mangal-rang-logo-img {
+  width: clamp(145px, 38vw, 175px);
+  height: auto;
+  object-fit: contain;
   display: block;
+  filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.45));
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
 
