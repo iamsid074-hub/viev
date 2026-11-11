@@ -14,13 +14,13 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_note_bakwass_2026",
+  questionId: "digi_note_kaya_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `Kyun sunti hai tu meri bakwass itni ,, 
-aj kal kuch jyada hi bolne lga hu mai 
-mereko to dar lagjata hai kabhi kabhi 
-kahin rishte ko na torne lga hu mai`,
+  noteText: `Kash Mai Teri Jagah Hota , Or Tu Meri 
+Mai Dekhna Chahata Hun Kasi Dikhti Hai Kaya Teri 
+Na Jane Konse Vo Leela Hai Tujme Smayi 
+Jo Tujhe Sota Dekh Mujhe Thi Kheech Layi`,
 
   // Note Memory Photo:
   imageUrl: "assets/daily_note.jpg",
