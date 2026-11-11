@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
-  <link rel="stylesheet" href="css/exxclusive-3.css?v=3.8">
+  <link rel="stylesheet" href="css/exxclusive-3.css?v=3.9">
 </head>
 <body>
 
@@ -269,15 +269,15 @@
             <span class="note-attempts-subtitle" id="note-attempts-subtitle" style="display: none;">no more attemps</span>
           </div>
 
-          <!-- Pure Cinematic Typography Link: MANGAL RANG RAMAYANA -->
+          <!-- Pure Cinematic Typography Link: MANGAL RANG RAMAYANA (Plays in Cinema Lounge) -->
           <div class="mangal-rang-cinematic-banner" id="mangal-rang-cinematic-banner" aria-label="Mangal Rang Ramayana">
-            <a href="https://www.youtube.com/watch?v=z_e1d5_VVfw" target="_blank" rel="noopener noreferrer" class="mangal-rang-title-link" id="mangal-rang-title-link" aria-label="Watch Mangal Rang Ramayana on YouTube">
+            <button type="button" class="mangal-rang-title-link" id="mangal-rang-title-link" aria-label="Play Mangal Rang Ramayana in Cinema">
               <span class="mangal-rang-song-name">MANGAL RANG</span>
               <picture class="mangal-rang-logo-wrap">
                 <source srcset="assets/ramayana_logo.webp" type="image/webp">
                 <img src="assets/ramayana_logo.png" alt="Ramayana" class="mangal-rang-logo-img" width="165" height="45" loading="lazy">
               </picture>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -707,102 +707,43 @@
             <button type="button" class="aura-filter-chip" data-filter="trending">Trending</button>
           </div>
 
-          <!-- Dynamic Media Cards Grid -->
+          <!-- Dynamic Media Cards Grid (Curated Memory Archive) -->
           <div class="aura-media-grid" id="aura-media-grid">
-            <div class="aura-media-card" data-media-id="chhod-diya" role="button" tabindex="0">
+            <div class="aura-media-card aura-memory-card" data-media-id="mangal-rang" role="button" tabindex="0">
               <div class="aura-card-thumb-wrap">
-                <img src="https://img.youtube.com/vi/7DzWXIE4Pj0/maxresdefault.jpg" alt="Chhod Diya" class="aura-card-img" onerror="this.src='song/Chhod Diya.jpg'">
-                <div class="aura-card-badge-top">4K UHD</div>
-                <div class="aura-card-duration-bottom">4:12</div>
+                <img src="https://img.youtube.com/vi/z_e1d5_VVfw/maxresdefault.jpg" alt="Mangal Rang • Ramayana" class="aura-card-img" onerror="this.src='assets/ramayana_logo.png'">
+                <div class="aura-card-badge-top">4K CINEMA</div>
+                <div class="aura-card-duration-bottom">4:18</div>
                 <div class="aura-card-play-hover">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="6 3 20 12 6 21 6 3"></polygon>
                   </svg>
                 </div>
               </div>
-              <div class="aura-card-meta">
-                <h4 class="aura-card-title">Chhod Diya • Kanika Kapoor & Arijit Singh</h4>
-                <span class="aura-card-sub">Baazaar • 4K Remastered Dolby Atmos</span>
-              </div>
-            </div>
-            <div class="aura-media-card" data-media-id="kesariya" role="button" tabindex="0">
-              <div class="aura-card-thumb-wrap">
-                <img src="song/Kesariya.jpg" alt="Kesariya" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-                <div class="aura-card-badge-top">4K MASTER</div>
-                <div class="aura-card-duration-bottom">4:28</div>
-                <div class="aura-card-play-hover">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                  </svg>
+              <div class="aura-card-meta aura-memory-meta">
+                <div class="aura-memory-header">
+                  <span class="aura-memory-date-pill">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    12 November 2026
+                  </span>
+                  <span class="aura-memory-tag">Added Memory</span>
                 </div>
-              </div>
-              <div class="aura-card-meta">
-                <h4 class="aura-card-title">Kesariya • Arijit Singh</h4>
-                <span class="aura-card-sub">Brahmāstra • 4K HDR TrueColor</span>
-              </div>
-            </div>
-            <div class="aura-media-card" data-media-id="sawan-aaya-hai" role="button" tabindex="0">
-              <div class="aura-card-thumb-wrap">
-                <img src="song/Sawan Aaya Hai.jpg" alt="Sawan Aaya Hai" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-                <div class="aura-card-badge-top">DOLBY 3D</div>
-                <div class="aura-card-duration-bottom">4:45</div>
-                <div class="aura-card-play-hover">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                  </svg>
+                <h4 class="aura-card-title aura-memory-title">Mangal Rang • Ramayana (Rise of a Legend)</h4>
+                <span class="aura-card-sub aura-memory-sub">Namit Malhotra • A.R. Rahman & Shreya Ghoshal</span>
+                <div class="aura-memory-story-box">
+                  <div class="aura-memory-story-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    Why this was added
+                  </div>
+                  <p class="aura-memory-story-text">"Virat and Digi went to watch this movie at CP67, and Digi loved this song so much. That’s why it was added."</p>
                 </div>
-              </div>
-              <div class="aura-card-meta">
-                <h4 class="aura-card-title">Sawan Aaya Hai • Creature 3D</h4>
-                <span class="aura-card-sub">Arijit Singh • Dolby Cinema 3D Binaural</span>
-              </div>
-            </div>
-            <div class="aura-media-card" data-media-id="sooiyan" role="button" tabindex="0">
-              <div class="aura-card-thumb-wrap">
-                <img src="song/Sooiyan.jpg" alt="Sooiyan" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-                <div class="aura-card-badge-top">1080P</div>
-                <div class="aura-card-duration-bottom">3:58</div>
-                <div class="aura-card-play-hover">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                  </svg>
-                </div>
-              </div>
-              <div class="aura-card-meta">
-                <h4 class="aura-card-title">Sooiyan • Guddu Rangeela</h4>
-                <span class="aura-card-sub">Arijit Singh & Chinmayi • Acoustic Spatial</span>
-              </div>
-            </div>
-            <div class="aura-media-card" data-media-id="yaad-hai-na" role="button" tabindex="0">
-              <div class="aura-card-thumb-wrap">
-                <img src="song/Yaad Hai Na.jpg" alt="Yaad Hai Na" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-                <div class="aura-card-badge-top">4K UHD</div>
-                <div class="aura-card-duration-bottom">4:03</div>
-                <div class="aura-card-play-hover">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                  </svg>
-                </div>
-              </div>
-              <div class="aura-card-meta">
-                <h4 class="aura-card-title">Yaad Hai Na • Raaz Reboot</h4>
-                <span class="aura-card-sub">Arijit Singh • 4K Ultra Wide Soundscape</span>
-              </div>
-            </div>
-            <div class="aura-media-card" data-media-id="ek-dil-ek-jaan" role="button" tabindex="0">
-              <div class="aura-card-thumb-wrap">
-                <img src="song/Screenshot 2026-10-24 224316.png" alt="Ek Dil Ek Jaan" class="aura-card-img" onerror="this.src='song/virat_plays_avatar.png'">
-                <div class="aura-card-badge-top">4K MASTER</div>
-                <div class="aura-card-duration-bottom">5:10</div>
-                <div class="aura-card-play-hover">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="6 3 20 12 6 21 6 3"></polygon>
-                  </svg>
-                </div>
-              </div>
-              <div class="aura-card-meta">
-                <h4 class="aura-card-title">Ek Dil Ek Jaan • Padmaavat</h4>
-                <span class="aura-card-sub">Deepika Padukone & Shahid Kapoor • Epic Cinema</span>
               </div>
             </div>
           </div>
@@ -2219,14 +2160,14 @@
   </div>
 
   <script src="js/apple-welcome.js?v=7.1"></script>
-  <script src="js/daily-note.js?v=8.2"></script>
+  <script src="js/daily-note.js?v=8.3"></script>
   <script src="js/navbar.js?v=8.0"></script>
   <script src="js/youtube-data.js?v=7.1"></script>
   <script src="js/cinema.js?v=7.1"></script>
   <script src="js/cast-engine.js?v=7.1"></script>
   <script src="js/motion-ad.js?v=7.1"></script>
   <script src="js/exxclusive.js?v=7.4"></script>
-  <script src="js/exxclusive-3.js?v=3.8"></script>
+  <script src="js/exxclusive-3.js?v=3.9"></script>
   <script src="js/push-notifications.js?v=1.0"></script>
   <script src="js/app.js?v=7.3"></script>
 </body>

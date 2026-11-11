@@ -9,89 +9,22 @@
 (function () {
   'use strict';
 
-  // --- CATALOG OF MEDIA (Zero-latency local HD & 4K assets) ---
+  // --- CATALOG OF MEDIA (Curated Personal Memory Archive) ---
   const EXXCLUSIVE_MEDIA = [
     {
-      id: 'chhod-diya',
-      title: 'Chhod Diya • Kanika Kapoor & Arijit Singh',
-      sub: 'Baazaar • 4K Remastered Dolby Atmos',
-      category: ['4k', 'romantic', 'atmospheric'],
-      badge: '4K UHD',
-      duration: '4:12',
-      poster: 'https://img.youtube.com/vi/7DzWXIE4Pj0/maxresdefault.jpg',
-      posterFallback: 'song/Chhod Diya.jpg',
-      src: 'video/exxclusive.mp4',
+      id: 'mangal-rang',
+      title: 'Mangal Rang • Ramayana (Rise of a Legend)',
+      sub: 'Namit Malhotra • A.R. Rahman & Shreya Ghoshal',
+      category: ['4k', 'dolby', 'romantic', 'atmospheric', 'trending'],
+      badge: '4K CINEMA',
+      duration: '4:18',
+      poster: 'https://img.youtube.com/vi/z_e1d5_VVfw/maxresdefault.jpg',
+      posterFallback: 'assets/ramayana_logo.png',
+      youtubeId: 'z_e1d5_VVfw',
+      src: 'song/mangal_rang.mp4',
+      date: '12 November 2026',
+      memory: 'Virat and Digi went to watch this movie at CP67, and Digi loved this song so much. That’s why it was added.',
       isFeatured: true
-    },
-    {
-      id: 'kesariya',
-      title: 'Kesariya • Arijit Singh',
-      sub: 'Brahmāstra • 4K HDR TrueColor',
-      category: ['4k', 'romantic', 'trending'],
-      badge: '4K MASTER',
-      duration: '4:28',
-      poster: 'song/Kesariya.jpg',
-      src: 'song/Kesariya.mp4'
-    },
-    {
-      id: 'sawan-aaya-hai',
-      title: 'Sawan Aaya Hai • Creature 3D',
-      sub: 'Arijit Singh • Dolby Cinema 3D Binaural',
-      category: ['dolby', 'romantic', 'atmospheric'],
-      badge: 'DOLBY 3D',
-      duration: '4:45',
-      poster: 'song/Sawan Aaya Hai.jpg',
-      src: 'song/Sawan Aaya Hai.mp4'
-    },
-    {
-      id: 'sooiyan',
-      title: 'Sooiyan • Guddu Rangeela',
-      sub: 'Arijit Singh & Chinmayi • Acoustic Spatial',
-      category: ['atmospheric', 'trending'],
-      badge: '1080P',
-      duration: '3:58',
-      poster: 'song/Sooiyan.jpg',
-      src: 'song/Sooiyan.mp4'
-    },
-    {
-      id: 'yaad-hai-na',
-      title: 'Yaad Hai Na • Raaz Reboot',
-      sub: 'Arijit Singh • 4K Ultra Wide Soundscape',
-      category: ['4k', 'atmospheric', 'romantic'],
-      badge: '4K UHD',
-      duration: '4:03',
-      poster: 'song/Yaad Hai Na.jpg',
-      src: 'song/Yaad Hai Na.mp4'
-    },
-    {
-      id: 'ek-dil-ek-jaan',
-      title: 'Ek Dil Ek Jaan • Padmaavat',
-      sub: 'Deepika Padukone & Shahid Kapoor • Epic Cinema',
-      category: ['4k', 'romantic', 'trending'],
-      badge: '4K MASTER',
-      duration: '5:10',
-      poster: 'song/Screenshot 2026-10-24 224316.png',
-      src: 'video/exxclusive.mp4'
-    },
-    {
-      id: 've-haaniyaan',
-      title: 'Ve Haaniyaan • Ravi Dubey & Sargun',
-      sub: 'Danny & Avvy Sra • Pure Melody',
-      category: ['trending', 'romantic'],
-      badge: 'DOLBY 3D',
-      duration: '4:05',
-      poster: 'song/Screenshot 2026-10-24 224355.png',
-      src: 'song/Sawan Aaya Hai.mp4'
-    },
-    {
-      id: 'khairiyat',
-      title: 'Khairiyat • Chhichhore',
-      sub: 'Sushant Singh Rajput • Soulful Spatial Audio',
-      category: ['atmospheric', 'romantic'],
-      badge: '1080P',
-      duration: '4:40',
-      poster: 'song/Screenshot 2026-10-24 224416.png',
-      src: 'song/Kesariya.mp4'
     }
   ];
 
@@ -436,20 +369,43 @@
     }
 
     mediaGridEl.innerHTML = filtered.map(item => `
-      <div class="aura-media-card" data-media-id="${item.id}" role="button" tabindex="0">
+      <div class="aura-media-card aura-memory-card" data-media-id="${item.id}" role="button" tabindex="0">
         <div class="aura-card-thumb-wrap">
-          <img src="${item.poster}" alt="${item.title}" class="aura-card-img" loading="lazy" onerror="this.src='${item.posterFallback || 'song/virat_plays_avatar.png'}'">
-          <div class="aura-card-badge-top">${item.badge}</div>
-          <div class="aura-card-duration-bottom">${item.duration}</div>
+          <img src="${item.poster}" alt="${item.title}" class="aura-card-img" loading="lazy" onerror="this.src='${item.posterFallback || 'assets/ramayana_logo.png'}'">
+          <div class="aura-card-badge-top">${item.badge || '4K CINEMA'}</div>
+          <div class="aura-card-duration-bottom">${item.duration || '4:18'}</div>
           <div class="aura-card-play-hover">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <polygon points="6 3 20 12 6 21 6 3"></polygon>
             </svg>
           </div>
         </div>
-        <div class="aura-card-meta">
-          <h4 class="aura-card-title">${item.title}</h4>
-          <span class="aura-card-sub">${item.sub}</span>
+        <div class="aura-card-meta aura-memory-meta">
+          <div class="aura-memory-header">
+            <span class="aura-memory-date-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              ${item.date || '12 November 2026'}
+            </span>
+            <span class="aura-memory-tag">Added Memory</span>
+          </div>
+          <h4 class="aura-card-title aura-memory-title">${item.title}</h4>
+          <span class="aura-card-sub aura-memory-sub">${item.sub}</span>
+          ${item.memory ? `
+            <div class="aura-memory-story-box">
+              <div class="aura-memory-story-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                Why this was added
+              </div>
+              <p class="aura-memory-story-text">"${item.memory}"</p>
+            </div>
+          ` : ''}
         </div>
       </div>
     `).join('');
@@ -784,6 +740,8 @@
   // --- 4. LUXURY AIRBNB CURVED CHARCOAL HOME CINEMA LOUNGE ---
   function openCurvedCinemaLounge(media) {
     if (!loungeEl) return;
+    dismissIntro();
+    hasVisitedCinema = true;
     currentMedia = media || currentMedia;
     const ytPlayer = document.getElementById('lounge-youtube-player');
     const isYouTube = currentMedia && (currentMedia.type === 'youtube' || !!currentMedia.youtubeId);

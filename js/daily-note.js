@@ -1028,6 +1028,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // Run initial state setup
   syncDailyNoteWithActiveUser();
 
+  // Handle Home page "MANGAL RANG (RAMAYANA)" click -> switches to Cinema & plays in Cinema Lounge!
+  const mangalRangLink = document.getElementById('mangal-rang-title-link');
+  if (mangalRangLink) {
+    mangalRangLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Stop daily note preview audio if playing
+      stopHeroNoteAudio();
+      if (isNoteOpen) hideNote();
+
+      // 1. Switch to Cinema / Exxclusive tab
+      const cinemaTabBtn = document.getElementById('tab-cinema');
+      if (cinemaTabBtn) {
+        cinemaTabBtn.click();
+      }
+
+      // 2. Play Mangal Rang in Cinema Lounge
+      setTimeout(() => {
+        if (window.vievCinema && typeof window.vievCinema.open === 'function') {
+          window.vievCinema.open('mangal-rang');
+        }
+      }, 300);
+    });
+  }
+
   // Testing & Reset helper (accessible via Developer Console if needed)
   window.resetDailyNoteQuiz = () => {
     try {
