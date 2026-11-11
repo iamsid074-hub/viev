@@ -353,6 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let particleRafId = null;
   let particlesList = [];
   let heroNoteAudio = null;
+  let ambientVideo = null;
+  let stageVideo = null;
   let heroAudioFadeInterval = null;
 
   function initParticleCanvas() {
@@ -454,10 +456,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }).join('');
   }
 
-  // Audio Sync Engine (Mangal Rang: 0:29s to 1:00min)
+  // Audio & Ambient Video Sync Engine (Mangal Rang: 0:29s to 1:00min)
   function initHeroNoteAudio() {
     if (!heroNoteAudio) {
       heroNoteAudio = document.getElementById('hero-note-audio');
+    }
+    if (!ambientVideo) {
+      ambientVideo = document.getElementById('hero-note-ambient-video');
+    }
+    if (!stageVideo) {
+      stageVideo = document.getElementById('hero-note-stage-video');
     }
   }
 
@@ -481,6 +489,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     heroNoteAudio.currentTime = startTime;
     heroNoteAudio.volume = 0;
+
+    // Start Real Ambient Video sync (Cinema Ambilight)
+    const startVid = (vid) => {
+      if (!vid) return;
+      try {
+        vid.currentTime = startTime;
+        const p = vid.play();
+        if (p !== undefined) {
+          p.catch(err => console.warn('[AmbientVideo] Play prevented:', err));
+        }
+      } catch(e) {
+        console.warn('[AmbientVideo] Error:', e);
+      }
+    };
+    startVid(ambientVideo);
+    startVid(stageVideo);
 
     const playPromise = heroNoteAudio.play();
     if (playPromise !== undefined) {
@@ -511,6 +535,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     heroNoteAudio.ontimeupdate = () => {
       const cur = heroNoteAudio.currentTime;
+
+      // Keep living ambient videos strictly in sync
+      const syncVid = (vid) => {
+        if (!vid || vid.paused) return;
+        if (Math.abs(vid.currentTime - cur) > 0.35) {
+          try { vid.currentTime = cur; } catch(e) {}
+        }
+      };
+      syncVid(ambientVideo);
+      syncVid(stageVideo);
+
       if (cur >= fadeOutStart && cur < endTime) {
         // Smooth cubic ease-out fade curve
         const progress = (endTime - cur) / fadeOutSpan;
@@ -520,6 +555,15 @@ document.addEventListener('DOMContentLoaded', () => {
         heroNoteAudio.volume = 0;
         heroNoteAudio.currentTime = startTime;
         heroNoteAudio.ontimeupdate = null;
+
+        if (ambientVideo) {
+          ambientVideo.pause();
+          ambientVideo.currentTime = startTime;
+        }
+        if (stageVideo) {
+          stageVideo.pause();
+          stageVideo.currentTime = startTime;
+        }
       }
     };
   }
@@ -534,7 +578,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     heroNoteAudio.ontimeupdate = null;
 
-    if (heroNoteAudio.paused) return;
+    const startTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
+
+    const pauseVideos = () => {
+      if (ambientVideo) {
+        ambientVideo.pause();
+        ambientVideo.currentTime = startTime;
+      }
+      if (stageVideo) {
+        stageVideo.pause();
+        stageVideo.currentTime = startTime;
+      }
+    };
+
+    if (heroNoteAudio.paused) {
+      pauseVideos();
+      return;
+    }
 
     // Smooth relaxing fade-out over 1.8s before pausing
     const initialVol = heroNoteAudio.volume;
@@ -552,7 +612,8 @@ document.addEventListener('DOMContentLoaded', () => {
         heroAudioFadeInterval = null;
         heroNoteAudio.pause();
         heroNoteAudio.volume = 0;
-        heroNoteAudio.currentTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
+        heroNoteAudio.currentTime = startTime;
+        pauseVideos();
       }
     }, 25);
   }
@@ -620,12 +681,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Stop particles loop
     stopHeroParticles();
 
-    // Reset Hero Stage after fade-out transition completes (700ms)
+    // Reset Hero Stage after fade-out transition completes (1200ms)
     setTimeout(() => {
       if (!isNoteOpen && heroNoteStage) {
         heroNoteStage.style.display = 'none';
       }
-    }, 700);
+    }, 1200);
 
     // Update Button State Below
     if (noteBtnText) {
