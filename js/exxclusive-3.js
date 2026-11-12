@@ -13,7 +13,7 @@
   const EXXCLUSIVE_MEDIA = [
     {
       id: 'mangal-rang',
-      title: 'Mangal Rang • Ramayana (Rise of a Legend)',
+      title: 'Mangal Rang • Ramayana',
       sub: 'Namit Malhotra • A.R. Rahman & Shreya Ghoshal',
       category: ['4k', 'dolby', 'romantic', 'atmospheric', 'trending'],
       badge: '4K CINEMA',
@@ -22,8 +22,7 @@
       posterFallback: 'assets/ramayana_logo.png',
       youtubeId: 'z_e1d5_VVfw',
       src: 'song/mangal_rang.mp4',
-      date: '12 November 2026',
-      memory: 'Virat and Digi went to watch this movie at CP67, and Digi loved this song so much. That’s why it was added.',
+      memory: 'Virat and Digi went to watch this movie of CP67 on 11 Nov 2026, and Digi loved this song so much.',
       isFeatured: true
     }
   ];
@@ -381,29 +380,11 @@
           </div>
         </div>
         <div class="aura-card-meta aura-memory-meta">
-          <div class="aura-memory-header">
-            <span class="aura-memory-date-pill">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              ${item.date || '12 November 2026'}
-            </span>
-            <span class="aura-memory-tag">Added Memory</span>
-          </div>
           <h4 class="aura-card-title aura-memory-title">${item.title}</h4>
           <span class="aura-card-sub aura-memory-sub">${item.sub}</span>
           ${item.memory ? `
             <div class="aura-memory-story-box">
-              <div class="aura-memory-story-label">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-                Why this was added
-              </div>
-              <p class="aura-memory-story-text">"${item.memory}"</p>
+              <p class="aura-memory-story-text">${item.memory}</p>
             </div>
           ` : ''}
         </div>
