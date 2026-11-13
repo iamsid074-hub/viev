@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindCandleTap(rightCandle);
 
   // Interactive Happy Birthday Neetu Celebration Button Tap
-  const hbdBtn = document.getElementById('elite-hbd-btn');
+  const hbdBtn = document.getElementById('elite-hbd-title-link') || document.getElementById('elite-hbd-btn');
   if (hbdBtn) {
     hbdBtn.addEventListener('click', (e) => {
       e.stopPropagation();
