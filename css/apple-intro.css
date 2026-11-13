@@ -8353,10 +8353,10 @@ body.is-elite-1711 .app-screen#welcome-screen.active .elite-birthday-candles-con
 
 .elite-candle-wrapper {
   position: fixed;
-  bottom: calc(var(--sab, 0px) + 76px); /* Elevated directly above floating navbar dock */
-  z-index: 990; /* Right above dock level, under top modals */
+  bottom: calc(var(--sab, 0px) + 14px); /* Starts right alongside the navbar from the bottom */
+  z-index: 1001; /* Flanks navbar dock cleanly with full visibility */
   width: auto;
-  height: clamp(88px, 13vh, 126px);
+  height: clamp(118px, 16.5vh, 155px); /* Base is at navbar level, upper body & flame rise high above navbar */
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;
@@ -8366,12 +8366,12 @@ body.is-elite-1711 .app-screen#welcome-screen.active .elite-birthday-candles-con
 }
 
 .elite-candle-wrapper.candle-left {
-  left: clamp(12px, 3.5vw, 24px);
+  left: clamp(8px, calc(50% - 205px), calc(50% - 148px));
   transform-origin: bottom center;
 }
 
 .elite-candle-wrapper.candle-right {
-  right: clamp(12px, 3.5vw, 24px);
+  right: clamp(8px, calc(50% - 205px), calc(50% - 148px));
   transform-origin: bottom center;
 }
 
