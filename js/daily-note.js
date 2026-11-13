@@ -14,13 +14,13 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_note_kaya_2026",
+  questionId: "digi_note_shadi_miss_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `Kash Mai Teri Jagah Hota , Or Tu Meri 
-Mai Dekhna Chahata Hun Kasi Dikhti Hai Kaya Teri 
-Na Jane Konse Vo Leela Hai Tujme Smayi 
-Jo Tujhe Sota Dekh Mujhe Thi Kheech Layi`,
+  noteText: `Mai abhi bhi tere hi sath hu 
+shadi me mujhe miss mat karna 
+kuch bhi khaye to ek bite mujhe soch kar kha lena bas . 
+I MISS YOU BABY .`,
 
   // Note Memory Photo:
   imageUrl: "assets/daily_note.jpg",
@@ -40,6 +40,8 @@ Jo Tujhe Sota Dekh Mujhe Thi Kheech Layi`,
     endTime: 60.0    // 1:00 min
   }
 };
+
+window.DAILY_NOTE_CONFIG = DAILY_NOTE_CONFIG;
 // =========================================================
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,7 +1,7 @@
 /* =========================================================
    VIEVS - PUSH NOTIFICATIONS & ALERTS ENGINE
    Native Service Worker + Apple-Style Permission Experience
-   Dedicated for Princess Digi & Sid
+   Dedicated for Princess Digi & Honey
    ========================================================= */
 
 (function () {
@@ -195,8 +195,8 @@
 
       setTimeout(() => {
         sendLocalNotification({
-          title: '💌 Naya Note Aaya Hai Princess Digi ❤️',
-          body: `"${previewText}" — Touch to open & read`,
+          title: '💌 Honey Ka Naya Note Aaya Hai',
+          body: `"${previewText}" — Touch to open`,
           tag: 'viev-daily-note-' + currentNoteId,
           data: { url: './index.html', action: 'open_note' }
         });
@@ -217,9 +217,9 @@
       // Only fire during morning / afternoon (between 8:00 AM and 10:00 PM)
       if (hours >= 9 && hours <= 22) {
         const reminders = [
-          { title: 'Good Morning Princess Digi ☀️', body: 'Aapka din bohot pyaara aur khushiyon se bhara ho! Ek baar Daily Note check karlo ❤️' },
-          { title: 'Digi Viev Reminder 🌸', body: 'Sid misses you! Paani peelo aur thoda rest lelo ❤️' },
-          { title: 'Special Dedication for You 🎶', body: 'Arijit Singh ka ek song aapke liye queue me ready hai. Touch to listen!' }
+          { title: 'Good Morning Princess Digi', body: 'Aapka din bohot pyaara ho! Ek baar Daily Note check karlo ❤️' },
+          { title: 'Digi Viev Reminder', body: 'Honey misses you! Paani peelo aur thoda rest lelo ❤️' },
+          { title: 'Special Dedication for You', body: 'Arijit Singh ka ek song aapke liye queue me ready hai. Touch to listen!' }
         ];
         const randomPick = reminders[Math.floor(Math.random() * reminders.length)];
 
@@ -253,9 +253,9 @@
           <span class="notif-banner-bell">🔔</span>
         </div>
         <div class="notif-banner-content">
-          <span class="notif-banner-kicker">Princess Digi & Sid</span>
+          <span class="notif-banner-kicker">Princess Digi & Honey</span>
           <h4 class="notif-banner-title">Turn On Notifications</h4>
-          <p class="notif-banner-desc">Get instant alerts when Sid writes a new Daily Note, dedicates a song, or drops a surprise update ❤️</p>
+          <p class="notif-banner-desc">Get instant alerts when Honey writes a new Daily Note, dedicates a song, or drops a surprise update ❤️</p>
           <div class="notif-banner-actions">
             <button class="notif-action-btn primary" id="notif-allow-btn" type="button">
               <span>Enable Alerts</span>
@@ -386,7 +386,7 @@
         }
 
         const role = getActiveUserRole();
-        const testTitle = role === 'user' ? 'Digi Viev • Sid Test 🔔' : 'Digi Viev • Princess Digi ❤️';
+        const testTitle = role === 'user' ? 'Digi Viev • Honey Test 🔔' : 'Digi Viev • Princess Digi ❤️';
         const testBody = 'Notification engine is working smoothly on your device! Perfect for daily notes & love drops ✨';
 
         sendLocalNotification({
@@ -413,7 +413,7 @@
       toggleSweetPings.addEventListener('change', (e) => setPref('sweet_pings', e.target.checked));
     }
 
-    // Sid's Quick Custom Ping Composer
+    // Honey's Quick Custom Ping Composer
     const customPingBtn = document.getElementById('sid-send-ping-btn');
     const customPingInput = document.getElementById('sid-ping-text-input');
     if (customPingBtn && customPingInput) {
@@ -422,9 +422,9 @@
         if (!text) return;
 
         sendLocalNotification({
-          title: '💌 Sid Ka Secret Message ❤️',
+          title: '💌 Honey Ka Message ❤️',
           body: text,
-          tag: 'sid-ping-' + Date.now(),
+          tag: 'honey-ping-' + Date.now(),
           data: { url: './index.html', action: 'open_note' }
         });
 
