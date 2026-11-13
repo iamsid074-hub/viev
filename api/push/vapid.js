@@ -4,3 +4,4 @@ module.exports = {
   privateKey: 'o57IZnKRavOdVikEoGuXga-FVk9nWjj8xg0GiErvCiA',
   mailto: 'mailto:viev.app@gmail.com'
 };
+

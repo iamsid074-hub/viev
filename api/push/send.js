@@ -83,3 +83,4 @@ module.exports = async (req, res) => {
     message: `Push delivered to ${deliveredCount} device(s)`
   });
 };
+
