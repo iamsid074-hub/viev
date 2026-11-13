@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Great+Vibes&family=Cinzel:wght@600;700;800;900&family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/liquid-glass.css?v=7.1">
-  <link rel="stylesheet" href="css/apple-intro.css?v=13.0">
+  <link rel="stylesheet" href="css/apple-intro.css?v=14.0">
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
@@ -171,17 +171,6 @@
         <img src="assets/digi_home.jpg" alt="Princess Digi" class="hero-photo-img" id="hero-photo-img">
         <div class="hero-photo-bottom-glow" aria-hidden="true"></div>
 
-        <!-- Top-Right Floating Live Countdown (Hours : Mins : Secs) -->
-        <div class="hero-photo-clock" id="apple-live-clock" title="17 Nov Birthday Countdown" role="button" tabindex="0">
-          <div class="hero-clock-time">
-            <span class="hero-clock-num ticker-unit" id="counter-hours"></span><span class="hero-clock-unit">h</span>
-            <span class="hero-clock-sep">:</span>
-            <span class="hero-clock-num ticker-unit" id="counter-minutes"></span><span class="hero-clock-unit">m</span>
-            <span class="hero-clock-sep">:</span>
-            <span class="hero-clock-num ticker-unit" id="counter-seconds"></span><span class="hero-clock-unit">s</span>
-          </div>
-        </div>
-
         <!-- MAGICAL DAILY NOTE THEATRE STAGE (Replaces photo on Note reveal) -->
         <div class="hero-note-stage" id="hero-note-stage" aria-label="Special Daily Note Stage" style="display: none;">
           <!-- Actual Music Video Playing in the Window Behind Note -->
@@ -236,6 +225,36 @@
         
         <!-- SECTION 1: HOME -->
         <div class="welcome-tab-section active" id="section-home">
+          <!-- Option 2: Dual-Pill Balance (Hero Days on Left • Live Time Ticker on Right) -->
+          <div class="apple-live-clock dual-pill-mode" id="apple-live-clock" title="Tap to toggle 17 Nov Countdown / Days Together" role="button" tabindex="0">
+            <!-- Left Side: Grand Milestone (Countdown / Days of Love) -->
+            <div class="clock-milestone-half">
+              <div class="milestone-value-wrap">
+                <span class="segment-num hero-days-num" id="counter-days"></span>
+              </div>
+              <span class="milestone-label" id="clock-milestone-label">Days To 17 Nov</span>
+            </div>
+
+            <!-- Subtle Vertical Glass Divider -->
+            <div class="clock-vertical-divider" aria-hidden="true"></div>
+
+            <!-- Right Side: Clean Live Time Ticker (Hours : Mins : Secs) -->
+            <div class="clock-ticker-half">
+              <div class="ticker-digits-row">
+                <span class="segment-num ticker-unit" id="counter-hours"></span>
+                <span class="ticker-colon">:</span>
+                <span class="segment-num ticker-unit" id="counter-minutes"></span>
+                <span class="ticker-colon">:</span>
+                <span class="segment-num ticker-unit" id="counter-seconds"></span>
+              </div>
+              <div class="ticker-label-row">
+                <span class="ticker-sublabel">Hours</span>
+                <span class="ticker-sublabel">Mins</span>
+                <span class="ticker-sublabel">Secs</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Note Control: Open Note / Hide Note Button -->
           <div class="cta-container revealed" id="cta-container">
             <button id="toggle-note-btn" class="liquid-btn note-toggle-btn" aria-label="Open Note">
@@ -270,7 +289,9 @@
                 <img src="images/happybirthday.png" alt="Happy Birthday" class="elite-hbd-3d-logo" width="280" height="93" loading="eager" />
               </picture>
               <div class="elite-hbd-name-wrap">
+                <span class="elite-hbd-name-sparkle">✦</span>
                 <span class="elite-hbd-neetu-title">NEETU</span>
+                <span class="elite-hbd-name-sparkle">✦</span>
               </div>
             </button>
           </div>
@@ -2181,7 +2202,7 @@
     </div>
   </div>
 
-  <script src="js/apple-welcome.js?v=11.0"></script>
+  <script src="js/apple-welcome.js?v=14.0"></script>
   <script src="js/daily-note.js?v=8.4"></script>
   <script src="js/navbar.js?v=8.0"></script>
   <script src="js/youtube-data.js?v=7.1"></script>

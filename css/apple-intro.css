@@ -391,93 +391,6 @@
 }
 
 /* =========================================================
-   HERO FLOATING LIVE CLOCK (Top Right Corner of Digi's Photo)
-   Hours : Mins : Secs Clean Typography (No Pill / No Round BG)
-   ========================================================= */
-.hero-photo-clock {
-  position: absolute;
-  top: calc(var(--sat, 0px) + 10px);
-  right: 12px;
-  z-index: 12;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  padding: 2px 4px;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 10px rgba(0, 0, 0, 0.85));
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
-  will-change: transform, opacity;
-}
-
-.hero-photo-clock:hover {
-  transform: scale(1.04);
-}
-
-.hero-photo-clock:active {
-  transform: scale(0.95);
-}
-
-.hero-photo-wrapper.is-note-active .hero-photo-clock {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  transform: translateY(-8px) scale(0.92) !important;
-}
-
-.hero-clock-time {
-  display: inline-flex;
-  align-items: baseline;
-  justify-content: center;
-  line-height: 1;
-}
-
-.hero-clock-num.ticker-unit {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", 'Outfit', system-ui, sans-serif !important;
-  font-size: clamp(17px, 4.8vw, 20px) !important;
-  font-weight: 800 !important;
-  color: #ffffff !important;
-  letter-spacing: 0.02em;
-  font-variant-numeric: tabular-nums;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hero-clock-num.ticker-unit .digit-slot {
-  min-width: 0.58em;
-  height: 1.15em;
-  line-height: 1;
-}
-
-.hero-clock-unit {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", 'Outfit', system-ui, sans-serif;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #fbcfe8;
-  margin-left: 1.5px;
-  text-transform: lowercase;
-}
-
-.hero-photo-clock.mode-together .hero-clock-unit {
-  color: #bae6fd;
-}
-
-.hero-clock-sep {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
-  font-size: 14.5px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.55);
-  margin: 0 3px;
-}
-
-/* =========================================================
    APPLE LIVE ACTIVITY TIME CAPSULE (Liquid Glass Card)
    ========================================================= */
 .apple-live-clock {
@@ -8641,7 +8554,7 @@ body.is-elite-1711 .app-screen#welcome-screen.active .elite-birthday-candles-con
   display: none !important;
   position: relative;
   width: 100%;
-  margin-top: 14px;
+  margin-top: 10px;
   justify-content: center;
   align-items: center;
 }
