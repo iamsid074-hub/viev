@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyEliteTheme(themeName) {
     if (!themeName || (themeName !== 'rose-gold' && themeName !== 'velvet-noir' && themeName !== 'starlight-silver')) {
-      themeName = 'rose-gold';
+      themeName = 'velvet-noir';
     }
     document.body.setAttribute('data-theme', themeName);
     try {
@@ -315,8 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Restore saved theme or default to rose-gold
-  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'rose-gold';
+  // Restore saved theme or default to velvet-noir
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'velvet-noir';
   applyEliteTheme(savedTheme);
 
   themeBtns.forEach((btn) => {

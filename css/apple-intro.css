@@ -8681,6 +8681,37 @@ body.is-elite-1711 #elite-hbd-banner {
    Strictly Gated for ID 1711
    ========================================================= */
 
+/* Velvet Noir Atmospheric Mesh Gradient (Applied globally across background for ID 1711) */
+body.is-elite-1711 {
+  background-color: #060205 !important;
+  background-image: 
+    radial-gradient(ellipse 90% 65% at 50% 10%, rgba(225, 29, 72, 0.16) 0%, rgba(136, 19, 55, 0.08) 42%, transparent 75%),
+    radial-gradient(circle 500px at 85% 85%, rgba(159, 18, 57, 0.14) 0%, rgba(76, 5, 25, 0.06) 50%, transparent 80%),
+    radial-gradient(circle 450px at 15% 75%, rgba(190, 18, 60, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, #0d0309 0%, #060205 60%, #000000 100%) !important;
+  background-attachment: fixed !important;
+  background-size: 100% 100% !important;
+}
+
+body.is-elite-1711 .liquid-ambient-canvas {
+  opacity: 0.85;
+}
+
+body.is-elite-1711 .aurora-blob.blob-1 {
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.35) 0%, rgba(190, 18, 60, 0.18) 45%, transparent 70%) !important;
+  filter: blur(90px) !important;
+}
+
+body.is-elite-1711 .aurora-blob.blob-2 {
+  background: radial-gradient(circle, rgba(136, 19, 55, 0.30) 0%, rgba(76, 5, 25, 0.15) 50%, transparent 70%) !important;
+  filter: blur(100px) !important;
+}
+
+body.is-elite-1711 .aurora-blob.blob-3 {
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.22) 0%, transparent 70%) !important;
+  filter: blur(80px) !important;
+}
+
 /* Floating Switcher Toolbar */
 .elite-theme-switcher-bar {
   display: none !important;
