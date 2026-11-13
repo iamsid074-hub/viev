@@ -219,6 +219,64 @@ document.addEventListener('DOMContentLoaded', () => {
   bindCandleTap(leftCandle);
   bindCandleTap(rightCandle);
 
+  // Interactive Happy Birthday Neetu Celebration Button Tap
+  const hbdBtn = document.getElementById('elite-hbd-btn');
+  if (hbdBtn) {
+    hbdBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (window.triggerHaptic) {
+        window.triggerHaptic('medium');
+      } else if (navigator.vibrate) {
+        navigator.vibrate([30, 40, 30]);
+      }
+
+      // Flare both candles synchronously
+      if (leftCandle) leftCandle.dispatchEvent(new Event('click'));
+      if (rightCandle) rightCandle.dispatchEvent(new Event('click'));
+
+      // Launch celebration confetti burst
+      triggerBirthdayConfetti();
+    });
+  }
+
+  function triggerBirthdayConfetti() {
+    const colors = ['#fbbf24', '#f43f5e', '#38bdf8', '#c084fc', '#fbcfe8', '#34d399', '#ffffff'];
+    for (let i = 0; i < 26; i++) {
+      const conf = document.createElement('div');
+      conf.className = 'elite-screen-confetti';
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const startX = 50 + (Math.random() * 20 - 10);
+      const destX = (Math.random() * 80 - 40);
+      const destY = -120 - Math.random() * 240;
+      const rot = Math.random() * 720 - 360;
+      const isCircle = Math.random() > 0.45;
+
+      conf.style.cssText = `
+        position: fixed;
+        bottom: 110px;
+        left: ${startX}%;
+        width: ${isCircle ? '7px' : '8px'};
+        height: ${isCircle ? '7px' : '13px'};
+        border-radius: ${isCircle ? '50%' : '2px'};
+        background: ${color};
+        box-shadow: 0 0 8px ${color};
+        pointer-events: none;
+        z-index: 10000;
+        transition: transform 1.8s cubic-bezier(0.12, 0.8, 0.32, 1), opacity 1.8s ease;
+      `;
+      document.body.appendChild(conf);
+
+      requestAnimationFrame(() => {
+        conf.style.transform = `translate3d(${destX}vw, ${destY}px, 0) rotate(${rot}deg) scale(${0.4 + Math.random() * 0.8})`;
+        conf.style.opacity = '0';
+      });
+
+      setTimeout(() => {
+        conf.remove();
+      }, 1900);
+    }
+  }
+
   evaluateEliteCandlesAccess();
   window.evaluateEliteCandlesAccess = evaluateEliteCandlesAccess;
 
