@@ -23,8 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const barMinutes = document.getElementById('bar-minutes-fill');
   const barSeconds = document.getElementById('bar-seconds-fill');
 
-  // Mode: 'countdown' (default) | 'together'
-  let clockMode = localStorage.getItem('viev_clock_mode') || 'countdown';
+  // Universal 17 Nov Birthday Countdown for all IDs (Digi 3009/3011 & Virat 1711)
+  // Default mode: 'countdown' | Tapping flips between 'countdown' and 'together'
+  let clockMode = 'countdown';
 
   function updateSegmentDigits(container, newStr, isInitial = false) {
     if (!container) return;
@@ -147,12 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
     isFirstRun = false;
   }
 
-  // Allow clicking the clock pill to toggle between 17 Nov Countdown and Days Together
+  // Allow clicking the clock pill to toggle between 17 Nov Countdown and Days Together (All IDs)
   if (clockContainer) {
     clockContainer.style.cursor = 'pointer';
     clockContainer.addEventListener('click', () => {
       clockMode = (clockMode === 'countdown') ? 'together' : 'countdown';
-      localStorage.setItem('viev_clock_mode', clockMode);
       if (window.triggerHaptic) window.triggerHaptic('light');
       isFirstRun = true;
       updateLiveCounter();
