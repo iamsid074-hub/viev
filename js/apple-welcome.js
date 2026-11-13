@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.setMovingWelcomeVisible = function() {};
 
   /* =========================================================
-     3.1 ELITE: LIVING BIRTHDAY CANDLES ENGINE
+     3.1 ELITE: LIVING BIRTHDAY CANDLES & CELEBRATION ENGINE
      Strictly Gated for ID 1711 (Home Screen Only)
      ========================================================= */
   function evaluateEliteCandlesAccess() {
@@ -177,18 +177,27 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       sess = window.__vievActiveSession
         || JSON.parse(sessionStorage.getItem('viev_auth_session') || 'null')
-        || JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
+        || JSON.parse(localStorage.getItem('viev_auth_session') || 'null');
     } catch (_) {}
 
-    const is1711 = !!(sess && (sess.code === '1711' || sess.role === 'user'));
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlEliteOverride = urlParams.get('id') === '1711' || urlParams.get('user') === '1711' || urlParams.get('code') === '1711' || urlParams.has('elite');
+
+    const is1711 = urlEliteOverride || !!(sess && (sess.code === '1711' || sess.role === 'user'));
     const container = document.getElementById('elite-birthday-candles');
+    const hbdBanner = document.getElementById('elite-hbd-banner');
+    const mangalBanner = document.getElementById('mangal-rang-cinematic-banner');
 
     if (is1711) {
       document.body.classList.add('is-elite-1711');
-      if (container) container.style.display = 'block';
+      if (container) container.style.setProperty('display', 'block', 'important');
+      if (hbdBanner) hbdBanner.style.setProperty('display', 'flex', 'important');
+      if (mangalBanner) mangalBanner.style.setProperty('display', 'none', 'important');
     } else {
       document.body.classList.remove('is-elite-1711');
-      if (container) container.style.display = 'none';
+      if (container) container.style.setProperty('display', 'none', 'important');
+      if (hbdBanner) hbdBanner.style.setProperty('display', 'none', 'important');
+      if (mangalBanner) mangalBanner.style.removeProperty('display');
     }
   }
 
@@ -220,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
   bindCandleTap(rightCandle);
 
   // Interactive Happy Birthday Neetu Celebration Button Tap
-  const hbdBtn = document.getElementById('elite-hbd-btn');
+  const hbdBtn = document.getElementById('elite-hbd-title-link') || document.getElementById('elite-hbd-btn');
   if (hbdBtn) {
     hbdBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -280,7 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
   evaluateEliteCandlesAccess();
   window.evaluateEliteCandlesAccess = evaluateEliteCandlesAccess;
 
-  // Listen for storage or session events
+  // Listen for storage or session events & periodic check
   window.addEventListener('storage', evaluateEliteCandlesAccess);
   window.addEventListener('viev:session-changed', evaluateEliteCandlesAccess);
+  setInterval(evaluateEliteCandlesAccess, 600);
 });

@@ -1244,6 +1244,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateProfileUI(activeSession);
     applySystemVersion(getSystemVersion(activeSession.role));
+    if (window.evaluateEliteCandlesAccess) {
+      window.evaluateEliteCandlesAccess();
+    }
     if (window.setFloatingNavVisible) {
       window.setFloatingNavVisible(false);
     }
