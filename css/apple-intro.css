@@ -8548,16 +8548,15 @@ body.is-elite-1711 .app-screen#welcome-screen.active .elite-birthday-candles-con
 }
 
 /* =========================================================
-   3.1 ELITE - HAPPY BIRTHDAY NEETU (CINEMATIC TYPOGRAPHY)
+   3.1 ELITE - 3D ROSE-GOLD HAPPY BIRTHDAY LOGO & NEETU
    Strictly Gated for ID 1711 (Replaces Mangal Rang Banner)
-   Aligned and styled exactly like MANGAL RANG RAMAYANA
    ========================================================= */
 
 .elite-hbd-banner {
   display: none !important;
   position: relative;
   width: 100%;
-  margin-top: 14px;
+  margin-top: 10px;
   justify-content: center;
   align-items: center;
 }
@@ -8571,83 +8570,112 @@ body.is-elite-1711 #elite-hbd-banner {
   display: flex !important;
 }
 
+.elite-hbd-ambient-aura {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: clamp(230px, 68vw, 300px);
+  height: 110px;
+  background: radial-gradient(ellipse at center, rgba(244, 63, 94, 0.24) 0%, rgba(251, 191, 36, 0.12) 45%, transparent 75%);
+  filter: blur(28px);
+  pointer-events: none;
+  animation: hbdAuraBreathe 3s infinite ease-in-out alternate;
+}
+
 .elite-hbd-title-link {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-decoration: none;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  padding: 2px 10px;
+  padding: 0;
   cursor: pointer;
-  gap: 3px;
+  gap: 2px;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.elite-hbd-title-link:hover {
+.elite-hbd-title-link:hover .elite-hbd-3d-logo {
+  transform: scale(1.035);
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 28px rgba(244, 63, 94, 0.5));
+}
+
+.elite-hbd-title-link:hover .elite-hbd-neetu-title {
   transform: scale(1.04);
-  filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.65));
+  filter: drop-shadow(0 2px 2px rgba(120, 20, 45, 0.95)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 22px rgba(244, 63, 94, 0.75));
 }
 
 .elite-hbd-title-link:active {
   transform: scale(0.97);
 }
 
-/* HAPPY BIRTHDAY: Exact match to MANGAL RANG style */
-.elite-hbd-kicker {
-  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
-  font-size: clamp(12.5px, 3.6vw, 14.5px);
-  font-weight: 900;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  background: linear-gradient(180deg, #fffbeb 0%, #fde047 30%, #f59e0b 70%, #d97706 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 16px rgba(245, 158, 11, 0.5));
-  will-change: transform, filter;
-  white-space: nowrap;
-  display: block;
+.elite-hbd-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
-/* NEETU: Monumental Title (matching Ramayana's prominence) */
-.elite-hbd-name {
-  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
-  font-size: clamp(18px, 5.2vw, 24px);
-  font-weight: 900;
-  letter-spacing: 0.36em;
-  margin-left: 0.36em; /* Optical center alignment for extreme letter-spacing */
-  text-transform: uppercase;
-  background: linear-gradient(180deg, #ffffff 0%, #fef08a 28%, #f59e0b 68%, #b45309 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 20px rgba(245, 158, 11, 0.55));
-  will-change: transform, filter;
-  white-space: nowrap;
+.elite-hbd-3d-logo {
+  width: clamp(215px, 66vw, 280px);
+  height: auto;
+  object-fit: contain;
   display: block;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.88)) drop-shadow(0 0 20px rgba(244, 63, 94, 0.32));
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+}
+
+/* NEETU Title Wrap & Sparkling Accents */
+.elite-hbd-name-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   margin-top: 1px;
 }
 
-@keyframes balloonSwayLeft {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-5px) rotate(-3.5deg); }
+.elite-hbd-name-sparkle {
+  font-size: 11px;
+  color: #fecdd3;
+  filter: drop-shadow(0 0 6px #f43f5e);
+  animation: sparkleTwinkle 2.4s infinite ease-in-out alternate;
 }
 
-@keyframes balloonSwayRight {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-6px) rotate(3.5deg); }
+.elite-hbd-name-sparkle:last-child {
+  animation-delay: -1.2s;
 }
 
-@keyframes heartPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(244, 63, 94, 0.95)); }
+/* NEETU: 3D Metallic Rose-Gold & Bronze */
+.elite-hbd-neetu-title {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+  font-size: clamp(16.5px, 4.6vw, 21.5px);
+  font-weight: 900;
+  letter-spacing: 0.36em;
+  margin-left: 0.36em; /* optical alignment */
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #ffffff 0%, #ffe4e6 20%, #f472b6 45%, #db2777 65%, #881337 85%, #fecdd3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 2px rgba(120, 20, 45, 0.95)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 16px rgba(244, 63, 94, 0.55));
+  will-change: transform, filter;
+  white-space: nowrap;
+  display: block;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+}
+
+@keyframes sparkleTwinkle {
+  0% { opacity: 0.5; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.18); filter: drop-shadow(0 0 10px #f43f5e); }
 }
 
 @keyframes hbdAuraBreathe {
   0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.7; }
-  100% { transform: translate(-50%, -50%) scale(1.14); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
 }
 
 
