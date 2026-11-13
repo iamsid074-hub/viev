@@ -293,4 +293,42 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('storage', evaluateEliteCandlesAccess);
   window.addEventListener('viev:session-changed', evaluateEliteCandlesAccess);
   setInterval(evaluateEliteCandlesAccess, 600);
+
+  /* =========================================================
+     3.1 ELITE: INTERACTIVE THEME PREVIEW SWITCHER
+     ========================================================= */
+  const THEME_STORAGE_KEY = 'viev_elite_theme';
+  const themeBtns = document.querySelectorAll('.theme-switch-btn');
+
+  function applyEliteTheme(themeName) {
+    if (!themeName || (themeName !== 'rose-gold' && themeName !== 'velvet-noir' && themeName !== 'starlight-silver')) {
+      themeName = 'rose-gold';
+    }
+    document.body.setAttribute('data-theme', themeName);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, themeName);
+    } catch (_) {}
+
+    themeBtns.forEach((btn) => {
+      const isCurrent = btn.getAttribute('data-theme') === themeName;
+      btn.classList.toggle('active', isCurrent);
+    });
+  }
+
+  // Restore saved theme or default to rose-gold
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'rose-gold';
+  applyEliteTheme(savedTheme);
+
+  themeBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const chosen = btn.getAttribute('data-theme');
+      if (window.triggerHaptic) {
+        window.triggerHaptic('light');
+      } else if (navigator.vibrate) {
+        navigator.vibrate(20);
+      }
+      applyEliteTheme(chosen);
+    });
+  });
 });

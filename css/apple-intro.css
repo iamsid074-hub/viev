@@ -8676,6 +8676,214 @@ body.is-elite-1711 #elite-hbd-banner {
   100% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
 }
 
+/* =========================================================
+   3.1 ELITE: INTERACTIVE THEME PREVIEW ENGINE & PALETTES
+   Strictly Gated for ID 1711
+   ========================================================= */
+
+/* Floating Switcher Toolbar */
+.elite-theme-switcher-bar {
+  display: none !important;
+  position: fixed;
+  top: calc(var(--sat, 0px) + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10005;
+  background: rgba(14, 14, 18, 0.82);
+  border: 1px solid var(--theme-glass-border, rgba(244, 114, 182, 0.35));
+  border-radius: 9999px;
+  padding: 3px 4px 3px 10px;
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 16px var(--theme-accent-glow, rgba(244, 114, 182, 0.2)), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  align-items: center;
+  gap: 7px;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.is-elite-1711 .elite-theme-switcher-bar {
+  display: flex !important;
+}
+
+.theme-switcher-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Outfit', sans-serif;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--theme-accent, #f472b6);
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.theme-switcher-pills {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px;
+  border-radius: 9999px;
+}
+
+.theme-switch-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  padding: 4px 9px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.60);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.theme-switch-btn:hover {
+  color: #ffffff;
+}
+
+.theme-switch-btn.active {
+  background: var(--theme-pill-active-bg, rgba(244, 114, 182, 0.32));
+  border-color: var(--theme-glass-border-strong, rgba(253, 224, 71, 0.42));
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 12px var(--theme-accent-glow, rgba(244, 114, 182, 0.3));
+}
+
+/* =========================================================
+   PALETTE DEFINITIONS
+   ========================================================= */
+
+/* Option 1: Rose Gold & Champagne Luxury (Default) */
+body[data-theme="rose-gold"],
+body.is-elite-1711:not([data-theme]) {
+  --theme-accent: #f472b6;
+  --theme-accent-secondary: #fde047;
+  --theme-accent-glow: rgba(244, 114, 182, 0.35);
+  --theme-glass-border: rgba(244, 114, 182, 0.30);
+  --theme-glass-border-strong: rgba(253, 224, 71, 0.48);
+  --theme-glass-specular: rgba(255, 228, 230, 0.45);
+  --theme-card-bg: linear-gradient(180deg, rgba(244, 114, 182, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  --theme-pill-active-bg: linear-gradient(135deg, rgba(244, 114, 182, 0.35) 0%, rgba(253, 224, 71, 0.22) 100%);
+  --theme-pill-text: #fecdd3;
+  --theme-clock-label: #fbcfe8;
+  --theme-clock-num-color: #ffffff;
+  --theme-nav-border: rgba(244, 114, 182, 0.35);
+  --theme-nav-indicator-bg: linear-gradient(135deg, rgba(244, 114, 182, 0.30) 0%, rgba(253, 224, 71, 0.20) 100%);
+  --theme-nav-indicator-border: rgba(244, 114, 182, 0.55);
+  --theme-nav-active-glow: 0 0 16px rgba(244, 114, 182, 0.45);
+  --theme-nav-active-text: #fff1f2;
+  --theme-aura-glow: radial-gradient(ellipse at center, rgba(244, 114, 182, 0.28) 0%, rgba(253, 224, 71, 0.14) 45%, transparent 75%);
+  --theme-neetu-gradient: linear-gradient(180deg, #ffffff 0%, #ffe4e6 20%, #f472b6 45%, #db2777 65%, #881337 85%, #fecdd3 100%);
+}
+
+/* Option 2: Princess Velvet Noir & Neon Rose */
+body[data-theme="velvet-noir"] {
+  --theme-accent: #f43f5e;
+  --theme-accent-secondary: #ec4899;
+  --theme-accent-glow: rgba(244, 63, 94, 0.48);
+  --theme-glass-border: rgba(244, 63, 94, 0.36);
+  --theme-glass-border-strong: rgba(236, 72, 153, 0.55);
+  --theme-glass-specular: rgba(255, 228, 230, 0.50);
+  --theme-card-bg: linear-gradient(180deg, rgba(244, 63, 94, 0.12) 0%, rgba(219, 39, 119, 0.04) 100%);
+  --theme-pill-active-bg: linear-gradient(135deg, rgba(244, 63, 94, 0.42) 0%, rgba(219, 39, 119, 0.30) 100%);
+  --theme-pill-text: #ffe4e6;
+  --theme-clock-label: #fda4af;
+  --theme-clock-num-color: #ffffff;
+  --theme-nav-border: rgba(244, 63, 94, 0.42);
+  --theme-nav-indicator-bg: linear-gradient(135deg, rgba(244, 63, 94, 0.38) 0%, rgba(219, 39, 119, 0.28) 100%);
+  --theme-nav-indicator-border: rgba(244, 63, 94, 0.65);
+  --theme-nav-active-glow: 0 0 20px rgba(244, 63, 94, 0.60);
+  --theme-nav-active-text: #ffffff;
+  --theme-aura-glow: radial-gradient(ellipse at center, rgba(244, 63, 94, 0.36) 0%, rgba(219, 39, 119, 0.18) 45%, transparent 75%);
+  --theme-neetu-gradient: linear-gradient(180deg, #ffffff 0%, #ffe4e6 20%, #fb7185 40%, #e11d48 65%, #881337 85%, #fecdd3 100%);
+}
+
+/* Option 3: Apple VisionOS Starlight (Liquid Silver & Platinum) */
+body[data-theme="starlight-silver"] {
+  --theme-accent: #f8fafc;
+  --theme-accent-secondary: #cbd5e1;
+  --theme-accent-glow: rgba(255, 255, 255, 0.28);
+  --theme-glass-border: rgba(255, 255, 255, 0.28);
+  --theme-glass-border-strong: rgba(255, 255, 255, 0.50);
+  --theme-glass-specular: rgba(255, 255, 255, 0.60);
+  --theme-card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+  --theme-pill-active-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(203, 213, 225, 0.16) 100%);
+  --theme-pill-text: #f8fafc;
+  --theme-clock-label: #e2e8f0;
+  --theme-clock-num-color: #ffffff;
+  --theme-nav-border: rgba(255, 255, 255, 0.32);
+  --theme-nav-indicator-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(203, 213, 225, 0.16) 100%);
+  --theme-nav-indicator-border: rgba(255, 255, 255, 0.55);
+  --theme-nav-active-glow: 0 0 18px rgba(255, 255, 255, 0.40);
+  --theme-nav-active-text: #ffffff;
+  --theme-aura-glow: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.22) 0%, rgba(203, 213, 225, 0.10) 45%, transparent 75%);
+  --theme-neetu-gradient: linear-gradient(180deg, #ffffff 0%, #f1f5f9 25%, #cbd5e1 50%, #94a3b8 75%, #ffffff 100%);
+}
+
+/* =========================================================
+   DYNAMIC COMPONENT INJECTIONS (FOR ID 1711)
+   ========================================================= */
+
+/* Clock Card */
+body.is-elite-1711 .apple-live-clock {
+  background: var(--theme-card-bg) !important;
+  border-color: var(--theme-glass-border) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 24px var(--theme-accent-glow), inset 0 1px 0 var(--theme-glass-specular) !important;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+}
+
+body.is-elite-1711 .milestone-label {
+  color: var(--theme-clock-label) !important;
+  transition: color 0.35s ease;
+}
+
+body.is-elite-1711 .clock-vertical-divider {
+  background: linear-gradient(180deg, transparent 0%, var(--theme-glass-border) 50%, transparent 100%) !important;
+  transition: background 0.35s ease;
+}
+
+/* Floating Navbar */
+body.is-elite-1711 .apple-floating-navbar {
+  border-color: var(--theme-nav-border) !important;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.65), 0 0 20px var(--theme-accent-glow), inset 0 1.2px 0.5px var(--theme-glass-specular) !important;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+body.is-elite-1711 .nav-indicator-pill {
+  background: var(--theme-nav-indicator-bg) !important;
+  border-color: var(--theme-nav-indicator-border) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), var(--theme-nav-active-glow), inset 0 1px 1px var(--theme-glass-specular) !important;
+  transition: left 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.35s ease,
+              border-color 0.35s ease,
+              box-shadow 0.35s ease;
+}
+
+body.is-elite-1711 .nav-tab-btn.active {
+  color: var(--theme-nav-active-text) !important;
+  text-shadow: 0 0 10px var(--theme-accent-glow);
+  transition: color 0.25s ease, text-shadow 0.35s ease;
+}
+
+/* NEETU Title gradient */
+body.is-elite-1711 .elite-hbd-neetu-title {
+  background: var(--theme-neetu-gradient) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  transition: background 0.35s ease;
+}
+
+/* Ambient Aura */
+body.is-elite-1711 .elite-hbd-ambient-aura {
+  background: var(--theme-aura-glow) !important;
+  transition: background 0.5s ease;
+}
+
 
 
 
