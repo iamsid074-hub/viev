@@ -181,9 +181,17 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (_) {}
 
     const urlParams = new URLSearchParams(window.location.search);
-    const urlEliteOverride = urlParams.get('id') === '1711' || urlParams.get('user') === '1711' || urlParams.get('code') === '1711' || urlParams.has('elite');
+    const urlEliteOverride = urlParams.get('id') === '1711' || urlParams.get('user') === '1711' || urlParams.get('code') === '1711' || urlParams.has('elite') || window.location.search.includes('1711');
 
-    const is1711 = urlEliteOverride || !!(sess && (sess.code === '1711' || sess.role === 'user'));
+    if (urlEliteOverride) {
+      try { localStorage.setItem('viev_last_elite', '1'); } catch (_) {}
+    }
+
+    const isDigiExplicit = sess && (sess.code === '3009' || sess.code === '3011' || sess.role === 'digi');
+    let rememberedElite = false;
+    try { rememberedElite = localStorage.getItem('viev_last_elite') === '1'; } catch (_) {}
+
+    const is1711 = !isDigiExplicit && (urlEliteOverride || !!(sess && (sess.code === '1711' || sess.role === 'user')) || rememberedElite);
     const container = document.getElementById('elite-birthday-candles');
     const hbdBanner = document.getElementById('elite-hbd-banner');
     const mangalBanner = document.getElementById('mangal-rang-cinematic-banner');

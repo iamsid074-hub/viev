@@ -8683,33 +8683,49 @@ body.is-elite-1711 #elite-hbd-banner {
 
 /* Velvet Noir Atmospheric Mesh Gradient (Applied globally across background for ID 1711) */
 body.is-elite-1711 {
-  background-color: #060205 !important;
+  background-color: #0c0209 !important;
   background-image: 
-    radial-gradient(ellipse 90% 65% at 50% 10%, rgba(225, 29, 72, 0.16) 0%, rgba(136, 19, 55, 0.08) 42%, transparent 75%),
-    radial-gradient(circle 500px at 85% 85%, rgba(159, 18, 57, 0.14) 0%, rgba(76, 5, 25, 0.06) 50%, transparent 80%),
-    radial-gradient(circle 450px at 15% 75%, rgba(190, 18, 60, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 100% 100% at 50% 50%, #0d0309 0%, #060205 60%, #000000 100%) !important;
+    radial-gradient(ellipse 95% 65% at 50% 8%, rgba(244, 63, 94, 0.32) 0%, rgba(225, 29, 72, 0.18) 35%, rgba(136, 19, 55, 0.08) 60%, transparent 80%),
+    radial-gradient(circle 550px at 90% 80%, rgba(190, 18, 60, 0.26) 0%, rgba(136, 19, 55, 0.12) 45%, transparent 75%),
+    radial-gradient(circle 500px at 10% 70%, rgba(244, 63, 94, 0.22) 0%, rgba(159, 18, 57, 0.10) 45%, transparent 70%),
+    radial-gradient(ellipse 110% 100% at 50% 50%, #15030e 0%, #0c0209 60%, #050003 100%) !important;
   background-attachment: fixed !important;
   background-size: 100% 100% !important;
 }
 
+/* Make all screen containers transparent so Velvet shines through everywhere */
+body.is-elite-1711 .app-screen,
+body.is-elite-1711 .login-screen,
+body.is-elite-1711 #welcome-screen,
+body.is-elite-1711 #music-screen,
+body.is-elite-1711 #cinema-screen,
+body.is-elite-1711 #settings-screen,
+body.is-elite-1711 #hub-screen {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Rich Velvet Liquid Aurora Blobs in background */
 body.is-elite-1711 .liquid-ambient-canvas {
-  opacity: 0.85;
+  opacity: 1 !important;
 }
 
 body.is-elite-1711 .aurora-blob.blob-1 {
-  background: radial-gradient(circle, rgba(244, 63, 94, 0.35) 0%, rgba(190, 18, 60, 0.18) 45%, transparent 70%) !important;
-  filter: blur(90px) !important;
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.45) 0%, rgba(190, 18, 60, 0.25) 45%, transparent 70%) !important;
+  filter: blur(85px) !important;
+  opacity: 0.75 !important;
 }
 
 body.is-elite-1711 .aurora-blob.blob-2 {
-  background: radial-gradient(circle, rgba(136, 19, 55, 0.30) 0%, rgba(76, 5, 25, 0.15) 50%, transparent 70%) !important;
-  filter: blur(100px) !important;
+  background: radial-gradient(circle, rgba(225, 29, 72, 0.40) 0%, rgba(136, 19, 55, 0.20) 50%, transparent 70%) !important;
+  filter: blur(95px) !important;
+  opacity: 0.70 !important;
 }
 
 body.is-elite-1711 .aurora-blob.blob-3 {
-  background: radial-gradient(circle, rgba(225, 29, 72, 0.22) 0%, transparent 70%) !important;
-  filter: blur(80px) !important;
+  background: radial-gradient(circle, rgba(244, 63, 94, 0.32) 0%, rgba(159, 18, 57, 0.15) 50%, transparent 70%) !important;
+  filter: blur(75px) !important;
+  opacity: 0.65 !important;
 }
 
 /* Floating Switcher Toolbar */
