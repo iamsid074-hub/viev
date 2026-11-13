@@ -1,9 +1,9 @@
 /* =========================================================
    VIEVS - SERVICE WORKER & PUSH NOTIFICATION ENGINE
-   Special Liquid Glass Experience for Princess Digi & Sid
+   Special Liquid Glass Experience for Princess Digi & Honey
    ========================================================= */
 
-const CACHE_NAME = 'viev-cache-v3.0';
+const CACHE_NAME = 'viev-cache-v3.1';
 const OFFLINE_URL = './index.html';
 
 // Install Event

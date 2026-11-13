@@ -10,6 +10,10 @@
       "dest": "/api/cast/$1.js"
     },
     {
+      "src": "/api/push/(.*)",
+      "dest": "/api/push/$1.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1"
     }

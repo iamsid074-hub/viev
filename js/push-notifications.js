@@ -9,11 +9,107 @@
 
   let swRegistration = null;
 
+  const VAPID_PUBLIC_KEY = 'BK--8YAZe4qvGBMwXCAgbOmqEWHoXZ-3NjQa7ispw4O3sp2TG4LLWYglOc9EhojIoIEOW2pdHg361QRX1V_8LFM';
+
   const NOTIF_CONFIG = {
     icon: 'assets/digi.png',
     badge: 'assets/digi.png',
     sound: 'default'
   };
+
+  // Convert VAPID base64 public key to Uint8Array
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+
+  // Register Web Push subscription for true background phone notifications
+  async function registerWebPushSubscription() {
+    if (!swRegistration || !('pushManager' in swRegistration)) {
+      console.warn('[Push] pushManager not available in SW registration.');
+      return null;
+    }
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      return null;
+    }
+
+    try {
+      let sub = await swRegistration.pushManager.getSubscription();
+      if (!sub) {
+        const convertedKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+        sub = await swRegistration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedKey
+        });
+        console.log('[Push] Newly subscribed to Web Push:', sub.endpoint);
+      } else {
+        console.log('[Push] Existing Web Push subscription found:', sub.endpoint);
+      }
+
+      if (sub) {
+        const role = getActiveUserRole();
+        await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: role, subscription: sub.toJSON() })
+        }).catch(err => console.warn('[Push] Server subscription sync warning:', err));
+      }
+      return sub;
+    } catch (err) {
+      console.warn('[Push] Web Push subscription registration error:', err);
+      return null;
+    }
+  }
+
+  // Send Remote Push to Digi's phone lock-screen via Serverless VAPID API
+  async function sendRemotePush({ targetRole = 'digi', title, body, data }) {
+    try {
+      const res = await fetch('/api/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetRole,
+          title,
+          body,
+          data: data || { url: './index.html', action: 'open_note' }
+        })
+      });
+      return await res.json();
+    } catch (err) {
+      console.error('[Push] Remote push error:', err);
+      return { success: false, error: err.message };
+    }
+  }
+
+  // Check Digi device connectivity status
+  async function checkDigiDeviceStatus() {
+    const statusEl = document.getElementById('honey-digi-device-status');
+    if (!statusEl) return;
+    try {
+      const res = await fetch('/api/push/status');
+      const json = await res.json();
+      if (json && json.subscribers) {
+        if (json.subscribers.digi > 0) {
+          statusEl.innerHTML = `🟢 Active (${json.subscribers.digi} device connected)`;
+          statusEl.style.color = '#34c759';
+        } else {
+          statusEl.innerHTML = `🟡 Waiting for Digi to tap Allow`;
+          statusEl.style.color = '#ff9f0a';
+        }
+      }
+    } catch (_) {
+      statusEl.textContent = 'Ready';
+      statusEl.style.color = 'rgba(255,255,255,0.6)';
+    }
+  }
 
   // Get active session role
   function getActiveUserRole() {
@@ -53,6 +149,11 @@
 
       // Listen for message from SW (e.g. when user clicks a notification)
       navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+
+      // If notification permission is already granted, ensure Web Push subscription is registered & synced
+      if ('Notification' in window && Notification.permission === 'granted') {
+        registerWebPushSubscription();
+      }
 
       return swRegistration;
     } catch (error) {
@@ -116,6 +217,9 @@
         localStorage.setItem('viev_notif_enabled', 'true');
         dismissPermissionBanner();
         updateSettingsUI();
+
+        // Register Web Push subscription with server for true lock-screen background push
+        await registerWebPushSubscription();
 
         // Send confirmation welcome notification
         sendLocalNotification({
@@ -413,26 +517,68 @@
       toggleSweetPings.addEventListener('change', (e) => setPref('sweet_pings', e.target.checked));
     }
 
-    // Honey's Quick Custom Ping Composer
-    const customPingBtn = document.getElementById('sid-send-ping-btn');
-    const customPingInput = document.getElementById('sid-ping-text-input');
-    if (customPingBtn && customPingInput) {
-      customPingBtn.addEventListener('click', () => {
-        const text = customPingInput.value.trim();
-        if (!text) return;
+    // Honey's Instant Daily Note Lock-Screen Push to Digi
+    const pushDailyNoteBtn = document.getElementById('push-daily-note-btn');
+    if (pushDailyNoteBtn) {
+      pushDailyNoteBtn.addEventListener('click', async () => {
+        const noteConfig = window.DAILY_NOTE_CONFIG || {};
+        const noteText = noteConfig.noteText || "Mai abhi bhi tere hi sath hu\nshadi me mujhe miss mat karna\nkuch bhi khaye to ek bite mujhe soch kar kha lena bas .\nI MISS YOU BABY .";
+        const preview = noteText.split('\n')[0].trim();
 
-        sendLocalNotification({
-          title: '💌 Honey Ka Message ❤️',
-          body: text,
-          tag: 'honey-ping-' + Date.now(),
+        pushDailyNoteBtn.disabled = true;
+        pushDailyNoteBtn.innerHTML = '<span>⏳ Sending to Digi\'s Phone...</span>';
+
+        const res = await sendRemotePush({
+          targetRole: 'digi',
+          title: '💌 Honey Ka Naya Note Aaya Hai',
+          body: `"${preview}" — Touch to open`,
           data: { url: './index.html', action: 'open_note' }
         });
 
-        customPingInput.value = '';
-        customPingBtn.textContent = 'Sent! ✨';
+        pushDailyNoteBtn.disabled = false;
+        if (res && res.delivered > 0) {
+          pushDailyNoteBtn.innerHTML = '<span>✅ Sent to Digi\'s Phone!</span>';
+        } else {
+          pushDailyNoteBtn.innerHTML = '<span>⚠️ Waiting for Digi to Allow on Phone</span>';
+        }
+
         setTimeout(() => {
-          customPingBtn.textContent = 'Send Alert';
-        }, 2000);
+          pushDailyNoteBtn.innerHTML = '<span>💌 Push Today\'s Note to Digi\'s Lock-Screen</span>';
+          checkDigiDeviceStatus();
+        }, 3500);
+      });
+    }
+
+    // Honey's Direct Message Push to Digi's Phone Lock-Screen
+    const customPingBtn = document.getElementById('sid-send-ping-btn');
+    const customPingInput = document.getElementById('sid-ping-text-input');
+    if (customPingBtn && customPingInput) {
+      customPingBtn.addEventListener('click', async () => {
+        const text = customPingInput.value.trim();
+        if (!text) return;
+
+        customPingBtn.disabled = true;
+        customPingBtn.textContent = 'Sending...';
+
+        const res = await sendRemotePush({
+          targetRole: 'digi',
+          title: '💌 Honey Ka Message ❤️',
+          body: text,
+          data: { url: './index.html', action: 'open_note' }
+        });
+
+        customPingBtn.disabled = false;
+        if (res && res.delivered > 0) {
+          customPingBtn.textContent = 'Delivered! 🚀';
+          customPingInput.value = '';
+        } else {
+          customPingBtn.textContent = 'Queued! ✨';
+        }
+
+        setTimeout(() => {
+          customPingBtn.textContent = 'Send';
+          checkDigiDeviceStatus();
+        }, 3000);
       });
     }
   }
@@ -441,6 +587,8 @@
   window.vievNotifications = {
     requestPermission: requestNotificationPermission,
     sendNotification: sendLocalNotification,
+    sendRemotePush: sendRemotePush,
+    checkDigiStatus: checkDigiDeviceStatus,
     checkDailyNote: checkNewDailyNoteAlert,
     checkDailyPing: checkDailySweetReminder,
     updateUI: updateSettingsUI
@@ -451,6 +599,7 @@
     await initServiceWorker();
     updateSettingsUI();
     bindSettingsEvents();
+    checkDigiDeviceStatus();
 
     // Check for new daily note alert
     setTimeout(checkNewDailyNoteAlert, 1800);
