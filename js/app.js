@@ -993,6 +993,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.syncCinemaTabVisibility) {
       window.syncCinemaTabVisibility();
     }
+
+    // 3.1 ELITE: Gated birthday candles evaluation for ID 1711
+    if (window.evaluateEliteCandlesAccess) {
+      window.evaluateEliteCandlesAccess();
+    }
   }
 
   function updatePinDisplay(val) {

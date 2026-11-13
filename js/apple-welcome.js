@@ -167,4 +167,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Safe stub for app.js screen transitions
   window.setMovingWelcomeVisible = function() {};
+
+  /* =========================================================
+     3.1 ELITE: LIVING BIRTHDAY CANDLES ENGINE
+     Strictly Gated for ID 1711 (Home Screen Only)
+     ========================================================= */
+  function evaluateEliteCandlesAccess() {
+    let sess = null;
+    try {
+      sess = window.__vievActiveSession
+        || JSON.parse(sessionStorage.getItem('viev_auth_session') || 'null')
+        || JSON.parse(localStorage.getItem('viev_auth_session') || '{}');
+    } catch (_) {}
+
+    const is1711 = !!(sess && (sess.code === '1711' || sess.role === 'user'));
+    const container = document.getElementById('elite-birthday-candles');
+
+    if (is1711) {
+      document.body.classList.add('is-elite-1711');
+      if (container) container.style.display = 'block';
+    } else {
+      document.body.classList.remove('is-elite-1711');
+      if (container) container.style.display = 'none';
+    }
+  }
+
+  // Interactive tap / micro-animation for both candles
+  const leftCandle = document.getElementById('elite-candle-left');
+  const rightCandle = document.getElementById('elite-candle-right');
+
+  function bindCandleTap(candleEl) {
+    if (!candleEl) return;
+    candleEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      candleEl.classList.remove('is-flaring');
+      void candleEl.offsetWidth; // trigger reflow
+      candleEl.classList.add('is-flaring');
+
+      if (window.triggerHaptic) {
+        window.triggerHaptic('medium');
+      } else if (navigator.vibrate) {
+        navigator.vibrate([25, 35, 25]);
+      }
+
+      setTimeout(() => {
+        candleEl.classList.remove('is-flaring');
+      }, 800);
+    });
+  }
+
+  bindCandleTap(leftCandle);
+  bindCandleTap(rightCandle);
+
+  evaluateEliteCandlesAccess();
+  window.evaluateEliteCandlesAccess = evaluateEliteCandlesAccess;
+
+  // Listen for storage or session events
+  window.addEventListener('storage', evaluateEliteCandlesAccess);
+  window.addEventListener('viev:session-changed', evaluateEliteCandlesAccess);
 });
