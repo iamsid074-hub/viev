@@ -391,7 +391,129 @@
 }
 
 /* =========================================================
-   APPLE LIVE ACTIVITY TIME CAPSULE (Pure typographic, borderless)
+   HERO FLOATING LIVE CLOCK PILL (Top Right of Digi's Photo)
+   Hours : Mins : Secs Liquid Glass Island
+   ========================================================= */
+.hero-photo-clock {
+  position: absolute;
+  top: calc(var(--sat, 0px) + 14px);
+  right: 14px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  will-change: transform, opacity;
+}
+
+.hero-photo-clock:hover {
+  transform: scale(1.03);
+}
+
+.hero-photo-clock:active {
+  transform: scale(0.95);
+}
+
+.hero-photo-wrapper.is-note-active .hero-photo-clock {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(-8px) scale(0.92) !important;
+}
+
+.hero-photo-clock-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 6.5px;
+  background: rgba(12, 14, 20, 0.65);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 5px 12px 5px 10px;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.55),
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.28);
+}
+
+.hero-clock-live-dot {
+  width: 6.5px;
+  height: 6.5px;
+  border-radius: 50%;
+  background: #f43f5e;
+  box-shadow: 0 0 8px #f43f5e, 0 0 14px rgba(244, 63, 94, 0.6);
+  flex-shrink: 0;
+  animation: heroDotPulse 2s infinite ease-in-out;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-photo-clock.mode-together .hero-clock-live-dot {
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8, 0 0 14px rgba(56, 189, 248, 0.6);
+}
+
+@keyframes heroDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.95;
+    box-shadow: 0 0 8px #f43f5e, 0 0 14px rgba(244, 63, 94, 0.6);
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.6;
+    box-shadow: 0 0 4px #f43f5e, 0 0 8px rgba(244, 63, 94, 0.3);
+  }
+}
+
+.hero-clock-time {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  line-height: 1;
+}
+
+.hero-clock-num.ticker-unit {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", 'Outfit', system-ui, sans-serif !important;
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-clock-num.ticker-unit .digit-slot {
+  min-width: 0.58em;
+  height: 1.15em;
+  line-height: 1;
+}
+
+.hero-clock-unit {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", 'Outfit', system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(254, 205, 211, 0.88);
+  margin-left: 1px;
+  text-transform: lowercase;
+}
+
+.hero-photo-clock.mode-together .hero-clock-unit {
+  color: rgba(186, 230, 253, 0.88);
+}
+
+.hero-clock-sep {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 2.5px;
+}
+
 /* =========================================================
    APPLE LIVE ACTIVITY TIME CAPSULE (Liquid Glass Card)
    ========================================================= */
@@ -8556,7 +8678,7 @@ body.is-elite-1711 .app-screen#welcome-screen.active .elite-birthday-candles-con
   display: none !important;
   position: relative;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 14px;
   justify-content: center;
   align-items: center;
 }

@@ -98,11 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const diffMs = COUNTDOWN_TARGET - now;
       if (diffMs > 0) {
         const totalSeconds = Math.floor(diffMs / 1000);
-        days = Math.floor(totalSeconds / 86400);
-        hours = Math.floor((totalSeconds % 86400) / 3600);
+        // Total Hours (e.g. 2 days = 48h + remaining hours)
+        hours = Math.floor(totalSeconds / 3600);
         minutes = Math.floor((totalSeconds % 3600) / 60);
         seconds = totalSeconds % 60;
-        if (milestoneLabelEl) milestoneLabelEl.textContent = 'Days To 17 Nov';
+        if (milestoneLabelEl) milestoneLabelEl.textContent = '17 Nov Countdown';
       } else {
         days = 0;
         hours = 0;
@@ -111,18 +111,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (milestoneLabelEl) milestoneLabelEl.textContent = "It's 17 Nov! 🎂";
       }
     } else {
-      // 'together' mode
+      // 'together' mode (Total Hours Together)
       const diffMs = Math.max(0, now - MET_DATE);
       const totalSeconds = Math.floor(diffMs / 1000);
-      days = Math.floor(totalSeconds / 86400);
-      hours = Math.floor((totalSeconds % 86400) / 3600);
+      hours = Math.floor(totalSeconds / 3600);
       minutes = Math.floor((totalSeconds % 3600) / 60);
       seconds = totalSeconds % 60;
-      if (milestoneLabelEl) milestoneLabelEl.textContent = 'Days Together';
+      if (milestoneLabelEl) milestoneLabelEl.textContent = 'Hours Together';
     }
 
     // Update with Apple Watch soft flip morph blur animation
-    updateSegmentDigits(daysEl, String(days), isFirstRun);
+    if (daysEl) updateSegmentDigits(daysEl, String(days), isFirstRun);
     updateSegmentDigits(hoursEl, String(hours).padStart(2, '0'), isFirstRun);
     updateSegmentDigits(minsEl, String(minutes).padStart(2, '0'), isFirstRun);
     updateSegmentDigits(secsEl, String(seconds).padStart(2, '0'), isFirstRun);
@@ -148,12 +147,18 @@ document.addEventListener('DOMContentLoaded', () => {
     isFirstRun = false;
   }
 
-  // Allow clicking the clock pill to toggle between 17 Nov Countdown and Days Together (All IDs)
+  // Allow clicking the clock pill to toggle between 17 Nov Countdown and Hours Together (All IDs)
   if (clockContainer) {
     clockContainer.style.cursor = 'pointer';
     clockContainer.addEventListener('click', () => {
       clockMode = (clockMode === 'countdown') ? 'together' : 'countdown';
+      if (clockMode === 'together') {
+        clockContainer.classList.add('mode-together');
+      } else {
+        clockContainer.classList.remove('mode-together');
+      }
       if (window.triggerHaptic) window.triggerHaptic('light');
+      clockContainer.title = (clockMode === 'countdown') ? '17 Nov Birthday Countdown' : 'Hours Together';
       isFirstRun = true;
       updateLiveCounter();
     });
