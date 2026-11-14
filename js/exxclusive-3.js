@@ -663,29 +663,10 @@
     const sourceActiveIcon = document.getElementById('aura-source-active-icon');
     const sourceOptLibrary = document.getElementById('source-opt-library');
     const sourceOptYoutube = document.getElementById('source-opt-youtube');
-    const sourceOptReels = document.getElementById('source-opt-reels');
     const viewLibraryEl = document.getElementById('aura-view-library');
     const viewYoutubeEl = document.getElementById('aura-view-youtube');
-    const viewReelsEl = document.getElementById('aura-view-reels');
 
     if (sourceSwitcherEl) sourceSwitcherEl.classList.remove('is-open');
-
-    if (sourceOptLibrary) sourceOptLibrary.classList.toggle('active', source === 'library');
-    if (sourceOptYoutube) sourceOptYoutube.classList.toggle('active', source === 'youtube');
-    if (sourceOptReels) sourceOptReels.classList.toggle('active', source === 'reels');
-
-    if (viewLibraryEl) {
-      viewLibraryEl.style.display = source === 'library' ? 'flex' : 'none';
-      viewLibraryEl.classList.toggle('active', source === 'library');
-    }
-    if (viewYoutubeEl) {
-      viewYoutubeEl.style.display = source === 'youtube' ? 'flex' : 'none';
-      viewYoutubeEl.classList.toggle('active', source === 'youtube');
-    }
-    if (viewReelsEl) {
-      viewReelsEl.style.display = source === 'reels' ? 'flex' : 'none';
-      viewReelsEl.classList.toggle('active', source === 'reels');
-    }
 
     if (source === 'youtube') {
       if (sourceActiveLabel) sourceActiveLabel.textContent = 'YouTube';
@@ -693,21 +674,34 @@
         sourceActiveIcon.className = 'aura-source-btn-icon is-yt';
         sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
       }
+      if (sourceOptLibrary) sourceOptLibrary.classList.remove('active');
+      if (sourceOptYoutube) sourceOptYoutube.classList.add('active');
+
+      if (viewLibraryEl) viewLibraryEl.style.display = 'none';
+      if (viewYoutubeEl) {
+        viewYoutubeEl.style.display = 'flex';
+        viewYoutubeEl.classList.add('active');
+      }
+
       if (ytFeedVideos.length === 0) {
         loadYouTubeFeed('all');
       }
-    } else if (source === 'reels') {
-      if (sourceActiveLabel) sourceActiveLabel.textContent = 'Our Reels';
-      if (sourceActiveIcon) {
-        sourceActiveIcon.className = 'aura-source-btn-icon is-reels';
-        sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>`;
-      }
-      initReelsFeed();
     } else {
       if (sourceActiveLabel) sourceActiveLabel.textContent = 'Added Videos';
       if (sourceActiveIcon) {
         sourceActiveIcon.className = 'aura-source-btn-icon';
         sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 2v20M8 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path></svg>`;
+      }
+      if (sourceOptLibrary) sourceOptLibrary.classList.add('active');
+      if (sourceOptYoutube) sourceOptYoutube.classList.remove('active');
+
+      if (viewYoutubeEl) {
+        viewYoutubeEl.style.display = 'none';
+        viewYoutubeEl.classList.remove('active');
+      }
+      if (viewLibraryEl) {
+        viewLibraryEl.style.display = 'flex';
+        viewLibraryEl.classList.add('active');
       }
     }
   }
@@ -1321,442 +1315,6 @@
     }, 2600);
   }
 
-  // =========================================================
-  // 3.1 ELITE: OUR REELS (PRIVATE VIDEO MEMORIES & REELS)
-  // =========================================================
-  const OUR_REELS_STORAGE_KEY = 'viev_our_reels';
-  const DEFAULT_OUR_REELS = [
-    {
-      id: "reel-tumsehi",
-      videoId: "jHNNMj5bNQw",
-      title: "Tum Se Hi • Late Night Vibe ✨",
-      creator: "Our Memories",
-      audio: "Tum Se Hi (Lofi Chill)",
-      views: "Special",
-      likes: "❤️",
-      tag: "romantic",
-      addedAt: 1731600000000
-    },
-    {
-      id: "reel-apnabanale",
-      videoId: "BddP6PYo2gs",
-      title: "Apna Bana Le Piya 💖",
-      creator: "Our Memories",
-      audio: "Apna Bana Le • Arijit Singh",
-      views: "Special",
-      likes: "❤️",
-      tag: "romantic",
-      addedAt: 1731600100000
-    }
-  ];
-
-  function loadOurReelsFromStorage() {
-    try {
-      const stored = localStorage.getItem(OUR_REELS_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch (e) {
-      console.warn("Failed to parse our reels from storage", e);
-    }
-    // Initialize default if empty
-    try {
-      localStorage.setItem(OUR_REELS_STORAGE_KEY, JSON.stringify(DEFAULT_OUR_REELS));
-    } catch (_) {}
-    return [...DEFAULT_OUR_REELS];
-  }
-
-  function saveOurReelsToStorage(list) {
-    try {
-      localStorage.setItem(OUR_REELS_STORAGE_KEY, JSON.stringify(list));
-    } catch (e) {
-      console.warn("Failed to save our reels to storage", e);
-    }
-  }
-
-  function extractReelVideoId(urlOrId) {
-    if (!urlOrId) return '';
-    const str = urlOrId.trim();
-    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
-    const shortsMatch = str.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/i);
-    if (shortsMatch) return shortsMatch[1];
-    const youtuMatch = str.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
-    if (youtuMatch) return youtuMatch[1];
-    const watchMatch = str.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
-    if (watchMatch) return watchMatch[1];
-    const embedMatch = str.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/i);
-    if (embedMatch) return embedMatch[1];
-    return '';
-  }
-
-  let masterOurReels = loadOurReelsFromStorage();
-  let activeReelsList = [...masterOurReels];
-  let currentReelIndex = 0;
-  let reelsIsMuted = false;
-  let isReelsTheaterOpen = false;
-  let reelsFeedInitialized = false;
-
-  function initReelsFeed() {
-    masterOurReels = loadOurReelsFromStorage();
-    activeReelsList = [...masterOurReels];
-    renderReelsGrid(activeReelsList);
-  }
-
-  function renderReelsGrid(items) {
-    const gridEl = document.getElementById('aura-reels-feed-grid');
-    const emptyBox = document.getElementById('our-reels-empty-box');
-    if (!gridEl) return;
-    gridEl.innerHTML = '';
-
-    if (!items || items.length === 0) {
-      if (emptyBox) emptyBox.style.display = 'flex';
-      return;
-    }
-
-    if (emptyBox) emptyBox.style.display = 'none';
-
-    items.forEach((reel, idx) => {
-      const card = document.createElement('div');
-      card.className = 'aura-reel-card';
-      card.innerHTML = `
-        <img src="https://i.ytimg.com/vi/${reel.videoId}/hqdefault.jpg" alt="${reel.title}" class="reel-card-thumb" loading="lazy" />
-        <div class="reel-card-scrim"></div>
-        <div class="reel-top-badges">
-          <span class="reel-live-tag"><span class="reel-live-dot"></span> Reel</span>
-          <button type="button" class="reel-card-delete-btn" data-id="${reel.id}" title="Remove Reel" aria-label="Remove Reel">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"></polyline>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-            </svg>
-          </button>
-        </div>
-        <div class="reel-card-meta">
-          <p class="reel-card-title">${reel.title}</p>
-          <div class="reel-card-audio">♫ ${reel.audio || 'Original Sound'}</div>
-        </div>
-      `;
-
-      // Delete action on trash button
-      const delBtn = card.querySelector('.reel-card-delete-btn');
-      if (delBtn) {
-        delBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          deleteReelById(reel.id);
-        });
-      }
-
-      // Card click opens theater
-      card.addEventListener('click', (e) => {
-        if (e.target.closest('.reel-card-delete-btn')) return;
-        openReelsTheater(idx, items);
-      });
-
-      gridEl.appendChild(card);
-    });
-  }
-
-  function deleteReelById(reelId) {
-    if (!confirm("Are you sure you want to remove this reel from Our Reels?")) return;
-    masterOurReels = masterOurReels.filter(r => r.id !== reelId);
-    saveOurReelsToStorage(masterOurReels);
-    activeReelsList = activeReelsList.filter(r => r.id !== reelId);
-    renderReelsGrid(activeReelsList);
-    if (window.triggerHaptic) window.triggerHaptic(40);
-  }
-
-  function openReelsTheater(idx, list = activeReelsList) {
-    activeReelsList = list;
-    currentReelIndex = (idx >= 0 && idx < activeReelsList.length) ? idx : 0;
-    const modal = document.getElementById('viev-reels-theater-modal');
-    if (!modal) return;
-
-    isReelsTheaterOpen = true;
-    modal.style.display = 'flex';
-    document.body.classList.add('has-cinema-open');
-    loadReelAtIndex(currentReelIndex);
-  }
-
-  function closeReelsTheater() {
-    const modal = document.getElementById('viev-reels-theater-modal');
-    const iframe = document.getElementById('reels-active-iframe');
-    if (modal) modal.style.display = 'none';
-    if (iframe) iframe.src = '';
-    isReelsTheaterOpen = false;
-    document.body.classList.remove('has-cinema-open');
-  }
-
-  function loadReelAtIndex(idx) {
-    const reel = activeReelsList[idx];
-    if (!reel) return;
-
-    const iframe = document.getElementById('reels-active-iframe');
-    const creatorName = document.getElementById('reels-creator-name');
-    const captionText = document.getElementById('reels-caption-text');
-    const audioTitle = document.getElementById('reels-audio-title');
-    const likeCount = document.getElementById('reels-like-count');
-    const commentCount = document.getElementById('reels-comment-count');
-    const heartIcon = document.getElementById('reels-side-heart');
-
-    if (creatorName) creatorName.textContent = reel.creator || 'Our Memories';
-    if (captionText) captionText.textContent = reel.title;
-    if (audioTitle) audioTitle.textContent = `${reel.audio || 'Original Sound'} • Special`;
-    if (likeCount) likeCount.textContent = reel.likes || '❤️';
-    if (commentCount) commentCount.textContent = 'Special';
-    if (heartIcon) {
-      heartIcon.textContent = '🤍';
-      heartIcon.classList.remove('is-liked');
-    }
-
-    if (iframe) {
-      const muteParam = reelsIsMuted ? '&mute=1' : '';
-      iframe.src = `https://www.youtube-nocookie.com/embed/${reel.videoId}?autoplay=1&loop=1&playlist=${reel.videoId}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1${muteParam}`;
-    }
-  }
-
-  function nextReel() {
-    if (activeReelsList.length === 0) return;
-    currentReelIndex = (currentReelIndex + 1) % activeReelsList.length;
-    loadReelAtIndex(currentReelIndex);
-  }
-
-  function prevReel() {
-    if (activeReelsList.length === 0) return;
-    currentReelIndex = (currentReelIndex - 1 + activeReelsList.length) % activeReelsList.length;
-    loadReelAtIndex(currentReelIndex);
-  }
-
-  function triggerHeartLike(withBurst = false) {
-    const heartIcon = document.getElementById('reels-side-heart');
-    const burstEl = document.getElementById('reels-heart-burst');
-    if (heartIcon) {
-      heartIcon.textContent = '❤️';
-      heartIcon.classList.add('is-liked');
-    }
-    if (withBurst && burstEl) {
-      burstEl.classList.remove('is-bursting');
-      void burstEl.offsetWidth; // reflow
-      burstEl.classList.add('is-bursting');
-    }
-    if (window.triggerHaptic) window.triggerHaptic(60);
-  }
-
-  function openAddReelModal() {
-    const modal = document.getElementById('our-reels-add-modal');
-    if (modal) {
-      modal.style.display = 'flex';
-      const urlInput = document.getElementById('reel-form-url');
-      if (urlInput) setTimeout(() => urlInput.focus(), 80);
-    }
-  }
-
-  function closeAddReelModal() {
-    const modal = document.getElementById('our-reels-add-modal');
-    if (modal) modal.style.display = 'none';
-  }
-
-  function handleAddReelSubmit() {
-    const urlInput = document.getElementById('reel-form-url');
-    const titleInput = document.getElementById('reel-form-title');
-    const audioInput = document.getElementById('reel-form-audio');
-    const tagInput = document.getElementById('reel-form-tag');
-
-    const rawUrl = urlInput ? urlInput.value.trim() : '';
-    const title = titleInput && titleInput.value.trim() ? titleInput.value.trim() : 'Our Special Reel';
-    const audio = audioInput && audioInput.value.trim() ? audioInput.value.trim() : 'Original Audio';
-    const tag = tagInput ? tagInput.value : 'romantic';
-
-    const videoId = extractReelVideoId(rawUrl);
-    if (!videoId) {
-      alert("Please paste a valid YouTube Shorts or Video link (e.g. https://youtube.com/shorts/...)");
-      if (urlInput) urlInput.focus();
-      return;
-    }
-
-    const newReel = {
-      id: "reel-" + Date.now(),
-      videoId: videoId,
-      title: title,
-      creator: "Our Memories",
-      audio: audio,
-      views: "Special",
-      likes: "❤️",
-      tag: tag,
-      addedAt: Date.now()
-    };
-
-    masterOurReels.unshift(newReel);
-    saveOurReelsToStorage(masterOurReels);
-    activeReelsList = [...masterOurReels];
-    renderReelsGrid(activeReelsList);
-
-    // Reset inputs
-    if (urlInput) urlInput.value = '';
-    if (titleInput) titleInput.value = '';
-    if (audioInput) audioInput.value = '';
-
-    closeAddReelModal();
-    if (window.triggerHaptic) window.triggerHaptic(50);
-  }
-
-  function bindReelsEvents() {
-    const closeBtn = document.getElementById('reels-theater-close-btn');
-    const nextBtn = document.getElementById('reels-next-btn');
-    const prevBtn = document.getElementById('reels-prev-btn');
-    const likeBtn = document.getElementById('reels-like-btn');
-    const shareBtn = document.getElementById('reels-share-btn');
-    const soundBtn = document.getElementById('reels-sound-toggle-btn');
-    const touchOverlay = document.getElementById('reels-touch-overlay');
-    const searchInput = document.getElementById('aura-reels-search-input');
-    const clearBtn = document.getElementById('aura-reels-search-clear-btn');
-    const chips = Array.from(document.querySelectorAll('#aura-reels-chips .reels-chip'));
-
-    // Add Reel Modal Triggers
-    const addTriggerBtn = document.getElementById('our-reels-add-trigger-btn');
-    const emptyAddBtn = document.getElementById('our-reels-empty-add-btn');
-    const modalCloseBtn = document.getElementById('our-reels-modal-close-btn');
-    const modalBackdrop = document.getElementById('our-reels-add-modal');
-    const formSubmitBtn = document.getElementById('reel-form-submit-btn');
-
-    if (addTriggerBtn) addTriggerBtn.addEventListener('click', openAddReelModal);
-    if (emptyAddBtn) emptyAddBtn.addEventListener('click', openAddReelModal);
-    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeAddReelModal);
-    if (modalBackdrop) {
-      modalBackdrop.addEventListener('click', (e) => {
-        if (e.target === modalBackdrop) closeAddReelModal();
-      });
-    }
-    if (formSubmitBtn) formSubmitBtn.addEventListener('click', handleAddReelSubmit);
-
-    if (closeBtn) closeBtn.addEventListener('click', closeReelsTheater);
-    if (nextBtn) nextBtn.addEventListener('click', nextReel);
-    if (prevBtn) prevBtn.addEventListener('click', prevReel);
-
-    if (likeBtn) {
-      likeBtn.addEventListener('click', () => {
-        triggerHeartLike();
-      });
-    }
-
-    if (shareBtn) {
-      shareBtn.addEventListener('click', () => {
-        if (window.vievAirCast && typeof window.vievAirCast.inviteCast === 'function') {
-          window.vievAirCast.inviteCast();
-        } else {
-          alert("Sharing reel with Digi! ✨");
-        }
-      });
-    }
-
-    if (soundBtn) {
-      soundBtn.addEventListener('click', () => {
-        reelsIsMuted = !reelsIsMuted;
-        const iconOn = document.getElementById('reels-sound-icon-on');
-        const iconOff = document.getElementById('reels-sound-icon-off');
-        if (iconOn && iconOff) {
-          iconOn.style.display = reelsIsMuted ? 'none' : 'block';
-          iconOff.style.display = reelsIsMuted ? 'block' : 'none';
-        }
-        const iframe = document.getElementById('reels-active-iframe');
-        if (iframe && iframe.contentWindow) {
-          const action = reelsIsMuted ? 'mute' : 'unMute';
-          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: action, args: [] }), '*');
-        }
-      });
-    }
-
-    let touchStartY = 0;
-    let touchStartX = 0;
-    let lastTapTime = 0;
-
-    if (touchOverlay) {
-      touchOverlay.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-        touchStartX = e.touches[0].clientX;
-      }, { passive: true });
-
-      touchOverlay.addEventListener('touchend', (e) => {
-        const deltaY = e.changedTouches[0].clientY - touchStartY;
-        const deltaX = Math.abs(e.changedTouches[0].clientX - touchStartX);
-
-        if (Math.abs(deltaY) > 45 && Math.abs(deltaY) > deltaX) {
-          if (deltaY < 0) {
-            nextReel();
-          } else {
-            prevReel();
-          }
-        } else {
-          const now = Date.now();
-          if (now - lastTapTime < 320) {
-            triggerHeartLike(true);
-          }
-          lastTapTime = now;
-        }
-      });
-
-      touchOverlay.addEventListener('dblclick', () => {
-        triggerHeartLike(true);
-      });
-    }
-
-    // Keyboard support: ArrowUp, ArrowDown, Escape
-    document.addEventListener('keydown', (e) => {
-      if (!isReelsTheaterOpen) return;
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        nextReel();
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        prevReel();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        closeReelsTheater();
-      }
-    });
-
-    // Chips filtering
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        const tag = chip.getAttribute('data-tag') || 'all';
-        if (tag === 'all' || tag === 'trending') {
-          activeReelsList = [...masterOurReels];
-        } else {
-          activeReelsList = masterOurReels.filter(r => r.tag === tag || r.title.toLowerCase().includes(tag));
-        }
-        renderReelsGrid(activeReelsList);
-      });
-    });
-
-    // Search filter
-    if (searchInput) {
-      searchInput.addEventListener('input', () => {
-        const q = searchInput.value.trim().toLowerCase();
-        if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
-        if (!q) {
-          activeReelsList = [...masterOurReels];
-        } else {
-          activeReelsList = masterOurReels.filter(r =>
-            r.title.toLowerCase().includes(q) ||
-            r.creator.toLowerCase().includes(q) ||
-            (r.audio && r.audio.toLowerCase().includes(q))
-          );
-        }
-        renderReelsGrid(activeReelsList);
-      });
-    }
-
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        if (searchInput) searchInput.value = '';
-        clearBtn.style.display = 'none';
-        activeReelsList = [...masterOurReels];
-        renderReelsGrid(activeReelsList);
-      });
-    }
-  }
-
   // --- INITIALIZATION ---
   function init() {
     introEl = document.getElementById('exxclusive-netflix-intro');
@@ -1862,15 +1420,6 @@
         setVideoSource('youtube');
       });
     }
-
-    const sourceOptReels = document.getElementById('source-opt-reels');
-    if (sourceOptReels) {
-      sourceOptReels.addEventListener('click', () => {
-        setVideoSource('reels');
-      });
-    }
-
-    bindReelsEvents();
 
     // YouTube Search & Category Chips
     const ytSearchInput = document.getElementById('aura-yt-search-input');
@@ -2207,8 +1756,6 @@
       if (ytFeedVideos.length === 0) {
         loadYouTubeFeed(currentYtQuery || 'all');
       }
-    } else if (currentSource === 'reels') {
-      initReelsFeed();
     } else {
       renderMediaGrid();
     }
@@ -2221,9 +1768,6 @@
   window.onExxclusiveTabDeactivated = function () {
     if (isLoungeOpen) {
       closeCurvedCinemaLounge();
-    }
-    if (isReelsTheaterOpen) {
-      closeReelsTheater();
     }
   };
 

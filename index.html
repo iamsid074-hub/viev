@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
-  <link rel="stylesheet" href="css/exxclusive-3.css?v=6.0">
+  <link rel="stylesheet" href="css/exxclusive-3.css?v=7.0">
 </head>
 <body>
 
@@ -613,14 +613,6 @@
     <!-- SCREEN 3: DEDICATED FULL PAGE - REAL YOUTUBE LOUNGE & FEED (DIGI OS 2.0) -->
     <section id="cinema-screen" class="app-screen" aria-label="Exxclusive Cinema">
       
-      <!-- 3.1 ELITE: Birthday Balloons in 4 Corners (Exact User Spec) -->
-      <div class="cinema-balloons-layer" id="cinema-balloons-layer" aria-hidden="true">
-        <img src="images/balloons_top_left.png" alt="" class="cinema-balloon-cluster corner-tl" />
-        <img src="images/balloons_top_right.png" alt="" class="cinema-balloon-cluster corner-tr" />
-        <img src="images/balloons_bottom_left.png" alt="" class="cinema-balloon-cluster corner-bl" />
-        <img src="images/balloons_bottom_right.png" alt="" class="cinema-balloon-cluster corner-br" />
-      </div>
-
       <!-- 1. NETFLIX-STYLE CINEMATIC OPENING SIGNATURE INTRO -->
       <div id="exxclusive-netflix-intro" class="exxclusive-netflix-intro" style="display: none;">
         <!-- Multi-Color Lines Ribbon Stage -->
@@ -683,19 +675,6 @@
                   <div class="source-item-meta">
                     <span class="source-item-title">YouTube</span>
                     <span class="source-item-desc">Browser Feed & Search</span>
-                  </div>
-                  <span class="source-item-check">✓</span>
-                </button>
-
-                <button type="button" class="aura-source-menu-item" data-source="reels" id="source-opt-reels">
-                  <div class="source-item-icon reels-icon">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
-                    </svg>
-                  </div>
-                  <div class="source-item-meta">
-                    <span class="source-item-title">Our Reels</span>
-                    <span class="source-item-desc">Private Video Memories</span>
                   </div>
                   <span class="source-item-check">✓</span>
                 </button>
@@ -781,49 +760,6 @@
           <div class="aura-yt-loader" id="aura-yt-loader" style="display: none;">
             <div class="aura-yt-spinner"></div>
             <span>Loading more videos...</span>
-          </div>
-        </div>
-
-        <!-- VIEW 3: OUR REELS (PRIVATE VIDEO MEMORIES) -->
-        <div id="aura-view-reels" class="aura-source-view" style="display: none;">
-          <!-- Top Action Bar: Search Pill + Add Reel Button -->
-          <div class="our-reels-action-bar">
-            <div class="aura-search-pill-box reels-search-pill-box">
-              <svg class="aura-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="text" id="aura-reels-search-input" class="aura-search-input" placeholder="Search our reels..." autocomplete="off">
-              <button type="button" id="aura-reels-search-clear-btn" class="aura-search-clear-btn" aria-label="Clear Search">✕</button>
-            </div>
-            <button type="button" class="our-reels-add-trigger-btn" id="our-reels-add-trigger-btn">
-              <span class="plus-icon">+</span>
-              <span>Add Reel</span>
-            </button>
-          </div>
-
-          <!-- Reels Topic Chips -->
-          <div class="aura-filters-scroll reels-filters-scroll" role="tablist" id="aura-reels-chips">
-            <button type="button" class="aura-filter-chip reels-chip active" data-tag="all">All Reels</button>
-            <button type="button" class="aura-filter-chip reels-chip" data-tag="romantic">💖 Romantic</button>
-            <button type="button" class="aura-filter-chip reels-chip" data-tag="memories">📸 Memories</button>
-            <button type="button" class="aura-filter-chip reels-chip" data-tag="music">🎵 Song Reels</button>
-            <button type="button" class="aura-filter-chip reels-chip" data-tag="vibes">✨ Special</button>
-          </div>
-
-          <!-- Empty State (Shown when no custom reels added yet) -->
-          <div class="our-reels-empty-box" id="our-reels-empty-box" style="display: none;">
-            <div class="empty-icon-orb">🎬</div>
-            <h3 class="empty-title">No Reels Added Yet</h3>
-            <p class="empty-subtitle">Paste any YouTube Short or Reel video link to save it here.</p>
-            <button type="button" class="empty-cta-btn" id="our-reels-empty-add-btn">
-              <span>+ Add Your First Reel</span>
-            </button>
-          </div>
-
-          <!-- Reels Vertical Grid Feed (9:16 aspect ratio cards) -->
-          <div class="aura-reels-feed-grid" id="aura-reels-feed-grid">
-            <!-- User added 9:16 vertical reel cards -->
           </div>
         </div>
       </div>
@@ -2249,130 +2185,6 @@
     </div>
   </div>
 
-  <!-- 3.1 ELITE: Fullscreen Interactive Vertical Reels Player (Exact Instagram Reels Feed) -->
-  <div class="viev-reels-theater-modal" id="viev-reels-theater-modal" style="display: none;" role="dialog" aria-modal="true" aria-label="Instagram Reels Theater">
-    <!-- Top Bar: Back Button, Title & Sound Toggle -->
-    <div class="reels-theater-topbar">
-      <button type="button" class="reels-action-btn reels-back-btn" id="reels-theater-close-btn" aria-label="Close Reels">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-      </button>
-      <div class="reels-theater-title">
-        <span class="reels-badge-dot"></span>
-        <span>Our Reels • Memories</span>
-      </div>
-      <button type="button" class="reels-action-btn reels-sound-btn" id="reels-sound-toggle-btn" aria-label="Toggle Sound">
-        <svg id="reels-sound-icon-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-        </svg>
-        <svg id="reels-sound-icon-off" style="display: none;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <line x1="23" y1="9" x2="17" y2="15"></line>
-          <line x1="17" y1="9" x2="23" y2="15"></line>
-        </svg>
-      </button>
-    </div>
-
-    <!-- Main Reels Swiper Container (Vertical swipe up/down) -->
-    <div class="reels-swipe-viewport" id="reels-swipe-viewport">
-      <!-- Vertical Reel Stage -->
-      <div class="reels-active-stage" id="reels-active-stage">
-        <iframe id="reels-active-iframe" class="reels-iframe" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-        <div class="reels-touch-overlay" id="reels-touch-overlay"></div>
-        
-        <!-- Double Tap Heart Burst Animation Layer -->
-        <div class="reels-heart-burst" id="reels-heart-burst">❤️</div>
-      </div>
-
-      <!-- Right Side Action Bar (Instagram Style) -->
-      <div class="reels-side-actions">
-        <!-- Like Button -->
-        <button type="button" class="reels-side-btn" id="reels-like-btn" aria-label="Like Reel">
-          <span class="reels-side-icon reels-heart-icon" id="reels-side-heart">🤍</span>
-          <span class="reels-side-count" id="reels-like-count">14.2K</span>
-        </button>
-        <!-- Comments / Vibes -->
-        <button type="button" class="reels-side-btn" id="reels-comment-btn" aria-label="Reel Vibes">
-          <span class="reels-side-icon">💬</span>
-          <span class="reels-side-count" id="reels-comment-count">1.8K</span>
-        </button>
-        <!-- Share / AirCast to Digi -->
-        <button type="button" class="reels-side-btn" id="reels-share-btn" aria-label="Watch Together with Digi">
-          <span class="reels-side-icon">✨</span>
-          <span class="reels-side-count">Share</span>
-        </button>
-      </div>
-
-      <!-- Bottom Reel Meta (Creator, Audio Tag, Title) -->
-      <div class="reels-bottom-meta">
-        <div class="reels-creator-row">
-          <div class="reels-creator-avatar">📸</div>
-          <span class="reels-creator-name" id="reels-creator-name">@reels_live</span>
-          <span class="reels-follow-pill">Follow</span>
-        </div>
-        <p class="reels-caption-text" id="reels-caption-text">Trending reel</p>
-        <div class="reels-audio-ticker">
-          <span class="audio-ticker-icon">♫</span>
-          <div class="audio-ticker-marquee">
-            <span id="reels-audio-title">Original Audio • Trending Beats</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Swipe Navigation Pill Indicators (Next / Prev) -->
-      <div class="reels-nav-controls">
-        <button type="button" class="reels-nav-btn prev-btn" id="reels-prev-btn" title="Previous Reel (Swipe Down)">▲</button>
-        <button type="button" class="reels-nav-btn next-btn" id="reels-next-btn" title="Next Reel (Swipe Up)">▼</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal: Add New Reel Sheet -->
-  <div class="cinema-cast-modal-backdrop" id="our-reels-add-modal" style="display: none;" role="dialog" aria-modal="true" aria-label="Add New Reel">
-    <div class="cinema-cast-sheet our-reels-sheet">
-      <button type="button" class="cinema-cast-close-btn" id="our-reels-modal-close-btn" aria-label="Close">✕</button>
-      <div class="cinema-cast-header">
-        <div class="cinema-cast-icon-orb reels-modal-orb">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
-          </svg>
-        </div>
-        <h3 class="cinema-cast-title">Add to Our Reels</h3>
-        <p class="cinema-cast-subtitle">Paste any YouTube Short or Reel video link to save it to your private collection.</p>
-      </div>
-
-      <div class="our-reels-form">
-        <div class="reels-form-group">
-          <label class="reels-form-label" for="reel-form-url">Reel or Video Link *</label>
-          <input type="url" id="reel-form-url" class="reels-form-input" placeholder="https://youtube.com/shorts/... or video link" required />
-        </div>
-        <div class="reels-form-group">
-          <label class="reels-form-label" for="reel-form-title">Caption / Title *</label>
-          <input type="text" id="reel-form-title" class="reels-form-input" placeholder="e.g. Our special song • Neetu & Virat" required />
-        </div>
-        <div class="reels-form-group">
-          <label class="reels-form-label" for="reel-form-audio">Song / Audio Name (optional)</label>
-          <input type="text" id="reel-form-audio" class="reels-form-input" placeholder="e.g. Tum Se Hi (Slowed & Reverb)" />
-        </div>
-        <div class="reels-form-group">
-          <label class="reels-form-label" for="reel-form-tag">Category</label>
-          <select id="reel-form-tag" class="reels-form-select">
-            <option value="romantic">💖 Romantic</option>
-            <option value="memories">📸 Memories</option>
-            <option value="music">🎵 Song Reel</option>
-            <option value="vibes">✨ Special Vibe</option>
-          </select>
-        </div>
-
-        <button type="button" class="reels-form-submit-btn" id="reel-form-submit-btn">
-          <span>Save to Our Reels</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <script src="js/apple-welcome.js?v=21.0"></script>
   <script src="js/daily-note.js?v=8.4"></script>
   <script src="js/navbar.js?v=8.0"></script>
@@ -2381,7 +2193,7 @@
   <script src="js/cast-engine.js?v=7.1"></script>
   <script src="js/motion-ad.js?v=7.1"></script>
   <script src="js/exxclusive.js?v=7.4"></script>
-  <script src="js/exxclusive-3.js?v=6.0"></script>
+  <script src="js/exxclusive-3.js?v=7.0"></script>
   <script src="js/push-notifications.js?v=2.0"></script>
   <script src="js/app.js?v=7.4"></script>
 </body>
