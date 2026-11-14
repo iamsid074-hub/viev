@@ -697,10 +697,10 @@
         loadYouTubeFeed('all');
       }
     } else if (source === 'reels') {
-      if (sourceActiveLabel) sourceActiveLabel.textContent = 'Instagram Reels';
+      if (sourceActiveLabel) sourceActiveLabel.textContent = 'Our Reels';
       if (sourceActiveIcon) {
         sourceActiveIcon.className = 'aura-source-btn-icon is-reels';
-        sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`;
+        sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>`;
       }
       initReelsFeed();
     } else {
@@ -1322,248 +1322,99 @@
   }
 
   // =========================================================
-  // 3.1 ELITE: LIVE INSTAGRAM REELS & VERTICAL SWIPER
+  // 3.1 ELITE: OUR REELS (PRIVATE VIDEO MEMORIES & REELS)
   // =========================================================
-  const LIVE_REELS = [
+  const OUR_REELS_STORAGE_KEY = 'viev_our_reels';
+  const DEFAULT_OUR_REELS = [
     {
       id: "reel-tumsehi",
       videoId: "jHNNMj5bNQw",
       title: "Tum Se Hi • Late Night Vibe ✨",
-      creator: "@viev_exclusive",
+      creator: "Our Memories",
       audio: "Tum Se Hi (Lofi Chill)",
-      views: "1.4M",
-      likes: "89.2K",
-      comments: "3.4K",
-      tag: "romantic"
-    },
-    {
-      id: "reel-kesariya",
-      videoId: "BddP6PYo2gs",
-      title: "Kesariya Tera Ishq Hai Piya 💫",
-      creator: "@arijit_live",
-      audio: "Kesariya • Arijit Singh",
-      views: "3.8M",
-      likes: "240K",
-      comments: "12.8K",
-      tag: "romantic"
+      views: "Special",
+      likes: "❤️",
+      tag: "romantic",
+      addedAt: 1731600000000
     },
     {
       id: "reel-apnabanale",
-      videoId: "AX6OrbgS8lI",
-      title: "Apna Bana Le Piya • Dil Se Dil Tak ❤️",
-      creator: "@romantic_reels",
-      audio: "Apna Bana Le • Bhediya",
-      views: "2.1M",
-      likes: "165K",
-      comments: "8.1K",
-      tag: "romantic"
-    },
-    {
-      id: "reel-pehle",
-      videoId: "HqUeS9fqmTu",
-      title: "Pehle Bhi Main Tumse Mila Hu 🎵",
-      creator: "@animal_vibes",
-      audio: "Pehle Bhi Main • Vishal Mishra",
-      views: "4.5M",
-      likes: "310K",
-      comments: "14.2K",
-      tag: "trending"
-    },
-    {
-      id: "reel-omaahi",
-      videoId: "fTdz8N_j6bY",
-      title: "O Maahi O Maahi • Dunki Acoustic 🌸",
-      creator: "@srk_reels",
-      audio: "O Maahi • Pritam & Arijit",
-      views: "1.9M",
-      likes: "142K",
-      comments: "5.6K",
-      tag: "romantic"
-    },
-    {
-      id: "reel-satranga",
-      videoId: "d4Xn223C7gA",
-      title: "Satranga • Ishq Sufiyana Beats 🌈",
-      creator: "@sufi_music",
-      audio: "Satranga • Arijit Singh",
-      views: "2.8M",
-      likes: "198K",
-      comments: "9.3K",
-      tag: "trending"
-    },
-    {
-      id: "reel-raataan",
-      videoId: "gvyUuxdRdR4",
-      title: "Raataan Lambiyan • Shershaah Reel 🌙",
-      creator: "@bollywood_reels",
-      audio: "Raataan Lambiyan • Jubin Nautiyal",
-      views: "5.1M",
-      likes: "420K",
-      comments: "18.5K",
-      tag: "romantic"
-    },
-    {
-      id: "reel-husn",
-      videoId: "6xKWiCMKKnM",
-      title: "Husn Tera • Anuv Jain Aesthetic 🌌",
-      creator: "@indie_tunes",
-      audio: "Husn • Anuv Jain",
-      views: "3.2M",
-      likes: "285K",
-      comments: "16.1K",
-      tag: "vibes"
-    },
-    {
-      id: "reel-chaleya",
-      videoId: "VbggtGjA1t8",
-      title: "Chaleya • Shah Rukh & Nayanthara Vibe 💃",
-      creator: "@jawan_energy",
-      audio: "Chaleya • Anirudh & Arijit",
-      views: "6.4M",
-      likes: "510K",
-      comments: "22.4K",
-      tag: "viral"
-    },
-    {
-      id: "reel-terehawaale",
-      videoId: "3v3gU9XQj3g",
-      title: "Tere Hawaale Kar Diya Ye Dil 🕊️",
-      creator: "@arijit_magic",
-      audio: "Tere Hawaale • Laal Singh Chaddha",
-      views: "2.4M",
-      likes: "178K",
-      comments: "7.9K",
-      tag: "romantic"
-    },
-    {
-      id: "reel-heeriye",
-      videoId: "RLzC55ai0eo",
-      title: "Heeriye Heeriye Aa • Dulquer & Jasleen 💍",
-      creator: "@jasleen_live",
-      audio: "Heeriye • Arijit Singh & Jasleen",
-      views: "4.8M",
-      likes: "390K",
-      comments: "15.7K",
-      tag: "viral"
-    },
-    {
-      id: "reel-maanmerijaan",
-      videoId: "1ZYbU82GVz4",
-      title: "Maan Meri Jaan • King Champagne Talk 👑",
-      creator: "@king_reels",
-      audio: "Maan Meri Jaan • King",
-      views: "7.2M",
-      likes: "680K",
-      comments: "29.1K",
-      tag: "viral"
-    },
-    {
-      id: "reel-kahanisuno",
-      videoId: "k4yXQkGLeAk",
-      title: "Kahani Suno 2.0 • Kaifi Khalil Soul 💔",
-      creator: "@sad_melodies",
-      audio: "Kahani Suno 2.0 • Kaifi Khalil",
-      views: "5.5M",
-      likes: "440K",
-      comments: "21.0K",
-      tag: "vibes"
-    },
-    {
-      id: "reel-taubatauba",
-      videoId: "v3X8O_28u8s",
-      title: "Tauba Tauba • Vicky Kaushal Dance Craze 🔥",
-      creator: "@karan_aujla_fan",
-      audio: "Tauba Tauba • Karan Aujla",
-      views: "8.9M",
-      likes: "790K",
-      comments: "34.5K",
-      tag: "trending"
-    },
-    {
-      id: "reel-sajni",
-      videoId: "Y8yWwG77sQ8",
-      title: "O Sajni Re • Laapataa Ladies Masterpiece 🌹",
-      creator: "@laapataa_reels",
-      audio: "Sajni • Ram Sampath & Arijit",
-      views: "3.6M",
-      likes: "295K",
-      comments: "13.4K",
-      tag: "bollywood"
-    },
-    {
-      id: "reel-vehaaniyan",
-      videoId: "Z3x8X32x9Xs",
-      title: "Ve Haaniyan • Ravi & Sargun Love Anthem 💑",
-      creator: "@punjabi_beats",
-      audio: "Ve Haaniyan • Danny",
-      views: "3.1M",
-      likes: "230K",
-      comments: "10.2K",
-      tag: "romantic"
-    },
-    {
-      id: "reel-tuhaikahan",
-      videoId: "Q8u17x89v2s",
-      title: "Tu Hai Kahan • AUR Midnight Acoustic 🎧",
-      creator: "@aur_music",
-      audio: "Tu Hai Kahan • AUR",
-      views: "4.1M",
-      likes: "340K",
-      comments: "16.8K",
-      tag: "vibes"
-    },
-    {
-      id: "reel-ruaan",
-      videoId: "W7x391xX82s",
-      title: "Ruaan • Tiger 3 Arijit Soul Track 🐅",
-      creator: "@tiger_reels",
-      audio: "Ruaan • Pritam & Arijit Singh",
-      views: "1.8M",
-      likes: "125K",
-      comments: "4.8K",
-      tag: "bollywood"
-    },
-    {
-      id: "reel-devadeva",
-      videoId: "A8x11X882u0",
-      title: "Deva Deva • Brahmastra Divine Light ⚡",
-      creator: "@dharma_music",
-      audio: "Deva Deva • Arijit Singh",
-      views: "3.9M",
-      likes: "290K",
-      comments: "11.5K",
-      tag: "bollywood"
-    },
-    {
-      id: "reel-soulmate",
-      videoId: "P9u821x8x21",
-      title: "Soulmate • Badshah ft. Arijit Singh 💎",
-      creator: "@badshah_reels",
-      audio: "Soulmate • Ek Tha Raja",
-      views: "5.0M",
-      likes: "410K",
-      comments: "17.2K",
-      tag: "trending"
+      videoId: "BddP6PYo2gs",
+      title: "Apna Bana Le Piya 💖",
+      creator: "Our Memories",
+      audio: "Apna Bana Le • Arijit Singh",
+      views: "Special",
+      likes: "❤️",
+      tag: "romantic",
+      addedAt: 1731600100000
     }
   ];
 
-  let activeReelsList = [...LIVE_REELS];
+  function loadOurReelsFromStorage() {
+    try {
+      const stored = localStorage.getItem(OUR_REELS_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn("Failed to parse our reels from storage", e);
+    }
+    // Initialize default if empty
+    try {
+      localStorage.setItem(OUR_REELS_STORAGE_KEY, JSON.stringify(DEFAULT_OUR_REELS));
+    } catch (_) {}
+    return [...DEFAULT_OUR_REELS];
+  }
+
+  function saveOurReelsToStorage(list) {
+    try {
+      localStorage.setItem(OUR_REELS_STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.warn("Failed to save our reels to storage", e);
+    }
+  }
+
+  function extractReelVideoId(urlOrId) {
+    if (!urlOrId) return '';
+    const str = urlOrId.trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+    const shortsMatch = str.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/i);
+    if (shortsMatch) return shortsMatch[1];
+    const youtuMatch = str.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+    if (youtuMatch) return youtuMatch[1];
+    const watchMatch = str.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+    if (watchMatch) return watchMatch[1];
+    const embedMatch = str.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/i);
+    if (embedMatch) return embedMatch[1];
+    return '';
+  }
+
+  let masterOurReels = loadOurReelsFromStorage();
+  let activeReelsList = [...masterOurReels];
   let currentReelIndex = 0;
   let reelsIsMuted = false;
   let isReelsTheaterOpen = false;
   let reelsFeedInitialized = false;
 
   function initReelsFeed() {
-    if (!reelsFeedInitialized) {
-      reelsFeedInitialized = true;
-      renderReelsGrid(activeReelsList);
-    }
+    masterOurReels = loadOurReelsFromStorage();
+    activeReelsList = [...masterOurReels];
+    renderReelsGrid(activeReelsList);
   }
 
   function renderReelsGrid(items) {
     const gridEl = document.getElementById('aura-reels-feed-grid');
+    const emptyBox = document.getElementById('our-reels-empty-box');
     if (!gridEl) return;
     gridEl.innerHTML = '';
+
+    if (!items || items.length === 0) {
+      if (emptyBox) emptyBox.style.display = 'flex';
+      return;
+    }
+
+    if (emptyBox) emptyBox.style.display = 'none';
 
     items.forEach((reel, idx) => {
       const card = document.createElement('div');
@@ -1573,18 +1424,45 @@
         <div class="reel-card-scrim"></div>
         <div class="reel-top-badges">
           <span class="reel-live-tag"><span class="reel-live-dot"></span> Reel</span>
-          <span class="reel-views-pill">👁️ ${reel.views}</span>
+          <button type="button" class="reel-card-delete-btn" data-id="${reel.id}" title="Remove Reel" aria-label="Remove Reel">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
         </div>
         <div class="reel-card-meta">
           <p class="reel-card-title">${reel.title}</p>
-          <div class="reel-card-audio">♫ ${reel.audio}</div>
+          <div class="reel-card-audio">♫ ${reel.audio || 'Original Sound'}</div>
         </div>
       `;
-      card.addEventListener('click', () => {
+
+      // Delete action on trash button
+      const delBtn = card.querySelector('.reel-card-delete-btn');
+      if (delBtn) {
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteReelById(reel.id);
+        });
+      }
+
+      // Card click opens theater
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.reel-card-delete-btn')) return;
         openReelsTheater(idx, items);
       });
+
       gridEl.appendChild(card);
     });
+  }
+
+  function deleteReelById(reelId) {
+    if (!confirm("Are you sure you want to remove this reel from Our Reels?")) return;
+    masterOurReels = masterOurReels.filter(r => r.id !== reelId);
+    saveOurReelsToStorage(masterOurReels);
+    activeReelsList = activeReelsList.filter(r => r.id !== reelId);
+    renderReelsGrid(activeReelsList);
+    if (window.triggerHaptic) window.triggerHaptic(40);
   }
 
   function openReelsTheater(idx, list = activeReelsList) {
@@ -1620,11 +1498,11 @@
     const commentCount = document.getElementById('reels-comment-count');
     const heartIcon = document.getElementById('reels-side-heart');
 
-    if (creatorName) creatorName.textContent = reel.creator;
+    if (creatorName) creatorName.textContent = reel.creator || 'Our Memories';
     if (captionText) captionText.textContent = reel.title;
-    if (audioTitle) audioTitle.textContent = `${reel.audio} • Original Sound`;
-    if (likeCount) likeCount.textContent = reel.likes;
-    if (commentCount) commentCount.textContent = reel.comments || '1.2K';
+    if (audioTitle) audioTitle.textContent = `${reel.audio || 'Original Sound'} • Special`;
+    if (likeCount) likeCount.textContent = reel.likes || '❤️';
+    if (commentCount) commentCount.textContent = 'Special';
     if (heartIcon) {
       heartIcon.textContent = '🤍';
       heartIcon.classList.remove('is-liked');
@@ -1663,6 +1541,64 @@
     if (window.triggerHaptic) window.triggerHaptic(60);
   }
 
+  function openAddReelModal() {
+    const modal = document.getElementById('our-reels-add-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+      const urlInput = document.getElementById('reel-form-url');
+      if (urlInput) setTimeout(() => urlInput.focus(), 80);
+    }
+  }
+
+  function closeAddReelModal() {
+    const modal = document.getElementById('our-reels-add-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function handleAddReelSubmit() {
+    const urlInput = document.getElementById('reel-form-url');
+    const titleInput = document.getElementById('reel-form-title');
+    const audioInput = document.getElementById('reel-form-audio');
+    const tagInput = document.getElementById('reel-form-tag');
+
+    const rawUrl = urlInput ? urlInput.value.trim() : '';
+    const title = titleInput && titleInput.value.trim() ? titleInput.value.trim() : 'Our Special Reel';
+    const audio = audioInput && audioInput.value.trim() ? audioInput.value.trim() : 'Original Audio';
+    const tag = tagInput ? tagInput.value : 'romantic';
+
+    const videoId = extractReelVideoId(rawUrl);
+    if (!videoId) {
+      alert("Please paste a valid YouTube Shorts or Video link (e.g. https://youtube.com/shorts/...)");
+      if (urlInput) urlInput.focus();
+      return;
+    }
+
+    const newReel = {
+      id: "reel-" + Date.now(),
+      videoId: videoId,
+      title: title,
+      creator: "Our Memories",
+      audio: audio,
+      views: "Special",
+      likes: "❤️",
+      tag: tag,
+      addedAt: Date.now()
+    };
+
+    masterOurReels.unshift(newReel);
+    saveOurReelsToStorage(masterOurReels);
+    activeReelsList = [...masterOurReels];
+    renderReelsGrid(activeReelsList);
+
+    // Reset inputs
+    if (urlInput) urlInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (audioInput) audioInput.value = '';
+
+    closeAddReelModal();
+    if (window.triggerHaptic) window.triggerHaptic(50);
+  }
+
   function bindReelsEvents() {
     const closeBtn = document.getElementById('reels-theater-close-btn');
     const nextBtn = document.getElementById('reels-next-btn');
@@ -1674,6 +1610,23 @@
     const searchInput = document.getElementById('aura-reels-search-input');
     const clearBtn = document.getElementById('aura-reels-search-clear-btn');
     const chips = Array.from(document.querySelectorAll('#aura-reels-chips .reels-chip'));
+
+    // Add Reel Modal Triggers
+    const addTriggerBtn = document.getElementById('our-reels-add-trigger-btn');
+    const emptyAddBtn = document.getElementById('our-reels-empty-add-btn');
+    const modalCloseBtn = document.getElementById('our-reels-modal-close-btn');
+    const modalBackdrop = document.getElementById('our-reels-add-modal');
+    const formSubmitBtn = document.getElementById('reel-form-submit-btn');
+
+    if (addTriggerBtn) addTriggerBtn.addEventListener('click', openAddReelModal);
+    if (emptyAddBtn) emptyAddBtn.addEventListener('click', openAddReelModal);
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeAddReelModal);
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) closeAddReelModal();
+      });
+    }
+    if (formSubmitBtn) formSubmitBtn.addEventListener('click', handleAddReelSubmit);
 
     if (closeBtn) closeBtn.addEventListener('click', closeReelsTheater);
     if (nextBtn) nextBtn.addEventListener('click', nextReel);
@@ -1766,12 +1719,11 @@
       chip.addEventListener('click', () => {
         chips.forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
-        const tag = chip.getAttribute('data-tag') || 'trending';
-        if (tag === 'trending') {
-          activeReelsList = [...LIVE_REELS];
+        const tag = chip.getAttribute('data-tag') || 'all';
+        if (tag === 'all' || tag === 'trending') {
+          activeReelsList = [...masterOurReels];
         } else {
-          activeReelsList = LIVE_REELS.filter(r => r.tag === tag || r.title.toLowerCase().includes(tag));
-          if (activeReelsList.length === 0) activeReelsList = [...LIVE_REELS];
+          activeReelsList = masterOurReels.filter(r => r.tag === tag || r.title.toLowerCase().includes(tag));
         }
         renderReelsGrid(activeReelsList);
       });
@@ -1783,12 +1735,12 @@
         const q = searchInput.value.trim().toLowerCase();
         if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
         if (!q) {
-          activeReelsList = [...LIVE_REELS];
+          activeReelsList = [...masterOurReels];
         } else {
-          activeReelsList = LIVE_REELS.filter(r =>
+          activeReelsList = masterOurReels.filter(r =>
             r.title.toLowerCase().includes(q) ||
             r.creator.toLowerCase().includes(q) ||
-            r.audio.toLowerCase().includes(q)
+            (r.audio && r.audio.toLowerCase().includes(q))
           );
         }
         renderReelsGrid(activeReelsList);
@@ -1799,7 +1751,7 @@
       clearBtn.addEventListener('click', () => {
         if (searchInput) searchInput.value = '';
         clearBtn.style.display = 'none';
-        activeReelsList = [...LIVE_REELS];
+        activeReelsList = [...masterOurReels];
         renderReelsGrid(activeReelsList);
       });
     }
