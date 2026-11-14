@@ -301,9 +301,4 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('storage', evaluateEliteCandlesAccess);
   window.addEventListener('viev:session-changed', evaluateEliteCandlesAccess);
   setInterval(evaluateEliteCandlesAccess, 600);
-
-  /* =========================================================
-     3.1 ELITE: PERMANENT VELVET NOIR LUXURY THEME
-     ========================================================= */
-  document.body.setAttribute('data-theme', 'velvet-noir');
 });
