@@ -303,40 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(evaluateEliteCandlesAccess, 600);
 
   /* =========================================================
-     3.1 ELITE: INTERACTIVE THEME PREVIEW SWITCHER
+     3.1 ELITE: PERMANENT VELVET NOIR LUXURY THEME
      ========================================================= */
-  const THEME_STORAGE_KEY = 'viev_elite_theme';
-  const themeBtns = document.querySelectorAll('.theme-switch-btn');
-
-  function applyEliteTheme(themeName) {
-    if (!themeName || (themeName !== 'rose-gold' && themeName !== 'velvet-noir' && themeName !== 'starlight-silver')) {
-      themeName = 'velvet-noir';
-    }
-    document.body.setAttribute('data-theme', themeName);
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, themeName);
-    } catch (_) {}
-
-    themeBtns.forEach((btn) => {
-      const isCurrent = btn.getAttribute('data-theme') === themeName;
-      btn.classList.toggle('active', isCurrent);
-    });
-  }
-
-  // Restore saved theme or default to velvet-noir
-  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'velvet-noir';
-  applyEliteTheme(savedTheme);
-
-  themeBtns.forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const chosen = btn.getAttribute('data-theme');
-      if (window.triggerHaptic) {
-        window.triggerHaptic('light');
-      } else if (navigator.vibrate) {
-        navigator.vibrate(20);
-      }
-      applyEliteTheme(chosen);
-    });
-  });
+  document.body.setAttribute('data-theme', 'velvet-noir');
 });
