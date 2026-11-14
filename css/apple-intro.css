@@ -8343,9 +8343,9 @@
   pointer-events: none;
 }
 
-/* Strictly visible ONLY when body has .is-elite-1711 AND home screen is active */
-body.is-elite-1711 #welcome-screen.active .elite-birthday-candles-container,
-body.is-elite-1711 .app-screen#welcome-screen.active .elite-birthday-candles-container {
+/* Strictly visible ONLY when body has .is-elite-1711 AND settings screen is active */
+body.is-elite-1711 #settings-screen.active .elite-birthday-candles-container,
+body.is-elite-1711 .app-screen#settings-screen.active .elite-birthday-candles-container {
   display: block !important;
 }
 

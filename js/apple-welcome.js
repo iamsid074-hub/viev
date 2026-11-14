@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (is1711) {
       document.body.classList.add('is-elite-1711');
-      if (container) container.style.setProperty('display', 'block', 'important');
+      if (container) container.style.removeProperty('display');
       if (hbdBanner) hbdBanner.style.setProperty('display', 'flex', 'important');
       if (mangalBanner) mangalBanner.style.setProperty('display', 'none', 'important');
     } else {
