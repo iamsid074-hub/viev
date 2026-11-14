@@ -8677,16 +8677,15 @@ body.is-elite-1711 #elite-hbd-banner {
 }
 
 /* =========================================================
-   3.1 ELITE: ULTRA-LUXURY MATTE VELVET NOIR (ZERO NOISE / ZERO GLOW)
-   Strictly Gated for ID 1711
+   3.1 ELITE: SOLID BABY PINK PALETTE (ID 1711 ONLY)
+   Applied everywhere across the app background EXCEPT Cinema
    ========================================================= */
 
-/* Pure, Clean, Deep Obsidian Velvet Canvas (No fuzzy neon fog) */
+/* Solid Baby Pink Canvas */
 body.is-elite-1711 {
-  background-color: #070306 !important;
-  background-image: radial-gradient(ellipse 100% 80% at 50% 0%, #13040c 0%, #070306 65%, #000000 100%) !important;
-  background-attachment: fixed !important;
-  background-size: 100% 100% !important;
+  background-color: #fbcfe8 !important;
+  background-image: none !important;
+  background: #fbcfe8 !important;
 }
 
 /* Eliminate all blurry ambient blobs entirely */
@@ -8694,47 +8693,57 @@ body.is-elite-1711 .liquid-ambient-canvas {
   display: none !important;
 }
 
-/* Make all screen wrappers transparent so the velvet obsidian canvas is pure and uniform */
+/* Make all screen wrappers transparent so the baby pink canvas shines through everywhere */
 body.is-elite-1711 .app-screen,
 body.is-elite-1711 .login-screen,
 body.is-elite-1711 #welcome-screen,
 body.is-elite-1711 #music-screen,
-body.is-elite-1711 #cinema-screen,
 body.is-elite-1711 #settings-screen,
 body.is-elite-1711 #hub-screen {
   background-color: transparent !important;
   background: transparent !important;
 }
 
-/* Hide Theme Switcher Pill (Restoring clean view of Digi's photo) */
+/* EXCEPT CINEMA: Strictly Deep Obsidian Black */
+body.is-elite-1711 #cinema-screen,
+body.is-elite-1711 #cinema-screen.active,
+body.is-elite-1711 .cinema-lounge-chassis,
+body.is-elite-1711 #cinema-modal,
+body.is-elite-1711 .viev-cast-fullscreen-theater {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Hide Theme Switcher Pill */
 .elite-theme-switcher-bar,
 #elite-theme-switcher {
   display: none !important;
 }
 
-/* 1. CLOCK CARD: Razor-Sharp Smoked Glass (No neon glow haze) */
+/* 1. CLOCK CARD: Smoked Dark Liquid Glass on Baby Pink (Ultra High Contrast) */
 body.is-elite-1711 .apple-live-clock {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(20, 5, 12, 0.35) 100%) !important;
-  border: 1px solid rgba(244, 63, 94, 0.25) !important;
+  background: rgba(18, 12, 16, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
   border-radius: 28px !important;
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.20), inset 0 -1px 0 rgba(0, 0, 0, 0.40) !important;
+  box-shadow: 0 16px 36px rgba(220, 100, 140, 0.25), 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
   transition: all 0.3s ease;
 }
 
 body.is-elite-1711 .milestone-label {
-  color: #f472b6 !important;
+  color: #fbcfe8 !important;
   font-weight: 700 !important;
   text-shadow: none !important;
 }
 
 body.is-elite-1711 .clock-vertical-divider {
-  background: linear-gradient(180deg, transparent 0%, rgba(244, 63, 94, 0.30) 50%, transparent 100%) !important;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.20) 50%, transparent 100%) !important;
 }
 
 body.is-elite-1711 .ticker-sublabel {
-  color: rgba(255, 255, 255, 0.50) !important;
+  color: rgba(255, 255, 255, 0.60) !important;
 }
 
 body.is-elite-1711 .segment-num {
@@ -8742,14 +8751,14 @@ body.is-elite-1711 .segment-num {
   text-shadow: none !important;
 }
 
-/* 2. 3D HAPPY BIRTHDAY & NEETU: Pure Razor-Sharp Metallic Elegance */
+/* 2. 3D HAPPY BIRTHDAY & NEETU: High Contrast Luxury on Baby Pink */
 body.is-elite-1711 .elite-hbd-ambient-aura,
 .elite-hbd-ambient-aura {
   display: none !important;
 }
 
 body.is-elite-1711 .elite-hbd-3d-logo {
-  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.95)) !important;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45)) !important;
 }
 
 body.is-elite-1711 .elite-hbd-neetu-title {
@@ -8759,36 +8768,42 @@ body.is-elite-1711 .elite-hbd-neetu-title {
   letter-spacing: 0.36em;
   margin-left: 0.36em;
   text-transform: uppercase;
-  background: linear-gradient(180deg, #ffffff 0%, #ffe4e6 25%, #f472b6 55%, #db2777 75%, #881337 100%) !important;
+  background: linear-gradient(180deg, #6b0c26 0%, #9f1239 35%, #be123c 65%, #4c0519 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.95)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.90)) !important;
+  filter: drop-shadow(0 2px 3px rgba(100, 10, 30, 0.35)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25)) !important;
   text-shadow: none !important;
 }
 
-/* 3. FLOATING NAVBAR: Clean Optical Liquid Crystal (Zero Neon Haze) */
+/* 3. FLOATING NAVBAR: Smoked Dark Liquid Glass Dock */
 body.is-elite-1711 .apple-floating-navbar {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.012) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  background: rgba(18, 12, 16, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
   border-radius: 9999px !important;
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.85), inset 0 1.2px 0.5px rgba(255, 255, 255, 0.36), inset 0 -1px 0.8px rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 16px 38px rgba(220, 100, 140, 0.28), 0 4px 14px rgba(0, 0, 0, 0.18), inset 0 1.2px 0.5px rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(36px) !important;
+  -webkit-backdrop-filter: blur(36px) !important;
 }
 
 body.is-elite-1711 .nav-indicator-pill {
-  background: linear-gradient(135deg, rgba(225, 29, 72, 0.28) 0%, rgba(136, 19, 55, 0.22) 100%) !important;
-  border: 1px solid rgba(244, 63, 94, 0.38) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.50), inset 0 1px 1px rgba(255, 255, 255, 0.30) !important;
+  background: rgba(244, 63, 94, 0.40) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.30) !important;
+}
+
+body.is-elite-1711 .nav-tab-btn {
+  color: rgba(255, 255, 255, 0.65) !important;
 }
 
 body.is-elite-1711 .nav-tab-btn.active {
   color: #ffffff !important;
   text-shadow: none !important;
-  font-weight: 650 !important;
+  font-weight: 700 !important;
 }
 
-/* 4. LIVING BIRTHDAY CANDLES: Flanking baseline, warm natural flame */
+/* 4. LIVING BIRTHDAY CANDLES */
 body.is-elite-1711 .elite-candle-wrapper {
-  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.90));
+  filter: drop-shadow(0 6px 14px rgba(180, 50, 90, 0.35));
 }
 
 
