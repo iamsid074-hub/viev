@@ -663,10 +663,29 @@
     const sourceActiveIcon = document.getElementById('aura-source-active-icon');
     const sourceOptLibrary = document.getElementById('source-opt-library');
     const sourceOptYoutube = document.getElementById('source-opt-youtube');
+    const sourceOptReels = document.getElementById('source-opt-reels');
     const viewLibraryEl = document.getElementById('aura-view-library');
     const viewYoutubeEl = document.getElementById('aura-view-youtube');
+    const viewReelsEl = document.getElementById('aura-view-reels');
 
     if (sourceSwitcherEl) sourceSwitcherEl.classList.remove('is-open');
+
+    if (sourceOptLibrary) sourceOptLibrary.classList.toggle('active', source === 'library');
+    if (sourceOptYoutube) sourceOptYoutube.classList.toggle('active', source === 'youtube');
+    if (sourceOptReels) sourceOptReels.classList.toggle('active', source === 'reels');
+
+    if (viewLibraryEl) {
+      viewLibraryEl.style.display = source === 'library' ? 'flex' : 'none';
+      viewLibraryEl.classList.toggle('active', source === 'library');
+    }
+    if (viewYoutubeEl) {
+      viewYoutubeEl.style.display = source === 'youtube' ? 'flex' : 'none';
+      viewYoutubeEl.classList.toggle('active', source === 'youtube');
+    }
+    if (viewReelsEl) {
+      viewReelsEl.style.display = source === 'reels' ? 'flex' : 'none';
+      viewReelsEl.classList.toggle('active', source === 'reels');
+    }
 
     if (source === 'youtube') {
       if (sourceActiveLabel) sourceActiveLabel.textContent = 'YouTube';
@@ -674,34 +693,21 @@
         sourceActiveIcon.className = 'aura-source-btn-icon is-yt';
         sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>`;
       }
-      if (sourceOptLibrary) sourceOptLibrary.classList.remove('active');
-      if (sourceOptYoutube) sourceOptYoutube.classList.add('active');
-
-      if (viewLibraryEl) viewLibraryEl.style.display = 'none';
-      if (viewYoutubeEl) {
-        viewYoutubeEl.style.display = 'flex';
-        viewYoutubeEl.classList.add('active');
-      }
-
       if (ytFeedVideos.length === 0) {
         loadYouTubeFeed('all');
       }
+    } else if (source === 'reels') {
+      if (sourceActiveLabel) sourceActiveLabel.textContent = 'Instagram Reels';
+      if (sourceActiveIcon) {
+        sourceActiveIcon.className = 'aura-source-btn-icon is-reels';
+        sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`;
+      }
+      initReelsFeed();
     } else {
       if (sourceActiveLabel) sourceActiveLabel.textContent = 'Added Videos';
       if (sourceActiveIcon) {
         sourceActiveIcon.className = 'aura-source-btn-icon';
         sourceActiveIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 2v20M8 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path></svg>`;
-      }
-      if (sourceOptLibrary) sourceOptLibrary.classList.add('active');
-      if (sourceOptYoutube) sourceOptYoutube.classList.remove('active');
-
-      if (viewYoutubeEl) {
-        viewYoutubeEl.style.display = 'none';
-        viewYoutubeEl.classList.remove('active');
-      }
-      if (viewLibraryEl) {
-        viewLibraryEl.style.display = 'flex';
-        viewLibraryEl.classList.add('active');
       }
     }
   }
@@ -1315,6 +1321,490 @@
     }, 2600);
   }
 
+  // =========================================================
+  // 3.1 ELITE: LIVE INSTAGRAM REELS & VERTICAL SWIPER
+  // =========================================================
+  const LIVE_REELS = [
+    {
+      id: "reel-tumsehi",
+      videoId: "jHNNMj5bNQw",
+      title: "Tum Se Hi • Late Night Vibe ✨",
+      creator: "@viev_exclusive",
+      audio: "Tum Se Hi (Lofi Chill)",
+      views: "1.4M",
+      likes: "89.2K",
+      comments: "3.4K",
+      tag: "romantic"
+    },
+    {
+      id: "reel-kesariya",
+      videoId: "BddP6PYo2gs",
+      title: "Kesariya Tera Ishq Hai Piya 💫",
+      creator: "@arijit_live",
+      audio: "Kesariya • Arijit Singh",
+      views: "3.8M",
+      likes: "240K",
+      comments: "12.8K",
+      tag: "romantic"
+    },
+    {
+      id: "reel-apnabanale",
+      videoId: "AX6OrbgS8lI",
+      title: "Apna Bana Le Piya • Dil Se Dil Tak ❤️",
+      creator: "@romantic_reels",
+      audio: "Apna Bana Le • Bhediya",
+      views: "2.1M",
+      likes: "165K",
+      comments: "8.1K",
+      tag: "romantic"
+    },
+    {
+      id: "reel-pehle",
+      videoId: "HqUeS9fqmTu",
+      title: "Pehle Bhi Main Tumse Mila Hu 🎵",
+      creator: "@animal_vibes",
+      audio: "Pehle Bhi Main • Vishal Mishra",
+      views: "4.5M",
+      likes: "310K",
+      comments: "14.2K",
+      tag: "trending"
+    },
+    {
+      id: "reel-omaahi",
+      videoId: "fTdz8N_j6bY",
+      title: "O Maahi O Maahi • Dunki Acoustic 🌸",
+      creator: "@srk_reels",
+      audio: "O Maahi • Pritam & Arijit",
+      views: "1.9M",
+      likes: "142K",
+      comments: "5.6K",
+      tag: "romantic"
+    },
+    {
+      id: "reel-satranga",
+      videoId: "d4Xn223C7gA",
+      title: "Satranga • Ishq Sufiyana Beats 🌈",
+      creator: "@sufi_music",
+      audio: "Satranga • Arijit Singh",
+      views: "2.8M",
+      likes: "198K",
+      comments: "9.3K",
+      tag: "trending"
+    },
+    {
+      id: "reel-raataan",
+      videoId: "gvyUuxdRdR4",
+      title: "Raataan Lambiyan • Shershaah Reel 🌙",
+      creator: "@bollywood_reels",
+      audio: "Raataan Lambiyan • Jubin Nautiyal",
+      views: "5.1M",
+      likes: "420K",
+      comments: "18.5K",
+      tag: "romantic"
+    },
+    {
+      id: "reel-husn",
+      videoId: "6xKWiCMKKnM",
+      title: "Husn Tera • Anuv Jain Aesthetic 🌌",
+      creator: "@indie_tunes",
+      audio: "Husn • Anuv Jain",
+      views: "3.2M",
+      likes: "285K",
+      comments: "16.1K",
+      tag: "vibes"
+    },
+    {
+      id: "reel-chaleya",
+      videoId: "VbggtGjA1t8",
+      title: "Chaleya • Shah Rukh & Nayanthara Vibe 💃",
+      creator: "@jawan_energy",
+      audio: "Chaleya • Anirudh & Arijit",
+      views: "6.4M",
+      likes: "510K",
+      comments: "22.4K",
+      tag: "viral"
+    },
+    {
+      id: "reel-terehawaale",
+      videoId: "3v3gU9XQj3g",
+      title: "Tere Hawaale Kar Diya Ye Dil 🕊️",
+      creator: "@arijit_magic",
+      audio: "Tere Hawaale • Laal Singh Chaddha",
+      views: "2.4M",
+      likes: "178K",
+      comments: "7.9K",
+      tag: "romantic"
+    },
+    {
+      id: "reel-heeriye",
+      videoId: "RLzC55ai0eo",
+      title: "Heeriye Heeriye Aa • Dulquer & Jasleen 💍",
+      creator: "@jasleen_live",
+      audio: "Heeriye • Arijit Singh & Jasleen",
+      views: "4.8M",
+      likes: "390K",
+      comments: "15.7K",
+      tag: "viral"
+    },
+    {
+      id: "reel-maanmerijaan",
+      videoId: "1ZYbU82GVz4",
+      title: "Maan Meri Jaan • King Champagne Talk 👑",
+      creator: "@king_reels",
+      audio: "Maan Meri Jaan • King",
+      views: "7.2M",
+      likes: "680K",
+      comments: "29.1K",
+      tag: "viral"
+    },
+    {
+      id: "reel-kahanisuno",
+      videoId: "k4yXQkGLeAk",
+      title: "Kahani Suno 2.0 • Kaifi Khalil Soul 💔",
+      creator: "@sad_melodies",
+      audio: "Kahani Suno 2.0 • Kaifi Khalil",
+      views: "5.5M",
+      likes: "440K",
+      comments: "21.0K",
+      tag: "vibes"
+    },
+    {
+      id: "reel-taubatauba",
+      videoId: "v3X8O_28u8s",
+      title: "Tauba Tauba • Vicky Kaushal Dance Craze 🔥",
+      creator: "@karan_aujla_fan",
+      audio: "Tauba Tauba • Karan Aujla",
+      views: "8.9M",
+      likes: "790K",
+      comments: "34.5K",
+      tag: "trending"
+    },
+    {
+      id: "reel-sajni",
+      videoId: "Y8yWwG77sQ8",
+      title: "O Sajni Re • Laapataa Ladies Masterpiece 🌹",
+      creator: "@laapataa_reels",
+      audio: "Sajni • Ram Sampath & Arijit",
+      views: "3.6M",
+      likes: "295K",
+      comments: "13.4K",
+      tag: "bollywood"
+    },
+    {
+      id: "reel-vehaaniyan",
+      videoId: "Z3x8X32x9Xs",
+      title: "Ve Haaniyan • Ravi & Sargun Love Anthem 💑",
+      creator: "@punjabi_beats",
+      audio: "Ve Haaniyan • Danny",
+      views: "3.1M",
+      likes: "230K",
+      comments: "10.2K",
+      tag: "romantic"
+    },
+    {
+      id: "reel-tuhaikahan",
+      videoId: "Q8u17x89v2s",
+      title: "Tu Hai Kahan • AUR Midnight Acoustic 🎧",
+      creator: "@aur_music",
+      audio: "Tu Hai Kahan • AUR",
+      views: "4.1M",
+      likes: "340K",
+      comments: "16.8K",
+      tag: "vibes"
+    },
+    {
+      id: "reel-ruaan",
+      videoId: "W7x391xX82s",
+      title: "Ruaan • Tiger 3 Arijit Soul Track 🐅",
+      creator: "@tiger_reels",
+      audio: "Ruaan • Pritam & Arijit Singh",
+      views: "1.8M",
+      likes: "125K",
+      comments: "4.8K",
+      tag: "bollywood"
+    },
+    {
+      id: "reel-devadeva",
+      videoId: "A8x11X882u0",
+      title: "Deva Deva • Brahmastra Divine Light ⚡",
+      creator: "@dharma_music",
+      audio: "Deva Deva • Arijit Singh",
+      views: "3.9M",
+      likes: "290K",
+      comments: "11.5K",
+      tag: "bollywood"
+    },
+    {
+      id: "reel-soulmate",
+      videoId: "P9u821x8x21",
+      title: "Soulmate • Badshah ft. Arijit Singh 💎",
+      creator: "@badshah_reels",
+      audio: "Soulmate • Ek Tha Raja",
+      views: "5.0M",
+      likes: "410K",
+      comments: "17.2K",
+      tag: "trending"
+    }
+  ];
+
+  let activeReelsList = [...LIVE_REELS];
+  let currentReelIndex = 0;
+  let reelsIsMuted = false;
+  let isReelsTheaterOpen = false;
+  let reelsFeedInitialized = false;
+
+  function initReelsFeed() {
+    if (!reelsFeedInitialized) {
+      reelsFeedInitialized = true;
+      renderReelsGrid(activeReelsList);
+    }
+  }
+
+  function renderReelsGrid(items) {
+    const gridEl = document.getElementById('aura-reels-feed-grid');
+    if (!gridEl) return;
+    gridEl.innerHTML = '';
+
+    items.forEach((reel, idx) => {
+      const card = document.createElement('div');
+      card.className = 'aura-reel-card';
+      card.innerHTML = `
+        <img src="https://i.ytimg.com/vi/${reel.videoId}/hqdefault.jpg" alt="${reel.title}" class="reel-card-thumb" loading="lazy" />
+        <div class="reel-card-scrim"></div>
+        <div class="reel-top-badges">
+          <span class="reel-live-tag"><span class="reel-live-dot"></span> Reel</span>
+          <span class="reel-views-pill">👁️ ${reel.views}</span>
+        </div>
+        <div class="reel-card-meta">
+          <p class="reel-card-title">${reel.title}</p>
+          <div class="reel-card-audio">♫ ${reel.audio}</div>
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        openReelsTheater(idx, items);
+      });
+      gridEl.appendChild(card);
+    });
+  }
+
+  function openReelsTheater(idx, list = activeReelsList) {
+    activeReelsList = list;
+    currentReelIndex = (idx >= 0 && idx < activeReelsList.length) ? idx : 0;
+    const modal = document.getElementById('viev-reels-theater-modal');
+    if (!modal) return;
+
+    isReelsTheaterOpen = true;
+    modal.style.display = 'flex';
+    document.body.classList.add('has-cinema-open');
+    loadReelAtIndex(currentReelIndex);
+  }
+
+  function closeReelsTheater() {
+    const modal = document.getElementById('viev-reels-theater-modal');
+    const iframe = document.getElementById('reels-active-iframe');
+    if (modal) modal.style.display = 'none';
+    if (iframe) iframe.src = '';
+    isReelsTheaterOpen = false;
+    document.body.classList.remove('has-cinema-open');
+  }
+
+  function loadReelAtIndex(idx) {
+    const reel = activeReelsList[idx];
+    if (!reel) return;
+
+    const iframe = document.getElementById('reels-active-iframe');
+    const creatorName = document.getElementById('reels-creator-name');
+    const captionText = document.getElementById('reels-caption-text');
+    const audioTitle = document.getElementById('reels-audio-title');
+    const likeCount = document.getElementById('reels-like-count');
+    const commentCount = document.getElementById('reels-comment-count');
+    const heartIcon = document.getElementById('reels-side-heart');
+
+    if (creatorName) creatorName.textContent = reel.creator;
+    if (captionText) captionText.textContent = reel.title;
+    if (audioTitle) audioTitle.textContent = `${reel.audio} • Original Sound`;
+    if (likeCount) likeCount.textContent = reel.likes;
+    if (commentCount) commentCount.textContent = reel.comments || '1.2K';
+    if (heartIcon) {
+      heartIcon.textContent = '🤍';
+      heartIcon.classList.remove('is-liked');
+    }
+
+    if (iframe) {
+      const muteParam = reelsIsMuted ? '&mute=1' : '';
+      iframe.src = `https://www.youtube-nocookie.com/embed/${reel.videoId}?autoplay=1&loop=1&playlist=${reel.videoId}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1${muteParam}`;
+    }
+  }
+
+  function nextReel() {
+    if (activeReelsList.length === 0) return;
+    currentReelIndex = (currentReelIndex + 1) % activeReelsList.length;
+    loadReelAtIndex(currentReelIndex);
+  }
+
+  function prevReel() {
+    if (activeReelsList.length === 0) return;
+    currentReelIndex = (currentReelIndex - 1 + activeReelsList.length) % activeReelsList.length;
+    loadReelAtIndex(currentReelIndex);
+  }
+
+  function triggerHeartLike(withBurst = false) {
+    const heartIcon = document.getElementById('reels-side-heart');
+    const burstEl = document.getElementById('reels-heart-burst');
+    if (heartIcon) {
+      heartIcon.textContent = '❤️';
+      heartIcon.classList.add('is-liked');
+    }
+    if (withBurst && burstEl) {
+      burstEl.classList.remove('is-bursting');
+      void burstEl.offsetWidth; // reflow
+      burstEl.classList.add('is-bursting');
+    }
+    if (window.triggerHaptic) window.triggerHaptic(60);
+  }
+
+  function bindReelsEvents() {
+    const closeBtn = document.getElementById('reels-theater-close-btn');
+    const nextBtn = document.getElementById('reels-next-btn');
+    const prevBtn = document.getElementById('reels-prev-btn');
+    const likeBtn = document.getElementById('reels-like-btn');
+    const shareBtn = document.getElementById('reels-share-btn');
+    const soundBtn = document.getElementById('reels-sound-toggle-btn');
+    const touchOverlay = document.getElementById('reels-touch-overlay');
+    const searchInput = document.getElementById('aura-reels-search-input');
+    const clearBtn = document.getElementById('aura-reels-search-clear-btn');
+    const chips = Array.from(document.querySelectorAll('#aura-reels-chips .reels-chip'));
+
+    if (closeBtn) closeBtn.addEventListener('click', closeReelsTheater);
+    if (nextBtn) nextBtn.addEventListener('click', nextReel);
+    if (prevBtn) prevBtn.addEventListener('click', prevReel);
+
+    if (likeBtn) {
+      likeBtn.addEventListener('click', () => {
+        triggerHeartLike();
+      });
+    }
+
+    if (shareBtn) {
+      shareBtn.addEventListener('click', () => {
+        if (window.vievAirCast && typeof window.vievAirCast.inviteCast === 'function') {
+          window.vievAirCast.inviteCast();
+        } else {
+          alert("Sharing reel with Digi! ✨");
+        }
+      });
+    }
+
+    if (soundBtn) {
+      soundBtn.addEventListener('click', () => {
+        reelsIsMuted = !reelsIsMuted;
+        const iconOn = document.getElementById('reels-sound-icon-on');
+        const iconOff = document.getElementById('reels-sound-icon-off');
+        if (iconOn && iconOff) {
+          iconOn.style.display = reelsIsMuted ? 'none' : 'block';
+          iconOff.style.display = reelsIsMuted ? 'block' : 'none';
+        }
+        const iframe = document.getElementById('reels-active-iframe');
+        if (iframe && iframe.contentWindow) {
+          const action = reelsIsMuted ? 'mute' : 'unMute';
+          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: action, args: [] }), '*');
+        }
+      });
+    }
+
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let lastTapTime = 0;
+
+    if (touchOverlay) {
+      touchOverlay.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+      }, { passive: true });
+
+      touchOverlay.addEventListener('touchend', (e) => {
+        const deltaY = e.changedTouches[0].clientY - touchStartY;
+        const deltaX = Math.abs(e.changedTouches[0].clientX - touchStartX);
+
+        if (Math.abs(deltaY) > 45 && Math.abs(deltaY) > deltaX) {
+          if (deltaY < 0) {
+            nextReel();
+          } else {
+            prevReel();
+          }
+        } else {
+          const now = Date.now();
+          if (now - lastTapTime < 320) {
+            triggerHeartLike(true);
+          }
+          lastTapTime = now;
+        }
+      });
+
+      touchOverlay.addEventListener('dblclick', () => {
+        triggerHeartLike(true);
+      });
+    }
+
+    // Keyboard support: ArrowUp, ArrowDown, Escape
+    document.addEventListener('keydown', (e) => {
+      if (!isReelsTheaterOpen) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        nextReel();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        prevReel();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        closeReelsTheater();
+      }
+    });
+
+    // Chips filtering
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const tag = chip.getAttribute('data-tag') || 'trending';
+        if (tag === 'trending') {
+          activeReelsList = [...LIVE_REELS];
+        } else {
+          activeReelsList = LIVE_REELS.filter(r => r.tag === tag || r.title.toLowerCase().includes(tag));
+          if (activeReelsList.length === 0) activeReelsList = [...LIVE_REELS];
+        }
+        renderReelsGrid(activeReelsList);
+      });
+    });
+
+    // Search filter
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.trim().toLowerCase();
+        if (clearBtn) clearBtn.style.display = q ? 'block' : 'none';
+        if (!q) {
+          activeReelsList = [...LIVE_REELS];
+        } else {
+          activeReelsList = LIVE_REELS.filter(r =>
+            r.title.toLowerCase().includes(q) ||
+            r.creator.toLowerCase().includes(q) ||
+            r.audio.toLowerCase().includes(q)
+          );
+        }
+        renderReelsGrid(activeReelsList);
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        clearBtn.style.display = 'none';
+        activeReelsList = [...LIVE_REELS];
+        renderReelsGrid(activeReelsList);
+      });
+    }
+  }
+
   // --- INITIALIZATION ---
   function init() {
     introEl = document.getElementById('exxclusive-netflix-intro');
@@ -1420,6 +1910,15 @@
         setVideoSource('youtube');
       });
     }
+
+    const sourceOptReels = document.getElementById('source-opt-reels');
+    if (sourceOptReels) {
+      sourceOptReels.addEventListener('click', () => {
+        setVideoSource('reels');
+      });
+    }
+
+    bindReelsEvents();
 
     // YouTube Search & Category Chips
     const ytSearchInput = document.getElementById('aura-yt-search-input');
@@ -1756,6 +2255,8 @@
       if (ytFeedVideos.length === 0) {
         loadYouTubeFeed(currentYtQuery || 'all');
       }
+    } else if (currentSource === 'reels') {
+      initReelsFeed();
     } else {
       renderMediaGrid();
     }
@@ -1768,6 +2269,9 @@
   window.onExxclusiveTabDeactivated = function () {
     if (isLoungeOpen) {
       closeCurvedCinemaLounge();
+    }
+    if (isReelsTheaterOpen) {
+      closeReelsTheater();
     }
   };
 
