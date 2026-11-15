@@ -1619,3 +1619,214 @@ body.has-cinema-open #apple-floating-dock {
   pointer-events: none !important;
 }
 
+/* =========================================================
+   3.1 ELITE: CINEMA CELEBRATION DECOR & REAL BALLOONS
+   ========================================================= */
+
+.cinema-celebration-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Ambient Rose-Gold Celebration Glow at Top */
+.cinema-top-ambient-aura {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 520px;
+  height: 160px;
+  background: radial-gradient(ellipse 65% 55% at 50% 0%, rgba(225, 48, 108, 0.18) 0%, rgba(255, 130, 180, 0.06) 50%, transparent 80%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Ambient Sparkles */
+.cinema-ambient-sparks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 180px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.c-spark {
+  position: absolute;
+  font-size: 11px;
+  color: rgba(255, 215, 0, 0.82);
+  text-shadow: 0 0 6px rgba(255, 192, 203, 0.8), 0 0 12px rgba(255, 215, 0, 0.5);
+  animation: sparkTwinkle 3.2s ease-in-out infinite alternate;
+  user-select: none;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+@keyframes sparkTwinkle {
+  0% {
+    opacity: 0.25;
+    transform: scale(0.7) translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) translateY(-2px);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.95), 0 0 18px rgba(255, 105, 180, 0.8);
+  }
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85) translateY(1px);
+  }
+}
+
+/* 4 Corner Realistic Balloons */
+.cinema-balloon-item {
+  position: absolute;
+  pointer-events: none;
+  z-index: 25;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.65));
+}
+
+.cinema-balloon-item .balloon-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  object-fit: contain;
+}
+
+/* Top-Left Corner: Anchors at top-left hugging corner */
+.cinema-balloon-item.corner-tl {
+  top: 0;
+  left: 0;
+  width: clamp(95px, 24vw, 130px);
+  transform-origin: top left;
+  animation: balloonFloatTL 5.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+/* Top-Right Corner: Anchors at top-right hugging corner */
+.cinema-balloon-item.corner-tr {
+  top: 0;
+  right: 0;
+  width: clamp(95px, 24vw, 130px);
+  transform-origin: top right;
+  animation: balloonFloatTR 5.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+/* Bottom-Left Corner: Sits right above bottom edge / dock */
+.cinema-balloon-item.corner-bl {
+  bottom: calc(var(--sab, 0px) + 8px);
+  left: 0;
+  width: clamp(75px, 19vw, 105px);
+  transform-origin: bottom left;
+  animation: balloonFloatBL 5.0s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+/* Bottom-Right Corner: Sits right above bottom edge / dock */
+.cinema-balloon-item.corner-br {
+  bottom: calc(var(--sab, 0px) + 8px);
+  right: 0;
+  width: clamp(75px, 19vw, 105px);
+  transform-origin: bottom right;
+  animation: balloonFloatBR 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+}
+
+/* Subtle Organic Floating Keyframes (Helium physics) */
+@keyframes balloonFloatTL {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  38% {
+    transform: translate3d(2px, -6px, 0) rotate(-1.5deg);
+  }
+  72% {
+    transform: translate3d(-3px, -3px, 0) rotate(1.2deg);
+  }
+  100% {
+    transform: translate3d(0, -7px, 0) rotate(-0.5deg);
+  }
+}
+
+@keyframes balloonFloatTR {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  42% {
+    transform: translate3d(-3px, -5px, 0) rotate(1.8deg);
+  }
+  78% {
+    transform: translate3d(2px, -8px, 0) rotate(-1deg);
+  }
+  100% {
+    transform: translate3d(-1px, -3px, 0) rotate(0.8deg);
+  }
+}
+
+@keyframes balloonFloatBL {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(2px, -6px, 0) rotate(-1.2deg);
+  }
+  100% {
+    transform: translate3d(-1px, -4px, 0) rotate(0.8deg);
+  }
+}
+
+@keyframes balloonFloatBR {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  48% {
+    transform: translate3d(-2px, -7px, 0) rotate(1.4deg);
+  }
+  100% {
+    transform: translate3d(1px, -3px, 0) rotate(-0.6deg);
+  }
+}
+
+/* Brand cluster celebration pill */
+.aura-brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aura-brand-decor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: rgba(225, 48, 108, 0.16);
+  border: 1px solid rgba(225, 48, 108, 0.38);
+  color: #ff9ec6;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
+  animation: decorPillGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes decorPillGlow {
+  0% {
+    box-shadow: 0 2px 8px rgba(225, 48, 108, 0.20);
+    border-color: rgba(225, 48, 108, 0.32);
+  }
+  100% {
+    box-shadow: 0 3px 14px rgba(225, 48, 108, 0.45);
+    border-color: rgba(255, 110, 180, 0.55);
+  }
+}
+
