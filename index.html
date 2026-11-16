@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
-  <link rel="stylesheet" href="css/exxclusive-3.css?v=11.0">
+  <link rel="stylesheet" href="css/exxclusive-3.css?v=12.0">
 </head>
 <body>
 
@@ -681,6 +681,19 @@
                   </div>
                   <span class="source-item-check">✓</span>
                 </button>
+
+                <button type="button" class="aura-source-menu-item" data-source="reels" id="source-opt-reels">
+                  <div class="source-item-icon reels-icon">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                    </svg>
+                  </div>
+                  <div class="source-item-meta">
+                    <span class="source-item-title">Our Reels</span>
+                    <span class="source-item-desc">Private Vertical Video Feed</span>
+                  </div>
+                  <span class="source-item-check">✓</span>
+                </button>
               </div>
             </div>
           </div>
@@ -763,6 +776,42 @@
           <div class="aura-yt-loader" id="aura-yt-loader" style="display: none;">
             <div class="aura-yt-spinner"></div>
             <span>Loading more videos...</span>
+          </div>
+        </div>
+
+        <!-- VIEW 3: OUR REELS (9:16 VERTICAL SMOOTH SWIPER) -->
+        <div id="aura-view-reels" class="aura-source-view aura-reels-container" style="display: none;">
+          <!-- Vertical Swiper Stage (1:1 finger swipe drag & spring snap) -->
+          <div class="reels-swiper-track" id="reels-swiper-track">
+            <!-- Dynamic vertical reel slides -->
+          </div>
+
+          <!-- Mute/Sound Toggle Pill at Top-Right -->
+          <button type="button" class="reels-sound-pill" id="our-reels-sound-btn" aria-label="Toggle Sound">
+            <svg id="our-reels-sound-icon-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <svg id="our-reels-sound-icon-off" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <line x1="23" y1="9" x2="17" y2="15"></line>
+              <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>
+          </button>
+
+          <!-- Center Play/Pause Micro HUD Indicator (fades out after tap) -->
+          <div class="reels-play-hud" id="reels-play-hud" aria-hidden="true">
+            <svg id="hud-play-icon" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="hud-pause-icon" width="36" height="36" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </div>
+
+          <!-- Reel Bottom Info Overlay (clean, minimal - NO hearts, NO like counts, NO share buttons) -->
+          <div class="reels-bottom-info" id="reels-bottom-info">
+            <div class="reels-caption-row">
+              <span class="reels-badge">✦ Our Reel</span>
+              <p class="reels-caption" id="our-reels-title">Our Memory</p>
+            </div>
+            <div class="reels-meta-sub" id="our-reels-meta">Swipe up for next reel • Tap to pause</div>
           </div>
         </div>
       </div>
@@ -2196,7 +2245,7 @@
   <script src="js/cast-engine.js?v=7.1"></script>
   <script src="js/motion-ad.js?v=7.1"></script>
   <script src="js/exxclusive.js?v=7.4"></script>
-  <script src="js/exxclusive-3.js?v=8.0"></script>
+  <script src="js/exxclusive-3.js?v=9.0"></script>
   <script src="js/push-notifications.js?v=2.0"></script>
   <script src="js/app.js?v=7.4"></script>
 </body>
