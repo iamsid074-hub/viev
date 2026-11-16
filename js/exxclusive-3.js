@@ -1747,9 +1747,155 @@
 
     // Render initial grid
     renderMediaGrid();
+
+    // Wire aura wordmark tap as interactive celebration pop Easter egg
+    const auraBrand = document.querySelector('.aura-brand-wordmark');
+    if (auraBrand) {
+      auraBrand.style.cursor = 'pointer';
+      auraBrand.title = "Pop Birthday Celebration! 🎂";
+      auraBrand.addEventListener('click', () => {
+        triggerCinemaBirthdayConfetti(true);
+      });
+    }
   }
 
-  // Tab switch hook: trigger signature intro on first visit
+  // =========================================================
+  // 3.1 ELITE: APPLE iMESSAGE STYLE BIRTHDAY CONFETTI ENGINE
+  // =========================================================
+  let confettiAnimFrame = null;
+  let confettiLastBurstTime = 0;
+
+  function stopCinemaBirthdayConfetti() {
+    if (confettiAnimFrame) {
+      cancelAnimationFrame(confettiAnimFrame);
+      confettiAnimFrame = null;
+    }
+    const canvas = document.getElementById('cinema-confetti-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  function triggerCinemaBirthdayConfetti(force = false) {
+    const now = Date.now();
+    if (!force && now - confettiLastBurstTime < 4500) return;
+    confettiLastBurstTime = now;
+
+    const canvas = document.getElementById('cinema-confetti-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (confettiAnimFrame) {
+      cancelAnimationFrame(confettiAnimFrame);
+      confettiAnimFrame = null;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width || window.innerWidth || 390;
+    const height = rect.height || window.innerHeight || 844;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Luxury Celebration Palette: Metallic Rose Gold, Champagne, Diamond White, Deep Rose
+    const colors = [
+      '#f43f5e', '#fb7185', '#fda4af',
+      '#fbbf24', '#f59e0b', '#fef08a',
+      '#ffffff', '#fce7f3', '#e11d48',
+      '#c084fc', '#e879f9'
+    ];
+
+    const particleCount = Math.min(Math.floor(width / 5.2), 70);
+    const particles = [];
+
+    for (let i = 0; i < particleCount; i++) {
+      const isRibbon = Math.random() > 0.35;
+      particles.push({
+        x: Math.random() * width,
+        y: -15 - Math.random() * (height * 0.4),
+        vx: (Math.random() - 0.5) * 2.2,
+        vy: Math.random() * 2.6 + 2.2,
+        w: isRibbon ? (Math.random() * 5 + 6) : (Math.random() * 6 + 5),
+        h: isRibbon ? (Math.random() * 10 + 10) : (Math.random() * 6 + 5),
+        isCircle: !isRibbon && Math.random() > 0.5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.12,
+        tilt: Math.random() * Math.PI,
+        tiltSpeed: Math.random() * 0.1 + 0.05,
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: Math.random() * 0.1 + 0.04,
+        alpha: 1.0,
+        drag: 0.99
+      });
+    }
+
+    if (window.triggerHaptic) {
+      window.triggerHaptic(45);
+    } else if (navigator.vibrate) {
+      navigator.vibrate([30, 20, 30]);
+    }
+
+    const startTime = Date.now();
+    const duration = 3800; // 3.8 seconds
+
+    function renderConfetti() {
+      const elapsed = Date.now() - startTime;
+      ctx.clearRect(0, 0, width, height);
+
+      let aliveCount = 0;
+      const fadeProgress = elapsed > 2400 ? (elapsed - 2400) / 1400 : 0;
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.wobble += p.wobbleSpeed;
+        p.tilt += p.tiltSpeed;
+        p.rotation += p.rotSpeed;
+        p.vy += 0.065; // gentle gravity
+        p.vy *= p.drag;
+        p.x += Math.sin(p.wobble) * 1.4 + p.vx;
+        p.y += p.vy;
+
+        p.alpha = Math.max(0, 1.0 - fadeProgress);
+
+        if (p.y < height + 30 && p.alpha > 0.01) {
+          aliveCount++;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+          ctx.scale(1, Math.cos(p.tilt)); // 3D flip effect
+
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+
+          if (p.isCircle) {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          }
+
+          ctx.restore();
+        }
+      }
+
+      if (aliveCount > 0 && elapsed < duration) {
+        confettiAnimFrame = requestAnimationFrame(renderConfetti);
+      } else {
+        ctx.clearRect(0, 0, width, height);
+        confettiAnimFrame = null;
+      }
+    }
+
+    confettiAnimFrame = requestAnimationFrame(renderConfetti);
+  }
+
+  // Tab switch hook: trigger signature intro on first visit & celebration confetti
   let hasVisitedCinema = false;
   window.onExxclusiveTabActivated = function () {
     if (currentSource === 'youtube') {
@@ -1763,12 +1909,15 @@
       hasVisitedCinema = true;
       triggerIntroAnimation();
     }
+    // Launch Apple iMessage celebration confetti
+    triggerCinemaBirthdayConfetti();
   };
 
   window.onExxclusiveTabDeactivated = function () {
     if (isLoungeOpen) {
       closeCurvedCinemaLounge();
     }
+    stopCinemaBirthdayConfetti();
   };
 
   // Expose global interface
