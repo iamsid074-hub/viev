@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* =========================================================
      3.1 ELITE: LIVING BIRTHDAY CANDLES & CELEBRATION ENGINE
-     Strictly Gated for ID 1711 (Home Screen Only)
+     Active for ALL Authenticated Members (Digi 3009/3011 & Virat 1711)
      ========================================================= */
   function evaluateEliteCandlesAccess() {
     let sess = null;
@@ -180,23 +180,13 @@ document.addEventListener('DOMContentLoaded', () => {
         || JSON.parse(localStorage.getItem('viev_auth_session') || 'null');
     } catch (_) {}
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlEliteOverride = urlParams.get('id') === '1711' || urlParams.get('user') === '1711' || urlParams.get('code') === '1711' || urlParams.has('elite') || window.location.search.includes('1711');
-
-    if (urlEliteOverride) {
-      try { localStorage.setItem('viev_last_elite', '1'); } catch (_) {}
-    }
-
-    const isDigiExplicit = sess && (sess.code === '3009' || sess.code === '3011' || sess.role === 'digi');
-    let rememberedElite = false;
-    try { rememberedElite = localStorage.getItem('viev_last_elite') === '1'; } catch (_) {}
-
-    const is1711 = !isDigiExplicit && (urlEliteOverride || !!(sess && (sess.code === '1711' || sess.role === 'user')) || rememberedElite);
+    // Birthday celebration (Happy Birthday Neetu + Living Candles) is active for ALL members (Digi & Virat)
+    const isBirthdayActive = true;
     const container = document.getElementById('elite-birthday-candles');
     const hbdBanner = document.getElementById('elite-hbd-banner');
     const mangalBanner = document.getElementById('mangal-rang-cinematic-banner');
 
-    if (is1711) {
+    if (isBirthdayActive) {
       document.body.classList.add('is-elite-1711');
       if (container) container.style.removeProperty('display');
       if (hbdBanner) hbdBanner.style.setProperty('display', 'flex', 'important');
