@@ -67,6 +67,19 @@
       });
     }
 
+    const letterBackBtn = document.getElementById('letter-back-btn');
+    if (letterBackBtn) {
+      letterBackBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const lettersPanel = document.getElementById('subpage-letters');
+        if (lettersPanel) lettersPanel.style.display = 'none';
+        const settingsBackBtn = document.getElementById('settings-back-btn');
+        if (settingsBackBtn) {
+          settingsBackBtn.click();
+        }
+      });
+    }
+
     // Close on overlay backdrop tap
     if (modalOverlay) {
       modalOverlay.addEventListener('click', (e) => {
