@@ -697,6 +697,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function openSubpage(targetId) {
     if (!settingsViewport) return;
 
+    // Full-Page Dedicated Overlay for Letters
+    if (targetId === 'subpage-letters') {
+      if (window.vievLetters && typeof window.vievLetters.open === 'function') {
+        window.vievLetters.open();
+      } else {
+        const lettersPanel = document.getElementById('subpage-letters');
+        if (lettersPanel) lettersPanel.style.display = 'block';
+        document.body.classList.add('has-letters-active');
+        document.documentElement.classList.add('has-letters-active');
+      }
+      return;
+    }
+
     // Set top bar center title (e.g. Software Update)
     const navCenterTitle = document.getElementById('subpage-nav-center-title');
     if (navCenterTitle) {
@@ -705,9 +718,6 @@ document.addEventListener('DOMContentLoaded', () => {
         navCenterTitle.style.display = 'block';
       } else if (targetId === 'subpage-notifications') {
         navCenterTitle.textContent = 'Notifications';
-        navCenterTitle.style.display = 'block';
-      } else if (targetId === 'subpage-letters') {
-        navCenterTitle.textContent = 'Letters';
         navCenterTitle.style.display = 'block';
       } else {
         navCenterTitle.textContent = '';
@@ -746,13 +756,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.vievNotifications && typeof window.vievNotifications.updateUI === 'function') {
         window.vievNotifications.updateUI();
       }
-    } else if (targetId === 'subpage-letters') {
-      settingsViewport.classList.add('is-letters-active');
-      document.body.classList.add('has-letters-active');
-      document.documentElement.classList.add('has-letters-active');
-      if (window.vievLetters && typeof window.vievLetters.init === 'function') {
-        window.vievLetters.init();
-      }
     }
   }
 
@@ -772,6 +775,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function finalizeCloseSubpage() {
     if (!settingsViewport) return;
+    const lettersPanel = document.getElementById('subpage-letters');
+    if (lettersPanel) lettersPanel.style.display = 'none';
     settingsViewport.classList.remove('is-subpage-open', 'is-letters-active');
     settingsViewport.classList.remove('is-exxclusive-mode');
     document.body.classList.remove('is-exxclusive-active', 'has-letters-active');

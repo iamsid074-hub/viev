@@ -69,15 +69,10 @@
 
     const letterBackBtn = document.getElementById('letter-back-btn');
     if (letterBackBtn) {
-      letterBackBtn.addEventListener('click', (e) => {
+      letterBackBtn.onclick = (e) => {
         e.stopPropagation();
-        const lettersPanel = document.getElementById('subpage-letters');
-        if (lettersPanel) lettersPanel.style.display = 'none';
-        const settingsBackBtn = document.getElementById('settings-back-btn');
-        if (settingsBackBtn) {
-          settingsBackBtn.click();
-        }
-      });
+        closeLetters();
+      };
     }
 
     // Close on overlay backdrop tap
@@ -346,9 +341,37 @@
     }
   }
 
+  function openLetters() {
+    const lettersPanel = document.getElementById('subpage-letters');
+    if (lettersPanel) {
+      lettersPanel.style.display = 'block';
+      lettersPanel.scrollTop = 0;
+    }
+    document.body.classList.add('has-letters-active');
+    document.documentElement.classList.add('has-letters-active');
+    if (typeof window.setFloatingNavVisible === 'function') {
+      window.setFloatingNavVisible(false);
+    }
+    initLetters();
+  }
+
+  function closeLetters() {
+    const lettersPanel = document.getElementById('subpage-letters');
+    if (lettersPanel) {
+      lettersPanel.style.display = 'none';
+    }
+    document.body.classList.remove('has-letters-active');
+    document.documentElement.classList.remove('has-letters-active');
+    if (typeof window.setFloatingNavVisible === 'function') {
+      window.setFloatingNavVisible(true);
+    }
+  }
+
   // Global exposure
   window.vievLetters = {
     init: initLetters,
+    open: openLetters,
+    close: closeLetters,
     openPad: openSignatureModal,
     clear: clearCanvas
   };

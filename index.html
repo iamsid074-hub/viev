@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
   <link rel="stylesheet" href="css/exxclusive-3.css?v=17.0">
-  <link rel="stylesheet" href="css/letters.css?v=4.0">
+  <link rel="stylesheet" href="css/letters.css?v=5.0">
 </head>
 <body>
 
@@ -1078,64 +1078,6 @@
             <!-- Result State -->
             <div class="favorites-result-container" id="favorites-result" style="display: none;">
               <div class="favorites-cards-list" id="favorites-cards-list"></div>
-            </div>
-          </div>
-
-          <!-- SUBPAGE: ROYAL LETTERS (Full Page Cream Stationery & Finger Signature) -->
-          <div class="subpage-body-container" id="subpage-letters" style="display: none;">
-            <!-- Integrated Clean Sticky Top Bar for Full-Page Letter -->
-            <div class="letter-top-navigation">
-              <button type="button" class="letter-back-btn" id="letter-back-btn" aria-label="Back to Settings">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-                <span>Settings</span>
-              </button>
-              <span class="letter-nav-title">Letters</span>
-              <div style="width: 70px;"></div>
-            </div>
-
-            <div class="vintage-letter-card">
-              <!-- Letter Header -->
-              <div class="letter-header-wrap">
-                <div class="letter-wax-seal">👑</div>
-                <div class="letter-royal-kicker">Chapter 20 • Royal Epistle</div>
-                <h2 class="letter-main-title">A Letter for Princess Digi</h2>
-                <span class="letter-date-stamp">17 November 2026 • CP67 Special Memory</span>
-              </div>
-
-              <!-- Letter Prose Body (Demo Letter from Virat - Easy to edit) -->
-              <div class="letter-prose-body">
-                <p class="letter-salutation">My Dearest Digi,</p>
-
-                <p class="letter-paragraph">
-                  <span class="letter-dropcap">T</span>oday marks the beginning of your twentieth year in this universe, and words will never truly capture how profoundly special you are. Watching you smile, hearing your laugh, and seeing the quiet brilliance with which you carry yourself makes every single day brighter than the last.
-                </p>
-
-                <p class="letter-paragraph">
-                  Whether it was watching movies together at CP67, lost in the melodies of Ramayana and our favorite songs, or sharing moments that only you and I truly understand—every single second spent by your side is a treasured chapter in my life that I will cherish forever.
-                </p>
-
-                <p class="letter-paragraph">
-                  You deserve every drop of happiness, every dream fulfilled, and a world full of kindness and love. No matter where this life takes us or how many years pass, remember that I will always be right here—protecting your peace, believing in you, and loving you endlessly.
-                </p>
-
-                <p class="letter-valediction">With all my love and forever yours,</p>
-                <div class="letter-sender-name">Virat ❤️</div>
-              </div>
-
-              <!-- Bottom Signature Area -->
-              <div class="letter-signature-section" id="letter-signature-area">
-                <button type="button" class="btn-your-signature" id="btn-open-signature-pad">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
-                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
-                    <path d="M2 2l7.586 7.586"></path>
-                    <circle cx="11" cy="11" r="2"></circle>
-                  </svg>
-                  <span>YOUR SIGNATURE</span>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -2282,6 +2224,67 @@
   </div>
 
   <!-- =========================================================
+       ROYAL LETTERS: FULL-SCREEN PARCHMENT STATIONERY
+       Direct body overlay - Zero clipping, Zero black blockages
+       ========================================================= -->
+  <div id="subpage-letters" class="subpage-body-container fullpage-letter-overlay" style="display: none;">
+    <!-- Integrated Clean Sticky Top Bar for Full-Page Letter -->
+    <div class="letter-top-navigation">
+      <button type="button" class="letter-back-btn" id="letter-back-btn" aria-label="Back to Settings">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Settings</span>
+      </button>
+      <span class="letter-nav-title">Letters</span>
+      <div style="width: 70px;"></div>
+    </div>
+
+    <div class="vintage-letter-card">
+      <!-- Letter Header -->
+      <div class="letter-header-wrap">
+        <div class="letter-wax-seal">👑</div>
+        <div class="letter-royal-kicker">Chapter 20 • Royal Epistle</div>
+        <h2 class="letter-main-title">A Letter for Princess Digi</h2>
+        <span class="letter-date-stamp">17 November 2026 • CP67 Special Memory</span>
+      </div>
+
+      <!-- Letter Prose Body (Demo Letter from Virat - Easy to edit) -->
+      <div class="letter-prose-body">
+        <p class="letter-salutation">My Dearest Digi,</p>
+
+        <p class="letter-paragraph">
+          <span class="letter-dropcap">T</span>oday marks the beginning of your twentieth year in this universe, and words will never truly capture how profoundly special you are. Watching you smile, hearing your laugh, and seeing the quiet brilliance with which you carry yourself makes every single day brighter than the last.
+        </p>
+
+        <p class="letter-paragraph">
+          Whether it was watching movies together at CP67, lost in the melodies of Ramayana and our favorite songs, or sharing moments that only you and I truly understand—every single second spent by your side is a treasured chapter in my life that I will cherish forever.
+        </p>
+
+        <p class="letter-paragraph">
+          You deserve every drop of happiness, every dream fulfilled, and a world full of kindness and love. No matter where this life takes us or how many years pass, remember that I will always be right here—protecting your peace, believing in you, and loving you endlessly.
+        </p>
+
+        <p class="letter-valediction">With all my love and forever yours,</p>
+        <div class="letter-sender-name">Virat ❤️</div>
+      </div>
+
+      <!-- Bottom Signature Area -->
+      <div class="letter-signature-section" id="letter-signature-area">
+        <button type="button" class="btn-your-signature" id="btn-open-signature-pad">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+            <path d="M2 2l7.586 7.586"></path>
+            <circle cx="11" cy="11" r="2"></circle>
+          </svg>
+          <span>YOUR SIGNATURE</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
        ROYAL SIGNATURE POPUP MODAL ("CHOTI WINDOW")
        ========================================================= -->
   <div class="signature-modal-overlay" id="signature-modal-overlay" aria-hidden="true" role="dialog" aria-modal="true">
@@ -2326,7 +2329,7 @@
   <script src="js/exxclusive.js?v=7.4"></script>
   <script src="js/exxclusive-3.js?v=14.0"></script>
   <script src="js/push-notifications.js?v=2.0"></script>
-  <script src="js/letters.js?v=3.0"></script>
-  <script src="js/app.js?v=7.7"></script>
+  <script src="js/letters.js?v=5.0"></script>
+  <script src="js/app.js?v=8.0"></script>
 </body>
 </html>
