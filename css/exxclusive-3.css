@@ -1347,6 +1347,47 @@
   z-index: 20;
 }
 
+.lounge-hud-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.lounge-top-yt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  background: rgba(220, 38, 38, 0.45) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 100, 100, 0.4) !important;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.lounge-top-yt-btn:hover {
+  background: rgba(220, 38, 38, 0.75) !important;
+  border-color: rgba(255, 150, 150, 0.6) !important;
+  transform: translateY(-1px);
+}
+
+.lounge-top-yt-btn:active {
+  transform: scale(0.95);
+}
+
 .lounge-top-back-btn {
   display: inline-flex;
   align-items: center;

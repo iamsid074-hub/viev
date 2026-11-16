@@ -20,10 +20,61 @@
       duration: '4:18',
       poster: 'https://img.youtube.com/vi/z_e1d5_VVfw/maxresdefault.jpg',
       posterFallback: 'assets/ramayana_logo.png',
-      youtubeId: 'z_e1d5_VVfw',
       src: 'song/mangal_rang.mp4',
       memory: 'Virat and Digi went to watch this movie of CP67 on 11 Nov 2026, and Digi loved this song so much.',
       isFeatured: true
+    },
+    {
+      id: 'kesariya',
+      title: 'Kesariya • Brahmāstra',
+      sub: 'Arijit Singh • 4K HDR TrueColor',
+      category: ['4k', 'romantic', 'trending'],
+      badge: '4K MASTER',
+      duration: '4:28',
+      poster: 'song/covers/Kesariya.jpg',
+      posterFallback: 'song/Kesariya.jpg',
+      src: 'song/Kesariya.mp4',
+      memory: 'Special celebration melody.'
+    },
+    {
+      id: 'sooiyan',
+      title: 'Sooiyan • Guddu Rangeela',
+      sub: 'Arijit Singh & Chinmayi • Acoustic Spatial',
+      category: ['atmospheric', 'romantic', 'trending'],
+      badge: 'DOLBY 3D',
+      duration: '3:58',
+      poster: 'song/Sooiyan.jpg',
+      src: 'song/Sooiyan.mp4'
+    },
+    {
+      id: 'chhod-diya',
+      title: 'Chhod Diya • Kanika Kapoor',
+      sub: 'Baazaar • 4K Remastered Dolby Atmos',
+      category: ['4k', 'romantic', 'atmospheric'],
+      badge: '4K UHD',
+      duration: '4:12',
+      poster: 'song/Chhod Diya.jpg',
+      src: 'song/Chhod Diya.mp4'
+    },
+    {
+      id: 'yaad-hai-na',
+      title: 'Yaad Hai Na • Raaz Reboot',
+      sub: 'Arijit Singh • 4K Ultra Wide Soundscape',
+      category: ['4k', 'atmospheric', 'romantic'],
+      badge: '4K CINEMA',
+      duration: '4:03',
+      poster: 'song/Yaad Hai Na.jpg',
+      src: 'song/Yaad Hai Na.mp4'
+    },
+    {
+      id: 'sawan-aaya-hai',
+      title: 'Sawan Aaya Hai • Creature 3D',
+      sub: 'Arijit Singh • Dolby Cinema 3D Binaural',
+      category: ['dolby', 'romantic', 'atmospheric'],
+      badge: 'DOLBY 3D',
+      duration: '4:45',
+      poster: 'song/covers/mangal_rang.jpg',
+      src: 'song/Sawan Aaya Hai.mp4'
     }
   ];
 
@@ -1128,7 +1179,8 @@
     hasVisitedCinema = true;
     currentMedia = media || currentMedia;
     const ytPlayer = document.getElementById('lounge-youtube-player');
-    const isYouTube = currentMedia && (currentMedia.type === 'youtube' || !!currentMedia.youtubeId);
+    const extYtBtn = document.getElementById('lounge-yt-external-btn');
+    const isYouTube = currentMedia && (currentMedia.type === 'youtube') && !currentMedia.src;
 
     // Clear any previous transition timers
     if (cinemaBootTimer) {
@@ -1163,7 +1215,7 @@
     showControlsHud();
 
     if (isYouTube) {
-      // YOUTUBE MODE: Play in curved concave iframe with strict-origin-when-cross-origin
+      // YOUTUBE MODE: Play in curved concave iframe with clean URL
       loungeEl.classList.add('is-youtube-mode');
       if (videoEl) {
         try { videoEl.pause(); } catch (_) {}
@@ -1171,14 +1223,15 @@
       }
       const ytId = currentMedia.youtubeId || extractYouTubeId(currentMedia.src);
 
+      if (extYtBtn) {
+        extYtBtn.href = `https://www.youtube.com/watch?v=${ytId}`;
+        extYtBtn.style.display = 'inline-flex';
+      }
+
       if (ytPlayer) {
         ytPlayer.style.display = 'block';
-        // Use standard www.youtube.com with widget_referrer and playsinline to prevent Error 150/153 on mobile
-        const originParam = (window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null')
-          ? `&origin=${encodeURIComponent(window.location.origin)}`
-          : '';
-        const refParam = `&widget_referrer=${encodeURIComponent(window.location.href)}`;
-        ytPlayer.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3${originParam}${refParam}`;
+        // Use clean embed URL without broken &origin to prevent Error 150/153 on GitHub Pages / mobile
+        ytPlayer.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3`;
 
         // Compute edge-to-edge covering dynamically so video fills curved screen with zero black bars
         fitYouTubePlayerToScreen();
@@ -1203,6 +1256,9 @@
       scheduleTheatreDim();
     } else {
       // DIRECT MP4 4K MASTER MODE
+      if (extYtBtn) {
+        extYtBtn.style.display = 'none';
+      }
       loungeEl.classList.remove('is-youtube-mode');
       // Enable & activate dynamic ambient canvas for MP4 videos
       if (ambilightCanvas) {
@@ -1215,67 +1271,43 @@
       }
       if (videoEl) {
         videoEl.style.display = 'block';
-        if (videoEl.src !== media.src && !videoEl.src.endsWith(media.src)) {
-          videoEl.src = media.src;
+        const targetSrc = (media && media.src) ? media.src : 'song/mangal_rang.mp4';
+        if (videoEl.src !== targetSrc && !videoEl.src.endsWith(targetSrc)) {
+          videoEl.src = targetSrc;
         }
 
-        // Prepare cinema dark state for dramatic 1.4s fade-in sequence
         videoEl.currentTime = 0;
-        videoEl.volume = 0;
-        videoEl.style.opacity = '0';
-        videoEl.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
-        updatePlayPauseButton(false);
+        videoEl.style.opacity = '1';
+        videoEl.muted = false;
+        const targetVol = volumeSlider ? parseFloat(volumeSlider.value) : 0.9;
+        videoEl.volume = targetVol;
 
-        cinemaBootTimer = setTimeout(() => {
-          if (!isLoungeOpen) return;
+        // Play immediately within user click gesture context
+        const playPromise = videoEl.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            setupDolbyAudioDSP();
+            updatePlayPauseButton(true);
+            scheduleTheatreDim();
+          }).catch(err => {
+            console.log('[Exxclusive 3.0] Autoplay unmuted blocked, falling back to muted:', err);
+            videoEl.muted = true;
+            videoEl.play().catch(() => {});
+            updatePlayPauseButton(true);
+          });
+        }
 
-          const playPromise = videoEl.play();
-          if (playPromise !== undefined) {
-            playPromise.then(() => {
-              setupDolbyAudioDSP();
-              updatePlayPauseButton(true);
-              scheduleTheatreDim();
-
-              // Smooth visual fade-in
-              videoEl.style.opacity = '1';
-
-              // Smooth acoustic fade-in from 0 to target volume over 1.2s
-              const targetVol = volumeSlider ? parseFloat(volumeSlider.value) : 0.9;
-              let currentVol = 0;
-              const fadeSteps = 24;
-              const stepInterval = 1200 / fadeSteps; // ~50ms
-              const volStep = targetVol / fadeSteps;
-
-              if (audioFadeTimer) clearInterval(audioFadeTimer);
-              audioFadeTimer = setInterval(() => {
-                if (!isLoungeOpen || !videoEl) {
-                  clearInterval(audioFadeTimer);
-                  return;
-                }
-                currentVol = Math.min(targetVol, currentVol + volStep);
-                videoEl.volume = currentVol;
-                if (currentVol >= targetVol) {
-                  clearInterval(audioFadeTimer);
-                  audioFadeTimer = null;
-                }
-              }, stepInterval);
-            }).catch(err => {
-              console.log('[Exxclusive 3.0] Autoplay prevented, waiting for tap:', err);
-              updatePlayPauseButton(false);
-              videoEl.style.opacity = '1';
-              if (volumeSlider) videoEl.volume = parseFloat(volumeSlider.value);
-            });
-          }
-
-          // Start Ambilight & Floor Reflection Canvas Loop
-          startLoungeRenderLoop();
-        }, 1400);
+        // Start Ambilight & Floor Reflection Canvas Loop
+        startLoungeRenderLoop();
       }
     }
   }
 
   function closeCurvedCinemaLounge() {
     if (!loungeEl || !isLoungeOpen) return;
+
+    const extYtBtn = document.getElementById('lounge-yt-external-btn');
+    if (extYtBtn) extYtBtn.style.display = 'none';
 
     if (cinemaBootTimer) {
       clearTimeout(cinemaBootTimer);
