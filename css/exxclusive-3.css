@@ -1620,213 +1620,175 @@ body.has-cinema-open #apple-floating-dock {
 }
 
 /* =========================================================
-   3.1 ELITE: CINEMA CELEBRATION DECOR & REAL BALLOONS
+   3.1 ELITE: LUXURY CINEMATIC AMBIENCE & CELEBRATION BACKDROP
+   Apple-grade diffuse aurora, specular shimmer & champagne motes
    ========================================================= */
 
-.cinema-celebration-decor {
+.cinema-luxury-backdrop {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 10;
+  z-index: 1;
   overflow: hidden;
 }
 
-/* Ambient Rose-Gold Celebration Glow at Top */
-.cinema-top-ambient-aura {
+/* Diffuse Living Aurora Blooms */
+.cinema-aurora-glow {
   position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 520px;
-  height: 160px;
-  background: radial-gradient(ellipse 65% 55% at 50% 0%, rgba(225, 48, 108, 0.18) 0%, rgba(255, 130, 180, 0.06) 50%, transparent 80%);
+  border-radius: 50%;
+  filter: blur(60px);
   pointer-events: none;
-  z-index: 1;
+  opacity: 0.65;
+  will-change: transform, opacity;
 }
 
-/* Ambient Sparkles */
-.cinema-ambient-sparks {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 180px;
-  pointer-events: none;
-  z-index: 2;
+.aura-glow-1 {
+  top: -60px;
+  left: 10%;
+  width: clamp(220px, 60vw, 380px);
+  height: clamp(160px, 45vw, 260px);
+  background: radial-gradient(circle, rgba(225, 48, 108, 0.22) 0%, rgba(255, 105, 180, 0.08) 50%, transparent 75%);
+  animation: auroraPulse1 8s ease-in-out infinite alternate;
 }
 
-.c-spark {
-  position: absolute;
-  font-size: 11px;
-  color: rgba(255, 215, 0, 0.82);
-  text-shadow: 0 0 6px rgba(255, 192, 203, 0.8), 0 0 12px rgba(255, 215, 0, 0.5);
-  animation: sparkTwinkle 3.2s ease-in-out infinite alternate;
-  user-select: none;
-  pointer-events: none;
-  opacity: 0.85;
+.aura-glow-2 {
+  top: 20px;
+  right: 5%;
+  width: clamp(200px, 55vw, 340px);
+  height: clamp(150px, 40vw, 240px);
+  background: radial-gradient(circle, rgba(255, 182, 193, 0.16) 0%, rgba(218, 112, 214, 0.06) 55%, transparent 80%);
+  animation: auroraPulse2 9.5s ease-in-out infinite alternate;
 }
 
-@keyframes sparkTwinkle {
+@keyframes auroraPulse1 {
   0% {
-    opacity: 0.25;
-    transform: scale(0.7) translateY(0);
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
   }
   50% {
-    opacity: 1;
-    transform: scale(1.15) translateY(-2px);
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.95), 0 0 18px rgba(255, 105, 180, 0.8);
+    transform: translate3d(15px, 20px, 0) scale(1.12);
+    opacity: 0.75;
   }
   100% {
-    opacity: 0.35;
-    transform: scale(0.85) translateY(1px);
+    transform: translate3d(-10px, 10px, 0) scale(0.95);
+    opacity: 0.6;
   }
 }
 
-/* 4 Corner Realistic Balloons */
-.cinema-balloon-item {
-  position: absolute;
-  pointer-events: none;
-  z-index: 25;
-  user-select: none;
-  -webkit-user-select: none;
-  will-change: transform;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.65));
-}
-
-.cinema-balloon-item .balloon-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  pointer-events: none;
-  object-fit: contain;
-}
-
-/* Top-Left Corner: Anchors at top-left hugging corner */
-.cinema-balloon-item.corner-tl {
-  top: 0;
-  left: 0;
-  width: clamp(95px, 24vw, 130px);
-  transform-origin: top left;
-  animation: balloonFloatTL 5.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-}
-
-/* Top-Right Corner: Anchors at top-right hugging corner */
-.cinema-balloon-item.corner-tr {
-  top: 0;
-  right: 0;
-  width: clamp(95px, 24vw, 130px);
-  transform-origin: top right;
-  animation: balloonFloatTR 5.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-}
-
-/* Bottom-Left Corner: Sits right above bottom edge / dock */
-.cinema-balloon-item.corner-bl {
-  bottom: calc(var(--sab, 0px) + 8px);
-  left: 0;
-  width: clamp(75px, 19vw, 105px);
-  transform-origin: bottom left;
-  animation: balloonFloatBL 5.0s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-}
-
-/* Bottom-Right Corner: Sits right above bottom edge / dock */
-.cinema-balloon-item.corner-br {
-  bottom: calc(var(--sab, 0px) + 8px);
-  right: 0;
-  width: clamp(75px, 19vw, 105px);
-  transform-origin: bottom right;
-  animation: balloonFloatBR 5.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-}
-
-/* Subtle Organic Floating Keyframes (Helium physics) */
-@keyframes balloonFloatTL {
+@keyframes auroraPulse2 {
   0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  38% {
-    transform: translate3d(2px, -6px, 0) rotate(-1.5deg);
-  }
-  72% {
-    transform: translate3d(-3px, -3px, 0) rotate(1.2deg);
-  }
-  100% {
-    transform: translate3d(0, -7px, 0) rotate(-0.5deg);
-  }
-}
-
-@keyframes balloonFloatTR {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  42% {
-    transform: translate3d(-3px, -5px, 0) rotate(1.8deg);
-  }
-  78% {
-    transform: translate3d(2px, -8px, 0) rotate(-1deg);
-  }
-  100% {
-    transform: translate3d(-1px, -3px, 0) rotate(0.8deg);
-  }
-}
-
-@keyframes balloonFloatBL {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
   }
   50% {
-    transform: translate3d(2px, -6px, 0) rotate(-1.2deg);
+    transform: translate3d(-18px, 15px, 0) scale(1.15);
+    opacity: 0.7;
   }
   100% {
-    transform: translate3d(-1px, -4px, 0) rotate(0.8deg);
+    transform: translate3d(10px, -10px, 0) scale(0.9);
+    opacity: 0.5;
   }
 }
 
-@keyframes balloonFloatBR {
+/* Floating Golden & Rose Celebration Motes */
+.cinema-motes-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.mote {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.85), 0 0 16px rgba(225, 48, 108, 0.6);
+  pointer-events: none;
+  animation: moteFloat var(--d) cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+.mote:nth-child(even) {
+  background: #ffe4b5;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.9), 0 0 18px rgba(255, 182, 193, 0.7);
+}
+
+@keyframes moteFloat {
   0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
+    transform: translate3d(0, 0, 0);
+    opacity: 0.2;
   }
-  48% {
-    transform: translate3d(-2px, -7px, 0) rotate(1.4deg);
+  50% {
+    transform: translate3d(4px, -14px, 0);
+    opacity: 0.9;
   }
   100% {
-    transform: translate3d(1px, -3px, 0) rotate(-0.6deg);
+    transform: translate3d(-6px, -24px, 0);
+    opacity: 0.3;
   }
 }
 
-/* Brand cluster celebration pill */
+/* Luxury Wordmark Specular Shimmer */
 .aura-brand-cluster {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.aura-brand-decor-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 9px;
-  border-radius: 9999px;
-  background: rgba(225, 48, 108, 0.16);
-  border: 1px solid rgba(225, 48, 108, 0.38);
-  color: #ff9ec6;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(225, 48, 108, 0.25);
-  animation: decorPillGlow 3s ease-in-out infinite alternate;
+.aura-brand-wordmark {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #ffffff 0%, #ffd6e0 40%, #ffffff 65%, #ffb6c1 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: auraWordmarkShimmer 7s ease-in-out infinite;
 }
 
-@keyframes decorPillGlow {
-  0% {
-    box-shadow: 0 2px 8px rgba(225, 48, 108, 0.20);
-    border-color: rgba(225, 48, 108, 0.32);
+@keyframes auraWordmarkShimmer {
+  0%, 20% {
+    background-position: 0% center;
+  }
+  50%, 70% {
+    background-position: 100% center;
   }
   100% {
-    box-shadow: 0 3px 14px rgba(225, 48, 108, 0.45);
-    border-color: rgba(255, 110, 180, 0.55);
+    background-position: 0% center;
   }
+}
+
+/* Subtle, Sleek Celebration Edition Badge */
+.aura-edition-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2.5px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(225, 48, 108, 0.32);
+  color: #ffb4cc;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4), 0 0 12px rgba(225, 48, 108, 0.18);
+}
+
+/* Card Ambilight Enhancement (Soft Ambient Drop) */
+.aura-featured-card,
+.aura-media-card {
+  box-shadow: 0 14px 34px -8px rgba(0, 0, 0, 0.8), 0 0 20px -4px rgba(225, 48, 108, 0.16) !important;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease !important;
+}
+
+.aura-featured-card:active,
+.aura-media-card:active {
+  transform: scale(0.985);
 }
 
