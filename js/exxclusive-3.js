@@ -23,58 +23,6 @@
       src: 'song/mangal_rang.mp4',
       memory: 'Virat and Digi went to watch this movie of CP67 on 11 Nov 2026, and Digi loved this song so much.',
       isFeatured: true
-    },
-    {
-      id: 'kesariya',
-      title: 'Kesariya • Brahmāstra',
-      sub: 'Arijit Singh • 4K HDR TrueColor',
-      category: ['4k', 'romantic', 'trending'],
-      badge: '4K MASTER',
-      duration: '4:28',
-      poster: 'song/covers/Kesariya.jpg',
-      posterFallback: 'song/Kesariya.jpg',
-      src: 'song/Kesariya.mp4',
-      memory: 'Special celebration melody.'
-    },
-    {
-      id: 'sooiyan',
-      title: 'Sooiyan • Guddu Rangeela',
-      sub: 'Arijit Singh & Chinmayi • Acoustic Spatial',
-      category: ['atmospheric', 'romantic', 'trending'],
-      badge: 'DOLBY 3D',
-      duration: '3:58',
-      poster: 'song/Sooiyan.jpg',
-      src: 'song/Sooiyan.mp4'
-    },
-    {
-      id: 'chhod-diya',
-      title: 'Chhod Diya • Kanika Kapoor',
-      sub: 'Baazaar • 4K Remastered Dolby Atmos',
-      category: ['4k', 'romantic', 'atmospheric'],
-      badge: '4K UHD',
-      duration: '4:12',
-      poster: 'song/Chhod Diya.jpg',
-      src: 'song/Chhod Diya.mp4'
-    },
-    {
-      id: 'yaad-hai-na',
-      title: 'Yaad Hai Na • Raaz Reboot',
-      sub: 'Arijit Singh • 4K Ultra Wide Soundscape',
-      category: ['4k', 'atmospheric', 'romantic'],
-      badge: '4K CINEMA',
-      duration: '4:03',
-      poster: 'song/Yaad Hai Na.jpg',
-      src: 'song/Yaad Hai Na.mp4'
-    },
-    {
-      id: 'sawan-aaya-hai',
-      title: 'Sawan Aaya Hai • Creature 3D',
-      sub: 'Arijit Singh • Dolby Cinema 3D Binaural',
-      category: ['dolby', 'romantic', 'atmospheric'],
-      badge: 'DOLBY 3D',
-      duration: '4:45',
-      poster: 'song/covers/mangal_rang.jpg',
-      src: 'song/Sawan Aaya Hai.mp4'
     }
   ];
 
@@ -1230,8 +1178,8 @@
 
       if (ytPlayer) {
         ytPlayer.style.display = 'block';
-        // Use clean embed URL without broken &origin to prevent Error 150/153 on GitHub Pages / mobile
-        ytPlayer.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3`;
+        // Use clean youtube-nocookie embed URL to prevent cross-origin tracking blocks and Error 150/153
+        ytPlayer.src = `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&enablejsapi=1&playsinline=1&rel=0&modestbranding=1`;
 
         // Compute edge-to-edge covering dynamically so video fills curved screen with zero black bars
         fitYouTubePlayerToScreen();
@@ -1595,7 +1543,7 @@
 
   function togglePlayPause() {
     const ytPlayer = document.getElementById('lounge-youtube-player');
-    const isYouTube = currentMedia && (currentMedia.type === 'youtube' || !!currentMedia.youtubeId);
+    const isYouTube = currentMedia && (currentMedia.type === 'youtube') && !currentMedia.src;
     if (isYouTube && ytPlayer && ytPlayer.contentWindow) {
       isYtPlaying = !isYtPlaying;
       const cmd = isYtPlaying ? 'playVideo' : 'pauseVideo';
@@ -1620,6 +1568,9 @@
     }
     if (!videoEl) return;
     if (videoEl.paused) {
+      videoEl.muted = false;
+      const targetVol = volumeSlider ? parseFloat(volumeSlider.value) : 1.0;
+      videoEl.volume = targetVol > 0 ? targetVol : 1.0;
       setupDolbyAudioDSP();
       videoEl.play();
       updatePlayPauseButton(true);
@@ -2119,9 +2070,18 @@
       });
     }
 
-    // Lounge Stage Tap: Show / Toggle HUD
+    // Lounge Stage Tap: Show / Toggle HUD & Unlock Sound
     if (loungeEl) {
       loungeEl.addEventListener('pointerdown', (e) => {
+        // Unlock sound immediately on any screen touch
+        if (videoEl && videoEl.muted) {
+          videoEl.muted = false;
+          videoEl.volume = 1.0;
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+
         if (e.target.closest('.lounge-glass-hud > *') || e.target.closest('#apple-floating-dock') || e.target.closest('.cinema-floating-dock') || e.target.closest('.lounge-exit-btn') || e.target.closest('#nav-cinema-back-btn') || e.target.closest('#lounge-top-back-btn')) {
           return;
         }
