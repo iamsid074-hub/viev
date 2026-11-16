@@ -171,25 +171,31 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  margin-bottom: 22px;
   position: relative;
   z-index: 50;
 }
 
 .aura-brand-cluster {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
 }
 
 .aura-brand-wordmark {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Outfit", sans-serif;
-  font-size: 26px;
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  font-size: clamp(38px, 9vw, 44px);
   font-weight: 800;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+  letter-spacing: -1.2px;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffffff 10%, #f1f5f9 60%, rgba(255, 255, 255, 0.72) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 18px rgba(255, 255, 255, 0.32)) drop-shadow(0 10px 32px rgba(0, 0, 0, 0.95));
+  text-shadow: 0 4px 20px rgba(255, 255, 255, 0.22);
+  display: inline-block;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Header Right Source Switcher */

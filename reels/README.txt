@@ -13,3 +13,4 @@ HOW TO ADD YOUR REELS:
    ]
 
 3. That's it! In the Aura Cinema "Added Videos" dropdown, select "Our Reels", and your videos will play in full 9:16 vertical format with smooth 1:1 finger swipe physics (swipe up/down like Instagram Reels, single tap to play/pause, sound toggle pill).
+
