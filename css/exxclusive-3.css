@@ -230,16 +230,14 @@
 .aura-source-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 9999px;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.16);
   color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  font-size: 13px;
-  font-weight: 600;
   cursor: pointer;
   outline: none;
   backdrop-filter: blur(20px);
@@ -251,17 +249,29 @@
 .aura-source-btn:hover {
   background: rgba(255, 255, 255, 0.14);
   border-color: rgba(255, 255, 255, 0.28);
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 .aura-source-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.94);
+}
+
+.aura-source-btn-label,
+.aura-source-chevron {
+  display: none !important;
 }
 
 .aura-source-btn-icon {
   display: flex;
   align-items: center;
+  justify-content: center;
   color: #ffffff;
+}
+
+.aura-source-btn-icon svg {
+  width: 17px;
+  height: 17px;
+  display: block;
 }
 
 .aura-source-btn-icon.is-yt {
