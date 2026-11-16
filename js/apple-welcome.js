@@ -8,6 +8,8 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Target: 17 Nov 2026 at 00:00:00 AM (12:00 AM Midnight IST)
   const COUNTDOWN_TARGET = new Date(2026, 10, 17, 0, 0, 0);
+  // 17 Nov Birthday Finish Target: 18 Nov 2026 at 00:00:00 AM (Midnight IST)
+  const BIRTHDAY_END_TARGET = new Date(2026, 10, 18, 0, 0, 0);
   // Met on 31 Jan 2026 at 1:16:00 AM local time
   const MET_DATE = new Date(2026, 0, 31, 1, 16, 0);
 
@@ -95,20 +97,33 @@ document.addEventListener('DOMContentLoaded', () => {
     let days = 0, hours = 0, minutes = 0, seconds = 0;
 
     if (clockMode === 'countdown') {
-      const diffMs = COUNTDOWN_TARGET - now;
-      if (diffMs > 0) {
+      const nowMs = now.getTime();
+      const startMs = COUNTDOWN_TARGET.getTime();
+      const endMs = BIRTHDAY_END_TARGET.getTime();
+
+      if (nowMs < startMs) {
+        const diffMs = startMs - nowMs;
         const totalSeconds = Math.floor(diffMs / 1000);
         days = Math.floor(totalSeconds / 86400);
         hours = Math.floor((totalSeconds % 86400) / 3600);
         minutes = Math.floor((totalSeconds % 3600) / 60);
         seconds = totalSeconds % 60;
         if (milestoneLabelEl) milestoneLabelEl.textContent = 'Days To 17 Nov';
+      } else if (nowMs < endMs) {
+        // Active 17 Nov Birthday: Counting down to the end of 17 Nov (Midnight)
+        const diffMs = endMs - nowMs;
+        const totalSeconds = Math.floor(diffMs / 1000);
+        days = Math.floor(totalSeconds / 86400);
+        hours = Math.floor((totalSeconds % 86400) / 3600);
+        minutes = Math.floor((totalSeconds % 3600) / 60);
+        seconds = totalSeconds % 60;
+        if (milestoneLabelEl) milestoneLabelEl.textContent = '17 Nov Ends In 🎂';
       } else {
         days = 0;
         hours = 0;
         minutes = 0;
         seconds = 0;
-        if (milestoneLabelEl) milestoneLabelEl.textContent = "It's 17 Nov! 🎂";
+        if (milestoneLabelEl) milestoneLabelEl.textContent = '17 Nov Ended ✨';
       }
     } else {
       // 'together' mode
@@ -129,8 +144,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Dynamic mini progress bar fills
     if (barDays) {
-      const dayPct = Math.min(100, Math.max(8, ((days % 365) / 365) * 100));
-      barDays.style.width = `${dayPct.toFixed(1)}%`;
+      if (clockMode === 'countdown' && now.getTime() >= COUNTDOWN_TARGET.getTime() && now.getTime() < BIRTHDAY_END_TARGET.getTime()) {
+        const remainingDaySecs = Math.max(0, Math.floor((BIRTHDAY_END_TARGET.getTime() - now.getTime()) / 1000));
+        const dayPct = Math.min(100, Math.max(8, (remainingDaySecs / 86400) * 100));
+        barDays.style.width = `${dayPct.toFixed(1)}%`;
+      } else {
+        const dayPct = Math.min(100, Math.max(8, ((days % 365) / 365) * 100));
+        barDays.style.width = `${dayPct.toFixed(1)}%`;
+      }
     }
     if (barHours) {
       const hourPct = Math.min(100, Math.max(8, (hours / 24) * 100));
