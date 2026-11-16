@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cinemaSettingsPill = document.querySelector('.settings-nav-pill[data-target="subpage-cinema"]');
     if (cinemaSettingsPill) {
-      cinemaSettingsPill.style.display = 'flex';
+      cinemaSettingsPill.style.display = 'none';
     }
 
     // Refresh active indicator position

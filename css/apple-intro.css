@@ -3381,6 +3381,13 @@
   text-align: left;
 }
 
+/* Permanently hidden settings options */
+.settings-nav-pill[data-target="subpage-display"],
+.settings-nav-pill[data-target="subpage-spatial"],
+.settings-nav-pill[data-target="subpage-cinema"] {
+  display: none !important;
+}
+
 .settings-nav-pill:hover {
   background: rgba(255, 255, 255, 0.09);
   border-color: rgba(255, 255, 255, 0.2);
