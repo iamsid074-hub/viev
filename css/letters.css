@@ -1,19 +1,24 @@
 /* =========================================================
    LETTERS & ROYAL SIGNATURE ENGINE — DIGI OS 2.1 / 3.0
-   Parchment Cream Aesthetics • Finger Signature Pad • Stamp Effect
+   Full-Page Parchment Cream Letter • Finger Calligraphy Pad • Stamp
    ========================================================= */
 
-/* --- FULL SCREEN SEAMLESS CREAM THEME FOR LETTERS --- */
+/* --- FULL PAGE SEAMLESS CREAM CANVAS --- */
 body.has-letters-active,
 body.has-letters-active #settings-screen,
 .settings-nav-viewport.is-letters-active,
 .settings-nav-viewport.is-letters-active .settings-subpage-pane {
   background: #fbf7ee !important;
   color: #2b2219 !important;
-  transition: background 0.35s ease;
+  transition: background 0.3s ease;
 }
 
-/* Hide Candles completely when any subpage or Letters is open */
+/* Remove huge ghost bottom space in Letters mode */
+.settings-nav-viewport.is-letters-active .settings-subpage-pane {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px) + 28px, 32px) !important;
+}
+
+/* Hide candles in Letters & Subpage mode */
 .settings-nav-viewport.is-subpage-open ~ .elite-birthday-candles-container,
 .settings-nav-viewport.is-letters-active ~ .elite-birthday-candles-container,
 body.has-letters-active .elite-birthday-candles-container {
@@ -23,27 +28,27 @@ body.has-letters-active .elite-birthday-candles-container {
   pointer-events: none !important;
 }
 
-/* Hide floating dock in Letters mode so full letter and signature are 100% unobstructed */
+/* Hide bottom floating dock in Letters mode so reading is 100% immersive & unobstructed */
 body.has-letters-active #apple-floating-dock,
 .settings-nav-viewport.is-letters-active ~ #apple-floating-dock {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
-  transform: translateX(-50%) translateY(32px) !important;
-  transition: opacity 0.28s ease, transform 0.28s ease !important;
+  transform: translateX(-50%) translateY(36px) !important;
+  transition: opacity 0.25s ease, transform 0.25s ease !important;
 }
 
-/* Royal Navigation Top Bar on Cream */
+/* Top Navigation Bar: Seamless on Cream */
 .settings-nav-viewport.is-letters-active .subpage-top-bar {
   background: transparent !important;
-  padding: 8px 16px 14px 16px !important;
+  padding: 10px 18px 12px 18px !important;
   margin-top: 0 !important;
-  margin-bottom: 6px !important;
-  border-bottom: 1px solid rgba(198, 169, 131, 0.25) !important;
+  margin-bottom: 0 !important;
+  border-bottom: 1px solid rgba(198, 169, 131, 0.3) !important;
 }
 
 .settings-nav-viewport.is-letters-active .subpage-back-btn {
-  color: #8b572a !important; /* Elegant warm leather bronze */
+  color: #8b572a !important;
   font-weight: 600 !important;
   font-size: 16px !important;
   letter-spacing: 0.2px !important;
@@ -61,15 +66,15 @@ body.has-letters-active #apple-floating-dock,
   letter-spacing: 0.6px !important;
 }
 
-/* --- SUBPAGE LETTERS CONTAINER --- */
+/* --- SUBPAGE LETTERS: FULL PAGE ZERO-GAP WRAPPER --- */
 #subpage-letters {
   background: transparent !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  padding: 10px 14px 140px 14px !important;
-  box-sizing: border-box !important;
+  padding: 0 !important;
+  margin: 0 !important;
   color: #2b2219 !important;
-  min-height: auto !important;
+  width: 100% !important;
   position: relative !important;
 }
 
@@ -87,56 +92,29 @@ body.has-letters-active #apple-floating-dock,
   box-shadow: 0 2px 8px rgba(212, 175, 55, 0.35);
 }
 
-/* --- THE VINTAGE CREAM LETTER SHEET --- */
+/* --- FULL-PAGE LETTER CONTENT --- */
 .vintage-letter-card {
   position: relative;
-  max-width: 540px;
+  width: 100%;
+  max-width: 600px;
   margin: 0 auto;
-  background: #fffdfa;
+  background: #fbf7ee;
   background-image: 
-    linear-gradient(to right, rgba(180, 150, 110, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(180, 150, 110, 0.04) 1px, transparent 1px),
-    radial-gradient(circle at top right, rgba(232, 213, 183, 0.25) 0%, transparent 60%);
-  background-size: 20px 20px, 20px 20px, 100% 100%;
-  border-radius: 24px;
-  padding: 34px 22px 42px 22px;
-  box-shadow: 
-    0 16px 44px rgba(90, 65, 40, 0.08),
-    0 4px 14px rgba(90, 65, 40, 0.04),
-    inset 0 0 0 1px rgba(212, 185, 145, 0.45);
-  border: 1px solid rgba(220, 195, 155, 0.55);
+    linear-gradient(to right, rgba(180, 150, 110, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(180, 150, 110, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 24px 20px 20px 20px;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible !important;
 }
 
-/* Elegant Golden Corner Accents */
-.vintage-letter-card::before,
-.vintage-letter-card::after {
-  content: '';
-  position: absolute;
-  width: 32px;
-  height: 32px;
-  border-color: rgba(198, 160, 100, 0.45);
-  border-style: solid;
-  pointer-events: none;
-}
-.vintage-letter-card::before {
-  top: 14px;
-  left: 14px;
-  border-width: 2px 0 0 2px;
-  border-top-left-radius: 10px;
-}
-.vintage-letter-card::after {
-  bottom: 14px;
-  right: 14px;
-  border-width: 0 2px 2px 0;
-  border-bottom-right-radius: 10px;
-}
-
-/* Letter Header & Royal Seal */
+/* Letter Header & Royal Wax Seal */
 .letter-header-wrap {
   text-align: center;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
   padding-bottom: 18px;
   border-bottom: 1px dashed rgba(200, 170, 130, 0.45);
   position: relative;
@@ -154,10 +132,10 @@ body.has-letters-active #apple-floating-dock,
   color: #fff;
   font-size: 22px;
   box-shadow: 
-    0 4px 14px rgba(168, 28, 28, 0.4),
+    0 4px 14px rgba(168, 28, 28, 0.35),
     inset 0 2px 4px rgba(255, 255, 255, 0.35),
     inset 0 -2px 4px rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(255, 215, 0, 0.4);
+  border: 2px solid rgba(255, 215, 0, 0.45);
   transform: rotate(-4deg);
 }
 
@@ -173,7 +151,7 @@ body.has-letters-active #apple-floating-dock,
 
 .letter-main-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 25px;
+  font-size: 26px;
   font-weight: 700;
   color: #2b1f14;
   margin: 0 0 6px 0;
@@ -191,22 +169,22 @@ body.has-letters-active #apple-floating-dock,
 /* Letter Body Prose */
 .letter-prose-body {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 16px;
-  line-height: 1.85;
+  font-size: 16.5px;
+  line-height: 1.9;
   color: #36291e;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .letter-salutation {
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
   color: #24170d;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   font-style: italic;
 }
 
 .letter-paragraph {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
   text-align: justify;
   text-justify: inter-word;
   hyphens: auto;
@@ -225,7 +203,7 @@ body.has-letters-active #apple-floating-dock,
 }
 
 .letter-valediction {
-  margin-top: 28px;
+  margin-top: 26px;
   font-style: italic;
   font-size: 17px;
   color: #4a3625;
@@ -233,7 +211,7 @@ body.has-letters-active #apple-floating-dock,
 
 .letter-sender-name {
   font-family: 'Great Vibes', 'Playfair Display', cursive, serif;
-  font-size: 32px;
+  font-size: 34px;
   color: #b82e2e;
   margin-top: 4px;
   font-weight: normal;
@@ -241,12 +219,12 @@ body.has-letters-active #apple-floating-dock,
 
 /* --- BOTTOM SIGNATURE SECTION --- */
 .letter-signature-section {
-  margin-top: 32px;
+  margin-top: 28px;
   padding-top: 24px;
-  border-top: 1px solid rgba(200, 170, 130, 0.4);
+  border-top: 1px dashed rgba(200, 170, 130, 0.45);
   text-align: center;
   position: relative;
-  min-height: 110px;
+  overflow: visible !important;
 }
 
 /* "YOUR SIGNATURE" Trigger Button */
@@ -255,9 +233,9 @@ body.has-letters-active #apple-floating-dock,
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 15px 34px;
+  padding: 16px 36px;
   border-radius: 999px;
-  border: 1px solid rgba(184, 134, 11, 0.6);
+  border: 1px solid rgba(184, 134, 11, 0.65);
   background: linear-gradient(135deg, #241c14 0%, #3e3020 100%);
   color: #f7e6c4;
   font-family: 'Outfit', sans-serif;
@@ -267,19 +245,20 @@ body.has-letters-active #apple-floating-dock,
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: 
-    0 10px 26px rgba(40, 28, 16, 0.35),
-    0 2px 6px rgba(184, 134, 11, 0.3),
+    0 10px 24px rgba(40, 28, 16, 0.3),
+    0 2px 6px rgba(184, 134, 11, 0.25),
     inset 0 1px 1px rgba(255, 230, 180, 0.3);
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
+  margin: 8px 0;
 }
 
 .btn-your-signature:hover {
   transform: translateY(-2px);
   box-shadow: 
-    0 14px 32px rgba(40, 28, 16, 0.45),
-    0 4px 10px rgba(184, 134, 11, 0.4);
+    0 14px 30px rgba(40, 28, 16, 0.4),
+    0 4px 10px rgba(184, 134, 11, 0.35);
   border-color: #d4af37;
   color: #ffffff;
 }
@@ -295,14 +274,15 @@ body.has-letters-active #apple-floating-dock,
   align-items: center;
   justify-content: center;
   position: relative;
+  margin: 6px 0;
 }
 
 /* Large Signature Stamp Image */
 .letter-signature-image {
-  max-width: 260px;
-  width: 85%;
+  max-width: 280px;
+  width: 90%;
   height: auto;
-  max-height: 120px;
+  max-height: 130px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
@@ -337,13 +317,13 @@ body.has-letters-active #apple-floating-dock,
 /* Small Stamp Text Line: -APPROVED BY AVNEET- */
 .letter-approved-tag-line {
   font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 2.2px;
+  letter-spacing: 2.4px;
   text-transform: uppercase;
   color: #8b2525;
-  margin-top: 10px;
-  padding: 4px 14px;
+  margin-top: 12px;
+  padding: 5px 16px;
   border-top: 1px dashed rgba(139, 37, 37, 0.35);
   border-bottom: 1px dashed rgba(139, 37, 37, 0.35);
   display: inline-block;
@@ -353,7 +333,7 @@ body.has-letters-active #apple-floating-dock,
 
 .letter-signed-meta {
   font-family: 'Outfit', sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   color: #8a7258;
   margin-top: 6px;
   letter-spacing: 0.5px;
@@ -367,12 +347,12 @@ body.has-letters-active #apple-floating-dock,
   background: transparent;
   border: none;
   font-family: 'Outfit', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #9c7542;
   cursor: pointer;
   text-decoration: underline;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 6px;
 }
 .letter-resign-btn:hover {
