@@ -3,23 +3,77 @@
    Parchment Cream Aesthetics • Finger Signature Pad • Stamp Effect
    ========================================================= */
 
-/* --- SUBPAGE CONTAINER OVERRIDES --- */
-#subpage-letters {
-  background: #f7f1e5;
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.8) 0%, transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(230, 214, 188, 0.45) 0%, transparent 50%),
-    linear-gradient(180deg, #faf4e8 0%, #f4ece0 100%);
-  border-radius: 28px;
-  padding: 18px 14px 140px 14px;
-  box-sizing: border-box;
-  color: #2b2219;
-  min-height: 100%;
-  position: relative;
-  box-shadow: inset 0 2px 24px rgba(180, 150, 110, 0.15);
+/* --- FULL SCREEN SEAMLESS CREAM THEME FOR LETTERS --- */
+body.has-letters-active,
+body.has-letters-active #settings-screen,
+.settings-nav-viewport.is-letters-active,
+.settings-nav-viewport.is-letters-active .settings-subpage-pane {
+  background: #fbf7ee !important;
+  color: #2b2219 !important;
+  transition: background 0.35s ease;
 }
 
-/* Kicker Badge in Settings Navigation */
+/* Hide Candles completely when any subpage or Letters is open */
+.settings-nav-viewport.is-subpage-open ~ .elite-birthday-candles-container,
+.settings-nav-viewport.is-letters-active ~ .elite-birthday-candles-container,
+body.has-letters-active .elite-birthday-candles-container {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Hide floating dock in Letters mode so full letter and signature are 100% unobstructed */
+body.has-letters-active #apple-floating-dock,
+.settings-nav-viewport.is-letters-active ~ #apple-floating-dock {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateX(-50%) translateY(32px) !important;
+  transition: opacity 0.28s ease, transform 0.28s ease !important;
+}
+
+/* Royal Navigation Top Bar on Cream */
+.settings-nav-viewport.is-letters-active .subpage-top-bar {
+  background: transparent !important;
+  padding: 8px 16px 14px 16px !important;
+  margin-top: 0 !important;
+  margin-bottom: 6px !important;
+  border-bottom: 1px solid rgba(198, 169, 131, 0.25) !important;
+}
+
+.settings-nav-viewport.is-letters-active .subpage-back-btn {
+  color: #8b572a !important; /* Elegant warm leather bronze */
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  letter-spacing: 0.2px !important;
+}
+
+.settings-nav-viewport.is-letters-active .subpage-back-btn svg {
+  stroke: #8b572a !important;
+}
+
+.settings-nav-viewport.is-letters-active .subpage-nav-center-title {
+  color: #2b2219 !important;
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.6px !important;
+}
+
+/* --- SUBPAGE LETTERS CONTAINER --- */
+#subpage-letters {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 10px 14px 140px 14px !important;
+  box-sizing: border-box !important;
+  color: #2b2219 !important;
+  min-height: auto !important;
+  position: relative !important;
+}
+
+/* Kicker Badge in Settings Navigation Menu */
 .letter-nav-badge {
   font-size: 11px;
   font-weight: 700;
@@ -38,19 +92,19 @@
   position: relative;
   max-width: 540px;
   margin: 0 auto;
-  background: #fffefb;
+  background: #fffdfa;
   background-image: 
-    linear-gradient(to right, rgba(0,0,0,0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.015) 1px, transparent 1px),
+    linear-gradient(to right, rgba(180, 150, 110, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(180, 150, 110, 0.04) 1px, transparent 1px),
     radial-gradient(circle at top right, rgba(232, 213, 183, 0.25) 0%, transparent 60%);
   background-size: 20px 20px, 20px 20px, 100% 100%;
   border-radius: 24px;
-  padding: 36px 26px 42px 26px;
+  padding: 34px 22px 42px 22px;
   box-shadow: 
-    0 20px 50px rgba(82, 58, 32, 0.12),
-    0 4px 16px rgba(82, 58, 32, 0.06),
+    0 16px 44px rgba(90, 65, 40, 0.08),
+    0 4px 14px rgba(90, 65, 40, 0.04),
     inset 0 0 0 1px rgba(212, 185, 145, 0.45);
-  border: 1px solid rgba(220, 195, 155, 0.5);
+  border: 1px solid rgba(220, 195, 155, 0.55);
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -62,7 +116,7 @@
   position: absolute;
   width: 32px;
   height: 32px;
-  border-color: rgba(198, 160, 100, 0.4);
+  border-color: rgba(198, 160, 100, 0.45);
   border-style: solid;
   pointer-events: none;
 }
@@ -82,7 +136,7 @@
 /* Letter Header & Royal Seal */
 .letter-header-wrap {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 26px;
   padding-bottom: 18px;
   border-bottom: 1px dashed rgba(200, 170, 130, 0.45);
   position: relative;
@@ -119,7 +173,7 @@
 
 .letter-main-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 26px;
+  font-size: 25px;
   font-weight: 700;
   color: #2b1f14;
   margin: 0 0 6px 0;
@@ -140,7 +194,7 @@
   font-size: 16px;
   line-height: 1.85;
   color: #36291e;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .letter-salutation {
@@ -187,7 +241,7 @@
 
 /* --- BOTTOM SIGNATURE SECTION --- */
 .letter-signature-section {
-  margin-top: 36px;
+  margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid rgba(200, 170, 130, 0.4);
   text-align: center;

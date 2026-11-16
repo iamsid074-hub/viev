@@ -747,6 +747,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.vievNotifications.updateUI();
       }
     } else if (targetId === 'subpage-letters') {
+      settingsViewport.classList.add('is-letters-active');
+      document.body.classList.add('has-letters-active');
+      document.documentElement.classList.add('has-letters-active');
       if (window.vievLetters && typeof window.vievLetters.init === 'function') {
         window.vievLetters.init();
       }
@@ -769,10 +772,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function finalizeCloseSubpage() {
     if (!settingsViewport) return;
-    settingsViewport.classList.remove('is-subpage-open');
+    settingsViewport.classList.remove('is-subpage-open', 'is-letters-active');
     settingsViewport.classList.remove('is-exxclusive-mode');
-    document.body.classList.remove('is-exxclusive-active');
-    document.documentElement.classList.remove('is-exxclusive-active');
+    document.body.classList.remove('is-exxclusive-active', 'has-letters-active');
+    document.documentElement.classList.remove('is-exxclusive-active', 'has-letters-active');
     if (typeof window.setFloatingNavVisible === 'function') {
       window.setFloatingNavVisible(true);
     }
