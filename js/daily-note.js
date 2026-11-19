@@ -617,9 +617,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (!heroStageVideo) {
       heroStageVideo = document.getElementById('hero-stage-video');
+      if (heroStageVideo) {
+        heroStageVideo.muted = true;
+        heroStageVideo.defaultMuted = true;
+        heroStageVideo.playsInline = true;
+      }
     }
     if (!ambientVideo) {
       ambientVideo = document.getElementById('hero-note-ambient-video');
+      if (ambientVideo) {
+        ambientVideo.muted = true;
+        ambientVideo.defaultMuted = true;
+        ambientVideo.playsInline = true;
+      }
     }
   }
 
@@ -641,17 +651,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const endTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.endTime) || 60.0;
     const targetVol = 0.95;
 
-    heroNoteAudio.currentTime = startTime;
+    try {
+      heroNoteAudio.currentTime = startTime;
+    } catch(_) {}
     heroNoteAudio.volume = 0;
 
     // Start Real Music Video in Hero Frame & Ambient Video
     const startVid = (vid) => {
       if (!vid) return;
       try {
-        vid.currentTime = startTime;
-        const p = vid.play();
-        if (p !== undefined) {
-          p.catch(err => console.warn('[VideoSync] Play prevented:', err));
+        vid.muted = true;
+        vid.defaultMuted = true;
+        vid.playsInline = true;
+        vid.setAttribute('playsinline', '');
+        vid.setAttribute('webkit-playsinline', '');
+
+        const safeSeekAndPlay = () => {
+          try {
+            if (vid.duration && startTime < vid.duration) {
+              if (Math.abs(vid.currentTime - startTime) > 0.8) {
+                vid.currentTime = startTime;
+              }
+            }
+          } catch(e) {}
+          const p = vid.play();
+          if (p !== undefined) {
+            p.catch(err => {
+              console.warn('[VideoSync] Retrying muted play:', err);
+              vid.muted = true;
+              vid.play().catch(() => {});
+            });
+          }
+        };
+
+        if (vid.readyState >= 1) {
+          safeSeekAndPlay();
+        } else {
+          vid.addEventListener('loadedmetadata', safeSeekAndPlay, { once: true });
+          vid.load();
+          vid.play().catch(() => {});
         }
       } catch(e) {
         console.warn('[VideoSync] Error:', e);
@@ -692,8 +730,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Keep real hero video and ambient video strictly locked to audio
       const syncVid = (vid) => {
-        if (!vid || vid.paused) return;
-        if (Math.abs(vid.currentTime - cur) > 0.35) {
+        if (!vid || vid.paused || vid.seeking || vid.readyState < 2) return;
+        if (Math.abs(vid.currentTime - cur) > 1.8) {
           try { vid.currentTime = cur; } catch(e) {}
         }
       };
