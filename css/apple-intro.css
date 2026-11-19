@@ -8590,22 +8590,21 @@ body.is-elite-1711 .app-screen#settings-screen.active .elite-birthday-candles-co
    Strictly Gated for ID 1711 (Replaces Mangal Rang Banner)
    ========================================================= */
 
-.elite-hbd-banner {
+.elite-hbd-banner,
+.elite-birthday-candles-container {
   display: none !important;
-  position: relative;
-  width: 100%;
-  margin-top: clamp(24px, 3.8vh, 34px);
-  justify-content: center;
-  align-items: center;
 }
 
-/* Strictly swap: for ID 1711, Hide Mangal Rang and Show Happy Birthday Neetu */
+#mangal-rang-cinematic-banner {
+  display: flex !important;
+}
+
 body.is-elite-1711 #mangal-rang-cinematic-banner {
-  display: none !important;
+  display: flex !important;
 }
 
 body.is-elite-1711 #elite-hbd-banner {
-  display: flex !important;
+  display: none !important;
 }
 
 .elite-hbd-ambient-aura {

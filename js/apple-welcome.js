@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let isFirstRun = true;
 
   function updateLiveCounter() {
+    if (!clockContainer) return;
     const now = new Date();
     let days = 0, hours = 0, minutes = 0, seconds = 0;
 
@@ -190,34 +191,18 @@ document.addEventListener('DOMContentLoaded', () => {
   window.setMovingWelcomeVisible = function() {};
 
   /* =========================================================
-     3.1 ELITE: LIVING BIRTHDAY CANDLES & CELEBRATION ENGINE
-     Active for ALL Authenticated Members (Digi 3009/3011 & Virat 1711)
+     RAMAYANA THEME CONTROLLER
+     Birthday theme & candles removed; RAMA THEME permanently active
      ========================================================= */
   function evaluateEliteCandlesAccess() {
-    let sess = null;
-    try {
-      sess = window.__vievActiveSession
-        || JSON.parse(sessionStorage.getItem('viev_auth_session') || 'null')
-        || JSON.parse(localStorage.getItem('viev_auth_session') || 'null');
-    } catch (_) {}
-
-    // Birthday celebration (Happy Birthday Neetu + Living Candles) is active for ALL members (Digi & Virat)
-    const isBirthdayActive = true;
+    document.body.classList.remove('is-elite-1711');
     const container = document.getElementById('elite-birthday-candles');
     const hbdBanner = document.getElementById('elite-hbd-banner');
     const mangalBanner = document.getElementById('mangal-rang-cinematic-banner');
 
-    if (isBirthdayActive) {
-      document.body.classList.add('is-elite-1711');
-      if (container) container.style.removeProperty('display');
-      if (hbdBanner) hbdBanner.style.setProperty('display', 'flex', 'important');
-      if (mangalBanner) mangalBanner.style.setProperty('display', 'none', 'important');
-    } else {
-      document.body.classList.remove('is-elite-1711');
-      if (container) container.style.setProperty('display', 'none', 'important');
-      if (hbdBanner) hbdBanner.style.setProperty('display', 'none', 'important');
-      if (mangalBanner) mangalBanner.style.removeProperty('display');
-    }
+    if (container) container.style.setProperty('display', 'none', 'important');
+    if (hbdBanner) hbdBanner.style.setProperty('display', 'none', 'important');
+    if (mangalBanner) mangalBanner.style.setProperty('display', 'flex', 'important');
   }
 
   // Interactive tap / micro-animation for both candles

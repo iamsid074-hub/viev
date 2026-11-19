@@ -2149,16 +2149,6 @@
 
     // Render initial grid
     renderMediaGrid();
-
-    // Wire aura wordmark tap as interactive celebration pop Easter egg
-    const auraBrand = document.querySelector('.aura-brand-wordmark');
-    if (auraBrand) {
-      auraBrand.style.cursor = 'pointer';
-      auraBrand.title = "Pop Birthday Celebration! 🎂";
-      auraBrand.addEventListener('click', () => {
-        triggerCinemaBirthdayConfetti(true);
-      });
-    }
   }
 
   // =========================================================
@@ -2313,8 +2303,6 @@
       hasVisitedCinema = true;
       triggerIntroAnimation();
     }
-    // Launch Apple iMessage celebration confetti
-    triggerCinemaBirthdayConfetti();
   };
 
   window.onExxclusiveTabDeactivated = function () {
@@ -2322,7 +2310,6 @@
       closeCurvedCinemaLounge();
     }
     pauseActiveReel();
-    stopCinemaBirthdayConfetti();
   };
 
   // Expose global interface
