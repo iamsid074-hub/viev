@@ -25,9 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const barMinutes = document.getElementById('bar-minutes-fill');
   const barSeconds = document.getElementById('bar-seconds-fill');
 
-  // Universal 17 Nov Birthday Countdown for all IDs (Digi 3009/3011 & Virat 1711)
-  // Default mode: 'countdown' | Tapping flips between 'countdown' and 'together'
-  let clockMode = 'countdown';
+  // Real Relationship Timeline Mode: 'together' (Days Together & Live Ticker)
+  let clockMode = 'together';
 
   function updateSegmentDigits(container, newStr, isInitial = false) {
     if (!container) return;
@@ -170,11 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
     isFirstRun = false;
   }
 
-  // Allow clicking the clock pill to toggle between 17 Nov Countdown and Days Together (All IDs)
+  // Real Relationship Timeline clock (Tap triggers tactile heart pulse)
   if (clockContainer) {
-    clockContainer.style.cursor = 'pointer';
     clockContainer.addEventListener('click', () => {
-      clockMode = (clockMode === 'countdown') ? 'together' : 'countdown';
+      clockMode = 'together';
       if (window.triggerHaptic) window.triggerHaptic('light');
       isFirstRun = true;
       updateLiveCounter();
