@@ -14,13 +14,14 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_note_shadi_miss_2026",
+  questionId: "digi_note_uthjao_alarm_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `Mai abhi bhi tere hi sath hu 
-shadi me mujhe miss mat karna 
-kuch bhi khaye to ek bite mujhe soch kar kha lena bas . 
-I MISS YOU BABY .`,
+  noteText: `Uthjao baby ji aur ha aap hi meri alarm ho .
+Agar aap ne mujhe nhi uthaya to mai nhi uthunga .
+I LOVE U BABY , bohot sara bohot sara , 
+And ha sallon chli jana ache se mujhe dekhna hai fir shyam ko APKO . 
+MISS YOU BABY .`,
 
   // Note Memory Photo:
   imageUrl: "assets/daily_note.jpg",
