@@ -12,6 +12,20 @@
   // --- CATALOG OF MEDIA (Curated Personal Memory Archive) ---
   const EXXCLUSIVE_MEDIA = [
     {
+      id: 'nashe-si-chadh-gayi',
+      title: 'Nashe Si Chadh Gayi • Befikre',
+      sub: 'Arijit Singh & Caralisa Monteiro • Ranveer & Vaani',
+      category: ['4k', 'dolby', 'romantic', 'atmospheric', 'trending'],
+      badge: '4K CINEMA',
+      duration: '4:02',
+      poster: 'https://img.youtube.com/vi/Wd2B8OAotU8/maxresdefault.jpg',
+      posterFallback: 'assets/befikre_logo.png',
+      src: 'song/nashe_si_chadh_gayi.mp4',
+      youtubeId: 'Wd2B8OAotU8',
+      memory: 'Befikre Paris Vibe • Nashe Si Chadh Gayi',
+      isFeatured: true
+    },
+    {
       id: 'mangal-rang',
       title: 'Mangal Rang • Ramayana',
       sub: 'Namit Malhotra • A.R. Rahman & Shreya Ghoshal',
@@ -22,7 +36,7 @@
       posterFallback: 'assets/ramayana_logo.png',
       src: 'song/mangal_rang.mp4',
       memory: 'Virat and Digi went to watch this movie of CP67 on 11 Nov 2026, and Digi loved this song so much.',
-      isFeatured: true
+      isFeatured: false
     }
   ];
 

@@ -32,13 +32,13 @@ MISS YOU BABY .`,
   // Right-side date label:
   dateLabel: "Today",
 
-  // Audio Sync Configuration: Mangal Rang (Arijit Singh - Ramayana)
+  // Audio Sync Configuration: Nashe Si Chadh Gayi (Arijit Singh - Befikre)
   audio: {
-    src: "song/mangal_rang.m4a",
-    fallbackSrc: "song/mangal_rang.webm",
-    title: "Mangal Rang • Arijit Singh",
-    startTime: 29.0, // 0:29 sec
-    endTime: 60.0    // 1:00 min
+    src: "song/nashe_si_chadh_gayi.m4a",
+    fallbackSrc: "song/nashe_si_chadh_gayi.mp4",
+    title: "Nashe Si Chadh Gayi • Arijit Singh",
+    startTime: 127.0, // 2:07 min
+    endTime: 148.0    // 2:28 min
   }
 };
 
@@ -1069,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Run initial state setup
   syncDailyNoteWithActiveUser();
 
-  // Handle Home page "MANGAL RANG (RAMAYANA)" click -> switches to Cinema & plays in Cinema Lounge!
+  // Handle Home page "NASHE SE CHAD GYI (BEFIKRE)" click -> switches to Cinema & plays in Cinema Lounge!
   const mangalRangLink = document.getElementById('mangal-rang-title-link');
   if (mangalRangLink) {
     mangalRangLink.addEventListener('click', (e) => {
@@ -1084,10 +1084,10 @@ document.addEventListener('DOMContentLoaded', () => {
         cinemaTabBtn.click();
       }
 
-      // 2. Play Mangal Rang in Cinema Lounge
+      // 2. Play Nashe Si Chadh Gayi in Cinema Lounge
       setTimeout(() => {
         if (window.vievCinema && typeof window.vievCinema.open === 'function') {
-          window.vievCinema.open('mangal-rang');
+          window.vievCinema.open('nashe-si-chadh-gayi');
         }
       }, 300);
     });
