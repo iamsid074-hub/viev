@@ -30,6 +30,7 @@
   <link rel="preload" as="image" href="assets/befikre_logo.webp" type="image/webp">
   <link rel="preload" as="image" href="assets/nashe_note_poster.webp" type="image/webp">
   <link rel="preload" as="video" href="song/nashe_si_chadh_gayi_note.mp4" type="video/mp4">
+  <link rel="preload" as="audio" href="song/nashe_si_chadh_gayi_note.mp3" type="audio/mpeg">
 </head>
 <body>
 
@@ -164,10 +165,6 @@
 
       <!-- Full-Page Living Ambient Glow (Driven by Real Song Video across Entire Page) -->
       <div class="welcome-note-full-ambient" id="welcome-note-full-ambient" aria-hidden="true">
-        <!-- Hidden Source Video (Zero Layout Cost) -->
-        <video id="hero-note-ambient-video" class="hero-note-ambient-video-source" playsinline webkit-playsinline muted loop preload="auto" style="display: none;">
-          <source src="song/nashe_si_chadh_gayi_note.mp4" type="video/mp4">
-        </video>
         <!-- Ultra-Smooth Temporal Accumulation Canvas (Zero Lag, Silky Liquid Crossfades) -->
         <canvas id="hero-note-ambient-canvas" class="hero-note-ambient-canvas" width="96" height="54"></canvas>
         <div class="welcome-note-ambient-overlay"></div>
@@ -201,6 +198,7 @@
 
         <!-- Audio Player for Nashe Si Chadh Gayi (Pre-cut Note audio) -->
         <audio id="hero-note-audio" preload="auto">
+          <source src="song/nashe_si_chadh_gayi_note.mp3" type="audio/mpeg">
           <source src="song/nashe_si_chadh_gayi_note.m4a" type="audio/mp4">
           <source src="song/nashe_si_chadh_gayi_note.mp4" type="video/mp4">
         </audio>
@@ -2313,7 +2311,7 @@
   </div>
 
   <script src="js/apple-welcome.js?v=25.0"></script>
-  <script src="js/daily-note.js?v=8.8"></script>
+  <script src="js/daily-note.js?v=8.9"></script>
   <script src="js/navbar.js?v=9.0"></script>
   <script src="js/youtube-data.js?v=7.1"></script>
   <script src="js/cinema.js?v=7.1"></script>

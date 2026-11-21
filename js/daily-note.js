@@ -34,8 +34,8 @@ MISS YOU BABY .`,
 
   // Audio Sync Configuration: Nashe Si Chadh Gayi (Arijit Singh - Befikre)
   audio: {
-    src: "song/nashe_si_chadh_gayi_note.m4a",
-    fallbackSrc: "song/nashe_si_chadh_gayi_note.mp4",
+    src: "song/nashe_si_chadh_gayi_note.mp3",
+    fallbackSrc: "song/nashe_si_chadh_gayi_note.m4a",
     title: "Nashe Si Chadh Gayi • Arijit Singh",
     startTime: 0.0,
     endTime: 21.0
@@ -357,7 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let particlesList = [];
   let heroNoteAudio = null;
   let heroStageVideo = null;
-  let ambientVideo = null;
   let ambientCanvas = null;
   let ambientCtx = null;
   let ambientRafId = null;
@@ -574,10 +573,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderFrame() {
       if (!isNoteOpen) return;
 
-      const vidSource = heroStageVideo || ambientVideo;
+      const vidSource = heroStageVideo;
       if (vidSource && !vidSource.paused && vidSource.readyState >= 2) {
         if (!isAmbientPrimed) {
-          // Instantly prime with the exact starting frame at 0:29
           if (ambientCtx && ambientCanvas) {
             ambientCtx.globalCompositeOperation = 'source-over';
             ambientCtx.globalAlpha = 1.0;
@@ -586,7 +584,6 @@ document.addEventListener('DOMContentLoaded', () => {
           isAmbientPrimed = true;
         } else {
           // Exponential decay temporal filter: 0.045 alpha per frame
-          // Hard video scene cuts melt into smooth liquid color blooms with zero abrupt shifts!
           const blendAlpha = 0.045;
           if (ambientCtx && ambientCanvas) {
             ambientCtx.globalCompositeOperation = 'source-over';
@@ -610,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
     isAmbientPrimed = false;
   }
 
-  // Audio & Ambient Video Sync Engine (Nashe Si Chadh Gayi)
+  // Audio & Video Playback Engine (Nashe Si Chadh Gayi)
   function initHeroNoteAudio() {
     if (!heroNoteAudio) {
       heroNoteAudio = document.getElementById('hero-note-audio');
@@ -627,14 +624,24 @@ document.addEventListener('DOMContentLoaded', () => {
         try { heroStageVideo.load(); } catch(_) {}
       }
     }
-    if (!ambientVideo) {
-      ambientVideo = document.getElementById('hero-note-ambient-video');
-      if (ambientVideo) {
-        ambientVideo.muted = true;
-        ambientVideo.defaultMuted = true;
-        ambientVideo.playsInline = true;
-        try { ambientVideo.load(); } catch(_) {}
-      }
+  }
+
+  function loopHeroNoteMedia() {
+    if (!isNoteOpen) return;
+    const startTime = (DAILY_NOTE_CONFIG.audio && typeof DAILY_NOTE_CONFIG.audio.startTime === 'number')
+      ? DAILY_NOTE_CONFIG.audio.startTime
+      : 0.0;
+    if (heroNoteAudio) {
+      try {
+        heroNoteAudio.currentTime = startTime;
+        heroNoteAudio.play().catch(() => {});
+      } catch(_) {}
+    }
+    if (heroStageVideo) {
+      try {
+        heroStageVideo.currentTime = startTime;
+        heroStageVideo.play().catch(() => {});
+      } catch(_) {}
     }
   }
 
@@ -663,62 +670,54 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       heroNoteAudio.currentTime = startTime;
     } catch(_) {}
-    heroNoteAudio.volume = 0;
 
-    // Start Real Music Video in Hero Frame & Ambient Video
-    const startVid = (vid) => {
-      if (!vid) return;
+    // Start video muted (100% allowed on all browsers without blocking)
+    if (heroStageVideo) {
       try {
-        vid.muted = true;
-        vid.defaultMuted = true;
-        vid.playsInline = true;
-        vid.setAttribute('playsinline', '');
-        vid.setAttribute('webkit-playsinline', '');
+        heroStageVideo.muted = true;
+        heroStageVideo.defaultMuted = true;
+        heroStageVideo.playsInline = true;
+        heroStageVideo.setAttribute('playsinline', '');
+        heroStageVideo.setAttribute('webkit-playsinline', '');
 
-        const safeSeekAndPlay = () => {
+        const safePlayVideo = () => {
           try {
-            if (vid.duration && startTime < vid.duration) {
-              if (Math.abs(vid.currentTime - startTime) > 0.8) {
-                vid.currentTime = startTime;
+            if (heroStageVideo.duration && startTime < heroStageVideo.duration) {
+              if (Math.abs(heroStageVideo.currentTime - startTime) > 0.5) {
+                heroStageVideo.currentTime = startTime;
               }
             }
           } catch(e) {}
-          const p = vid.play();
-          if (p !== undefined) {
-            p.catch(err => {
-              console.warn('[VideoSync] Retrying muted play:', err);
-              vid.muted = true;
-              vid.play().catch(() => {});
-            });
-          }
+          heroStageVideo.play().catch(err => {
+            console.warn('[VideoSync] Retrying muted play:', err);
+            heroStageVideo.muted = true;
+            heroStageVideo.play().catch(() => {});
+          });
         };
 
-        if (vid.readyState >= 1) {
-          safeSeekAndPlay();
+        if (heroStageVideo.readyState >= 1) {
+          safePlayVideo();
         } else {
-          vid.addEventListener('loadedmetadata', safeSeekAndPlay, { once: true });
-          vid.load();
-          vid.play().catch(() => {});
+          heroStageVideo.addEventListener('loadedmetadata', safePlayVideo, { once: true });
+          heroStageVideo.load();
+          heroStageVideo.play().catch(() => {});
         }
       } catch(e) {
-        console.warn('[VideoSync] Error:', e);
+        console.warn('[VideoSync] Video play error:', e);
       }
-    };
-    startVid(heroStageVideo);
-    startVid(ambientVideo);
+    }
 
+    // Direct, reliable audio playback with quick, crisp 300ms fade-in
+    heroNoteAudio.volume = 0.3;
     const playPromise = heroNoteAudio.play();
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        // Ultra-smooth exponential fade-in over 3.5s (Aram se ekdam gentle)
-        const fadeDuration = 3500;
+        const fadeDuration = 300;
         const fadeStartTime = performance.now();
-
         heroAudioFadeInterval = setInterval(() => {
           const elapsed = performance.now() - fadeStartTime;
           const progress = Math.min(1, elapsed / fadeDuration);
-          heroNoteAudio.volume = Math.min(targetVol, Math.pow(progress, 1.4) * targetVol);
-
+          heroNoteAudio.volume = Math.min(targetVol, 0.3 + progress * (targetVol - 0.3));
           if (progress >= 1) {
             clearInterval(heroAudioFadeInterval);
             heroAudioFadeInterval = null;
@@ -726,46 +725,35 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }, 25);
       }).catch(err => {
-        console.warn('[NoteAudio] Autoplay blocked:', err);
+        console.warn('[NoteAudio] Autoplay blocked, retrying on interaction:', err);
       });
     }
 
-    // Monitor playback timeline: gentle 5.5s fade-out towards 1:00 min (60.0s)
-    const fadeOutSpan = 5.5; // Starts at 54.5s down to 60.0s
-    const fadeOutStart = endTime - fadeOutSpan;
+    // When audio naturally ends, loop both video and audio seamlessly while note is open!
+    heroNoteAudio.onended = () => {
+      if (isNoteOpen) {
+        loopHeroNoteMedia();
+      }
+    };
 
+    // Monitor playback timeline & loop seamlessly
     heroNoteAudio.ontimeupdate = () => {
       const cur = heroNoteAudio.currentTime;
 
-      // Keep real hero video and ambient video strictly locked to audio
-      const syncVid = (vid) => {
-        if (!vid || vid.paused || vid.seeking || vid.readyState < 2) return;
-        if (Math.abs(vid.currentTime - cur) > 1.8) {
-          try { vid.currentTime = cur; } catch(e) {}
+      // Soft sync video only on significant drift (>2.5s) to avoid seeking stutter
+      if (heroStageVideo && !heroStageVideo.paused && !heroStageVideo.seeking && heroStageVideo.readyState >= 2) {
+        if (Math.abs(heroStageVideo.currentTime - cur) > 2.5) {
+          try { heroStageVideo.currentTime = cur; } catch(e) {}
         }
-      };
-      syncVid(heroStageVideo);
-      syncVid(ambientVideo);
+      }
 
-      if (cur >= fadeOutStart && cur < endTime) {
-        // Smooth cubic ease-out fade curve
-        const progress = (endTime - cur) / fadeOutSpan;
-        heroNoteAudio.volume = Math.max(0, Math.min(targetVol, Math.pow(progress, 1.35) * targetVol));
-      } else if (cur >= endTime) {
-        heroNoteAudio.pause();
-        heroNoteAudio.volume = 0;
-        heroNoteAudio.currentTime = startTime;
-        heroNoteAudio.ontimeupdate = null;
-
-        if (heroStageVideo) {
-          heroStageVideo.pause();
-          heroStageVideo.currentTime = startTime;
+      // If clip reaches configured endTime and note is still open, loop seamlessly!
+      if (cur >= endTime) {
+        if (isNoteOpen) {
+          loopHeroNoteMedia();
+        } else {
+          heroNoteAudio.pause();
         }
-        if (ambientVideo) {
-          ambientVideo.pause();
-          ambientVideo.currentTime = startTime;
-        }
-        stopAmbientRenderLoop();
       }
     };
   }
@@ -779,44 +767,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     heroNoteAudio.ontimeupdate = null;
+    heroNoteAudio.onended = null;
 
-    const startTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
+    const startTime = (DAILY_NOTE_CONFIG.audio && typeof DAILY_NOTE_CONFIG.audio.startTime === 'number')
+      ? DAILY_NOTE_CONFIG.audio.startTime
+      : 0.0;
 
-    const pauseVideoSource = () => {
+    const pauseAllMedia = () => {
       if (heroStageVideo) {
-        heroStageVideo.pause();
-        heroStageVideo.currentTime = startTime;
-      }
-      if (ambientVideo) {
-        ambientVideo.pause();
-        ambientVideo.currentTime = startTime;
+        try {
+          heroStageVideo.pause();
+          heroStageVideo.currentTime = startTime;
+        } catch(_) {}
       }
       stopAmbientRenderLoop();
     };
 
     if (heroNoteAudio.paused) {
-      pauseVideoSource();
+      pauseAllMedia();
+      try { heroNoteAudio.currentTime = startTime; } catch(_) {}
       return;
     }
 
-    // Smooth relaxing fade-out over 1.8s before pausing
+    // Quick smooth fade-out over 400ms
     const initialVol = heroNoteAudio.volume;
-    const fadeDuration = 1800;
+    const fadeDuration = 400;
     const fadeStartTime = performance.now();
 
     heroAudioFadeInterval = setInterval(() => {
       const elapsed = performance.now() - fadeStartTime;
       const progress = Math.min(1, elapsed / fadeDuration);
-      const newVol = Math.max(0, initialVol * Math.pow(1 - progress, 1.35));
+      const newVol = Math.max(0, initialVol * (1 - progress));
       heroNoteAudio.volume = newVol;
 
-      if (progress >= 1 || newVol <= 0.01) {
+      if (progress >= 1 || newVol <= 0.02) {
         clearInterval(heroAudioFadeInterval);
         heroAudioFadeInterval = null;
-        heroNoteAudio.pause();
-        heroNoteAudio.volume = 0;
-        heroNoteAudio.currentTime = startTime;
-        pauseVideoSource();
+        try {
+          heroNoteAudio.pause();
+          heroNoteAudio.volume = 0;
+          heroNoteAudio.currentTime = startTime;
+        } catch(_) {}
+        pauseAllMedia();
       }
     }, 25);
   }
