@@ -34,11 +34,11 @@ MISS YOU BABY .`,
 
   // Audio Sync Configuration: Nashe Si Chadh Gayi (Arijit Singh - Befikre)
   audio: {
-    src: "song/nashe_si_chadh_gayi.m4a",
-    fallbackSrc: "song/nashe_si_chadh_gayi.mp4",
+    src: "song/nashe_si_chadh_gayi_note.m4a",
+    fallbackSrc: "song/nashe_si_chadh_gayi_note.mp4",
     title: "Nashe Si Chadh Gayi • Arijit Singh",
-    startTime: 127.0, // 2:07 min
-    endTime: 148.0    // 2:28 min
+    startTime: 0.0,
+    endTime: 21.0
   }
 };
 
@@ -610,10 +610,13 @@ document.addEventListener('DOMContentLoaded', () => {
     isAmbientPrimed = false;
   }
 
-  // Audio & Ambient Video Sync Engine (Mangal Rang: 0:29s to 1:00min)
+  // Audio & Ambient Video Sync Engine (Nashe Si Chadh Gayi)
   function initHeroNoteAudio() {
     if (!heroNoteAudio) {
       heroNoteAudio = document.getElementById('hero-note-audio');
+      if (heroNoteAudio) {
+        try { heroNoteAudio.load(); } catch(_) {}
+      }
     }
     if (!heroStageVideo) {
       heroStageVideo = document.getElementById('hero-stage-video');
@@ -621,6 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
         heroStageVideo.muted = true;
         heroStageVideo.defaultMuted = true;
         heroStageVideo.playsInline = true;
+        try { heroStageVideo.load(); } catch(_) {}
       }
     }
     if (!ambientVideo) {
@@ -629,6 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ambientVideo.muted = true;
         ambientVideo.defaultMuted = true;
         ambientVideo.playsInline = true;
+        try { ambientVideo.load(); } catch(_) {}
       }
     }
   }
@@ -647,8 +652,12 @@ document.addEventListener('DOMContentLoaded', () => {
       heroAudioFadeInterval = null;
     }
 
-    const startTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.startTime) || 29.0;
-    const endTime = (DAILY_NOTE_CONFIG.audio && DAILY_NOTE_CONFIG.audio.endTime) || 60.0;
+    const startTime = (DAILY_NOTE_CONFIG.audio && typeof DAILY_NOTE_CONFIG.audio.startTime === 'number') 
+      ? DAILY_NOTE_CONFIG.audio.startTime 
+      : 0.0;
+    const endTime = (DAILY_NOTE_CONFIG.audio && typeof DAILY_NOTE_CONFIG.audio.endTime === 'number') 
+      ? DAILY_NOTE_CONFIG.audio.endTime 
+      : 21.0;
     const targetVol = 0.95;
 
     try {
@@ -1068,6 +1077,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Run initial state setup
   syncDailyNoteWithActiveUser();
+  // Pre-warm Note media in background for zero-latency instant play
+  initHeroNoteAudio();
 
   // Handle Home page "NASHE SE CHAD GYI (BEFIKRE)" click -> switches to Cinema & plays in Cinema Lounge!
   const mangalRangLink = document.getElementById('mangal-rang-title-link');

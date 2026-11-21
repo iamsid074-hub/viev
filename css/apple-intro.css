@@ -8024,6 +8024,7 @@
   transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
   pointer-events: none;
+  background: #000000 url('../assets/nashe_note_poster.webp') center center / cover no-repeat;
 }
 
 .hero-photo-wrapper.is-note-active .hero-note-stage {
