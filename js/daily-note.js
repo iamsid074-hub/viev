@@ -14,14 +14,15 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_note_uthjao_alarm_2026",
+  questionId: "digi_note_dbms_paper_23_nov_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `Uthjao baby ji aur ha aap hi meri alarm ho .
-Agar aap ne mujhe nhi uthaya to mai nhi uthunga .
-I LOVE U BABY , bohot sara bohot sara , 
-And ha sallon chli jana ache se mujhe dekhna hai fir shyam ko APKO . 
-MISS YOU BABY .`,
+  noteText: `23 , DBMS ka paper hai baby . 
+Mujhe padhne ka man to nhi ho rha hai 
+Balki tujhe yaad kare ja rha hu mai .
+Tu bhi mujhe yaad kar mujhe nhi pta . 
+Kissiyan de mujhe jitne ho ske 
+Muuumaa....`,
 
   // Note Memory Photo:
   imageUrl: "assets/daily_note.jpg",

@@ -522,7 +522,7 @@
     if (pushDailyNoteBtn) {
       pushDailyNoteBtn.addEventListener('click', async () => {
         const noteConfig = window.DAILY_NOTE_CONFIG || {};
-        const noteText = noteConfig.noteText || "Uthjao baby ji aur ha aap hi meri alarm ho .\nAgar aap ne mujhe nhi uthaya to mai nhi uthunga .\nI LOVE U BABY , bohot sara bohot sara ,\nAnd ha sallon chli jana ache se mujhe dekhna hai fir shyam ko APKO .\nMISS YOU BABY .";
+        const noteText = noteConfig.noteText || "23 , DBMS ka paper hai baby .\nMujhe padhne ka man to nhi ho rha hai \nBalki tujhe yaad kare ja rha hu mai .\nTu bhi mujhe yaad kar mujhe nhi pta .\nKissiyan de mujhe jitne ho ske \nMuuumaa....";
         const preview = noteText.split('\n')[0].trim();
 
         pushDailyNoteBtn.disabled = true;
