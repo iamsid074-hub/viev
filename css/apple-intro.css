@@ -2552,7 +2552,8 @@
 /* Scrubber Section */
 .apple-scrubber-section {
   width: 100%;
-  margin-bottom: 12px;
+  margin-top: 2px;
+  margin-bottom: 0;
   padding: 0 4px;
 }
 
@@ -2626,7 +2627,7 @@
 .music-vertical-controls-deck {
   width: 100%;
   max-width: 380px;
-  margin: 12px auto 0 auto;
+  margin: 4px auto 14px auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -5744,26 +5745,16 @@
     padding: 2px 7px;
   }
 
-  .apple-scrubber-section {
-    margin-bottom: 10px;
-    padding: 0 4px;
-  }
-
-  .apple-modes-row {
-    max-width: 310px;
-    margin: 2px auto 8px auto;
-    padding: 3px 12px;
-  }
-
-  .mode-btn {
-    width: 36px;
-    height: 36px;
-  }
-
   .music-vertical-controls-deck {
     max-width: 100%;
     padding: 0 10px;
-    margin-top: 8px;
+    margin: 2px auto 8px auto;
+  }
+
+  .apple-scrubber-section {
+    margin-top: 2px;
+    margin-bottom: 0;
+    padding: 0 4px;
   }
 
   .music-vertical-bar .mode-btn {

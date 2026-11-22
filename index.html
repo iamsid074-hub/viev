@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Great+Vibes&family=Cinzel:wght@600;700;800;900&family=Sacramento&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/liquid-glass.css?v=7.1">
-  <link rel="stylesheet" href="css/apple-intro.css?v=30.1">
+  <link rel="stylesheet" href="css/apple-intro.css?v=30.2">
   <link rel="stylesheet" href="css/cinema-player.css?v=7.1">
   <link rel="stylesheet" href="css/aircast.css?v=7.1">
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
@@ -385,21 +385,6 @@
           <div class="search-pill-hint" id="music-search-hint" style="display: none;"></div>
         </div>
 
-        <!-- Apple Scrubber Slider & Timestamps -->
-        <div class="apple-scrubber-section">
-          <div class="apple-scrubber-bar" id="apple-scrubber-bar">
-            <div class="apple-scrubber-progress" id="apple-scrubber-progress" style="width: 0%;">
-              <div class="apple-scrubber-thumb" id="apple-scrubber-thumb"></div>
-            </div>
-            <!-- Feature 4: Floating Timestamp Bubble on Scrub -->
-            <div class="apple-scrub-bubble" id="apple-scrub-bubble">0:00</div>
-          </div>
-          <div class="apple-time-stamps">
-            <span id="music-cur-time">0:00</span>
-            <span id="music-rem-time">-:--</span>
-          </div>
-        </div>
-
         <!-- Apple Music Dual Vertical Sidebars (Left: Repeat, Sleep Timer, AirPlay | Right: Song List, Lyrics, Share) -->
         <div class="music-vertical-controls-deck" id="music-vertical-controls-deck">
           <!-- Left Vertical Bar: Repeat, Sleep Timer, AirPlay -->
@@ -476,6 +461,21 @@
                 <line x1="12" y1="2" x2="12" y2="15"></line>
               </svg>
             </button>
+          </div>
+        </div>
+
+        <!-- Apple Scrubber Slider & Timestamps -->
+        <div class="apple-scrubber-section">
+          <div class="apple-scrubber-bar" id="apple-scrubber-bar">
+            <div class="apple-scrubber-progress" id="apple-scrubber-progress" style="width: 0%;">
+              <div class="apple-scrubber-thumb" id="apple-scrubber-thumb"></div>
+            </div>
+            <!-- Feature 4: Floating Timestamp Bubble on Scrub -->
+            <div class="apple-scrub-bubble" id="apple-scrub-bubble">0:00</div>
+          </div>
+          <div class="apple-time-stamps">
+            <span id="music-cur-time">0:00</span>
+            <span id="music-rem-time">-:--</span>
           </div>
         </div>
 
