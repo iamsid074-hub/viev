@@ -3,7 +3,7 @@
    Special Liquid Glass Experience for Princess Digi & Honey
    ========================================================= */
 
-const CACHE_NAME = 'viev-cache-v3.1';
+const CACHE_NAME = 'viev-cache-v3.2';
 const OFFLINE_URL = './index.html';
 
 // Install Event
