@@ -5429,6 +5429,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Render All Songs (or Search Results with typo tolerance) in Song List
   function renderSongList(customList = null) {
     if (!songlistItems) return;
+    const songCountEl = document.getElementById('music-song-count');
+    if (songCountEl) {
+      if (customList !== null && customList.length !== PLAYLIST.length) {
+        songCountEl.textContent = `${customList.length} / ${PLAYLIST.length}`;
+      } else {
+        songCountEl.textContent = PLAYLIST.length;
+      }
+    }
     let listToRender = [];
 
     if (customList !== null) {
