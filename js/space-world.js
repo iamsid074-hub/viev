@@ -731,6 +731,188 @@
       side: THREE.FrontSide
     });
 
+    // Premium Architectural 3-Wall Designs for First Shop (Travertine, Fluted Bronze, Brass Mouldings & Dim-Yellow Cove)
+    function createFirstShopBackWallTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 2048;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+
+      // 1. Honed Cream Travertine Base
+      const bg = ctx.createLinearGradient(0, 0, 0, 1024);
+      bg.addColorStop(0, '#e3d6be');
+      bg.addColorStop(0.5, '#ede2cd');
+      bg.addColorStop(1, '#dfd0b5');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Subtle horizontal travertine stone veining
+      for (let i = 0; i < 65; i++) {
+        const vy = Math.random() * 940;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(155, 132, 98, 0.08)' : 'rgba(255, 250, 238, 0.09)';
+        ctx.fillRect(0, vy, 2048, 1 + Math.random() * 2.5);
+      }
+
+      // 2. Left & Right Fluted Smoked-Walnut / Bronze Slat Bays
+      const fluteRegions = [[90, 440], [1608, 1958]];
+      fluteRegions.forEach(([xStart, xEnd]) => {
+        ctx.fillStyle = '#2a241d';
+        ctx.fillRect(xStart, 50, xEnd - xStart, 900);
+        for (let fx = xStart + 6; fx < xEnd - 4; fx += 14) {
+          const fg = ctx.createLinearGradient(fx, 0, fx + 12, 0);
+          fg.addColorStop(0, '#1a1510');
+          fg.addColorStop(0.45, '#594a38');
+          fg.addColorStop(0.7, '#3b3024');
+          fg.addColorStop(1, '#18130e');
+          ctx.fillStyle = fg;
+          ctx.fillRect(fx, 54, 11, 892);
+        }
+        // Brushed brass perimeter trim around fluted bay
+        ctx.strokeStyle = '#cfa84e';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(xStart, 50, xEnd - xStart, 900);
+      });
+
+      // 3. Center Grand Architectural Feature Alcove with Geometric Brass Moulding & Dim-Yellow Cove
+      const cx1 = 520, cx2 = 1528, cy1 = 70, cy2 = 910;
+      ctx.fillStyle = '#e7dac2';
+      ctx.fillRect(cx1, cy1, cx2 - cx1, cy2 - cy1);
+
+      // Subtle diamond/chevron architectural relief pattern inside center panel
+      ctx.strokeStyle = 'rgba(160, 134, 92, 0.16)';
+      ctx.lineWidth = 2;
+      for (let gx = cx1 + 40; gx < cx2 - 40; gx += 84) {
+        for (let gy = cy1 + 40; gy < cy2 - 40; gy += 84) {
+          ctx.beginPath();
+          ctx.moveTo(gx, gy - 32);
+          ctx.lineTo(gx + 32, gy);
+          ctx.lineTo(gx, gy + 32);
+          ctx.lineTo(gx - 32, gy);
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
+
+      // Soft dim-yellow recessed perimeter cove inside center frame
+      ctx.save();
+      ctx.shadowColor = 'rgba(230, 180, 55, 0.8)';
+      ctx.shadowBlur = 22;
+      ctx.strokeStyle = '#e8ba4c';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(cx1 + 12, cy1 + 12, (cx2 - cx1) - 24, (cy2 - cy1) - 24);
+      ctx.restore();
+
+      // Outer & inner dark bronze + brushed brass architectural frame
+      ctx.strokeStyle = '#241f18';
+      ctx.lineWidth = 10;
+      ctx.strokeRect(cx1, cy1, cx2 - cx1, cy2 - cy1);
+      ctx.strokeStyle = '#cfa84e';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(cx1 + 26, cy1 + 26, (cx2 - cx1) - 52, (cy2 - cy1) - 52);
+
+      // 4. Dark Nero Marble Baseboard Plinth & Gold Hairline Reveal
+      ctx.fillStyle = '#141312';
+      ctx.fillRect(0, 954, 2048, 70);
+      ctx.fillStyle = '#cfa84e';
+      ctx.fillRect(0, 950, 2048, 4);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.encoding = THREE.sRGBEncoding;
+      tex.anisotropy = 16;
+      return tex;
+    }
+
+    function createFirstShopSideWallTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+
+      // 1. Matching Honed Cream Travertine Base
+      const bg = ctx.createLinearGradient(0, 0, 0, 1024);
+      bg.addColorStop(0, '#e3d6be');
+      bg.addColorStop(0.5, '#ede2cd');
+      bg.addColorStop(1, '#dfd0b5');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 1024, 1024);
+
+      for (let i = 0; i < 40; i++) {
+        const vy = Math.random() * 940;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(155, 132, 98, 0.08)' : 'rgba(255, 250, 238, 0.09)';
+        ctx.fillRect(0, vy, 1024, 1 + Math.random() * 2);
+      }
+
+      // 2. Luxury 3-Bay Architectural Moulding Panels with Brushed Brass Borders
+      const bays = [[56, 300], [344, 680], [724, 968]];
+      bays.forEach(([bx1, bx2], idx) => {
+        const bw = bx2 - bx1;
+        // Subtle recessed inner panel
+        ctx.fillStyle = idx === 1 ? '#e5d7be' : '#eadec7';
+        ctx.fillRect(bx1, 70, bw, 830);
+
+        // Dark bronze outer moulding + brushed brass inner trim
+        ctx.strokeStyle = '#2b241c';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(bx1, 70, bw, 830);
+        ctx.strokeStyle = '#cfa84e';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(bx1 + 18, 88, bw - 36, 794);
+
+        // Center architectural arch motif inside middle bay
+        if (idx === 1) {
+          ctx.strokeStyle = 'rgba(195, 158, 72, 0.55)';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(bx1 + bw / 2, 320, bw * 0.28, Math.PI, 0);
+          ctx.lineTo(bx1 + bw / 2 + bw * 0.28, 820);
+          ctx.lineTo(bx1 + bw / 2 - bw * 0.28, 820);
+          ctx.closePath();
+          ctx.stroke();
+        }
+      });
+
+      // 3. Two Slim Vertical Recessed Dim-Yellow LED Light Reveals between Bays
+      [322, 702].forEach(lx => {
+        ctx.fillStyle = '#1b1915';
+        ctx.fillRect(lx - 7, 50, 14, 900);
+        ctx.save();
+        ctx.shadowColor = 'rgba(235, 180, 55, 0.8)';
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = '#e8ba4c';
+        ctx.fillRect(lx - 3, 56, 6, 888);
+        ctx.restore();
+      });
+
+      // 4. Matching Dark Nero Marble Baseboard Plinth & Gold Hairline Reveal
+      ctx.fillStyle = '#141312';
+      ctx.fillRect(0, 954, 1024, 70);
+      ctx.fillStyle = '#cfa84e';
+      ctx.fillRect(0, 950, 1024, 4);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.encoding = THREE.sRGBEncoding;
+      tex.anisotropy = 16;
+      return tex;
+    }
+
+    const firstShopBackWallMat = new THREE.MeshStandardMaterial({
+      map: createFirstShopBackWallTexture(),
+      roughness: 0.72,
+      metalness: 0.08,
+      emissive: new THREE.Color(0x2b2010),
+      emissiveIntensity: 0.08,
+      side: THREE.FrontSide
+    });
+
+    const firstShopSideWallMat = new THREE.MeshStandardMaterial({
+      map: createFirstShopSideWallTexture(),
+      roughness: 0.74,
+      metalness: 0.06,
+      emissive: new THREE.Color(0x2b2010),
+      emissiveIntensity: 0.08,
+      side: THREE.FrontSide
+    });
+
     const shopBackWallMat = new THREE.MeshStandardMaterial({
       map: shopBackWallTexture,
       roughness: 0.3,
@@ -931,7 +1113,7 @@
         [xBack, 0, zStart],           // BL: Bottom-North
         [xBack, 0, zEnd]              // BR: Bottom-South
       );
-      const backWall = new THREE.Mesh(backWallGeo, shopBackWallMat);
+      const backWall = new THREE.Mesh(backWallGeo, i === 0 ? firstShopBackWallMat : shopBackWallMat);
       scene.add(backWall);
 
       // D) Boutique Dividing Side Walls
@@ -942,7 +1124,7 @@
         [xFront, 0, zStart],           // BL: Front-Bottom
         [xBack, 0, zStart]             // BR: Back-Bottom
       );
-      const northSideWall = new THREE.Mesh(northWallGeo, shopSideWallMat);
+      const northSideWall = new THREE.Mesh(northWallGeo, i === 0 ? firstShopSideWallMat : shopSideWallMat);
       scene.add(northSideWall);
 
       // South Side Wall (at z = zEnd)
@@ -952,7 +1134,7 @@
         [xBack, 0, zEnd],              // BL: Back-Bottom
         [xFront, 0, zEnd]              // BR: Front-Bottom
       );
-      const southSideWall = new THREE.Mesh(southWallGeo, shopSideWallMat);
+      const southSideWall = new THREE.Mesh(southWallGeo, i === 0 ? firstShopSideWallMat : shopSideWallMat);
       scene.add(southSideWall);
 
       // E) Solid 3D Overhead Fascia Beam across entrance (y = 4.8 to 6.4, x = -6.0 to -6.5)
