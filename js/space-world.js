@@ -707,6 +707,31 @@
       emissiveIntensity: 0.35
     });
 
+    // Black Tinted Luxury Architectural Glass & Hardware Materials
+    const tintedGlassMat = new THREE.MeshStandardMaterial({
+      color: 0x07090e, // sleek midnight smoked black tint
+      roughness: 0.05,
+      metalness: 0.90,
+      transparent: true,
+      opacity: 0.40,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+
+    const glassFrameMat = new THREE.MeshStandardMaterial({
+      color: 0x161820,
+      roughness: 0.28,
+      metalness: 0.85
+    });
+
+    const goldHandleMat = new THREE.MeshStandardMaterial({
+      color: 0xd4af37,
+      roughness: 0.18,
+      metalness: 0.92,
+      emissive: new THREE.Color(0xb58e28),
+      emissiveIntensity: 0.35
+    });
+
     // Helper: Build seamless mathematical quad buffer geometry joining all 4 corners perfectly
     function createModularQuad(pTL, pTR, pBL, pBR) {
       const geo = new THREE.BufferGeometry();
@@ -844,7 +869,129 @@
       rightPillar.position.set(xFront - fasciaDepth / 2, halfH, zEnd + pillarWidth / 2);
       scene.add(rightPillar);
 
-      // G) 3D Luxury Green Planter outside each Boutique Pillar
+      // G) Black Tinted Glass Storefront & Open Glass Doors (Walkable Interior Entrance)
+      const xGlass = xFront - 0.12; // 12cm recessed behind front portal face
+      const doorWidth = 2.0;        // width of each door leaf
+      const doorwayWidth = 4.4;     // 4.4m wide central entrance
+      const doorHeight = 3.6;       // 3.6m tall glass doors
+      const transomHeight = openEntranceHeight - doorHeight; // 1.2m glass transom
+      const paneZSpan = (shopSpan - 2.0 * pillarWidth - doorwayWidth) / 2; // 5.8m each pane
+
+      // 1. North Fixed Tinted Glass Pane
+      const northPaneCenterZ = zCenter + doorwayWidth / 2 + paneZSpan / 2;
+      const northPaneGeo = new THREE.PlaneGeometry(paneZSpan, openEntranceHeight);
+      northPaneGeo.rotateY(Math.PI / 2);
+      const northPane = new THREE.Mesh(northPaneGeo, tintedGlassMat);
+      northPane.position.set(xGlass, openEntranceHeight / 2, northPaneCenterZ);
+      scene.add(northPane);
+
+      // North Pane Slim Metal Frames (bottom runner, top runner, doorway mullion)
+      const northBottomRunner = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, paneZSpan), glassFrameMat);
+      northBottomRunner.position.set(xGlass, 0.04, northPaneCenterZ);
+      scene.add(northBottomRunner);
+
+      const northTopRunner = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, paneZSpan), glassFrameMat);
+      northTopRunner.position.set(xGlass, openEntranceHeight - 0.04, northPaneCenterZ);
+      scene.add(northTopRunner);
+
+      const northDoorJamb = new THREE.Mesh(new THREE.BoxGeometry(0.06, openEntranceHeight, 0.06), glassFrameMat);
+      northDoorJamb.position.set(xGlass, openEntranceHeight / 2, zCenter + doorwayWidth / 2);
+      scene.add(northDoorJamb);
+
+      // 2. South Fixed Tinted Glass Pane
+      const southPaneCenterZ = zCenter - doorwayWidth / 2 - paneZSpan / 2;
+      const southPaneGeo = new THREE.PlaneGeometry(paneZSpan, openEntranceHeight);
+      southPaneGeo.rotateY(Math.PI / 2);
+      const southPane = new THREE.Mesh(southPaneGeo, tintedGlassMat);
+      southPane.position.set(xGlass, openEntranceHeight / 2, southPaneCenterZ);
+      scene.add(southPane);
+
+      // South Pane Slim Metal Frames
+      const southBottomRunner = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, paneZSpan), glassFrameMat);
+      southBottomRunner.position.set(xGlass, 0.04, southPaneCenterZ);
+      scene.add(southBottomRunner);
+
+      const southTopRunner = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, paneZSpan), glassFrameMat);
+      southTopRunner.position.set(xGlass, openEntranceHeight - 0.04, southPaneCenterZ);
+      scene.add(southTopRunner);
+
+      const southDoorJamb = new THREE.Mesh(new THREE.BoxGeometry(0.06, openEntranceHeight, 0.06), glassFrameMat);
+      southDoorJamb.position.set(xGlass, openEntranceHeight / 2, zCenter - doorwayWidth / 2);
+      scene.add(southDoorJamb);
+
+      // 3. Overhead Glass Transom Panel (above open doors: y = 3.6m to 4.8m)
+      const transomGeo = new THREE.PlaneGeometry(doorwayWidth, transomHeight);
+      transomGeo.rotateY(Math.PI / 2);
+      const transomMesh = new THREE.Mesh(transomGeo, tintedGlassMat);
+      transomMesh.position.set(xGlass, doorHeight + transomHeight / 2, zCenter);
+      scene.add(transomMesh);
+
+      const transomBar = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, doorwayWidth), glassFrameMat);
+      transomBar.position.set(xGlass, doorHeight, zCenter);
+      scene.add(transomBar);
+
+      // 4. Grand Open Glass Doors (Swung open inwards into the boutique interior!)
+      // A) North Glass Door (swung inward)
+      const northDoorGroup = new THREE.Group();
+      northDoorGroup.position.set(xGlass, 0, zCenter + doorwayWidth / 2 - 0.04);
+      northDoorGroup.rotation.y = -Math.PI * 0.36; // 65 degrees swung open into store
+
+      const northDoorLeafGeo = new THREE.PlaneGeometry(doorWidth, doorHeight - 0.04);
+      northDoorLeafGeo.rotateY(Math.PI / 2);
+      const northDoorLeaf = new THREE.Mesh(northDoorLeafGeo, tintedGlassMat);
+      northDoorLeaf.position.set(0, doorHeight / 2, -doorWidth / 2);
+      northDoorGroup.add(northDoorLeaf);
+
+      const northDoorTop = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, doorWidth), glassFrameMat);
+      northDoorTop.position.set(0, doorHeight - 0.03, -doorWidth / 2);
+      northDoorGroup.add(northDoorTop);
+
+      const northDoorBot = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.08, doorWidth), glassFrameMat);
+      northDoorBot.position.set(0, 0.04, -doorWidth / 2);
+      northDoorGroup.add(northDoorBot);
+
+      const northDoorEdge = new THREE.Mesh(new THREE.BoxGeometry(0.04, doorHeight, 0.04), glassFrameMat);
+      northDoorEdge.position.set(0, doorHeight / 2, -doorWidth + 0.02);
+      northDoorGroup.add(northDoorEdge);
+
+      // Luxury vertical gold tubular pull handle
+      const handleGeo = new THREE.CylinderGeometry(0.018, 0.018, 1.4, 16);
+      const northHandle = new THREE.Mesh(handleGeo, goldHandleMat);
+      northHandle.position.set(0.035, 1.4, -doorWidth + 0.22);
+      northDoorGroup.add(northHandle);
+
+      scene.add(northDoorGroup);
+
+      // B) South Glass Door (swung inward)
+      const southDoorGroup = new THREE.Group();
+      southDoorGroup.position.set(xGlass, 0, zCenter - doorwayWidth / 2 + 0.04);
+      southDoorGroup.rotation.y = Math.PI * 0.36; // 65 degrees swung open into store
+
+      const southDoorLeafGeo = new THREE.PlaneGeometry(doorWidth, doorHeight - 0.04);
+      southDoorLeafGeo.rotateY(Math.PI / 2);
+      const southDoorLeaf = new THREE.Mesh(southDoorLeafGeo, tintedGlassMat);
+      southDoorLeaf.position.set(0, doorHeight / 2, doorWidth / 2);
+      southDoorGroup.add(southDoorLeaf);
+
+      const southDoorTop = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, doorWidth), glassFrameMat);
+      southDoorTop.position.set(0, doorHeight - 0.03, doorWidth / 2);
+      southDoorGroup.add(southDoorTop);
+
+      const southDoorBot = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.08, doorWidth), glassFrameMat);
+      southDoorBot.position.set(0, 0.04, doorWidth / 2);
+      southDoorGroup.add(southDoorBot);
+
+      const southDoorEdge = new THREE.Mesh(new THREE.BoxGeometry(0.04, doorHeight, 0.04), glassFrameMat);
+      southDoorEdge.position.set(0, doorHeight / 2, doorWidth - 0.02);
+      southDoorGroup.add(southDoorEdge);
+
+      const southHandle = new THREE.Mesh(handleGeo, goldHandleMat);
+      southHandle.position.set(0.035, 1.4, doorWidth - 0.22);
+      southDoorGroup.add(southHandle);
+
+      scene.add(southDoorGroup);
+
+      // H) 3D Luxury Green Planter outside each Boutique Pillar
       const boutiquePlanter = createLuxuryPlanter(-halfW + 0.85, zStart - pillarWidth / 2);
       scene.add(boutiquePlanter);
 
@@ -1346,6 +1493,16 @@
       nextX = Math.min(5.2, Math.max(-13.2, nextX));
       if (nextX < -5.8 && [-12, -30, -48].some(divZ => Math.abs(camera.position.z - divZ) < 0.65)) {
         nextX = camera.position.x;
+      }
+      // Fixed glass storefront window collision (x = -6.0): central 4.4m doorway allows entrance
+      if (nextX < -5.9 && camera.position.x >= -5.9) {
+        if (camera.position.z <= 6.0 && camera.position.z >= -66.0) {
+          const shopIdx = Math.floor((6.0 - camera.position.z) / 18.0);
+          const shopCenterZ = 6.0 - shopIdx * 18.0 - 9.0;
+          if (Math.abs(camera.position.z - shopCenterZ) > 1.95) {
+            nextX = camera.position.x; // Blocked by fixed black tinted glass window!
+          }
+        }
       }
       camera.position.x = nextX;
 
