@@ -597,6 +597,7 @@
 
   /**
    * Analog Movement Joystick (Bottom-Left)
+   * Fully Multi-Touch Enabled: Tracks its own touch identifier independently
    */
   function setupJoystickControls() {
     const zone = document.getElementById('space-joystick-zone');
@@ -609,17 +610,6 @@
         x: rect.left + rect.width / 2,
         y: rect.top + rect.height / 2
       };
-    }
-
-    function onPointerDown(e) {
-      if (isJoystickActive) return;
-      isJoystickActive = true;
-      zone.classList.add('is-active');
-
-      const touch = e.touches ? e.touches[0] : e;
-      joystickTouchId = e.touches ? touch.identifier : 'mouse';
-      updateJoystickCenter();
-      handleJoystickMove(touch.clientX, touch.clientY);
     }
 
     function handleJoystickMove(clientX, clientY) {
@@ -646,92 +636,135 @@
       joystickVector.y = clampedY / JOYSTICK_MAX_RADIUS;
     }
 
-    function onPointerMove(e) {
-      if (!isJoystickActive) return;
-      if (e.touches) {
-        for (let i = 0; i < e.touches.length; i++) {
-          if (e.touches[i].identifier === joystickTouchId) {
-            handleJoystickMove(e.touches[i].clientX, e.touches[i].clientY);
-            break;
-          }
+    function onTouchStart(e) {
+      if (isJoystickActive) return;
+      if (!e.changedTouches || e.changedTouches.length === 0) return;
+      const t = e.changedTouches[0];
+      isJoystickActive = true;
+      joystickTouchId = t.identifier;
+      zone.classList.add('is-active');
+      updateJoystickCenter();
+      handleJoystickMove(t.clientX, t.clientY);
+      e.stopPropagation();
+    }
+
+    function onTouchMove(e) {
+      if (!isJoystickActive || joystickTouchId === null) return;
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === joystickTouchId) {
+          handleJoystickMove(e.touches[i].clientX, e.touches[i].clientY);
+          break;
         }
-      } else {
+      }
+    }
+
+    function onTouchEnd(e) {
+      if (!isJoystickActive || joystickTouchId === null) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === joystickTouchId) {
+          isJoystickActive = false;
+          joystickTouchId = null;
+          zone.classList.remove('is-active');
+          thumb.style.transform = 'translate(0px, 0px)';
+          joystickVector.x = 0;
+          joystickVector.y = 0;
+          break;
+        }
+      }
+    }
+
+    function onMouseDown(e) {
+      if (isJoystickActive) return;
+      isJoystickActive = true;
+      joystickTouchId = 'mouse';
+      zone.classList.add('is-active');
+      updateJoystickCenter();
+      handleJoystickMove(e.clientX, e.clientY);
+      e.stopPropagation();
+    }
+
+    function onMouseMove(e) {
+      if (isJoystickActive && joystickTouchId === 'mouse') {
         handleJoystickMove(e.clientX, e.clientY);
       }
     }
 
-    function onPointerUp(e) {
-      if (!isJoystickActive) return;
-      if (e.touches) {
-        let touchStillActive = false;
-        for (let i = 0; i < e.touches.length; i++) {
-          if (e.touches[i].identifier === joystickTouchId) {
-            touchStillActive = true;
-            break;
-          }
-        }
-        if (touchStillActive) return;
+    function onMouseUp(e) {
+      if (isJoystickActive && joystickTouchId === 'mouse') {
+        isJoystickActive = false;
+        joystickTouchId = null;
+        zone.classList.remove('is-active');
+        thumb.style.transform = 'translate(0px, 0px)';
+        joystickVector.x = 0;
+        joystickVector.y = 0;
       }
-
-      isJoystickActive = false;
-      joystickTouchId = null;
-      zone.classList.remove('is-active');
-      thumb.style.transform = 'translate(0px, 0px)';
-      joystickVector.x = 0;
-      joystickVector.y = 0;
     }
 
-    zone.addEventListener('touchstart', onPointerDown, { passive: false });
-    window.addEventListener('touchmove', onPointerMove, { passive: false });
-    window.addEventListener('touchend', onPointerUp);
-    window.addEventListener('touchcancel', onPointerUp);
+    zone.addEventListener('touchstart', onTouchStart, { passive: false });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+    window.addEventListener('touchend', onTouchEnd, { passive: false });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: false });
 
-    zone.addEventListener('mousedown', onPointerDown);
-    window.addEventListener('mousemove', onPointerMove);
-    window.addEventListener('mouseup', onPointerUp);
+    zone.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   }
 
   /**
    * Rotation-Aware Touch & Mouse Smooth Pan / Look Around (Right Screen)
+   * Multi-Touch Safe: Completely ignores the joystick touch point
    */
   function setupTouchLookControls(element) {
     const joystickZone = document.getElementById('space-joystick-zone');
 
-    function isInsideJoystick(target) {
-      return joystickZone && (joystickZone === target || joystickZone.contains(target));
+    function isInsideJoystickZone(clientX, clientY, target) {
+      if (joystickZone && (joystickZone === target || joystickZone.contains(target))) return true;
+      if (joystickZone) {
+        const rect = joystickZone.getBoundingClientRect();
+        const margin = 20;
+        if (clientX >= rect.left - margin && clientX <= rect.right + margin &&
+            clientY >= rect.top - margin && clientY <= rect.bottom + margin) {
+          return true;
+        }
+      }
+      return false;
     }
 
-    function onPointerDown(e) {
-      if (isInsideJoystick(e.target)) return;
+    function onTouchStart(e) {
+      if (!e.changedTouches) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const t = e.changedTouches[i];
+        // Ignore the joystick touch or touches inside joystick area
+        if (joystickTouchId !== null && t.identifier === joystickTouchId) continue;
+        if (isInsideJoystickZone(t.clientX, t.clientY, e.target)) continue;
 
-      const touch = e.touches ? e.touches[0] : e;
-      isDraggingLook = true;
-      lookTouchId = e.touches ? touch.identifier : 'mouse';
-      prevPointerX = touch.clientX;
-      prevPointerY = touch.clientY;
+        // If not already dragging look, start looking with this touch
+        if (lookTouchId === null) {
+          isDraggingLook = true;
+          lookTouchId = t.identifier;
+          prevPointerX = t.clientX;
+          prevPointerY = t.clientY;
+          break;
+        }
+      }
     }
 
-    function onPointerMove(e) {
-      if (!isDraggingLook) return;
+    function onTouchMove(e) {
+      if (!isDraggingLook || lookTouchId === null || !e.touches) return;
 
       let clientX = 0;
       let clientY = 0;
+      let found = false;
 
-      if (e.touches) {
-        let found = false;
-        for (let i = 0; i < e.touches.length; i++) {
-          if (e.touches[i].identifier === lookTouchId) {
-            clientX = e.touches[i].clientX;
-            clientY = e.touches[i].clientY;
-            found = true;
-            break;
-          }
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === lookTouchId) {
+          clientX = e.touches[i].clientX;
+          clientY = e.touches[i].clientY;
+          found = true;
+          break;
         }
-        if (!found) return;
-      } else {
-        clientX = e.clientX;
-        clientY = e.clientY;
       }
+      if (!found) return;
 
       const screenDeltaX = clientX - prevPointerX;
       const screenDeltaY = clientY - prevPointerY;
@@ -746,141 +779,174 @@
 
       targetYaw -= visualDeltaX * 0.0035;
       targetPitch -= visualDeltaY * 0.003;
-
-      // Vertical pitch clamp (look up at ceiling lights or down at marble floor)
       targetPitch = Math.max(-0.65, Math.min(0.75, targetPitch));
     }
 
-    function onPointerUp(e) {
-      if (e && e.touches && lookTouchId !== null) {
-        for (let i = 0; i < e.touches.length; i++) {
-          if (e.touches[i].identifier === lookTouchId) return;
+    function onTouchEnd(e) {
+      if (!isDraggingLook || lookTouchId === null || !e.changedTouches) return;
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === lookTouchId) {
+          isDraggingLook = false;
+          lookTouchId = null;
+          break;
         }
       }
-      isDraggingLook = false;
-      lookTouchId = null;
     }
 
-    element.addEventListener('touchstart', onPointerDown, { passive: true });
-    window.addEventListener('touchmove', onPointerMove, { passive: true });
-    window.addEventListener('touchend', onPointerUp);
-    window.addEventListener('touchcancel', onPointerUp);
+    function onMouseDown(e) {
+      if (isInsideJoystickZone(e.clientX, e.clientY, e.target)) return;
+      if (lookTouchId !== null) return;
+      isDraggingLook = true;
+      lookTouchId = 'mouse';
+      prevPointerX = e.clientX;
+      prevPointerY = e.clientY;
+    }
 
-    element.addEventListener('mousedown', onPointerDown);
-    window.addEventListener('mousemove', onPointerMove);
-    window.addEventListener('mouseup', onPointerUp);
+    function onMouseMove(e) {
+      if (!isDraggingLook || lookTouchId !== 'mouse') return;
+      const screenDeltaX = e.clientX - prevPointerX;
+      const screenDeltaY = e.clientY - prevPointerY;
+
+      prevPointerX = e.clientX;
+      prevPointerY = e.clientY;
+
+      const isPortrait = window.innerHeight > window.innerWidth;
+      const visualDeltaX = isPortrait ? screenDeltaY : screenDeltaX;
+      const visualDeltaY = isPortrait ? -screenDeltaX : screenDeltaY;
+
+      targetYaw -= visualDeltaX * 0.0035;
+      targetPitch -= visualDeltaY * 0.003;
+      targetPitch = Math.max(-0.65, Math.min(0.75, targetPitch));
+    }
+
+    function onMouseUp(e) {
+      if (lookTouchId === 'mouse') {
+        isDraggingLook = false;
+        lookTouchId = null;
+      }
+    }
+
+    element.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
+
+    element.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   }
 
   /**
    * Laptop / Desktop Keyboard Controls (W/A/S/D & Arrow Keys + Shift)
+   * Simultaneous Multi-Key Support: W+A, W+D, S+A, S+D diagonal walking
    */
   function setupKeyboardControls() {
     const hintPill = document.getElementById('space-desktop-hint');
 
+    function getKeyAction(e) {
+      const code = e.code || '';
+      const key = (e.key || '').toLowerCase();
+      if (code === 'KeyW' || key === 'w' || code === 'ArrowUp' || key === 'arrowup') return 'forward';
+      if (code === 'KeyS' || key === 's' || code === 'ArrowDown' || key === 'arrowdown') return 'backward';
+      if (code === 'KeyA' || key === 'a' || code === 'ArrowLeft' || key === 'arrowleft') return 'left';
+      if (code === 'KeyD' || key === 'd' || code === 'ArrowRight' || key === 'arrowright') return 'right';
+      if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') return 'sprint';
+      return null;
+    }
+
     function onKeyDown(e) {
       if (!isRunning) return;
-      const code = e.code;
-
-      let matched = false;
-      if (code === 'KeyW' || code === 'ArrowUp') {
-        keysPressed.forward = true;
-        matched = true;
-      } else if (code === 'KeyS' || code === 'ArrowDown') {
-        keysPressed.backward = true;
-        matched = true;
-      } else if (code === 'KeyA' || code === 'ArrowLeft') {
-        keysPressed.left = true;
-        matched = true;
-      } else if (code === 'KeyD' || code === 'ArrowRight') {
-        keysPressed.right = true;
-        matched = true;
-      } else if (code === 'ShiftLeft' || code === 'ShiftRight') {
-        keysPressed.sprint = true;
-      }
-
-      if (matched) {
-        // Prevent page scroll when using arrow keys inside 3D world
+      const action = getKeyAction(e);
+      if (action) {
+        keysPressed[action] = true;
         e.preventDefault();
-        // Fade out hint after user begins moving
+        e.stopPropagation();
         if (hintPill) hintPill.style.opacity = '0.3';
       }
     }
 
     function onKeyUp(e) {
-      const code = e.code;
-      if (code === 'KeyW' || code === 'ArrowUp') {
-        keysPressed.forward = false;
-      } else if (code === 'KeyS' || code === 'ArrowDown') {
-        keysPressed.backward = false;
-      } else if (code === 'KeyA' || code === 'ArrowLeft') {
-        keysPressed.left = false;
-      } else if (code === 'KeyD' || code === 'ArrowRight') {
-        keysPressed.right = false;
-      } else if (code === 'ShiftLeft' || code === 'ShiftRight') {
-        keysPressed.sprint = false;
+      const action = getKeyAction(e);
+      if (action) {
+        keysPressed[action] = false;
+        e.preventDefault();
+        e.stopPropagation();
       }
+    }
+
+    function onWindowBlur() {
+      keysPressed.forward = false;
+      keysPressed.backward = false;
+      keysPressed.left = false;
+      keysPressed.right = false;
+      keysPressed.sprint = false;
     }
 
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', onWindowBlur);
   }
 
   /**
    * Update Player Walking Movement based on Joystick + Keyboard Input & Collisions
+   * Full Multi-Direction & Diagonal Sliding Support
    */
   function updatePlayerMovement() {
     if (!camera) return;
 
-    // Combine on-screen joystick vector and physical keyboard inputs
-    let inputX = joystickVector.x;
-    let inputY = joystickVector.y;
+    // 1. Discrete Keyboard Multi-Key Vector
+    let keyX = 0;
+    let keyY = 0;
+    if (keysPressed.forward) keyY -= 1;
+    if (keysPressed.backward) keyY += 1;
+    if (keysPressed.left) keyX -= 1;
+    if (keysPressed.right) keyX += 1;
 
-    if (keysPressed.forward) inputY -= 1;
-    if (keysPressed.backward) inputY += 1;
-    if (keysPressed.left) inputX -= 1;
-    if (keysPressed.right) inputX += 1;
+    // Normalize diagonal keys (e.g. W+A, W+D, S+A, S+D)
+    const keyMag = Math.hypot(keyX, keyY);
+    let normKeyX = 0;
+    let normKeyY = 0;
+    if (keyMag > 0) {
+      normKeyX = keyX / keyMag;
+      normKeyY = keyY / keyMag;
+    }
 
-    const inputMag = Math.hypot(inputX, inputY);
-    if (inputMag > 0.05) {
-      const normFactor = inputMag > 1 ? inputMag : 1;
-      const normX = inputX / normFactor;
-      const normY = inputY / normFactor;
+    // 2. Analog Joystick Vector
+    const joyX = joystickVector.x;
+    const joyY = joystickVector.y;
+
+    // 3. Combined total vector
+    let totalX = normKeyX + joyX;
+    let totalY = normKeyY + joyY;
+    const totalMag = Math.hypot(totalX, totalY);
+
+    if (totalMag > 0.04) {
+      const factor = totalMag > 1 ? totalMag : 1;
+      const moveX = totalX / factor; // strafe right (+1) / left (-1)
+      const moveZ = totalY / factor; // forward (-1) / backward (+1)
 
       const currentSpeed = keysPressed.sprint ? WALK_SPEED * 1.55 : WALK_SPEED;
       const yaw = camera.rotation.y;
 
-      // moveForward: negative Y is forward
-      const moveForward = -normY;
-      const moveRight = normX;
-
       // Direction vectors in X-Z ground plane
-      const deltaX = (moveForward * (-Math.sin(yaw)) + moveRight * Math.cos(yaw)) * currentSpeed;
-      const deltaZ = (moveForward * (-Math.cos(yaw)) + moveRight * (-Math.sin(yaw))) * currentSpeed;
+      // Forward (-Z) in camera yaw: (-sin(yaw), -cos(yaw))
+      // Right (+X) in camera yaw:   ( cos(yaw), -sin(yaw))
+      const deltaX = (-moveZ * (-Math.sin(yaw)) + moveX * Math.cos(yaw)) * currentSpeed;
+      const deltaZ = (-moveZ * (-Math.cos(yaw)) + moveX * (-Math.sin(yaw))) * currentSpeed;
 
+      // Axis-independent collision sliding (diagonal movement slides along walls smoothly)
       let nextX = camera.position.x + deltaX;
-      let nextZ = camera.position.z + deltaZ;
-
-      // Collision Boundaries:
-      // 1. Right White Wall: x <= 5.2
-      nextX = Math.min(5.2, nextX);
-
-      // 2. Open Shops on Left: Can walk inside up to x = -13.2 (Shop depth)
-      nextX = Math.max(-13.2, nextX);
-
-      // 3. Corridor Length: from z = 6.0 (start) to z = -72.0 (far end)
-      nextZ = Math.min(6.0, Math.max(-72.0, nextZ));
-
-      // 4. Collision with dividing walls between shops when inside shop area (x < -5.8)
-      if (nextX < -5.8) {
-        const dividerZList = [-13, -33, -53];
-        dividerZList.forEach(divZ => {
-          if (Math.abs(nextZ - divZ) < 0.65) {
-            nextZ = camera.position.z; // Block moving through dividing wall
-          }
-        });
+      nextX = Math.min(5.2, Math.max(-13.2, nextX));
+      if (nextX < -5.8 && [-13, -33, -53].some(divZ => Math.abs(camera.position.z - divZ) < 0.65)) {
+        nextX = camera.position.x;
       }
-
       camera.position.x = nextX;
+
+      let nextZ = camera.position.z + deltaZ;
+      nextZ = Math.min(6.0, Math.max(-72.0, nextZ));
+      if (camera.position.x < -5.8 && [-13, -33, -53].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
+        nextZ = camera.position.z;
+      }
       camera.position.z = nextZ;
 
       // Subtle natural human walking head bob

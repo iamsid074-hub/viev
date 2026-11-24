@@ -6790,6 +6790,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const tag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
     if (tag === 'input' || tag === 'textarea') return;
 
+    // Ignore when 3D SPACE overlay is open so keyboard movement controls work uninterrupted
+    const spaceSubpage = document.getElementById('subpage-space');
+    if (spaceSubpage && spaceSubpage.style.display !== 'none') return;
+
     if (e.code === 'Space') {
       e.preventDefault();
       togglePlay();

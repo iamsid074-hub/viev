@@ -45,6 +45,9 @@ body.has-space-active .apple-floating-dock {
     transform-origin: center center !important;
     overflow: hidden !important;
     background: #080a0f !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
   }
 }
 
@@ -57,6 +60,9 @@ body.has-space-active .apple-floating-dock {
     transform: none !important;
     overflow: hidden !important;
     background: #080a0f !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
   }
 }
 
