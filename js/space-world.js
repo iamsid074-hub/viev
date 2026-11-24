@@ -150,9 +150,9 @@
   }
 
   /**
-   * Procedural Luxury Boutique Facades (Left or Right)
+   * Procedural Luxury Boutique Facades (Left Side)
    */
-  function createBoutiqueFacadeTexture(isRightSide) {
+  function createBoutiqueFacadeTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 2048;
     canvas.height = 1024;
@@ -162,10 +162,7 @@
     ctx.fillStyle = '#14161f';
     ctx.fillRect(0, 0, 2048, 1024);
 
-    const brands = isRightSide
-      ? ['R O L E X', 'L O U I S   V U I T T O N', 'B V L G A R I', 'G U C C I']
-      : ['T I F F A N Y   &   C O.', 'C A R T I E R', 'C H A N E L', 'D I O R'];
-
+    const brands = ['T I F F A N Y   &   C O.', 'C A R T I E R', 'C H A N E L', 'D I O R'];
     const storeWidth = 512;
     for (let i = 0; i < 4; i++) {
       const startX = i * storeWidth;
@@ -222,6 +219,98 @@
   }
 
   /**
+   * Procedural Premium White Gallery Wall Texture with Continuous Quote
+   * "WE WILL DEFINETLY GET EACH OTHER"
+   */
+  function createWhiteWallWithTextTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 4096;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Pristine luxury off-white architectural wall background
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, 512);
+    bgGrad.addColorStop(0, '#ebedf2');
+    bgGrad.addColorStop(0.12, '#f6f7fa');
+    bgGrad.addColorStop(0.88, '#f7f8fb');
+    bgGrad.addColorStop(1, '#e8eaf0');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 4096, 512);
+
+    // 2. Subtle architectural plaster texture
+    const imgData = ctx.getImageData(0, 0, 4096, 512);
+    const data = imgData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const n = (Math.random() - 0.5) * 8;
+      data[i] = Math.min(255, Math.max(0, data[i] + n));
+      data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + n));
+      data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + n));
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    // 3. Champagne gold top ceiling cove trim
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.55)';
+    ctx.fillRect(0, 0, 4096, 12);
+
+    // 4. Brushed brass bottom baseboard skirting
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.75)';
+    ctx.fillRect(0, 502, 4096, 10);
+
+    // 5. Subtle architectural panel reveal grooves every 512px
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.04)';
+    ctx.lineWidth = 2;
+    for (let x = 512; x < 4096; x += 512) {
+      ctx.beginPath();
+      ctx.moveTo(x, 12);
+      ctx.lineTo(x, 502);
+      ctx.stroke();
+    }
+
+    // 6. Main Text: "WE WILL DEFINETLY GET EACH OTHER"
+    // Grand architectural embossed champagne-gold lettering
+    ctx.font = 'bold 46px -apple-system, BlinkMacSystemFont, "Cinzel", "Playfair Display", Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Words spaced evenly from starting to end of the corridor
+    const wordsWithPositions = [
+      { text: 'W E', x: 380 },
+      { text: 'W I L L', x: 1020 },
+      { text: 'D E F I N E T L Y', x: 1880 },
+      { text: 'G E T', x: 2720 },
+      { text: 'E A C H', x: 3340 },
+      { text: 'O T H E R', x: 3850 }
+    ];
+
+    const yPos = 256;
+
+    // Soft 3D drop shadow
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.16)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 3;
+
+    // Metallic champagne gold fill
+    ctx.fillStyle = '#bfa14a';
+    wordsWithPositions.forEach(item => {
+      ctx.fillText(item.text, item.x, yPos);
+    });
+
+    // Hairline specular highlight over letters
+    ctx.shadowColor = 'transparent';
+    ctx.fillStyle = '#f5df98';
+    ctx.font = 'bold 46px -apple-system, BlinkMacSystemFont, "Cinzel", "Playfair Display", Georgia, serif';
+    wordsWithPositions.forEach(item => {
+      ctx.fillText(item.text, item.x - 1, yPos - 1);
+    });
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    return texture;
+  }
+
+  /**
    * Build the 3D Mall Corridor Scene
    */
   function buildMallCorridor() {
@@ -256,11 +345,11 @@
     ceilingMesh.position.set(0, MALL_HEIGHT, -MALL_LENGTH / 2 + 8);
     scene.add(ceilingMesh);
 
-    // 3. Left Luxury Boutique Facades
+    // 3. Left Luxury Boutique Facades (Left Side Kept Intact)
     const leftWallGeo = new THREE.PlaneGeometry(MALL_LENGTH, MALL_HEIGHT);
     leftWallGeo.rotateY(Math.PI / 2);
     const leftWallMat = new THREE.MeshStandardMaterial({
-      map: createBoutiqueFacadeTexture(false),
+      map: createBoutiqueFacadeTexture(),
       roughness: 0.25,
       metalness: 0.2,
       side: THREE.DoubleSide
@@ -269,13 +358,19 @@
     leftWall.position.set(-halfW, halfH, -MALL_LENGTH / 2 + 8);
     scene.add(leftWall);
 
-    // 4. Right Luxury Boutique Facades
+    // 4. Right Premium White Gallery Wall with Quote:
+    // "WE WILL DEFINETLY GET EACH OTHER" from starting to end
     const rightWallGeo = new THREE.PlaneGeometry(MALL_LENGTH, MALL_HEIGHT);
     rightWallGeo.rotateY(-Math.PI / 2);
+    // Flip UV.x so x=0 is at near start (z=+8) and x=4096 is at far end (z=-76)
+    const rightUV = rightWallGeo.attributes.uv;
+    for (let i = 0; i < rightUV.count; i++) {
+      rightUV.setX(i, 1 - rightUV.getX(i));
+    }
     const rightWallMat = new THREE.MeshStandardMaterial({
-      map: createBoutiqueFacadeTexture(true),
-      roughness: 0.25,
-      metalness: 0.2,
+      map: createWhiteWallWithTextTexture(),
+      roughness: 0.35,
+      metalness: 0.08,
       side: THREE.DoubleSide
     });
     const rightWall = new THREE.Mesh(rightWallGeo, rightWallMat);
@@ -293,7 +388,7 @@
     endWall.position.set(0, halfH, -MALL_LENGTH + 8);
     scene.add(endWall);
 
-    // 6. Architectural Columns (Polished Brass & Black Marble)
+    // 6. Architectural Columns (Left side only to keep Right White Wall seamless)
     const pillarGeo = new THREE.BoxGeometry(0.7, MALL_HEIGHT, 0.7);
     const pillarMat = new THREE.MeshStandardMaterial({
       color: 0x0c0e14,
@@ -306,15 +401,10 @@
     for (let i = 0; i < pillarCount; i++) {
       const zPos = 8 - i * pillarSpacing;
 
-      // Left Pillar
+      // Left Pillar (Left side retains architectural boutique structure)
       const leftPillar = new THREE.Mesh(pillarGeo, pillarMat);
       leftPillar.position.set(-halfW + 0.35, halfH, zPos);
       scene.add(leftPillar);
-
-      // Right Pillar
-      const rightPillar = new THREE.Mesh(pillarGeo, pillarMat);
-      rightPillar.position.set(halfW - 0.35, halfH, zPos);
-      scene.add(rightPillar);
     }
 
     // 7. Warm Interior Point Lights along Promenade
@@ -333,9 +423,9 @@
       leftLight.position.set(-halfW + 1.2, 2.6, zPos);
       scene.add(leftLight);
 
-      // Right window warm glow
-      const rightLight = new THREE.PointLight(0xffdf9e, 1.1, 9, 2);
-      rightLight.position.set(halfW - 1.2, 2.6, zPos);
+      // Right white wall wash light (gently illuminates quote on white wall)
+      const rightLight = new THREE.PointLight(0xfff5ea, 1.2, 12, 1.8);
+      rightLight.position.set(halfW - 0.8, 3.2, zPos);
       scene.add(rightLight);
     }
   }
