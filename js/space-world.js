@@ -270,7 +270,7 @@
 
   /**
    * Procedural Premium White Gallery Wall Texture with Continuous Quote
-   * "WE WILL DEFINETLY GET EACH OTHER"
+   * "WE WILL DEFINETLY GET EACH OTHER" in Deep Solid Jet-Black Typography
    */
   function createWhiteWallWithTextTexture() {
     const canvas = document.createElement('canvas');
@@ -278,69 +278,61 @@
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
+    // Clean Architectural Gallery Matte Off-White Wall
     const bgGrad = ctx.createLinearGradient(0, 0, 0, 512);
     bgGrad.addColorStop(0, '#ebedf2');
     bgGrad.addColorStop(0.12, '#f6f7fa');
-    bgGrad.addColorStop(0.88, '#f7f8fb');
-    bgGrad.addColorStop(1, '#e8eaf0');
+    bgGrad.addColorStop(0.88, '#f6f7fa');
+    bgGrad.addColorStop(1, '#e4e7ed');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 4096, 512);
 
+    // Subtle natural plaster/stone grain
     const imgData = ctx.getImageData(0, 0, 4096, 512);
     const data = imgData.data;
     for (let i = 0; i < data.length; i += 4) {
-      const n = (Math.random() - 0.5) * 8;
+      const n = (Math.random() - 0.5) * 6;
       data[i] = Math.min(255, Math.max(0, data[i] + n));
       data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + n));
       data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + n));
     }
     ctx.putImageData(imgData, 0, 0);
 
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.55)';
-    ctx.fillRect(0, 0, 4096, 12);
-
-    ctx.fillStyle = 'rgba(212, 175, 55, 0.75)';
-    ctx.fillRect(0, 502, 4096, 10);
-
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.04)';
+    // Architectural gallery panel vertical seams
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
     ctx.lineWidth = 2;
-    for (let x = 512; x < 4096; x += 512) {
+    for (let x = 1024; x < 4096; x += 1024) {
       ctx.beginPath();
-      ctx.moveTo(x, 12);
-      ctx.lineTo(x, 502);
+      ctx.moveTo(x, 14);
+      ctx.lineTo(x, 498);
       ctx.stroke();
     }
 
-    ctx.font = 'bold 46px -apple-system, BlinkMacSystemFont, "Cinzel", "Playfair Display", Georgia, serif';
+    // Top and bottom architectural reveal trim
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+    ctx.fillRect(0, 0, 4096, 8);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+    ctx.fillRect(0, 504, 4096, 8);
+
+    // SOLID JET-BLACK TYPOGRAPHY: "WE WILL DEFINETLY GET EACH OTHER"
+    ctx.font = 'bold 54px -apple-system, BlinkMacSystemFont, "Cinzel", "Playfair Display", Georgia, serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const wordsWithPositions = [
-      { text: 'W E', x: 380 },
-      { text: 'W I L L', x: 1020 },
-      { text: 'D E F I N E T L Y', x: 1880 },
-      { text: 'G E T', x: 2720 },
-      { text: 'E A C H', x: 3340 },
-      { text: 'O T H E R', x: 3850 }
-    ];
+    const quoteText = 'W E   W I L L   D E F I N E T L Y   G E T   E A C H   O T H E R';
 
-    const yPos = 256;
+    // Repeated across the 4 primary architectural gallery bays (corresponding to the boutiques on the left)
+    // so that throughout the entire mall lane ("full space me"), the quote is bold, crisp, and clearly readable in black
+    const bayCenters = [512, 1536, 2560, 3584];
 
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.16)';
-    ctx.shadowBlur = 6;
-    ctx.shadowOffsetX = 3;
-    ctx.shadowOffsetY = 3;
+    bayCenters.forEach(cx => {
+      // Subtle ambient contact shadow for clean architectural depth
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+      ctx.fillText(quoteText, cx + 1, 257);
 
-    ctx.fillStyle = '#bfa14a';
-    wordsWithPositions.forEach(item => {
-      ctx.fillText(item.text, item.x, yPos);
-    });
-
-    ctx.shadowColor = 'transparent';
-    ctx.fillStyle = '#f5df98';
-    ctx.font = 'bold 46px -apple-system, BlinkMacSystemFont, "Cinzel", "Playfair Display", Georgia, serif';
-    wordsWithPositions.forEach(item => {
-      ctx.fillText(item.text, item.x - 1, yPos - 1);
+      // Deep solid jet black lettering
+      ctx.fillStyle = '#0a0b12';
+      ctx.fillText(quoteText, cx, 256);
     });
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -495,8 +487,8 @@
     }
     const rightWallMat = new THREE.MeshStandardMaterial({
       map: createWhiteWallWithTextTexture(),
-      roughness: 0.35,
-      metalness: 0.08,
+      roughness: 0.82,
+      metalness: 0.02,
       side: THREE.DoubleSide
     });
     const rightWall = new THREE.Mesh(rightWallGeo, rightWallMat);
@@ -521,13 +513,13 @@
       const zPos = 8 - i * lightSpacing;
 
       // Overhead warm ceiling spotlight casting down on marble
-      const spotLight = new THREE.PointLight(0xffedd1, 1.6, 18, 1.5);
+      const spotLight = new THREE.PointLight(0xffedd1, 1.5, 18, 1.5);
       spotLight.position.set(0, MALL_HEIGHT - 0.4, zPos);
       scene.add(spotLight);
 
-      // Right white wall wash light (gently illuminates quote on white wall)
-      const rightLight = new THREE.PointLight(0xfff5ea, 1.2, 12, 1.8);
-      rightLight.position.set(halfW - 0.8, 3.2, zPos);
+      // Soft diffuse gallery wall wash (clean, even illumination without glare blowout)
+      const rightLight = new THREE.PointLight(0xfff8ee, 0.45, 14, 2.0);
+      rightLight.position.set(halfW - 1.5, 3.2, zPos);
       scene.add(rightLight);
     }
   }
