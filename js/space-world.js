@@ -50,7 +50,7 @@
     if (isFinite(savedSens) && savedSens >= 0.5 && savedSens <= 3.0) {
       lookSensitivity = savedSens;
     }
-  } catch (_) {}
+  } catch (_) { }
 
   // First Shop Interactive OLED TV Audio Player & Dim-Yellow Mood Lighting State
   const firstShopAudioState = {
@@ -86,6 +86,14 @@
     video: null,
     tex: null,
     tvPos: { x: -13.9, z: -21.0 },
+    unlocked: false
+  };
+
+  // Shop 3 (LED3) Back-Wall OLED LED Video & Proximity Audio State
+  const shop3VideoState = {
+    video: null,
+    tex: null,
+    tvPos: { x: -13.9, z: -39.0 },
     unlocked: false
   };
   let lookTouchId = null;
@@ -1258,6 +1266,54 @@
         activeScreenMat = new THREE.MeshStandardMaterial({
           map: shop2VideoState.tex,
           emissiveMap: shop2VideoState.tex,
+          emissive: new THREE.Color(0xffffff),
+          emissiveIntensity: 0.94,
+          roughness: 0.08,
+          metalness: 0.15,
+          polygonOffset: true,
+          polygonOffsetFactor: -2,
+          polygonOffsetUnits: -2
+        });
+      } else if (i === 2) {
+        if (!shop3VideoState.video) {
+          const s3Vid = document.createElement('video');
+          s3Vid.src = 'video/video_20261024_234728.mp4';
+          s3Vid.loop = true;
+          s3Vid.muted = true;
+          s3Vid.playsInline = true;
+          s3Vid.setAttribute('playsinline', '');
+          s3Vid.preload = 'metadata';
+          s3Vid.volume = 0;
+
+          const s3Tex = new THREE.VideoTexture(s3Vid);
+          s3Tex.encoding = THREE.sRGBEncoding;
+          s3Tex.minFilter = THREE.LinearFilter;
+          s3Tex.magFilter = THREE.LinearFilter;
+
+          shop3VideoState.video = s3Vid;
+          shop3VideoState.tex = s3Tex;
+          shop3VideoState.tvPos = { x: xBack + 0.098, z: zCenter };
+
+          const unlockS3Audio = () => {
+            if (shop3VideoState.unlocked) return;
+            shop3VideoState.unlocked = true;
+            s3Vid.muted = false;
+            s3Vid.play().catch(() => {});
+          };
+          window.addEventListener('pointerdown', unlockS3Audio, { once: true, passive: true });
+          window.addEventListener('keydown', unlockS3Audio, { once: true, passive: true });
+
+          s3Vid.play().then(() => {
+            s3Vid.muted = false;
+            shop3VideoState.unlocked = true;
+          }).catch(() => {
+            s3Vid.muted = true;
+            s3Vid.play().catch(() => {});
+          });
+        }
+        activeScreenMat = new THREE.MeshStandardMaterial({
+          map: shop3VideoState.tex,
+          emissiveMap: shop3VideoState.tex,
           emissive: new THREE.Color(0xffffff),
           emissiveIntensity: 0.94,
           roughness: 0.08,
@@ -2552,6 +2608,27 @@
     }
   }
 
+  function updateShop3LedProximityAudio() {
+    const vid = shop3VideoState.video;
+    if (!vid || !camera) return;
+
+    const inShop3 = (camera.position.x < -5.8 && camera.position.z <= -30.0 && camera.position.z >= -48.0);
+    if (!inShop3 || firstShopAudioState.isPlaying) {
+      vid.volume = 0;
+      return;
+    }
+
+    const dx = camera.position.x - shop3VideoState.tvPos.x;
+    const dz = camera.position.z - shop3VideoState.tvPos.z;
+    const dist = Math.hypot(dx, dz);
+    if (dist >= 9.5) {
+      vid.volume = 0;
+    } else {
+      const norm = Math.min(1, Math.max(0, (9.5 - dist) / 7.5));
+      vid.volume = Math.pow(norm, 1.5) * 0.28;
+    }
+  }
+
   /**
    * Render Loop
    */
@@ -2573,6 +2650,7 @@
     renderFirstShopLedScreen(false);
     updateCorridorLedProximityAudio();
     updateShop2LedProximityAudio();
+    updateShop3LedProximityAudio();
 
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
@@ -2587,6 +2665,9 @@
     if (shop2VideoState.video) {
       shop2VideoState.video.play().catch(() => { });
     }
+    if (shop3VideoState.video) {
+      shop3VideoState.video.play().catch(() => { });
+    }
     onWindowResize();
     animFrameId = requestAnimationFrame(animate);
   }
@@ -2598,6 +2679,9 @@
     }
     if (shop2VideoState.video) {
       shop2VideoState.video.pause();
+    }
+    if (shop3VideoState.video) {
+      shop3VideoState.video.pause();
     }
     if (firstShopAudioState.audio && firstShopAudioState.isPlaying) {
       firstShopAudioState.audio.pause();
@@ -2673,7 +2757,7 @@
         valEl.textContent = lookSensitivity.toFixed(1) + 'x';
         try {
           localStorage.setItem(SENSITIVITY_STORAGE_KEY, String(lookSensitivity));
-        } catch (_) {}
+        } catch (_) { }
       }
     });
   }
