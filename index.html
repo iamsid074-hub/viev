@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
   <link rel="stylesheet" href="css/exxclusive-3.css?v=19.1">
   <link rel="stylesheet" href="css/letters.css?v=5.1">
-  <link rel="stylesheet" href="css/space-world.css?v=2.0">
+  <link rel="stylesheet" href="css/space-world.css?v=3.0">
 
   <!-- High-Priority Instant Visual Preloads -->
   <link rel="preload" as="image" href="assets/befikre_logo.webp" type="image/webp">
@@ -1370,36 +1370,6 @@
 
           </div>
 
-          <!-- SUBPAGE: SPACE (3D REAL MALL LANE WORLD) -->
-          <div class="subpage-body-container" id="subpage-space" style="display: none;">
-            <div class="space-canvas-wrapper" id="space-canvas-wrap"></div>
-
-            <!-- Sleek Minimal Top Navigation (Back to Settings) -->
-            <div class="space-top-nav">
-              <button type="button" class="space-back-pill" id="space-custom-back-btn" aria-label="Back to Settings">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-                <span>Settings</span>
-              </button>
-            </div>
-
-            <!-- Portrait Rotate Hint Overlay (Option B: Auto-Orient with Hint) -->
-            <div class="space-rotate-hint-overlay" id="space-rotate-overlay">
-              <div class="rotate-hint-card">
-                <div class="rotate-icon-wrap">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                  </svg>
-                </div>
-                <h3 class="rotate-hint-title">Rotate to Landscape</h3>
-                <p class="rotate-hint-desc">For the best cinematic 3D Mall experience, turn your phone horizontally.</p>
-                <button type="button" class="rotate-dismiss-btn" id="space-rotate-dismiss">Stay in Portrait</button>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
@@ -2248,6 +2218,32 @@
   </div>
 
   <!-- =========================================================
+       SUBPAGE: SPACE (3D REAL LUXURY MALL LANE WORLD)
+       Direct body overlay with Automatic Landscape Transformation
+       ========================================================= -->
+  <div id="subpage-space" class="subpage-body-container fullpage-space-overlay" style="display: none;">
+    <div class="space-landscape-stage" id="space-landscape-stage">
+      <div class="space-canvas-wrapper" id="space-canvas-wrap"></div>
+
+      <!-- Single Sleek VisionOS Back Button -->
+      <div class="space-top-bar">
+        <button type="button" class="space-back-pill" id="space-custom-back-btn" aria-label="Back to Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Settings</span>
+        </button>
+      </div>
+
+      <!-- Elegant Promenade Badge -->
+      <div class="space-title-badge">
+        <span class="gold-beacon"></span>
+        <span>Luxe Promenade</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
        ROYAL LETTERS: FULL-SCREEN PARCHMENT STATIONERY
        Direct body overlay - Zero clipping, Zero black blockages
        ========================================================= -->
@@ -2366,7 +2362,7 @@
   <script src="js/push-notifications.js?v=2.1"></script>
   <script src="js/letters.js?v=5.1"></script>
   <script src="js/three.min.js"></script>
-  <script src="js/space-world.js?v=2.0"></script>
-  <script src="js/app.js?v=8.1"></script>
+  <script src="js/space-world.js?v=3.0"></script>
+  <script src="js/app.js?v=8.2"></script>
 </body>
 </html>

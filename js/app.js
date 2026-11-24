@@ -710,6 +710,19 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Full-Page Dedicated Overlay for SPACE 3D World (Auto Landscape Promenade)
+    if (targetId === 'subpage-space') {
+      if (window.vievSpaceWorld && typeof window.vievSpaceWorld.open === 'function') {
+        window.vievSpaceWorld.open();
+      } else {
+        const spacePanel = document.getElementById('subpage-space');
+        if (spacePanel) spacePanel.style.display = 'block';
+        document.body.classList.add('has-space-active');
+        document.documentElement.classList.add('has-space-active');
+      }
+      return;
+    }
+
     // Set top bar center title (e.g. Software Update)
     const navCenterTitle = document.getElementById('subpage-nav-center-title');
     if (navCenterTitle) {
@@ -784,17 +797,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!settingsViewport) return;
     const lettersPanel = document.getElementById('subpage-letters');
     if (lettersPanel) lettersPanel.style.display = 'none';
+    const spacePanel = document.getElementById('subpage-space');
+    if (spacePanel) spacePanel.style.display = 'none';
     settingsViewport.classList.remove('is-subpage-open', 'is-letters-active');
     settingsViewport.classList.remove('is-exxclusive-mode');
-    document.body.classList.remove('is-exxclusive-active', 'has-letters-active');
-    document.documentElement.classList.remove('is-exxclusive-active', 'has-letters-active');
+    document.body.classList.remove('is-exxclusive-active', 'has-letters-active', 'has-space-active');
+    document.documentElement.classList.remove('is-exxclusive-active', 'has-letters-active', 'has-space-active');
     if (typeof window.setFloatingNavVisible === 'function') {
       window.setFloatingNavVisible(true);
     }
     if (window.vievExxclusive && typeof window.vievExxclusive.pauseVideo === 'function') {
       window.vievExxclusive.pauseVideo();
     }
-    if (window.vievSpaceWorld && typeof window.vievSpaceWorld.stop === 'function') {
+    if (window.vievSpaceWorld && typeof window.vievSpaceWorld.close === 'function') {
+      window.vievSpaceWorld.close();
+    } else if (window.vievSpaceWorld && typeof window.vievSpaceWorld.stop === 'function') {
       window.vievSpaceWorld.stop();
     }
     const navCenterTitle = document.getElementById('subpage-nav-center-title');

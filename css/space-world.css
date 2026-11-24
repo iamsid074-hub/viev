@@ -1,30 +1,62 @@
 /* =========================================================
-   SPACE 3D WORLD: LUXURY MALL LANE
-   Ultra-Premium Architectural Corridor • Three.js WebGL
+   SPACE 3D WORLD: ULTRA-PREMIUM LUXURY MALL LANE
+   Automatic Landscape Orientation • Dedicated Fullscreen Overlay
    ========================================================= */
 
-/* Top navigation back button floating over Mall View */
-.settings-subpage-pane:has(#subpage-space[style*="display: block"]) .subpage-top-bar,
-#subpage-space .space-top-nav {
-  position: absolute;
-  top: max(env(safe-area-inset-top, 0px), 14px);
-  left: max(env(safe-area-inset-left, 0px), 18px);
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  pointer-events: auto;
+/* Dedicated Direct Body Fullscreen Overlay (Zero clipping, Zero dock overlap) */
+#subpage-space.fullpage-space-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 999999 !important;
+  background: #080a0f !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  touch-action: none;
 }
 
-#subpage-space {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: #0d0f14;
-  z-index: 20;
+/* Hide Floating Dock and System Chrome when SPACE is active */
+html.has-space-active #apple-floating-dock,
+body.has-space-active #apple-floating-dock,
+html.has-space-active .apple-floating-dock,
+body.has-space-active .apple-floating-dock {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* =========================================================
+   AUTOMATIC LANDSCAPE STAGE TRANSFORMATION
+   In Portrait: Automatically rotate 90deg so user gets instant widescreen landscape!
+   In Landscape: Fills 100% edge-to-edge naturally without rotation!
+   ========================================================= */
+@media (orientation: portrait) {
+  .space-landscape-stage {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 100dvh !important;
+    height: 100dvw !important;
+    transform: translate(-50%, -50%) rotate(90deg) !important;
+    transform-origin: center center !important;
+    overflow: hidden !important;
+    background: #080a0f !important;
+  }
+}
+
+@media (orientation: landscape) {
+  .space-landscape-stage {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important;
+    overflow: hidden !important;
+    background: #080a0f !important;
+  }
 }
 
 /* 3D WebGL Canvas Viewport */
@@ -44,132 +76,78 @@
   display: block;
 }
 
-/* Elegant Minimal Back Button */
+/* Single Sleek Apple VisionOS Back Button (Top-Left of Rotated Landscape Stage) */
+.space-top-bar {
+  position: absolute;
+  top: max(env(safe-area-inset-left, 0px), 16px);
+  left: max(env(safe-area-inset-top, 0px), 20px);
+  z-index: 50;
+  pointer-events: auto;
+}
+
 .space-back-pill {
   appearance: none;
-  background: rgba(12, 14, 20, 0.65);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(15, 18, 28, 0.72);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  padding: 7px 16px 7px 12px;
+  padding: 8px 18px 8px 14px;
   color: #ffffff;
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.space-back-pill svg {
+  color: #0a84ff;
 }
 
 .space-back-pill:active {
-  transform: scale(0.96);
-  background: rgba(20, 24, 35, 0.85);
+  transform: scale(0.95);
+  background: rgba(25, 30, 48, 0.9);
 }
 
-/* Portrait Rotate Hint Overlay */
-.space-rotate-hint-overlay {
+/* Discreet Mall Kicker Badge (Top-Right) */
+.space-title-badge {
   position: absolute;
-  inset: 0;
-  z-index: 40;
-  background: rgba(5, 7, 12, 0.88);
+  top: max(env(safe-area-inset-left, 0px), 18px);
+  right: max(env(safe-area-inset-top, 0px), 24px);
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(15, 18, 28, 0.65);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  text-align: center;
-  pointer-events: auto;
-  transition: opacity 0.4s ease;
-}
-
-/* Show Rotate Hint ONLY when device is held in Portrait */
-@media (orientation: portrait) {
-  .space-rotate-hint-overlay {
-    display: flex;
-  }
-}
-
-/* Hide when in Landscape or Wide Screen */
-@media (orientation: landscape) {
-  .space-rotate-hint-overlay {
-    display: none !important;
-  }
-}
-
-.rotate-hint-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 290px;
-  gap: 16px;
-}
-
-.rotate-icon-wrap {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0.04) 70%, transparent 100%);
   border: 1px solid rgba(212, 175, 55, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffd778;
-  animation: phoneRotateAnim 2.8s ease-in-out infinite;
-}
-
-@keyframes phoneRotateAnim {
-  0%, 20% {
-    transform: rotate(0deg);
-  }
-  50%, 70% {
-    transform: rotate(90deg);
-  }
-  90%, 100% {
-    transform: rotate(0deg);
-  }
-}
-
-.rotate-hint-title {
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  color: #ffffff;
-  margin: 0;
-}
-
-.rotate-hint-desc {
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  font-size: 13px;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.65);
-  margin: 0;
-}
-
-.rotate-dismiss-btn {
-  appearance: none;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
-  padding: 8px 20px;
-  color: #e2e8f0;
-  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  margin-top: 6px;
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
 }
 
-.rotate-dismiss-btn:active {
-  transform: scale(0.96);
-  background: rgba(255, 255, 255, 0.15);
+.space-title-badge span {
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #ffd778;
+  text-transform: uppercase;
+}
+
+.space-title-badge .gold-beacon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffd778;
+  box-shadow: 0 0 10px #ffd778;
 }
 
 /* Nav Badge in Settings */
