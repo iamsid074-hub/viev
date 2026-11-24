@@ -719,6 +719,9 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (targetId === 'subpage-notifications') {
         navCenterTitle.textContent = 'Notifications';
         navCenterTitle.style.display = 'block';
+      } else if (targetId === 'subpage-space') {
+        navCenterTitle.textContent = 'SPACE';
+        navCenterTitle.style.display = 'block';
       } else {
         navCenterTitle.textContent = '';
         navCenterTitle.style.display = 'none';
@@ -756,6 +759,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.vievNotifications && typeof window.vievNotifications.updateUI === 'function') {
         window.vievNotifications.updateUI();
       }
+    } else if (targetId === 'subpage-space') {
+      if (window.vievSpaceWorld && typeof window.vievSpaceWorld.init === 'function') {
+        window.vievSpaceWorld.init();
+      }
     }
   }
 
@@ -786,6 +793,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (window.vievExxclusive && typeof window.vievExxclusive.pauseVideo === 'function') {
       window.vievExxclusive.pauseVideo();
+    }
+    if (window.vievSpaceWorld && typeof window.vievSpaceWorld.stop === 'function') {
+      window.vievSpaceWorld.stop();
     }
     const navCenterTitle = document.getElementById('subpage-nav-center-title');
     if (navCenterTitle) {

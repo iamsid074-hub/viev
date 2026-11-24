@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
   <link rel="stylesheet" href="css/exxclusive-3.css?v=19.1">
   <link rel="stylesheet" href="css/letters.css?v=5.1">
+  <link rel="stylesheet" href="css/space-world.css?v=1.0">
 
   <!-- High-Priority Instant Visual Preloads -->
   <link rel="preload" as="image" href="assets/befikre_logo.webp" type="image/webp">
@@ -866,6 +867,16 @@
           <div class="settings-menu-group">
             <span class="settings-group-kicker">Preferences</span>
             <div class="settings-pills-list">
+              <button class="settings-nav-pill" data-target="subpage-space" type="button" id="pill-space">
+                <span class="pill-nav-title">SPACE</span>
+                <div class="pill-nav-right">
+                  <span class="space-nav-badge">3D World ✦</span>
+                  <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </button>
+
               <button class="settings-nav-pill" data-target="subpage-favorites" type="button">
                 <span class="pill-nav-title">Favorite Songs</span>
                 <svg class="pill-nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1357,6 +1368,46 @@
               </div>
             </div>
 
+          </div>
+
+          <!-- SUBPAGE: SPACE (3D REAL STRAIGHT LANE WORLD) -->
+          <div class="subpage-body-container" id="subpage-space" style="display: none;">
+            <div class="space-canvas-wrapper" id="space-canvas-wrap"></div>
+
+            <!-- VisionOS Floating HUD Overlay -->
+            <div class="space-hud-overlay">
+              <div class="space-hud-top">
+                <div class="space-title-pill">
+                  <span class="space-pulse-beacon"></span>
+                  <span class="space-title-text">SPACE • Real Straight Lane</span>
+                </div>
+              </div>
+
+              <div class="space-hud-bottom">
+                <div class="space-gesture-hint" id="space-gesture-hint">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 9l6 6-6 6"></path>
+                    <path d="M4 4v7a4 4 0 0 0 4 4h11"></path>
+                  </svg>
+                  <span>Drag screen to look around • Tap to explore</span>
+                </div>
+                <div class="space-action-bar">
+                  <button type="button" class="space-pill-action is-active" id="space-btn-cruise">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                    <span>Gliding Forward</span>
+                  </button>
+                  <button type="button" class="space-pill-action" id="space-btn-reset">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                      <path d="M3 3v5h5"></path>
+                    </svg>
+                    <span>Center View</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -2324,6 +2375,8 @@
   <script src="js/exxclusive-3.js?v=17.0"></script>
   <script src="js/push-notifications.js?v=2.1"></script>
   <script src="js/letters.js?v=5.1"></script>
-  <script src="js/app.js?v=8.0"></script>
+  <script src="js/three.min.js"></script>
+  <script src="js/space-world.js?v=1.0"></script>
+  <script src="js/app.js?v=8.1"></script>
 </body>
 </html>
