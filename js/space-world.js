@@ -63,6 +63,15 @@
     lastDrawTime: 0,
     btnBound: false
   };
+
+  // Corridor Right-Wall OLED TVs: "Introducing Digi OS 2.0" Live Keynote Motion Video State
+  const corridorOs2State = {
+    canvas: null,
+    ctx: null,
+    tex: null,
+    startTime: 0,
+    lastDrawTime: 0
+  };
   let lookTouchId = null;
   let prevPointerX = 0;
   let prevPointerY = 0;
@@ -1529,30 +1538,8 @@
       scene.add(yellowWash);
     });
 
-    // 4.2. Real Wall-Mounted OLED LED TV Panels on Right Wall Opposite Every Shop (Blank / No Content Playing)
-    function createRealOledGlassTexture() {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 256;
-      const ctx = canvas.getContext('2d');
-
-      // Pure deep obsidian OLED glass panel (blank, nothing playing)
-      ctx.fillStyle = '#040508';
-      ctx.fillRect(0, 0, 512, 256);
-
-      // Subtle natural glass reflection gradient across the dark panel
-      const glassGrad = ctx.createLinearGradient(0, 0, 512, 256);
-      glassGrad.addColorStop(0, 'rgba(255, 250, 238, 0.045)');
-      glassGrad.addColorStop(0.35, 'rgba(255, 250, 238, 0.01)');
-      glassGrad.addColorStop(0.65, 'rgba(0, 0, 0, 0)');
-      glassGrad.addColorStop(1, 'rgba(255, 250, 238, 0.025)');
-      ctx.fillStyle = glassGrad;
-      ctx.fillRect(0, 0, 512, 256);
-
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.encoding = THREE.sRGBEncoding;
-      return tex;
-    }
+    // 4.2. Real Wall-Mounted OLED LED TV Panels on Right Wall Opposite Every Shop (Playing Introducing OS 2.0 Video)
+    initCorridorOs2Video();
 
     const oledMountMat = new THREE.MeshStandardMaterial({
       color: 0x16181e,
@@ -1565,9 +1552,12 @@
       metalness: 0.88
     });
     const oledGlassMat = new THREE.MeshStandardMaterial({
-      map: createRealOledGlassTexture(),
-      roughness: 0.06,
-      metalness: 0.88
+      map: corridorOs2State.tex,
+      emissiveMap: corridorOs2State.tex,
+      emissive: new THREE.Color(0xffffff),
+      emissiveIntensity: 0.92,
+      roughness: 0.12,
+      metalness: 0.15
     });
     const oledStandbyDotMat = new THREE.MeshStandardMaterial({
       color: 0xffd54f,
@@ -2407,6 +2397,197 @@
   }
 
   /**
+   * Corridor OLED TVs: "Introducing Digi OS 2.0" Apple-Style Motion Graphics Video Loop
+   */
+  function initCorridorOs2Video() {
+    const cs = corridorOs2State;
+    if (!cs.canvas) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 512;
+      cs.canvas = canvas;
+      cs.ctx = canvas.getContext('2d');
+      cs.tex = new THREE.CanvasTexture(canvas);
+      cs.tex.encoding = THREE.sRGBEncoding;
+      cs.tex.anisotropy = 16;
+      cs.startTime = performance.now();
+    }
+    renderCorridorOs2Video(true);
+  }
+
+  function renderCorridorOs2Video(forceDraw) {
+    const cs = corridorOs2State;
+    if (!cs.ctx || !cs.tex) return;
+    const now = performance.now();
+    if (!forceDraw && now - cs.lastDrawTime < 33) return; // ~30fps smooth keynote animation
+    cs.lastDrawTime = now;
+
+    const LOOP_MS = 24000;
+    const tMs = (now - cs.startTime) % LOOP_MS;
+    const ctx = cs.ctx;
+    const W = 1024, H = 512;
+    const easeOut = (x) => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    if (tMs < 2800) {
+      // SCENE 1: "Digi, something special is here."
+      const p = easeOut(tMs / 900);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = p;
+      ctx.fillStyle = '#111216';
+      ctx.font = '700 84px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+      ctx.fillText('Digi,', W / 2, 210 + (1 - p) * 20);
+      const p2 = easeOut((tMs - 450) / 900);
+      ctx.globalAlpha = p2;
+      ctx.fillStyle = '#555864';
+      ctx.font = '500 44px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+      ctx.fillText('something special is here.', W / 2, 295 + (1 - p2) * 16);
+    } else if (tMs < 6500) {
+      // SCENE 2: Hyperspace Warp Tunnel -> "Meet OS 2.0"
+      const local = tMs - 2800;
+      const p = easeOut(local / 1100);
+      ctx.fillStyle = '#040509';
+      ctx.fillRect(0, 0, W, H);
+
+      // Multi-color expanding warp rings
+      const colors = ['rgba(0, 220, 255, 0.35)', 'rgba(255, 60, 180, 0.30)', 'rgba(150, 90, 255, 0.28)', 'rgba(255, 195, 60, 0.32)'];
+      for (let r = 0; r < 8; r++) {
+        const phase = ((local * 0.0012 + r * 0.125) % 1);
+        ctx.strokeStyle = colors[r % colors.length];
+        ctx.lineWidth = 3 + phase * 6;
+        ctx.beginPath();
+        ctx.ellipse(W / 2, H / 2, 40 + phase * 540, 22 + phase * 290, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = p;
+      ctx.fillStyle = '#a6b0c4';
+      ctx.font = '600 34px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('M E E T', W / 2, 168);
+
+      ctx.shadowColor = 'rgba(255, 210, 110, 0.65)';
+      ctx.shadowBlur = 28;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 132px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('OS 2.0', W / 2, 275 + (1 - p) * 24);
+      ctx.shadowBlur = 0;
+    } else if (tMs < 10500) {
+      // SCENE 3: "Every word in real-time sync." + Lyric Pill
+      const local = tMs - 6500;
+      const p = easeOut(local / 900);
+      ctx.fillStyle = '#faf6ef';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.globalAlpha = p;
+      ctx.fillStyle = '#15171e';
+      ctx.font = '700 46px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('Every word in real-time sync.', W / 2, 165);
+
+      // Floating dark-glass lyric pill
+      const p2 = easeOut((local - 500) / 800);
+      ctx.globalAlpha = p2;
+      ctx.fillStyle = '#141722';
+      ctx.beginPath();
+      ctx.roundRect(182, 232, 660, 96, 48);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(212, 175, 55, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffe299';
+      ctx.font = 'italic 600 32px Georgia, serif';
+      ctx.fillText('“Tere kolon mainu saah milde…”', W / 2, 280);
+    } else if (tMs < 15000) {
+      // SCENE 4: "MUSIC" + Waveform + Lock Screen
+      const local = tMs - 10500;
+      const p = easeOut(local / 800);
+      ctx.fillStyle = '#070912';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.globalAlpha = p;
+      ctx.fillStyle = '#ffd778';
+      ctx.font = '800 68px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('MUSIC', W / 2, 130);
+
+      // Animated audio waveform
+      for (let b = 0; b < 28; b++) {
+        const bh = 22 + 92 * Math.abs(Math.sin(local * 0.006 + b * 0.45));
+        const bx = 200 + b * 23;
+        ctx.fillStyle = b % 2 === 0 ? '#ffca3a' : '#5ee7ff';
+        ctx.fillRect(bx, 250 - bh / 2, 12, bh);
+      }
+
+      ctx.fillStyle = '#d4dae8';
+      ctx.font = '500 30px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('Even when your phone is locked.', W / 2, 378);
+    } else if (tMs < 19500) {
+      // SCENE 5: "Live AirCast • Picture-in-Picture • Total Control"
+      const local = tMs - 15000;
+      const p = easeOut(local / 900);
+      ctx.fillStyle = '#06080f';
+      ctx.fillRect(0, 0, W, H);
+
+      // Concentric AirCast waves
+      for (let w = 1; w <= 4; w++) {
+        const rp = ((local * 0.0008 + w * 0.25) % 1);
+        ctx.strokeStyle = `rgba(255, 208, 95, ${(1 - rp) * 0.45})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(W / 2, 220, 45 + rp * 190, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.globalAlpha = p;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 50px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('Live AirCast  •  Total Control', W / 2, 220);
+
+      ctx.fillStyle = '#ffd56b';
+      ctx.font = '500 28px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('Picture-in-Picture Mini Cinema', W / 2, 305);
+    } else {
+      // SCENE 6: "Introducing Digi OS 2.0 • Experience More"
+      const local = tMs - 19500;
+      const p = easeOut(local / 900);
+      ctx.fillStyle = '#05060a';
+      ctx.fillRect(0, 0, W, H);
+
+      const rad = ctx.createRadialGradient(W / 2, H / 2, 20, W / 2, H / 2, 420);
+      rad.addColorStop(0, 'rgba(255, 200, 75, 0.24)');
+      rad.addColorStop(1, 'rgba(5, 6, 10, 0)');
+      ctx.fillStyle = rad;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.globalAlpha = p;
+      ctx.fillStyle = '#d4af37';
+      ctx.font = '600 26px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('I N T R O D U C I N G', W / 2, 165);
+
+      ctx.fillStyle = '#fff5d8';
+      ctx.font = '800 88px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('Digi OS 2.0', W / 2, 255);
+
+      ctx.fillStyle = 'rgba(255, 232, 175, 0.78)';
+      ctx.font = '500 26px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText('Crafted Exclusively for Princess Digi', W / 2, 338);
+    }
+
+    // Subtle keynote progress bar along bottom edge
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = 'rgba(255, 212, 100, 0.25)';
+    ctx.fillRect(0, H - 5, W, 5);
+    ctx.fillStyle = '#ffd15c';
+    ctx.fillRect(0, H - 5, W * (tMs / LOOP_MS), 5);
+
+    ctx.restore();
+    cs.tex.needsUpdate = true;
+  }
+
+  /**
    * Render Loop
    */
   function animate() {
@@ -2421,10 +2602,11 @@
     // Update First-Person Walking Movement from Joystick
     updatePlayerMovement();
 
-    // Update First Shop TV Proximity Button, Smooth Light Fade & Real-Time LED Visualizer
+    // Update First Shop TV Proximity Button, Smooth Light Fade, LED Visualizer & Corridor OS 2.0 Video
     updateFirstShopProximityUI();
     updateFirstShopLightingFade();
     renderFirstShopLedScreen(false);
+    renderCorridorOs2Video(false);
 
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
