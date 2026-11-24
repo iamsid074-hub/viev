@@ -1107,129 +1107,111 @@
       scene.add(yellowWash);
     });
 
-    // 4.2. Sleek Digital LED Display Screens on Right Wall Opposite Every Shop
-    function createShopLedScreenTexture(brandName, idx) {
+    // 4.2. Real Wall-Mounted OLED LED TV Panels on Right Wall Opposite Every Shop (Blank / No Content Playing)
+    function createRealOledGlassTexture() {
       const canvas = document.createElement('canvas');
-      canvas.width = 1024;
-      canvas.height = 512;
+      canvas.width = 512;
+      canvas.height = 256;
       const ctx = canvas.getContext('2d');
 
-      // Deep OLED obsidian background
-      ctx.fillStyle = '#06070b';
-      ctx.fillRect(0, 0, 1024, 512);
+      // Pure deep obsidian OLED glass panel (blank, nothing playing)
+      ctx.fillStyle = '#040508';
+      ctx.fillRect(0, 0, 512, 256);
 
-      // Subtle warm champagne ambient radial glow in screen center
-      const rad = ctx.createRadialGradient(512, 256, 30, 512, 256, 460);
-      rad.addColorStop(0, 'rgba(255, 215, 130, 0.22)');
-      rad.addColorStop(0.55, 'rgba(212, 175, 55, 0.08)');
-      rad.addColorStop(1, 'rgba(6, 7, 11, 0)');
-      ctx.fillStyle = rad;
-      ctx.fillRect(0, 0, 1024, 512);
-
-      // Diagonal subtle glass sheen
-      const sheen = ctx.createLinearGradient(0, 0, 1024, 512);
-      sheen.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
-      sheen.addColorStop(0.45, 'rgba(255, 255, 255, 0)');
-      sheen.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
-      ctx.fillStyle = sheen;
-      ctx.fillRect(0, 0, 1024, 512);
-
-      // Minimalist golden hairline inner border
-      ctx.strokeStyle = 'rgba(235, 198, 110, 0.55)';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(28, 28, 968, 456);
-
-      // Subtle corner accent ticks
-      ctx.strokeStyle = 'rgba(255, 232, 170, 0.9)';
-      ctx.lineWidth = 4;
-      const cLen = 28;
-      [[28, 28, 1, 1], [996, 28, -1, 1], [28, 484, 1, -1], [996, 484, -1, -1]].forEach(([cx, cy, dx, dy]) => {
-        ctx.beginPath();
-        ctx.moveTo(cx, cy + dy * cLen);
-        ctx.lineTo(cx, cy);
-        ctx.lineTo(cx + dx * cLen, cy);
-        ctx.stroke();
-      });
-
-      // Editorial Brand Title
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(255, 210, 110, 0.55)';
-      ctx.shadowBlur = 18;
-      ctx.fillStyle = '#fff3d6';
-      ctx.font = '700 84px "Playfair Display", Georgia, serif';
-      ctx.fillText(brandName, 512, 228);
-
-      // Subtitle
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = '#d9b55b';
-      ctx.font = '500 22px "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif';
-      const subtitles = [
-        'H A U T E   J O A I L L E R I E   &   A T E L I E R',
-        'N E W   S E A S O N   E D I T I O N',
-        'F L A G S H I P   E X P E R I E N C E',
-        'M A I S O N   D E   L U X E'
-      ];
-      ctx.fillText(subtitles[idx % subtitles.length], 512, 316);
+      // Subtle natural glass reflection gradient across the dark panel
+      const glassGrad = ctx.createLinearGradient(0, 0, 512, 256);
+      glassGrad.addColorStop(0, 'rgba(255, 250, 238, 0.045)');
+      glassGrad.addColorStop(0.35, 'rgba(255, 250, 238, 0.01)');
+      glassGrad.addColorStop(0.65, 'rgba(0, 0, 0, 0)');
+      glassGrad.addColorStop(1, 'rgba(255, 250, 238, 0.025)');
+      ctx.fillStyle = glassGrad;
+      ctx.fillRect(0, 0, 512, 256);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
-      tex.anisotropy = 16;
       return tex;
     }
 
-    const ledBezelMat = new THREE.MeshStandardMaterial({
-      color: 0x0d0f14,
-      roughness: 0.25,
-      metalness: 0.85
+    const oledMountMat = new THREE.MeshStandardMaterial({
+      color: 0x16181e,
+      roughness: 0.45,
+      metalness: 0.75
     });
-    const ledHaloMat = new THREE.MeshStandardMaterial({
-      color: 0xffdc78,
-      emissive: new THREE.Color(0xffc947),
-      emissiveIntensity: 0.9,
-      roughness: 0.3
+    const oledChassisMat = new THREE.MeshStandardMaterial({
+      color: 0x101218,
+      roughness: 0.22,
+      metalness: 0.88
+    });
+    const oledGlassMat = new THREE.MeshStandardMaterial({
+      map: createRealOledGlassTexture(),
+      roughness: 0.06,
+      metalness: 0.88
+    });
+    const oledStandbyDotMat = new THREE.MeshStandardMaterial({
+      color: 0xffd54f,
+      emissive: new THREE.Color(0xffb800),
+      emissiveIntensity: 1.4,
+      roughness: 0.2
     });
 
-    const ledWidth = 5.2;
-    const ledHeight = 2.3;
-    const ledCenterY = 4.25; // Cleanly above the eye-level quote (y ~ 2.0m) and below the yellow lamps (y ~ 6.1m)
+    const ledWidth = 5.0;
+    const ledHeight = 2.4;
+    const ledCenterY = 4.25; // Cleanly above eye-level quote (y ~ 2.0m) and below yellow lamps (y ~ 6.1m)
+    const rimT = 0.045;      // Slim 4.5cm outer bezel rim thickness
+    const rimD = 0.055;      // Chassis depth
 
     boutiqueBrands.forEach((brand, i) => {
       const zStart = 6 - i * shopSpan;
       const zEnd = zStart - shopSpan;
       const zCenter = (zStart + zEnd) / 2;
 
-      // Subtle warm backlight halo plate behind the LED bezel
-      const haloPlane = new THREE.Mesh(
-        new THREE.BoxGeometry(0.02, ledHeight + 0.22, ledWidth + 0.22),
-        ledHaloMat
+      // 1. Recessed Wall-Mount Bracket (gives authentic floating shadow gap off the cream wall)
+      const wallMount = new THREE.Mesh(
+        new THREE.BoxGeometry(0.05, ledHeight * 0.55, ledWidth * 0.65),
+        oledMountMat
       );
-      haloPlane.position.set(halfW - 0.015, ledCenterY, zCenter);
-      scene.add(haloPlane);
+      wallMount.position.set(halfW - 0.025, ledCenterY, zCenter);
+      scene.add(wallMount);
 
-      // Slim matte-black anodized aluminum bezel
-      const bezelBox = new THREE.Mesh(
-        new THREE.BoxGeometry(0.07, ledHeight + 0.12, ledWidth + 0.12),
-        ledBezelMat
+      // 2. Main Ultra-Slim Brushed Metal Backing Chassis
+      const chassisBox = new THREE.Mesh(
+        new THREE.BoxGeometry(0.035, ledHeight, ledWidth),
+        oledChassisMat
       );
-      bezelBox.position.set(halfW - 0.045, ledCenterY, zCenter);
-      scene.add(bezelBox);
+      chassisBox.position.set(halfW - 0.068, ledCenterY, zCenter);
+      scene.add(chassisBox);
 
-      // Active Glowing High-Definition LED Display Screen facing -X (toward the opposite shop)
-      const screenTex = createShopLedScreenTexture(brand, i);
-      const screenMat = new THREE.MeshStandardMaterial({
-        map: screenTex,
-        emissiveMap: screenTex,
-        emissive: new THREE.Color(0xffffff),
-        emissiveIntensity: 0.9,
-        roughness: 0.12,
-        metalness: 0.15
-      });
-      const screenGeo = new THREE.PlaneGeometry(ledWidth, ledHeight);
-      screenGeo.rotateY(-Math.PI / 2); // face -X into corridor
-      const screenMesh = new THREE.Mesh(screenGeo, screenMat);
-      screenMesh.position.set(halfW - 0.085, ledCenterY, zCenter);
-      scene.add(screenMesh);
+      // 3. Raised Slim Perimeter Bezel Frame (Top, Bottom, Left, Right)
+      const topRim = new THREE.Mesh(new THREE.BoxGeometry(rimD, rimT, ledWidth + rimT * 2), oledChassisMat);
+      topRim.position.set(halfW - 0.078, ledCenterY + ledHeight / 2 + rimT / 2, zCenter);
+      scene.add(topRim);
+
+      const botRim = new THREE.Mesh(new THREE.BoxGeometry(rimD, rimT, ledWidth + rimT * 2), oledChassisMat);
+      botRim.position.set(halfW - 0.078, ledCenterY - ledHeight / 2 - rimT / 2, zCenter);
+      scene.add(botRim);
+
+      const leftRim = new THREE.Mesh(new THREE.BoxGeometry(rimD, ledHeight, rimT), oledChassisMat);
+      leftRim.position.set(halfW - 0.078, ledCenterY, zCenter + ledWidth / 2 + rimT / 2);
+      scene.add(leftRim);
+
+      const rightRim = new THREE.Mesh(new THREE.BoxGeometry(rimD, ledHeight, rimT), oledChassisMat);
+      rightRim.position.set(halfW - 0.078, ledCenterY, zCenter - ledWidth / 2 - rimT / 2);
+      scene.add(rightRim);
+
+      // 4. Glossy Dark OLED Glass Panel (Blank / No Content Playing, Natural Specular Reflections)
+      const glassGeo = new THREE.PlaneGeometry(ledWidth, ledHeight);
+      glassGeo.rotateY(-Math.PI / 2);
+      const glassMesh = new THREE.Mesh(glassGeo, oledGlassMat);
+      glassMesh.position.set(halfW - 0.088, ledCenterY, zCenter);
+      scene.add(glassMesh);
+
+      // 5. Tiny Standby Power Indicator Pin-LED on Bottom-Right Bezel
+      const standbyDot = new THREE.Mesh(
+        new THREE.BoxGeometry(0.015, 0.018, 0.04),
+        oledStandbyDotMat
+      );
+      standbyDot.position.set(halfW - 0.106, ledCenterY - ledHeight / 2 - rimT / 2, zCenter - ledWidth / 2 + 0.18);
+      scene.add(standbyDot);
     });
 
     // Luxury Planters placed rhythmically along the Right Gallery Wall
