@@ -742,6 +742,82 @@
       emissiveIntensity: 0.35
     });
 
+    // Cream Textured Woven Jute Curtain Material & Pleated 3D Drapery Helper
+    function createCreamJuteCurtainTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // Warm cream natural jute base
+      ctx.fillStyle = '#eadec9';
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Subtle vertical drapery shading bands
+      for (let x = 0; x < 512; x += 32) {
+        const g = ctx.createLinearGradient(x, 0, x + 32, 0);
+        g.addColorStop(0, 'rgba(135, 112, 78, 0.14)');
+        g.addColorStop(0.5, 'rgba(255, 250, 240, 0.10)');
+        g.addColorStop(1, 'rgba(135, 112, 78, 0.14)');
+        ctx.fillStyle = g;
+        ctx.fillRect(x, 0, 32, 512);
+      }
+
+      // Authentic woven jute warp & weft cross-hatch threads
+      for (let y = 0; y < 512; y += 3) {
+        ctx.fillStyle = (y % 6 === 0) ? 'rgba(165, 140, 102, 0.22)' : 'rgba(255, 248, 235, 0.16)';
+        ctx.fillRect(0, y, 512, 1.5);
+      }
+      for (let x = 0; x < 512; x += 3) {
+        ctx.fillStyle = (x % 6 === 0) ? 'rgba(150, 126, 90, 0.20)' : 'rgba(250, 242, 224, 0.14)';
+        ctx.fillRect(x, 0, 1.5, 512);
+      }
+
+      // Organic jute slub fibers for tactile fabric realism
+      for (let i = 0; i < 450; i++) {
+        const sx = Math.random() * 512;
+        const sy = Math.random() * 512;
+        const len = 6 + Math.random() * 18;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(140, 115, 78, 0.24)' : 'rgba(255, 250, 238, 0.22)';
+        if (Math.random() > 0.5) {
+          ctx.fillRect(sx, sy, len, 1);
+        } else {
+          ctx.fillRect(sx, sy, 1, len);
+        }
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.encoding = THREE.sRGBEncoding;
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(4, 3);
+      tex.anisotropy = 16;
+      return tex;
+    }
+
+    const creamJuteCurtainMat = new THREE.MeshStandardMaterial({
+      map: createCreamJuteCurtainTexture(),
+      color: 0xf2e7d3,
+      roughness: 0.94,
+      metalness: 0.0,
+      side: THREE.DoubleSide
+    });
+
+    function createPleatedCurtainGeometry(widthZ, heightY, pleats) {
+      const segZ = pleats * 6;
+      const geo = new THREE.PlaneGeometry(widthZ, heightY, segZ, 1);
+      const pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const px = pos.getX(i); // along curtain width
+        const norm = (px / widthZ) + 0.5;
+        const depthWave = Math.sin(norm * pleats * Math.PI * 2) * 0.085;
+        pos.setZ(i, depthWave);
+      }
+      geo.rotateY(Math.PI / 2); // span along Z, waves along X
+      geo.computeVertexNormals();
+      return geo;
+    }
+
     // Helper: Build seamless mathematical quad buffer geometry joining all 4 corners perfectly
     function createModularQuad(pTL, pTR, pBL, pBR) {
       const geo = new THREE.BufferGeometry();
@@ -928,6 +1004,29 @@
       const southDoorJamb = new THREE.Mesh(new THREE.BoxGeometry(0.06, openEntranceHeight, 0.06), glassFrameMat);
       southDoorJamb.position.set(xGlass, openEntranceHeight / 2, zCenter - doorwayWidth / 2);
       scene.add(southDoorJamb);
+
+      // 2.5. Interior Cream Textured Jute Curtains Behind Fixed Tinted Glass Panes (Leaving Main Doorway Clear!)
+      const xCurtain = xGlass - 0.16; // mounted cleanly inside the shop behind the tinted glass
+      const curtainHeight = openEntranceHeight - 0.08;
+      const curtainGeo = createPleatedCurtainGeometry(paneZSpan - 0.08, curtainHeight, 16);
+
+      // North Interior Cream Jute Curtain & Top Track
+      const northCurtain = new THREE.Mesh(curtainGeo, creamJuteCurtainMat);
+      northCurtain.position.set(xCurtain, curtainHeight / 2 + 0.02, northPaneCenterZ);
+      scene.add(northCurtain);
+
+      const northCurtainTrack = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, paneZSpan), glassFrameMat);
+      northCurtainTrack.position.set(xCurtain, openEntranceHeight - 0.04, northPaneCenterZ);
+      scene.add(northCurtainTrack);
+
+      // South Interior Cream Jute Curtain & Top Track
+      const southCurtain = new THREE.Mesh(curtainGeo, creamJuteCurtainMat);
+      southCurtain.position.set(xCurtain, curtainHeight / 2 + 0.02, southPaneCenterZ);
+      scene.add(southCurtain);
+
+      const southCurtainTrack = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, paneZSpan), glassFrameMat);
+      southCurtainTrack.position.set(xCurtain, openEntranceHeight - 0.04, southPaneCenterZ);
+      scene.add(southCurtainTrack);
 
       // 3. Overhead Glass Transom Panel (above open doors: y = 3.6m to 4.8m)
       const transomGeo = new THREE.PlaneGeometry(doorwayWidth, transomHeight);
