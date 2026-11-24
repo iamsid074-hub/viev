@@ -1053,6 +1053,56 @@
     rightWall.position.set(halfW, halfH, -MALL_LENGTH / 2 + 8);
     scene.add(rightWall);
 
+    // 4.1. Right Wall & Ceiling Junction: Dim Yellow Architectural Cove & Minimal Sconce Lamps
+    const corniceZ = -MALL_LENGTH / 2 + 8;
+    const corniceHousingMat = new THREE.MeshStandardMaterial({
+      color: 0x161820,
+      roughness: 0.35,
+      metalness: 0.72
+    });
+    const dimYellowLampMat = new THREE.MeshStandardMaterial({
+      color: 0xf2cd74,
+      emissive: new THREE.Color(0xe5b242),
+      emissiveIntensity: 0.55,
+      roughness: 0.25,
+      metalness: 0.1
+    });
+
+    // Continuous shadow-gap cornice lip framing the cove along the right wall-ceiling seam
+    const rightCorniceLip = new THREE.Mesh(
+      new THREE.BoxGeometry(0.10, 0.05, MALL_LENGTH),
+      corniceHousingMat
+    );
+    rightCorniceLip.position.set(halfW - 0.09, MALL_HEIGHT - 0.11, corniceZ);
+    scene.add(rightCorniceLip);
+
+    // Continuous dim yellow linear cove lamp tucked inside the cornice
+    const rightCoveLamp = new THREE.Mesh(
+      new THREE.BoxGeometry(0.06, 0.04, MALL_LENGTH),
+      dimYellowLampMat
+    );
+    rightCoveLamp.position.set(halfW - 0.035, MALL_HEIGHT - 0.06, corniceZ);
+    scene.add(rightCoveLamp);
+
+    // Minimal linear architectural sconce lamps spaced rhythmically along the upper right wall-ceiling corner
+    const rightLampZList = [2, -12, -26, -40, -54, -68];
+    const sconceBodyGeo = new THREE.BoxGeometry(0.11, 0.07, 1.5);
+    const sconceGlowGeo = new THREE.BoxGeometry(0.08, 0.025, 1.42);
+    rightLampZList.forEach(lz => {
+      const sconceBody = new THREE.Mesh(sconceBodyGeo, corniceHousingMat);
+      sconceBody.position.set(halfW - 0.06, MALL_HEIGHT - 0.28, lz);
+      scene.add(sconceBody);
+
+      const sconceGlow = new THREE.Mesh(sconceGlowGeo, dimYellowLampMat);
+      sconceGlow.position.set(halfW - 0.06, MALL_HEIGHT - 0.235, lz);
+      scene.add(sconceGlow);
+
+      // Soft dim yellow ambient wash onto the upper right wall & ceiling corner
+      const dimYellowWash = new THREE.PointLight(0xffcf6e, 0.35, 9, 2.0);
+      dimYellowWash.position.set(halfW - 0.35, MALL_HEIGHT - 0.38, lz);
+      scene.add(dimYellowWash);
+    });
+
     // Luxury Planters placed rhythmically along the Right Gallery Wall
     const rightPlanterZList = [4, -16, -36, -56, -72];
     rightPlanterZList.forEach(pz => {
