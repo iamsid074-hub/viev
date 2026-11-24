@@ -365,7 +365,7 @@
   width: 100%;
   max-width: 420px;
   margin: 0 auto;
-  padding: 12px 18px calc(var(--sab) + 84px) 18px;
+  padding: 12px 18px calc(var(--sab) + 115px) 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1601,7 +1601,7 @@
   max-width: 420px;
   min-height: 100dvh;
   margin: 0 auto;
-  padding: calc(var(--sat) + 4px) 20px calc(var(--sab) + 84px) 20px;
+  padding: calc(var(--sat) + 4px) 20px calc(var(--sab) + 105px) 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -2294,7 +2294,7 @@
 .apple-now-playing-container.is-songlist-mode {
   justify-content: flex-start !important;
   gap: 10px !important;
-  padding-bottom: calc(var(--sab) + 76px) !important;
+  padding-bottom: calc(var(--sab) + 100px) !important;
   height: 100dvh !important;
   max-height: 100dvh !important;
   overflow: hidden !important;
@@ -3307,7 +3307,7 @@
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior-y: contain !important;
-  padding: max(env(safe-area-inset-top, 0px), 16px) 18px calc(var(--sab, 0px) + 120px) 18px !important;
+  padding: max(env(safe-area-inset-top, 0px), 16px) 18px calc(var(--sab, 0px) + 130px) 18px !important;
   box-sizing: border-box !important;
   opacity: 1;
   transform: translateX(0);
@@ -3336,7 +3336,7 @@
   transform: translateX(100%) !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  padding: max(env(safe-area-inset-top, 0px), 14px) 18px calc(var(--sab, 0px) + 120px) 18px !important;
+  padding: max(env(safe-area-inset-top, 0px), 14px) 18px calc(var(--sab, 0px) + 130px) 18px !important;
   box-sizing: border-box !important;
   transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease !important;
 }
@@ -5638,7 +5638,7 @@
   .welcome-lower-content {
     width: 100%;
     max-width: 100%;
-    padding: 12px 18px calc(var(--sab) + 84px) 18px !important;
+    padding: 12px 18px calc(var(--sab) + 115px) 18px !important;
   }
 
   .apple-live-clock.dual-pill-mode {
@@ -5704,7 +5704,7 @@
   .apple-now-playing-container {
     width: 100%;
     max-width: 100%;
-    padding: calc(var(--sat) + 8px) 18px calc(var(--sab) + 82px) 18px !important;
+    padding: calc(var(--sat) + 8px) 18px calc(var(--sab) + 105px) 18px !important;
     justify-content: space-between;
   }
 
@@ -5805,11 +5805,11 @@
   }
 
   .settings-root-pane {
-    padding: max(env(safe-area-inset-top, 0px), 12px) 16px calc(var(--sab) + 120px) 16px !important;
+    padding: max(env(safe-area-inset-top, 0px), 12px) 16px calc(var(--sab) + 130px) 16px !important;
   }
 
   .settings-subpage-pane {
-    padding: max(env(safe-area-inset-top, 0px), 12px) 16px calc(var(--sab) + 120px) 16px !important;
+    padding: max(env(safe-area-inset-top, 0px), 12px) 16px calc(var(--sab) + 130px) 16px !important;
   }
 
   .spatial-mode-pills {
@@ -6851,11 +6851,11 @@
 
 
 
-/* Safe area insets for iPhone Dynamic Island & Home indicator */
-@supports (padding: max(0px)) {
-  .apple-floating-dock {
-    padding-bottom: max(0px, env(safe-area-inset-bottom));
-  }
+/* Safe area insets for iPhone Dynamic Island & Home indicator:
+   The floating dock is detached and placed at bottom: calc(var(--sab) + 14px).
+   Zero out extra internal bottom padding to prevent double-counting and upward inflation. */
+.apple-floating-dock {
+  padding-bottom: 0 !important;
 }
 
 /* =========================================================
@@ -8342,7 +8342,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin: 38px auto 22px auto; /* thoda neeche */
+  margin: 18px auto 14px auto;
   padding: 0;
   width: 100%;
   max-width: 380px;

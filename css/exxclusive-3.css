@@ -157,7 +157,7 @@
   max-width: 640px;
   margin: 0 auto;
   box-sizing: border-box;
-  padding: max(env(safe-area-inset-top, 0px), 14px) 16px calc(var(--sab, 0px) + 100px);
+  padding: max(env(safe-area-inset-top, 0px), 14px) 16px calc(var(--sab, 0px) + 125px);
   display: flex;
   flex-direction: column;
   background: #000000;
