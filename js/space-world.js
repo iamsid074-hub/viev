@@ -402,57 +402,58 @@
 
   /**
    * Photorealistic Luxury Square White Planter with Lush Green Tree
-   * Built from user's provided PNG asset with 3D square base & multi-angle cross-planes
+   * Built from user's provided PNG asset with natural floor grounding & multi-angle cross-planes
    */
   function createLuxuryPlanter(x, z) {
     const planterGroup = new THREE.Group();
 
-    // 1. Solid 3D Square Architectural Cream Ceramic Pot at base
-    const potGeo = new THREE.BoxGeometry(0.72, 0.68, 0.72);
-    const potMat = new THREE.MeshStandardMaterial({
-      color: 0xf6f4ef,
-      roughness: 0.22,
-      metalness: 0.08
+    // 1. Subtle Circular Ambient Contact Shadow on Floor
+    const shadowGeo = new THREE.CircleGeometry(0.55, 18);
+    shadowGeo.rotateX(-Math.PI / 2);
+    const shadowMat = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.35
     });
-    const pot = new THREE.Mesh(potGeo, potMat);
-    pot.position.y = 0.34;
-    planterGroup.add(pot);
+    const shadow = new THREE.Mesh(shadowGeo, shadowMat);
+    shadow.position.y = 0.005;
+    planterGroup.add(shadow);
 
-    // 2. High-Res Photorealistic Tree Foliage & Planter Cross-Planes
+    // 2. High-Res Photorealistic Tree & Pot using User's PNG on Cross-Planes
     const foliageTex = getPlanterTexture();
     const foliageMat = new THREE.MeshStandardMaterial({
       map: foliageTex,
       transparent: true,
-      alphaTest: 0.22,
+      alphaTest: 0.18,
       roughness: 0.65,
       metalness: 0.04,
       side: THREE.DoubleSide
     });
 
-    const planeW = 1.45;
-    const planeH = 1.85;
+    const planeH = 2.1;
+    const planeW = 1.74; // Matches 848x1024 aspect ratio
     const planeGeo = new THREE.PlaneGeometry(planeW, planeH);
 
     // Plane 1 (Facing Z)
     const m1 = new THREE.Mesh(planeGeo, foliageMat);
-    m1.position.y = 1.05;
+    m1.position.y = planeH / 2;
     planterGroup.add(m1);
 
     // Plane 2 (Facing X - 90 deg rotation for full 3D volumetric depth)
     const m2 = new THREE.Mesh(planeGeo, foliageMat);
     m2.rotation.y = Math.PI / 2;
-    m2.position.y = 1.05;
+    m2.position.y = planeH / 2;
     planterGroup.add(m2);
 
     // Plane 3 & 4 (Diagonals for full lush 3D foliage density)
     const m3 = new THREE.Mesh(planeGeo, foliageMat);
     m3.rotation.y = Math.PI / 4;
-    m3.position.y = 1.05;
+    m3.position.y = planeH / 2;
     planterGroup.add(m3);
 
     const m4 = new THREE.Mesh(planeGeo, foliageMat);
     m4.rotation.y = -Math.PI / 4;
-    m4.position.y = 1.05;
+    m4.position.y = planeH / 2;
     planterGroup.add(m4);
 
     planterGroup.position.set(x, 0, z);
@@ -565,7 +566,7 @@
     });
 
     // 2. SOLID JET-BLACK ULTRA-BOLD TYPOGRAPHY: "WE WILL DEFINETLY GET EACH OTHER"
-    ctx.font = '900 66px -apple-system, BlinkMacSystemFont, "Montserrat", "Cinzel", "Arial Black", "Playfair Display", Georgia, serif';
+    ctx.font = '900 70px -apple-system, BlinkMacSystemFont, "Montserrat", "Cinzel", "Arial Black", "Playfair Display", Georgia, serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -581,7 +582,7 @@
       // Heavy architectural solid jet black fill + matching stroke for maximum boldness
       ctx.fillStyle = '#050608';
       ctx.strokeStyle = '#050608';
-      ctx.lineWidth = 4.5;
+      ctx.lineWidth = 5;
       ctx.strokeText(quoteText, cx, 370);
       ctx.fillText(quoteText, cx, 370);
     });
@@ -824,15 +825,15 @@
     ]);
 
     const wallUVs = new Float32Array([
-      // Triangle 1
-      0, 1, // TL
-      1, 1, // TR
-      0, 0, // BL
+      // Triangle 1: TL (z=+42), TR (z=-42), BL (z=+42)
+      1, 1, // TL (entrance)
+      0, 1, // TR (far end)
+      1, 0, // BL (entrance)
 
-      // Triangle 2
-      1, 1, // TR
-      1, 0, // BR
-      0, 0  // BL
+      // Triangle 2: TR (z=-42), BR (z=-42), BL (z=+42)
+      0, 1, // TR (far end)
+      0, 0, // BR (far end)
+      1, 0  // BL (entrance)
     ]);
 
     rightWallGeo.setAttribute('position', new THREE.BufferAttribute(wallPositions, 3));
