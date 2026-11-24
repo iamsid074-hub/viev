@@ -2404,14 +2404,14 @@
               }
             }
             if (st.audioCtx && st.audioCtx.state === 'suspended') {
-              st.audioCtx.resume().catch(() => {});
+              st.audioCtx.resume().catch(() => { });
             }
             st.audio.play().then(() => {
               st.isPlaying = true;
               setFirstShopAudioLighting(true);
               updateAudioButtonUI();
               renderFirstShopLedScreen(true);
-            }).catch(() => {});
+            }).catch(() => { });
           }
         });
       }
