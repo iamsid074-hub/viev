@@ -1328,6 +1328,131 @@
       const shopLight = new THREE.PointLight(0xfff0d4, 1.15, 22, 1.8);
       shopLight.position.set(-halfW - shopWidth / 2, MALL_HEIGHT - 1.0, zCenter);
       scene.add(shopLight);
+
+      // I) First Shop Left Wall (z = zStart): Big Real Wall-Mounted OLED LED TV + Power Wire & Wall Socket
+      if (i === 0) {
+        const tvCenterX = (xFront + xBack) / 2; // -10.0m (center of left wall)
+        const tvCenterY = 3.05;
+        const tvWidth = 4.2;
+        const tvHeight = 2.2;
+        const tvRimT = 0.045;
+        const tvRimD = 0.055;
+
+        const tvMountMat = new THREE.MeshStandardMaterial({ color: 0x16181e, roughness: 0.45, metalness: 0.75 });
+        const tvChassisMat = new THREE.MeshStandardMaterial({ color: 0x101218, roughness: 0.22, metalness: 0.88 });
+        const tvGlassCanvas = document.createElement('canvas');
+        tvGlassCanvas.width = 512;
+        tvGlassCanvas.height = 256;
+        const tvCtx = tvGlassCanvas.getContext('2d');
+        tvCtx.fillStyle = '#040508';
+        tvCtx.fillRect(0, 0, 512, 256);
+        const tvSheen = tvCtx.createLinearGradient(0, 0, 512, 256);
+        tvSheen.addColorStop(0, 'rgba(255, 250, 238, 0.05)');
+        tvSheen.addColorStop(0.4, 'rgba(255, 250, 238, 0.01)');
+        tvSheen.addColorStop(1, 'rgba(255, 250, 238, 0.025)');
+        tvCtx.fillStyle = tvSheen;
+        tvCtx.fillRect(0, 0, 512, 256);
+        const tvGlassTex = new THREE.CanvasTexture(tvGlassCanvas);
+        tvGlassTex.encoding = THREE.sRGBEncoding;
+
+        const tvGlassMat = new THREE.MeshStandardMaterial({
+          map: tvGlassTex,
+          roughness: 0.06,
+          metalness: 0.88
+        });
+        const tvDotMat = new THREE.MeshStandardMaterial({
+          color: 0xffd54f,
+          emissive: new THREE.Color(0xffb800),
+          emissiveIntensity: 1.5,
+          roughness: 0.2
+        });
+
+        // 1. Wall-Mount Spacer Bracket
+        const tvMount = new THREE.Mesh(
+          new THREE.BoxGeometry(tvWidth * 0.62, tvHeight * 0.55, 0.05),
+          tvMountMat
+        );
+        tvMount.position.set(tvCenterX, tvCenterY, zStart - 0.025);
+        scene.add(tvMount);
+
+        // 2. Slim Brushed Metal Backing Chassis
+        const tvChassis = new THREE.Mesh(
+          new THREE.BoxGeometry(tvWidth, tvHeight, 0.035),
+          tvChassisMat
+        );
+        tvChassis.position.set(tvCenterX, tvCenterY, zStart - 0.068);
+        scene.add(tvChassis);
+
+        // 3. Raised 4-Side Perimeter Bezel Rim
+        const tvTopRim = new THREE.Mesh(new THREE.BoxGeometry(tvWidth + tvRimT * 2, tvRimT, tvRimD), tvChassisMat);
+        tvTopRim.position.set(tvCenterX, tvCenterY + tvHeight / 2 + tvRimT / 2, zStart - 0.078);
+        scene.add(tvTopRim);
+
+        const tvBotRim = new THREE.Mesh(new THREE.BoxGeometry(tvWidth + tvRimT * 2, tvRimT, tvRimD), tvChassisMat);
+        tvBotRim.position.set(tvCenterX, tvCenterY - tvHeight / 2 - tvRimT / 2, zStart - 0.078);
+        scene.add(tvBotRim);
+
+        const tvLeftRim = new THREE.Mesh(new THREE.BoxGeometry(tvRimT, tvHeight, tvRimD), tvChassisMat);
+        tvLeftRim.position.set(tvCenterX + tvWidth / 2 + tvRimT / 2, tvCenterY, zStart - 0.078);
+        scene.add(tvLeftRim);
+
+        const tvRightRim = new THREE.Mesh(new THREE.BoxGeometry(tvRimT, tvHeight, tvRimD), tvChassisMat);
+        tvRightRim.position.set(tvCenterX - tvWidth / 2 - tvRimT / 2, tvCenterY, zStart - 0.078);
+        scene.add(tvRightRim);
+
+        // 4. Glossy Dark OLED Glass Panel facing -Z into the shop (Blank, No Content Playing)
+        const tvGlassGeo = new THREE.PlaneGeometry(tvWidth, tvHeight);
+        tvGlassGeo.rotateY(Math.PI); // face -Z
+        const tvGlassMesh = new THREE.Mesh(tvGlassGeo, tvGlassMat);
+        tvGlassMesh.position.set(tvCenterX, tvCenterY, zStart - 0.088);
+        scene.add(tvGlassMesh);
+
+        // 5. Standby Pin-LED Dot on Bottom-Right Bezel
+        const tvStandbyDot = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.018, 0.015), tvDotMat);
+        tvStandbyDot.position.set(tvCenterX - tvWidth / 2 + 0.18, tvCenterY - tvHeight / 2 - tvRimT / 2, zStart - 0.106);
+        scene.add(tvStandbyDot);
+
+        // 6. Real Wall Power Socket Plate, Outlet, Plug & Power Wire
+        const socketY = 0.82; // cleanly above the dark marble baseboard
+        const socketPlateMat = new THREE.MeshStandardMaterial({ color: 0xe6dcc8, roughness: 0.35, metalness: 0.15 });
+        const socketRecessMat = new THREE.MeshStandardMaterial({ color: 0x16181e, roughness: 0.5, metalness: 0.2 });
+        const cableMat = new THREE.MeshStandardMaterial({ color: 0x111216, roughness: 0.55, metalness: 0.1 });
+
+        // Wall socket faceplate
+        const socketPlate = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.16, 0.024), socketPlateMat);
+        socketPlate.position.set(tvCenterX, socketY, zStart - 0.012);
+        scene.add(socketPlate);
+
+        // Recessed outlet cavity + switch indicator
+        const socketCavity = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.10, 0.015), socketRecessMat);
+        socketCavity.position.set(tvCenterX - 0.03, socketY, zStart - 0.022);
+        scene.add(socketCavity);
+
+        const socketSwitch = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.05, 0.016), socketPlateMat);
+        socketSwitch.position.set(tvCenterX + 0.065, socketY, zStart - 0.024);
+        scene.add(socketSwitch);
+
+        const socketLed = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.012, 0.018), tvDotMat);
+        socketLed.position.set(tvCenterX + 0.065, socketY + 0.042, zStart - 0.025);
+        scene.add(socketLed);
+
+        // 3D Power Plug inserted into socket
+        const plugBody = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.08, 0.055), cableMat);
+        plugBody.position.set(tvCenterX - 0.03, socketY, zStart - 0.048);
+        scene.add(plugBody);
+
+        // Realistic curved power wire connecting bottom of LED TV into the 3D plug in the socket
+        const wireCurve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(tvCenterX, tvCenterY - tvHeight / 2 - tvRimT, zStart - 0.065),
+          new THREE.Vector3(tvCenterX - 0.01, tvCenterY - tvHeight / 2 - 0.28, zStart - 0.038),
+          new THREE.Vector3(tvCenterX - 0.025, (tvCenterY - tvHeight / 2 + socketY) / 2, zStart - 0.028),
+          new THREE.Vector3(tvCenterX - 0.03, socketY + 0.14, zStart - 0.036),
+          new THREE.Vector3(tvCenterX - 0.03, socketY, zStart - 0.065)
+        ]);
+        const wireGeo = new THREE.TubeGeometry(wireCurve, 32, 0.015, 10, false);
+        const wireMesh = new THREE.Mesh(wireGeo, cableMat);
+        scene.add(wireMesh);
+      }
     }
 
     // 4. RIGHT ARCHITECTURAL GALLERY WALL WITH JET-BLACK QUOTE & BACKLIT FRAMES
