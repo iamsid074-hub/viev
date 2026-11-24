@@ -684,6 +684,53 @@
       side: THREE.FrontSide
     });
 
+    // Clean Matte Cream Ceiling with Slim Recessed Dim-Yellow LED Strips for First Shop (i === 0)
+    function createFirstShopCleanCeilingTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 2048;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+
+      // Clean smooth warm cream ceiling base (no spotlight circles or busy coffer frames)
+      ctx.fillStyle = '#efe5d2';
+      ctx.fillRect(0, 0, 2048, 1024);
+
+      // Two clean, slim architectural ceiling strip dim-yellow lights running along the shop length
+      const stripYs = [320, 704];
+      stripYs.forEach(sy => {
+        // Slim dark recessed shadow-gap channel
+        ctx.fillStyle = '#1b1915';
+        ctx.fillRect(90, sy - 10, 1868, 20);
+
+        // Soft dim yellow glow halo around the strip
+        ctx.save();
+        ctx.shadowColor = 'rgba(235, 180, 55, 0.75)';
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = '#e5b84b';
+        ctx.fillRect(96, sy - 4, 1856, 8);
+        ctx.restore();
+
+        // Warm dim yellow diffuser core
+        ctx.fillStyle = '#f2cc6c';
+        ctx.fillRect(96, sy - 3, 1856, 6);
+      });
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.encoding = THREE.sRGBEncoding;
+      tex.anisotropy = 16;
+      return tex;
+    }
+
+    const firstShopCeilingTex = createFirstShopCleanCeilingTexture();
+    const firstShopCeilingMat = new THREE.MeshStandardMaterial({
+      map: firstShopCeilingTex,
+      roughness: 0.85,
+      metalness: 0.02,
+      emissive: new THREE.Color(0xe6b84c),
+      emissiveIntensity: 0.16,
+      side: THREE.FrontSide
+    });
+
     const shopBackWallMat = new THREE.MeshStandardMaterial({
       map: shopBackWallTexture,
       roughness: 0.3,
@@ -874,7 +921,7 @@
         [xBack, MALL_HEIGHT, zStart], // BL: Back-North
         [xBack, MALL_HEIGHT, zEnd]    // BR: Back-South
       );
-      const shopCeiling = new THREE.Mesh(ceilGeo, shopCeilingMat);
+      const shopCeiling = new THREE.Mesh(ceilGeo, i === 0 ? firstShopCeilingMat : shopCeilingMat);
       scene.add(shopCeiling);
 
       // C) Boutique Back Display Wall at x = xBack (-14.0m)
@@ -1105,8 +1152,13 @@
       scene.add(boutiquePlanter);
 
       // H) Warm Glowing Boutique Interior Lighting
-      // Soft central downlight radiating warm architectural light from ceiling tray
-      const shopLight = new THREE.PointLight(0xffe8c2, 1.8, 22, 1.8);
+      // Soft central downlight radiating warm architectural light from ceiling
+      const shopLight = new THREE.PointLight(
+        i === 0 ? 0xffd77d : 0xffe8c2,
+        i === 0 ? 1.05 : 1.8,
+        22,
+        1.8
+      );
       shopLight.position.set(-halfW - shopWidth / 2, MALL_HEIGHT - 1.0, zCenter);
       scene.add(shopLight);
     }
