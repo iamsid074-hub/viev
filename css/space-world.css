@@ -215,6 +215,82 @@ body.has-space-active .apple-floating-dock {
 }
 
 /* =========================================================
+   PROXIMITY TV AUDIO CONTROL PILL (Bottom-Center)
+   Appears when near First Shop OLED TV
+   ========================================================= */
+.space-tv-audio-btn {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%) translateY(14px);
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  background: rgba(14, 12, 10, 0.86);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255, 212, 100, 0.45);
+  border-radius: 999px;
+  color: #fff2cc;
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65), 0 0 18px rgba(255, 195, 60, 0.16);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.space-tv-audio-btn.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.space-tv-audio-btn:hover {
+  border-color: rgba(255, 222, 125, 0.85);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.75), 0 0 24px rgba(255, 200, 70, 0.32);
+}
+
+.space-tv-audio-btn:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.space-tv-audio-btn .tv-audio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffd15c;
+  box-shadow: 0 0 8px #ffb700;
+  transition: transform 0.25s ease;
+}
+
+.space-tv-audio-btn.is-playing .tv-audio-dot {
+  background: #ffca3a;
+  animation: tvAudioPulse 1.2s ease-in-out infinite;
+}
+
+.space-tv-audio-btn .tv-audio-icon {
+  font-size: 11px;
+  color: #ffd56b;
+}
+
+@keyframes tvAudioPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.45); opacity: 0.65; }
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .space-tv-audio-btn {
+    bottom: 28px;
+  }
+}
+
+/* =========================================================
    LOW-OPACITY ANALOG MOVEMENT JOYSTICK (Bottom-Left)
    Ultra-Subtle Liquid Glass Finish • Touch-Action None
    ========================================================= */

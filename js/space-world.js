@@ -43,6 +43,24 @@
 
   // Touch Look-Around State
   let isDraggingLook = false;
+
+  // First Shop Interactive OLED TV Audio Player & Dim-Yellow Mood Lighting State
+  const firstShopAudioState = {
+    audio: null,
+    audioCtx: null,
+    analyser: null,
+    freqData: null,
+    isPlaying: false,
+    ledCanvas: null,
+    ledCtx: null,
+    ledTex: null,
+    normalLight: null,
+    dimYellowLight: null,
+    shop0Mats: null,
+    tvPos: { x: -13.9, z: -3.0 },
+    lastDrawTime: 0,
+    btnBound: false
+  };
   let lookTouchId = null;
   let prevPointerX = 0;
   let prevPointerY = 0;
@@ -1052,6 +1070,24 @@
       const zEnd = zStart - shopSpan;  // -12, -30, -48, -66
       const zCenter = (zStart + zEnd) / 2;
 
+      // Shop 0 uses cloned materials so its lights/surfaces can dim independently during audio playback
+      let curFloorMat = shopFloorMat;
+      let curCeilingMat = firstShopCeilingMat;
+      let curBackWallMat = firstShopBackWallMat;
+      let curSideWallMat = firstShopSideWallMat;
+      if (i === 0) {
+        curFloorMat = shopFloorMat.clone();
+        curCeilingMat = firstShopCeilingMat.clone();
+        curBackWallMat = firstShopBackWallMat.clone();
+        curSideWallMat = firstShopSideWallMat.clone();
+        firstShopAudioState.shop0Mats = {
+          floor: curFloorMat,
+          ceiling: curCeilingMat,
+          backWall: curBackWallMat,
+          sideWall: curSideWallMat
+        };
+      }
+
       // A) Boutique Interior Polished Marble Floor (Perfect joint at y = 0.01)
       const floorGeo = createModularQuad(
         [xBack, 0.01, zStart], // TL: Back-North
@@ -1059,7 +1095,7 @@
         [xFront, 0.01, zStart],// BL: Front-North
         [xFront, 0.01, zEnd]   // BR: Front-South
       );
-      const shopFloor = new THREE.Mesh(floorGeo, shopFloorMat);
+      const shopFloor = new THREE.Mesh(floorGeo, curFloorMat);
       scene.add(shopFloor);
 
       // B) Boutique Interior Recessed Tray Ceiling (Perfect joint at y = MALL_HEIGHT)
@@ -1069,7 +1105,7 @@
         [xBack, MALL_HEIGHT, zStart], // BL: Back-North
         [xBack, MALL_HEIGHT, zEnd]    // BR: Back-South
       );
-      const shopCeiling = new THREE.Mesh(ceilGeo, firstShopCeilingMat);
+      const shopCeiling = new THREE.Mesh(ceilGeo, curCeilingMat);
       scene.add(shopCeiling);
 
       // C) Boutique Back Display Wall at x = xBack (-14.0m)
@@ -1079,7 +1115,7 @@
         [xBack, 0, zStart],           // BL: Bottom-North
         [xBack, 0, zEnd]              // BR: Bottom-South
       );
-      const backWall = new THREE.Mesh(backWallGeo, firstShopBackWallMat);
+      const backWall = new THREE.Mesh(backWallGeo, curBackWallMat);
       scene.add(backWall);
 
       // C.1. Large Wall-Mounted OLED LED Screen Centered on Each Shop's Back Wall
@@ -1138,10 +1174,22 @@
       sRightRim.position.set(xBack + 0.078, shopLedY, zCenter - shopLedW / 2 - shopLedRimT / 2);
       scene.add(sRightRim);
 
-      // Large blank glossy OLED glass panel facing +X (into shop & toward promenade)
+      // Large OLED glass panel facing +X (First Shop shows interactive audio clip player)
       const shopLedScreenGeo = new THREE.PlaneGeometry(shopLedW, shopLedH);
       shopLedScreenGeo.rotateY(Math.PI / 2);
-      const shopLedScreen = new THREE.Mesh(shopLedScreenGeo, shopLedGlassMat);
+      let activeScreenMat = shopLedGlassMat;
+      if (i === 0) {
+        initFirstShopTvAudio();
+        activeScreenMat = new THREE.MeshStandardMaterial({
+          map: firstShopAudioState.ledTex,
+          emissiveMap: firstShopAudioState.ledTex,
+          emissive: new THREE.Color(0xffffff),
+          emissiveIntensity: 0.95,
+          roughness: 0.08,
+          metalness: 0.15
+        });
+      }
+      const shopLedScreen = new THREE.Mesh(shopLedScreenGeo, activeScreenMat);
       shopLedScreen.position.set(xBack + 0.088, shopLedY, zCenter);
       scene.add(shopLedScreen);
 
@@ -1161,7 +1209,7 @@
         [xFront, 0, zStart],           // BL: Front-Bottom
         [xBack, 0, zStart]             // BR: Back-Bottom
       );
-      const northSideWall = new THREE.Mesh(northWallGeo, firstShopSideWallMat);
+      const northSideWall = new THREE.Mesh(northWallGeo, curSideWallMat);
       scene.add(northSideWall);
 
       // South Side Wall (at z = zEnd)
@@ -1171,7 +1219,7 @@
         [xBack, 0, zEnd],              // BL: Back-Bottom
         [xFront, 0, zEnd]              // BR: Front-Bottom
       );
-      const southSideWall = new THREE.Mesh(southWallGeo, firstShopSideWallMat);
+      const southSideWall = new THREE.Mesh(southWallGeo, curSideWallMat);
       scene.add(southSideWall);
 
       // E) Solid 3D Overhead Fascia Beam across entrance (y = 4.8 to 6.4, x = -6.0 to -6.5)
@@ -1374,6 +1422,14 @@
       const shopLight = new THREE.PointLight(0xfff0d4, 1.15, 22, 1.8);
       shopLight.position.set(-halfW - shopWidth / 2, MALL_HEIGHT - 1.0, zCenter);
       scene.add(shopLight);
+
+      if (i === 0) {
+        firstShopAudioState.normalLight = shopLight;
+        const dimYellowLight = new THREE.PointLight(0xffb41f, 0, 18, 2.0);
+        dimYellowLight.position.set(-halfW - shopWidth / 2, MALL_HEIGHT - 1.2, zCenter);
+        scene.add(dimYellowLight);
+        firstShopAudioState.dimYellowLight = dimYellowLight;
+      }
     }
 
     // 4. RIGHT ARCHITECTURAL GALLERY WALL WITH JET-BLACK QUOTE & BACKLIT FRAMES
@@ -1383,14 +1439,14 @@
     const halfL = MALL_LENGTH / 2; // 42m
     const wallPositions = new Float32Array([
       // Triangle 1: TL, TR, BL
-      0,  halfH,  halfL, // TL (x=0, y=3.2, z=+42)
-      0,  halfH, -halfL, // TR (x=0, y=3.2, z=-42)
-      0, -halfH,  halfL, // BL (x=0, y=-3.2, z=+42)
+      0, halfH, halfL, // TL (x=0, y=3.2, z=+42)
+      0, halfH, -halfL, // TR (x=0, y=3.2, z=-42)
+      0, -halfH, halfL, // BL (x=0, y=-3.2, z=+42)
 
       // Triangle 2: TR, BR, BL
-      0,  halfH, -halfL, // TR (x=0, y=3.2, z=-42)
+      0, halfH, -halfL, // TR (x=0, y=3.2, z=-42)
       0, -halfH, -halfL, // BR (x=0, y=-3.2, z=-42)
-      0, -halfH,  halfL  // BL (x=0, y=-3.2, z=+42)
+      0, -halfH, halfL  // BL (x=0, y=-3.2, z=+42)
     ]);
 
     const wallUVs = new Float32Array([
@@ -1810,7 +1866,7 @@
         const rect = joystickZone.getBoundingClientRect();
         const margin = 20;
         if (clientX >= rect.left - margin && clientX <= rect.right + margin &&
-            clientY >= rect.top - margin && clientY <= rect.bottom + margin) {
+          clientY >= rect.top - margin && clientY <= rect.bottom + margin) {
           return true;
         }
       }
@@ -2078,6 +2134,269 @@
   }
 
   /**
+   * First Shop Interactive OLED TV Audio Player & Dim-Yellow Mood Lighting
+   */
+  function formatAudioTime(sec) {
+    if (!isFinite(sec) || sec < 0) return '00:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function setFirstShopAudioLighting(isAudioPlaying) {
+    const st = firstShopAudioState;
+    if (st.normalLight) {
+      st.normalLight.intensity = isAudioPlaying ? 0 : 1.15;
+    }
+    if (st.dimYellowLight) {
+      st.dimYellowLight.intensity = isAudioPlaying ? 0.34 : 0;
+    }
+    if (st.shop0Mats) {
+      const { floor, ceiling, backWall, sideWall } = st.shop0Mats;
+      if (isAudioPlaying) {
+        // Turn off bright normal lighting & bathe only first shop in extreme dim yellow
+        floor.color.setHex(0x4a391b);
+        ceiling.color.setHex(0x3a2b12);
+        ceiling.emissiveIntensity = 0.0;
+        backWall.color.setHex(0x453417);
+        backWall.emissive.setHex(0x3d2908);
+        backWall.emissiveIntensity = 0.05;
+        sideWall.color.setHex(0x453417);
+        sideWall.emissive.setHex(0x3d2908);
+        sideWall.emissiveIntensity = 0.05;
+      } else {
+        // Restore normal first shop lighting
+        floor.color.setHex(0xffffff);
+        ceiling.color.setHex(0xffffff);
+        ceiling.emissiveIntensity = 0.08;
+        backWall.color.setHex(0xffffff);
+        backWall.emissive.setHex(0x2b2010);
+        backWall.emissiveIntensity = 0.08;
+        sideWall.color.setHex(0xffffff);
+        sideWall.emissive.setHex(0x2b2010);
+        sideWall.emissiveIntensity = 0.08;
+      }
+    }
+  }
+
+  function updateAudioButtonUI() {
+    const btn = document.getElementById('space-tv-audio-btn');
+    const icon = document.getElementById('space-tv-audio-icon');
+    const label = document.getElementById('space-tv-audio-label');
+    if (!btn || !icon || !label) return;
+    if (firstShopAudioState.isPlaying) {
+      btn.classList.add('is-playing');
+      icon.textContent = '❚❚';
+      label.textContent = 'Pause Audio';
+    } else {
+      btn.classList.remove('is-playing');
+      icon.textContent = '▶';
+      label.textContent = 'Play Audio';
+    }
+  }
+
+  function renderFirstShopLedScreen(forceDraw) {
+    const st = firstShopAudioState;
+    if (!st.ledCtx || !st.ledTex) return;
+    const now = performance.now();
+    if (!forceDraw && !st.isPlaying) return;
+    if (!forceDraw && now - st.lastDrawTime < 33) return; // ~30fps smooth LED update
+    st.lastDrawTime = now;
+
+    const ctx = st.ledCtx;
+    const W = 1024, H = 512;
+
+    // Deep OLED obsidian background
+    ctx.fillStyle = '#05060a';
+    ctx.fillRect(0, 0, W, H);
+
+    // Sample real-time audio spectrum if playing
+    let avgEnergy = 0;
+    const barCount = 32;
+    const bars = new Array(barCount).fill(0.06);
+    if (st.isPlaying) {
+      if (st.analyser && st.freqData) {
+        st.analyser.getByteFrequencyData(st.freqData);
+        for (let b = 0; b < barCount; b++) {
+          const val = st.freqData[b % st.freqData.length] / 255;
+          bars[b] = Math.max(0.08, val);
+          avgEnergy += val;
+        }
+        avgEnergy /= barCount;
+      } else {
+        for (let b = 0; b < barCount; b++) {
+          const wave = 0.28 + 0.48 * Math.abs(Math.sin(now * 0.005 + b * 0.45) * Math.cos(now * 0.0028 - b * 0.25));
+          bars[b] = wave;
+          avgEnergy += wave;
+        }
+        avgEnergy /= barCount;
+      }
+    }
+
+    // Subtle warm golden radial backlight that breathes with audio
+    const glowAlpha = st.isPlaying ? (0.14 + avgEnergy * 0.22) : 0.09;
+    const rad = ctx.createRadialGradient(W / 2, H / 2, 20, W / 2, H / 2, 460);
+    rad.addColorStop(0, `rgba(255, 198, 65, ${glowAlpha.toFixed(3)})`);
+    rad.addColorStop(0.6, 'rgba(180, 125, 25, 0.05)');
+    rad.addColorStop(1, 'rgba(5, 6, 10, 0)');
+    ctx.fillStyle = rad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Hairline gold border
+    ctx.strokeStyle = st.isPlaying ? 'rgba(255, 210, 95, 0.55)' : 'rgba(255, 210, 95, 0.22)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(26, 26, W - 52, H - 52);
+
+    // Top Header
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffd978';
+    ctx.font = '600 24px "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText('VOICE NOTE  •  HONEY BUNNY', 64, 76);
+
+    // Status Pill on Top Right
+    ctx.textAlign = 'right';
+    ctx.fillStyle = st.isPlaying ? '#ffca3a' : 'rgba(255, 235, 185, 0.55)';
+    ctx.font = '700 20px "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText(st.isPlaying ? '● PLAYING LIVE' : '○ READY TO PLAY', W - 64, 76);
+
+    // Center Real-Time Symmetric Audio Spectrum Bars
+    const totalBarsW = 780;
+    const step = totalBarsW / barCount;
+    const barW = step * 0.58;
+    const startX = (W - totalBarsW) / 2 + (step - barW) / 2;
+    const centerY = 252;
+    const maxBarH = 190;
+
+    for (let b = 0; b < barCount; b++) {
+      const h = Math.max(10, bars[b] * maxBarH);
+      const bx = startX + b * step;
+      const by = centerY - h / 2;
+
+      const grad = ctx.createLinearGradient(0, by, 0, by + h);
+      grad.addColorStop(0, '#ffe89e');
+      grad.addColorStop(0.5, '#ffbe2e');
+      grad.addColorStop(1, '#ffe89e');
+      ctx.fillStyle = grad;
+      ctx.fillRect(bx, by, barW, h);
+    }
+
+    // Bottom Playback Progress Bar & Timestamps
+    const curTime = st.audio ? (st.audio.currentTime || 0) : 0;
+    const durTime = st.audio && isFinite(st.audio.duration) && st.audio.duration > 0 ? st.audio.duration : 85;
+    const progress = Math.min(1, Math.max(0, curTime / durTime));
+
+    const barX = 64, barY = 418, barFullW = W - 128, barH = 8;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+    ctx.fillRect(barX, barY, barFullW, barH);
+    ctx.fillStyle = '#ffca3a';
+    ctx.fillRect(barX, barY, barFullW * progress, barH);
+
+    // Playhead knob
+    ctx.beginPath();
+    ctx.arc(barX + barFullW * progress, barY + barH / 2, 9, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff3cc';
+    ctx.fill();
+
+    // Time labels
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(255, 240, 200, 0.85)';
+    ctx.font = '600 20px monospace';
+    ctx.fillText(formatAudioTime(curTime), barX, 456);
+
+    ctx.textAlign = 'right';
+    ctx.fillText(formatAudioTime(durTime), barX + barFullW, 456);
+
+    st.ledTex.needsUpdate = true;
+  }
+
+  function initFirstShopTvAudio() {
+    const st = firstShopAudioState;
+    if (!st.ledCanvas) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 512;
+      st.ledCanvas = canvas;
+      st.ledCtx = canvas.getContext('2d');
+      st.ledTex = new THREE.CanvasTexture(canvas);
+      st.ledTex.encoding = THREE.sRGBEncoding;
+      st.ledTex.anisotropy = 16;
+    }
+
+    if (!st.audio) {
+      const audio = new Audio('assets/audio/honey_bday_note.ogg');
+      audio.preload = 'metadata';
+      audio.addEventListener('loadedmetadata', () => renderFirstShopLedScreen(true));
+      audio.addEventListener('ended', () => {
+        st.isPlaying = false;
+        setFirstShopAudioLighting(false);
+        updateAudioButtonUI();
+        renderFirstShopLedScreen(true);
+      });
+      st.audio = audio;
+    }
+
+    if (!st.btnBound) {
+      st.btnBound = true;
+      const btn = document.getElementById('space-tv-audio-btn');
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!st.audio) return;
+          if (st.isPlaying) {
+            st.audio.pause();
+            st.isPlaying = false;
+            setFirstShopAudioLighting(false);
+            updateAudioButtonUI();
+            renderFirstShopLedScreen(true);
+          } else {
+            // Initialize Web Audio API Analyser on user gesture
+            if (!st.audioCtx) {
+              try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                st.audioCtx = new AudioCtx();
+                const srcNode = st.audioCtx.createMediaElementSource(st.audio);
+                st.analyser = st.audioCtx.createAnalyser();
+                st.analyser.fftSize = 64;
+                srcNode.connect(st.analyser);
+                st.analyser.connect(st.audioCtx.destination);
+                st.freqData = new Uint8Array(st.analyser.frequencyBinCount);
+              } catch (_) {
+                st.analyser = null;
+              }
+            }
+            if (st.audioCtx && st.audioCtx.state === 'suspended') {
+              st.audioCtx.resume().catch(() => {});
+            }
+            st.audio.play().then(() => {
+              st.isPlaying = true;
+              setFirstShopAudioLighting(true);
+              updateAudioButtonUI();
+              renderFirstShopLedScreen(true);
+            }).catch(() => {});
+          }
+        });
+      }
+    }
+
+    renderFirstShopLedScreen(true);
+  }
+
+  function updateFirstShopProximityUI() {
+    const btn = document.getElementById('space-tv-audio-btn');
+    if (!btn || !camera) return;
+    const dx = camera.position.x - firstShopAudioState.tvPos.x;
+    const dz = camera.position.z - firstShopAudioState.tvPos.z;
+    const dist = Math.hypot(dx, dz);
+    const insideFirstShopNearTv = (camera.position.x < -5.8 && camera.position.z <= 6 && camera.position.z >= -12 && dist < 9.5);
+    if (insideFirstShopNearTv || firstShopAudioState.isPlaying) {
+      btn.classList.add('is-visible');
+    } else {
+      btn.classList.remove('is-visible');
+    }
+  }
+
+  /**
    * Render Loop
    */
   function animate() {
@@ -2092,6 +2411,10 @@
     // Update First-Person Walking Movement from Joystick
     updatePlayerMovement();
 
+    // Update First Shop TV Proximity Button & Real-Time LED Visualizer
+    updateFirstShopProximityUI();
+    renderFirstShopLedScreen(false);
+
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
   }
@@ -2105,6 +2428,15 @@
 
   function stop() {
     isRunning = false;
+    if (firstShopAudioState.audio && firstShopAudioState.isPlaying) {
+      firstShopAudioState.audio.pause();
+      firstShopAudioState.isPlaying = false;
+      setFirstShopAudioLighting(false);
+      updateAudioButtonUI();
+      renderFirstShopLedScreen(true);
+    }
+    const btn = document.getElementById('space-tv-audio-btn');
+    if (btn) btn.classList.remove('is-visible');
     if (animFrameId) {
       cancelAnimationFrame(animFrameId);
       animFrameId = null;
@@ -2124,8 +2456,8 @@
 
     if (screen.orientation && screen.orientation.lock) {
       try {
-        screen.orientation.lock('landscape').catch(() => {});
-      } catch (_) {}
+        screen.orientation.lock('landscape').catch(() => { });
+      } catch (_) { }
     }
 
     initEngine();
@@ -2146,7 +2478,7 @@
     if (screen.orientation && screen.orientation.unlock) {
       try {
         screen.orientation.unlock();
-      } catch (_) {}
+      } catch (_) { }
     }
 
     if (typeof window.setFloatingNavVisible === 'function') {
