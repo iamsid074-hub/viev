@@ -562,6 +562,16 @@
   function buildMallCorridor() {
     const halfW = MALL_WIDTH / 2; // 6 meters
     const halfH = MALL_HEIGHT / 2;
+    const textureLoader = new THREE.TextureLoader();
+
+    function setupTexture(tex) {
+      tex.encoding = THREE.sRGBEncoding;
+      tex.anisotropy = 16;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = true;
+      return tex;
+    }
 
     // 1. DUAL-TONE LUXURY MARBLE FLOOR (Honed finish with minimal, silky reflection)
     // A) Central & Right Walking Lane: Honed Nero Marquina Marble (Subtle, refined reflection)
@@ -643,17 +653,6 @@
     const xBack = -halfW - shopWidth; // -14.0m (rear display wall)
 
     // Load High-Resolution Modular Shop Textures
-    const textureLoader = new THREE.TextureLoader();
-
-    function setupTexture(tex) {
-      tex.encoding = THREE.sRGBEncoding;
-      tex.anisotropy = 16;
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      tex.generateMipmaps = true;
-      return tex;
-    }
-
     const shopFloorTexture = setupTexture(textureLoader.load('assets/shop_model/shop_floor.png'));
     const shopCeilingTexture = setupTexture(textureLoader.load('assets/shop_model/shop_ceiling.png'));
     const shopBackWallTexture = setupTexture(textureLoader.load('assets/shop_model/shop_back_wall.png'));
