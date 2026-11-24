@@ -563,15 +563,15 @@
     const halfW = MALL_WIDTH / 2; // 6 meters
     const halfH = MALL_HEIGHT / 2;
 
-    // 1. DUAL-TONE LUXURY MARBLE FLOOR
-    // A) Central & Right Walking Lane: Ultra High-Gloss Dark Nero Marquina Marble
+    // 1. DUAL-TONE LUXURY MARBLE FLOOR (Honed finish with minimal, silky reflection)
+    // A) Central & Right Walking Lane: Honed Nero Marquina Marble (Subtle, refined reflection)
     const darkFloorWidth = 8.8;
     const darkFloorGeo = new THREE.PlaneGeometry(darkFloorWidth, MALL_LENGTH);
     darkFloorGeo.rotateX(-Math.PI / 2);
     const darkFloorMat = new THREE.MeshStandardMaterial({
       map: createNeroMarquinaMarbleTexture(),
-      roughness: 0.10,
-      metalness: 0.38,
+      roughness: 0.38,
+      metalness: 0.08,
       side: THREE.DoubleSide
     });
     const darkFloor = new THREE.Mesh(darkFloorGeo, darkFloorMat);
@@ -584,8 +584,8 @@
     whiteFloorGeo.rotateX(-Math.PI / 2);
     const whiteFloorMat = new THREE.MeshStandardMaterial({
       map: createCalacattaWhiteMarbleTexture(),
-      roughness: 0.14,
-      metalness: 0.20,
+      roughness: 0.40,
+      metalness: 0.05,
       side: THREE.DoubleSide
     });
     const whiteFloor = new THREE.Mesh(whiteFloorGeo, whiteFloorMat);
@@ -597,24 +597,33 @@
     brassStripGeo.rotateX(-Math.PI / 2);
     const brassStripMat = new THREE.MeshStandardMaterial({
       color: 0xd4af37,
-      roughness: 0.2,
+      roughness: 0.25,
       metalness: 0.85,
       emissive: new THREE.Color(0xc89d30),
-      emissiveIntensity: 0.32
+      emissiveIntensity: 0.25
     });
     const brassStrip = new THREE.Mesh(brassStripGeo, brassStripMat);
     brassStrip.position.set(-halfW + whiteFloorWidth, 0.003, -MALL_LENGTH / 2 + 8);
     scene.add(brassStrip);
 
-    // 2. Architectural Coffered Ceiling with Linear Warm LED Coves
+    // 2. Upgraded Architectural Corridor Ceiling (with Linear AC Vents & Acoustic Sound Bars)
+    const corridorCeilingTex = textureLoader.load('assets/corridor_ceiling_ultra.png');
+    corridorCeilingTex.encoding = THREE.sRGBEncoding;
+    corridorCeilingTex.wrapS = THREE.RepeatWrapping;
+    corridorCeilingTex.wrapT = THREE.RepeatWrapping;
+    corridorCeilingTex.repeat.set(1, 8); // 8 seamless repeats along the 84m length
+    corridorCeilingTex.anisotropy = 16;
+    corridorCeilingTex.minFilter = THREE.LinearMipmapLinearFilter;
+    corridorCeilingTex.magFilter = THREE.LinearFilter;
+
     const ceilingGeo = new THREE.PlaneGeometry(MALL_WIDTH, MALL_LENGTH);
     ceilingGeo.rotateX(Math.PI / 2);
     const ceilingMat = new THREE.MeshStandardMaterial({
-      map: createArchitecturalCeilingTexture(),
-      roughness: 0.45,
-      metalness: 0.15,
-      emissive: new THREE.Color(0xffe8ba),
-      emissiveIntensity: 0.48,
+      map: corridorCeilingTex,
+      roughness: 0.80,
+      metalness: 0.06,
+      emissive: new THREE.Color(0xfff5ea),
+      emissiveIntensity: 0.20, // refined, softly illuminated ceiling without blown-out glow
       side: THREE.DoubleSide
     });
     const ceilingMesh = new THREE.Mesh(ceilingGeo, ceilingMat);
@@ -1063,24 +1072,24 @@
     endWall.position.set(0, halfH, -MALL_LENGTH + 8);
     scene.add(endWall);
 
-    // Dedicated feature wall warm spotlight (casts grand reflections on dark floor!)
-    const featureWallSpot = new THREE.PointLight(0xffedd1, 1.8, 18, 1.8);
+    // Dedicated feature wall warm spotlight
+    const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
     featureWallSpot.position.set(0, 3.8, -MALL_LENGTH + 14);
     scene.add(featureWallSpot);
 
-    // 6. Warm Interior Point Lights along Main Promenade
-    const lightSpacing = 10;
+    // 6. Warm Interior Point Lights along Main Promenade (Refined minimal ambient illumination)
+    const lightSpacing = 12;
     const lightCount = Math.floor(MALL_LENGTH / lightSpacing);
     for (let i = 0; i < lightCount; i++) {
       const zPos = 8 - i * lightSpacing;
 
-      // Overhead warm ceiling spotlight casting down on marble
-      const spotLight = new THREE.PointLight(0xffedd1, 1.5, 18, 1.5);
+      // Soft architectural downlight (minimal specular flare on floor)
+      const spotLight = new THREE.PointLight(0xfff4e4, 0.65, 14, 2.0);
       spotLight.position.set(0, MALL_HEIGHT - 0.4, zPos);
       scene.add(spotLight);
 
       // Soft diffuse gallery wall wash
-      const rightLight = new THREE.PointLight(0xfff8ee, 0.45, 14, 2.0);
+      const rightLight = new THREE.PointLight(0xfff8ee, 0.25, 12, 2.0);
       rightLight.position.set(halfW - 1.5, 3.2, zPos);
       scene.add(rightLight);
     }
