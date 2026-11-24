@@ -43,6 +43,14 @@
 
   // Touch Look-Around State
   let isDraggingLook = false;
+  const SENSITIVITY_STORAGE_KEY = 'viev_space_look_sensitivity';
+  let lookSensitivity = 1.6; // Increased default mobile touch sensitivity
+  try {
+    const savedSens = parseFloat(localStorage.getItem(SENSITIVITY_STORAGE_KEY));
+    if (isFinite(savedSens) && savedSens >= 0.5 && savedSens <= 3.0) {
+      lookSensitivity = savedSens;
+    }
+  } catch (_) {}
 
   // First Shop Interactive OLED TV Audio Player & Dim-Yellow Mood Lighting State
   const firstShopAudioState = {
@@ -1593,7 +1601,10 @@
       emissive: new THREE.Color(0xffffff),
       emissiveIntensity: 0.92,
       roughness: 0.08,
-      metalness: 0.15
+      metalness: 0.15,
+      polygonOffset: true,
+      polygonOffsetFactor: -2,
+      polygonOffsetUnits: -2
     });
     const oledStandbyDotMat = new THREE.MeshStandardMaterial({
       color: 0xffd54f,
@@ -1623,12 +1634,12 @@
       wallMount.position.set(halfW - 0.025, ledCenterY, zCenter);
       scene.add(wallMount);
 
-      // 2. Main Ultra-Slim Brushed Metal Backing Chassis
+      // 2. Main Ultra-Slim Brushed Metal Backing Chassis (spaced cleanly behind glass to prevent mobile Z-fighting)
       const chassisBox = new THREE.Mesh(
-        new THREE.BoxGeometry(0.035, ledHeight, ledWidth),
+        new THREE.BoxGeometry(0.024, ledHeight, ledWidth),
         oledChassisMat
       );
-      chassisBox.position.set(halfW - 0.068, ledCenterY, zCenter);
+      chassisBox.position.set(halfW - 0.055, ledCenterY, zCenter);
       scene.add(chassisBox);
 
       // 3. Raised Slim Perimeter Bezel Frame (Top, Bottom, Left, Right)
@@ -1648,11 +1659,11 @@
       rightRim.position.set(halfW - 0.078, ledCenterY, zCenter - ledWidth / 2 - rimT / 2);
       scene.add(rightRim);
 
-      // 4. Glossy Dark OLED Glass Panel (Blank / No Content Playing, Natural Specular Reflections)
+      // 4. Glossy OLED Video Panel (3.1cm clear of backing chassis so it never blinks from afar on mobile)
       const glassGeo = new THREE.PlaneGeometry(ledWidth, ledHeight);
       glassGeo.rotateY(-Math.PI / 2);
       const glassMesh = new THREE.Mesh(glassGeo, oledGlassMat);
-      glassMesh.position.set(halfW - 0.088, ledCenterY, zCenter);
+      glassMesh.position.set(halfW - 0.098, ledCenterY, zCenter);
       scene.add(glassMesh);
 
       // 5. Tiny Standby Power Indicator Pin-LED on Bottom-Right Bezel
@@ -1727,8 +1738,8 @@
     scene.background = new THREE.Color(0x0c0e14);
     scene.fog = new THREE.FogExp2(0x0c0e14, 0.012);
 
-    // 2. Camera fixed at standing eye level in center of promenade
-    camera = new THREE.PerspectiveCamera(65, width / height, 0.1, 500);
+    // 2. Camera fixed at standing eye level in center of promenade (near=0.25, far=220 for crisp mobile depth precision)
+    camera = new THREE.PerspectiveCamera(65, width / height, 0.25, 220);
     camera.position.set(0, cameraY, 3);
 
     // 3. WebGL Renderer
@@ -1950,8 +1961,8 @@
       const visualDeltaX = isPortrait ? screenDeltaY : screenDeltaX;
       const visualDeltaY = isPortrait ? -screenDeltaX : screenDeltaY;
 
-      targetYaw -= visualDeltaX * 0.0035;
-      targetPitch -= visualDeltaY * 0.003;
+      targetYaw -= visualDeltaX * (0.0048 * lookSensitivity);
+      targetPitch -= visualDeltaY * (0.0040 * lookSensitivity);
       targetPitch = Math.max(-0.65, Math.min(0.75, targetPitch));
     }
 
@@ -1987,8 +1998,8 @@
       const visualDeltaX = isPortrait ? screenDeltaY : screenDeltaX;
       const visualDeltaY = isPortrait ? -screenDeltaX : screenDeltaY;
 
-      targetYaw -= visualDeltaX * 0.0035;
-      targetPitch -= visualDeltaY * 0.003;
+      targetYaw -= visualDeltaX * (0.0048 * lookSensitivity);
+      targetPitch -= visualDeltaY * (0.0040 * lookSensitivity);
       targetPitch = Math.max(-0.65, Math.min(0.75, targetPitch));
     }
 
@@ -2557,6 +2568,33 @@
     if (typeof window.setFloatingNavVisible === 'function') {
       window.setFloatingNavVisible(true);
     }
+  }
+
+  // Settings UI: SPACE Screen Look Sensitivity Slider
+  function initSpaceSensitivityControl() {
+    const slider = document.getElementById('space-sensitivity-slider');
+    const valEl = document.getElementById('space-sensitivity-val');
+    if (!slider || !valEl) return;
+
+    slider.value = String(lookSensitivity.toFixed(1));
+    valEl.textContent = lookSensitivity.toFixed(1) + 'x';
+
+    slider.addEventListener('input', () => {
+      const v = parseFloat(slider.value);
+      if (isFinite(v)) {
+        lookSensitivity = Math.min(3.0, Math.max(0.5, v));
+        valEl.textContent = lookSensitivity.toFixed(1) + 'x';
+        try {
+          localStorage.setItem(SENSITIVITY_STORAGE_KEY, String(lookSensitivity));
+        } catch (_) {}
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSpaceSensitivityControl);
+  } else {
+    initSpaceSensitivityControl();
   }
 
   // Public API
