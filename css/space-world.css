@@ -152,6 +152,63 @@ body.has-space-active .apple-floating-dock {
 }
 
 /* =========================================================
+   DESKTOP / LAPTOP KEYBOARD CONTROLS PILL HINT
+   Clean Floating Keycap Guide • W/A/S/D & Arrows
+   ========================================================= */
+.space-desktop-hint {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: rgba(14, 17, 26, 0.72);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.5s ease;
+}
+
+.space-desktop-hint .key-badge {
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", monospace, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 5px;
+  color: #ffd778;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.space-desktop-hint .hint-sep {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.space-desktop-hint .hint-text {
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  margin-left: 2px;
+}
+
+/* On mobile phones in portrait, hide desktop keyboard pill */
+@media (max-width: 600px) and (orientation: portrait) {
+  .space-desktop-hint {
+    display: none;
+  }
+}
+
+/* =========================================================
    LOW-OPACITY ANALOG MOVEMENT JOYSTICK (Bottom-Left)
    Ultra-Subtle Liquid Glass Finish • Touch-Action None
    ========================================================= */

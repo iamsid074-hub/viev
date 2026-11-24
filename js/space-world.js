@@ -32,6 +32,15 @@
   let walkStepTime = 0;
   const WALK_SPEED = 0.105; // Natural human walking speed
 
+  // Keyboard Movement State (Desktop / Laptop)
+  const keysPressed = {
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+    sprint: false
+  };
+
   // Touch Look-Around State
   let isDraggingLook = false;
   let lookTouchId = null;
@@ -571,8 +580,9 @@
     // 5. Build the Mall Promenade with Open Boutiques
     buildMallCorridor();
 
-    // 6. Setup Joystick & Look Controls
+    // 6. Setup Joystick, Keyboard & Look Controls
     setupJoystickControls();
+    setupKeyboardControls();
     setupTouchLookControls(stageElement);
     setupBackAction();
 
@@ -762,22 +772,90 @@
   }
 
   /**
-   * Update Player Walking Movement based on Joystick Input & Collisions
+   * Laptop / Desktop Keyboard Controls (W/A/S/D & Arrow Keys + Shift)
+   */
+  function setupKeyboardControls() {
+    const hintPill = document.getElementById('space-desktop-hint');
+
+    function onKeyDown(e) {
+      if (!isRunning) return;
+      const code = e.code;
+
+      let matched = false;
+      if (code === 'KeyW' || code === 'ArrowUp') {
+        keysPressed.forward = true;
+        matched = true;
+      } else if (code === 'KeyS' || code === 'ArrowDown') {
+        keysPressed.backward = true;
+        matched = true;
+      } else if (code === 'KeyA' || code === 'ArrowLeft') {
+        keysPressed.left = true;
+        matched = true;
+      } else if (code === 'KeyD' || code === 'ArrowRight') {
+        keysPressed.right = true;
+        matched = true;
+      } else if (code === 'ShiftLeft' || code === 'ShiftRight') {
+        keysPressed.sprint = true;
+      }
+
+      if (matched) {
+        // Prevent page scroll when using arrow keys inside 3D world
+        e.preventDefault();
+        // Fade out hint after user begins moving
+        if (hintPill) hintPill.style.opacity = '0.3';
+      }
+    }
+
+    function onKeyUp(e) {
+      const code = e.code;
+      if (code === 'KeyW' || code === 'ArrowUp') {
+        keysPressed.forward = false;
+      } else if (code === 'KeyS' || code === 'ArrowDown') {
+        keysPressed.backward = false;
+      } else if (code === 'KeyA' || code === 'ArrowLeft') {
+        keysPressed.left = false;
+      } else if (code === 'KeyD' || code === 'ArrowRight') {
+        keysPressed.right = false;
+      } else if (code === 'ShiftLeft' || code === 'ShiftRight') {
+        keysPressed.sprint = false;
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+  }
+
+  /**
+   * Update Player Walking Movement based on Joystick + Keyboard Input & Collisions
    */
   function updatePlayerMovement() {
     if (!camera) return;
 
-    const inputMag = Math.hypot(joystickVector.x, joystickVector.y);
+    // Combine on-screen joystick vector and physical keyboard inputs
+    let inputX = joystickVector.x;
+    let inputY = joystickVector.y;
+
+    if (keysPressed.forward) inputY -= 1;
+    if (keysPressed.backward) inputY += 1;
+    if (keysPressed.left) inputX -= 1;
+    if (keysPressed.right) inputX += 1;
+
+    const inputMag = Math.hypot(inputX, inputY);
     if (inputMag > 0.05) {
+      const normFactor = inputMag > 1 ? inputMag : 1;
+      const normX = inputX / normFactor;
+      const normY = inputY / normFactor;
+
+      const currentSpeed = keysPressed.sprint ? WALK_SPEED * 1.55 : WALK_SPEED;
       const yaw = camera.rotation.y;
 
-      // moveForward: negative y on joystick is forward
-      const moveForward = -joystickVector.y;
-      const moveRight = joystickVector.x;
+      // moveForward: negative Y is forward
+      const moveForward = -normY;
+      const moveRight = normX;
 
       // Direction vectors in X-Z ground plane
-      const deltaX = (moveForward * (-Math.sin(yaw)) + moveRight * Math.cos(yaw)) * WALK_SPEED * inputMag;
-      const deltaZ = (moveForward * (-Math.cos(yaw)) + moveRight * (-Math.sin(yaw))) * WALK_SPEED * inputMag;
+      const deltaX = (moveForward * (-Math.sin(yaw)) + moveRight * Math.cos(yaw)) * currentSpeed;
+      const deltaZ = (moveForward * (-Math.cos(yaw)) + moveRight * (-Math.sin(yaw))) * currentSpeed;
 
       let nextX = camera.position.x + deltaX;
       let nextZ = camera.position.z + deltaZ;
@@ -806,7 +884,7 @@
       camera.position.z = nextZ;
 
       // Subtle natural human walking head bob
-      walkStepTime += 0.14;
+      walkStepTime += keysPressed.sprint ? 0.22 : 0.14;
       camera.position.y = cameraY + Math.sin(walkStepTime) * 0.022;
     } else {
       // Smooth return to resting eye level
