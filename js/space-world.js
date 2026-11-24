@@ -390,67 +390,70 @@
     return texture;
   }
 
+  // High-Resolution Photorealistic Planter Texture from User's PNG
+  let planterTexture = null;
+  function getPlanterTexture() {
+    if (!planterTexture) {
+      planterTexture = new THREE.TextureLoader().load('assets/luxury_planter.png');
+      planterTexture.encoding = THREE.sRGBEncoding;
+    }
+    return planterTexture;
+  }
+
   /**
-   * Procedural Luxury Cylindrical White Planter with Lush Green Foliage
+   * Photorealistic Luxury Square White Planter with Lush Green Tree
+   * Built from user's provided PNG asset with 3D square base & multi-angle cross-planes
    */
   function createLuxuryPlanter(x, z) {
     const planterGroup = new THREE.Group();
 
-    // 1. Ceramic White Cylindrical Pot
-    const potGeo = new THREE.CylinderGeometry(0.32, 0.26, 0.75, 24);
+    // 1. Solid 3D Square Architectural Cream Ceramic Pot at base
+    const potGeo = new THREE.BoxGeometry(0.72, 0.68, 0.72);
     const potMat = new THREE.MeshStandardMaterial({
-      color: 0xf5f6fa,
-      roughness: 0.18,
-      metalness: 0.06
+      color: 0xf6f4ef,
+      roughness: 0.22,
+      metalness: 0.08
     });
     const pot = new THREE.Mesh(potGeo, potMat);
-    pot.position.y = 0.375;
+    pot.position.y = 0.34;
     planterGroup.add(pot);
 
-    // 2. Rich Dark Soil Disc
-    const soilGeo = new THREE.CircleGeometry(0.30, 16);
-    soilGeo.rotateX(-Math.PI / 2);
-    const soilMat = new THREE.MeshStandardMaterial({
-      color: 0x1f1712,
-      roughness: 0.95
-    });
-    const soil = new THREE.Mesh(soilGeo, soilMat);
-    soil.position.y = 0.74;
-    planterGroup.add(soil);
-
-    // 3. Wooden Trunk / Stem
-    const trunkGeo = new THREE.CylinderGeometry(0.04, 0.05, 0.45, 8);
-    const trunkMat = new THREE.MeshStandardMaterial({
-      color: 0x3d2716,
-      roughness: 0.8
-    });
-    const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-    trunk.position.y = 0.9;
-    planterGroup.add(trunk);
-
-    // 4. Lush Multi-Layered Ficus Topiary Foliage
-    const foliageMatPrimary = new THREE.MeshStandardMaterial({
-      color: 0x1c4c28,
+    // 2. High-Res Photorealistic Tree Foliage & Planter Cross-Planes
+    const foliageTex = getPlanterTexture();
+    const foliageMat = new THREE.MeshStandardMaterial({
+      map: foliageTex,
+      transparent: true,
+      alphaTest: 0.22,
       roughness: 0.65,
-      metalness: 0.05
-    });
-    const foliageMatTop = new THREE.MeshStandardMaterial({
-      color: 0x276637,
-      roughness: 0.6,
-      metalness: 0.05
+      metalness: 0.04,
+      side: THREE.DoubleSide
     });
 
-    const leafCluster1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.38, 1), foliageMatPrimary);
-    leafCluster1.position.set(0, 1.25, 0);
-    planterGroup.add(leafCluster1);
+    const planeW = 1.45;
+    const planeH = 1.85;
+    const planeGeo = new THREE.PlaneGeometry(planeW, planeH);
 
-    const leafCluster2 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.32, 1), foliageMatTop);
-    leafCluster2.position.set(0.08, 1.48, -0.06);
-    planterGroup.add(leafCluster2);
+    // Plane 1 (Facing Z)
+    const m1 = new THREE.Mesh(planeGeo, foliageMat);
+    m1.position.y = 1.05;
+    planterGroup.add(m1);
 
-    const leafCluster3 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.26, 1), foliageMatPrimary);
-    leafCluster3.position.set(-0.1, 1.35, 0.08);
-    planterGroup.add(leafCluster3);
+    // Plane 2 (Facing X - 90 deg rotation for full 3D volumetric depth)
+    const m2 = new THREE.Mesh(planeGeo, foliageMat);
+    m2.rotation.y = Math.PI / 2;
+    m2.position.y = 1.05;
+    planterGroup.add(m2);
+
+    // Plane 3 & 4 (Diagonals for full lush 3D foliage density)
+    const m3 = new THREE.Mesh(planeGeo, foliageMat);
+    m3.rotation.y = Math.PI / 4;
+    m3.position.y = 1.05;
+    planterGroup.add(m3);
+
+    const m4 = new THREE.Mesh(planeGeo, foliageMat);
+    m4.rotation.y = -Math.PI / 4;
+    m4.position.y = 1.05;
+    planterGroup.add(m4);
 
     planterGroup.position.set(x, 0, z);
     return planterGroup;
@@ -561,8 +564,8 @@
       }
     });
 
-    // 2. SOLID JET-BLACK TYPOGRAPHY: "WE WILL DEFINETLY GET EACH OTHER"
-    ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, "Cinzel", "Playfair Display", Georgia, serif';
+    // 2. SOLID JET-BLACK ULTRA-BOLD TYPOGRAPHY: "WE WILL DEFINETLY GET EACH OTHER"
+    ctx.font = '900 66px -apple-system, BlinkMacSystemFont, "Montserrat", "Cinzel", "Arial Black", "Playfair Display", Georgia, serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -570,12 +573,17 @@
 
     bayCenters.forEach(cx => {
       // Subtle ambient contact shadow for clean architectural depth
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
-      ctx.fillText(quoteText, cx + 1, 381);
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
+      ctx.shadowBlur = 6;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 2;
 
-      // Deep solid jet black lettering
-      ctx.fillStyle = '#0a0b12';
-      ctx.fillText(quoteText, cx, 380);
+      // Heavy architectural solid jet black fill + matching stroke for maximum boldness
+      ctx.fillStyle = '#050608';
+      ctx.strokeStyle = '#050608';
+      ctx.lineWidth = 4.5;
+      ctx.strokeText(quoteText, cx, 370);
+      ctx.fillText(quoteText, cx, 370);
     });
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -799,17 +807,43 @@
     }
 
     // 4. RIGHT ARCHITECTURAL GALLERY WALL WITH JET-BLACK QUOTE & BACKLIT FRAMES
-    const rightWallGeo = new THREE.PlaneGeometry(MALL_LENGTH, MALL_HEIGHT);
-    rightWallGeo.rotateY(-Math.PI / 2);
-    const rightUV = rightWallGeo.attributes.uv;
-    for (let i = 0; i < rightUV.count; i++) {
-      rightUV.setX(i, 1 - rightUV.getX(i));
-    }
+    // Built with exact left-to-right UV mapping & normal facing into corridor ([-1, 0, 0])
+    // so text is 100% upright, un-mirrored, and reads naturally from left to right!
+    const rightWallGeo = new THREE.BufferGeometry();
+    const halfL = MALL_LENGTH / 2; // 42m
+    const wallPositions = new Float32Array([
+      // Triangle 1: TL, TR, BL
+      0,  halfH,  halfL, // TL (x=0, y=3.2, z=+42)
+      0,  halfH, -halfL, // TR (x=0, y=3.2, z=-42)
+      0, -halfH,  halfL, // BL (x=0, y=-3.2, z=+42)
+
+      // Triangle 2: TR, BR, BL
+      0,  halfH, -halfL, // TR (x=0, y=3.2, z=-42)
+      0, -halfH, -halfL, // BR (x=0, y=-3.2, z=-42)
+      0, -halfH,  halfL  // BL (x=0, y=-3.2, z=+42)
+    ]);
+
+    const wallUVs = new Float32Array([
+      // Triangle 1
+      0, 1, // TL
+      1, 1, // TR
+      0, 0, // BL
+
+      // Triangle 2
+      1, 1, // TR
+      1, 0, // BR
+      0, 0  // BL
+    ]);
+
+    rightWallGeo.setAttribute('position', new THREE.BufferAttribute(wallPositions, 3));
+    rightWallGeo.setAttribute('uv', new THREE.BufferAttribute(wallUVs, 2));
+    rightWallGeo.computeVertexNormals();
+
     const rightWallMat = new THREE.MeshStandardMaterial({
       map: createWhiteWallWithTextTexture(),
       roughness: 0.82,
       metalness: 0.02,
-      side: THREE.DoubleSide
+      side: THREE.FrontSide
     });
     const rightWall = new THREE.Mesh(rightWallGeo, rightWallMat);
     rightWall.position.set(halfW, halfH, -MALL_LENGTH / 2 + 8);
