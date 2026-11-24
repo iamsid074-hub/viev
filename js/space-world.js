@@ -684,36 +684,21 @@
       side: THREE.FrontSide
     });
 
-    // Clean Matte Cream Ceiling with Slim Recessed Dim-Yellow LED Strips for First Shop (i === 0)
+    // Pure Clean Matte Cream Ceiling for All Shops (No Yellow Strips, No Spotlight Blobs)
     function createFirstShopCleanCeilingTexture() {
       const canvas = document.createElement('canvas');
       canvas.width = 2048;
       canvas.height = 1024;
       const ctx = canvas.getContext('2d');
 
-      // Clean smooth warm cream ceiling base (no spotlight circles or busy coffer frames)
+      // Clean smooth warm cream architectural ceiling base
       ctx.fillStyle = '#efe5d2';
       ctx.fillRect(0, 0, 2048, 1024);
 
-      // Two clean, slim architectural ceiling strip dim-yellow lights running along the shop length
-      const stripYs = [320, 704];
-      stripYs.forEach(sy => {
-        // Slim dark recessed shadow-gap channel
-        ctx.fillStyle = '#1b1915';
-        ctx.fillRect(90, sy - 10, 1868, 20);
-
-        // Soft dim yellow glow halo around the strip
-        ctx.save();
-        ctx.shadowColor = 'rgba(235, 180, 55, 0.75)';
-        ctx.shadowBlur = 18;
-        ctx.fillStyle = '#e5b84b';
-        ctx.fillRect(96, sy - 4, 1856, 8);
-        ctx.restore();
-
-        // Warm dim yellow diffuser core
-        ctx.fillStyle = '#f2cc6c';
-        ctx.fillRect(96, sy - 3, 1856, 6);
-      });
+      // Ultra-subtle recessed architectural shadow-line perimeter reveal (no yellow light strips)
+      ctx.strokeStyle = 'rgba(130, 110, 82, 0.22)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(48, 48, 1952, 928);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.encoding = THREE.sRGBEncoding;
@@ -724,14 +709,14 @@
     const firstShopCeilingTex = createFirstShopCleanCeilingTexture();
     const firstShopCeilingMat = new THREE.MeshStandardMaterial({
       map: firstShopCeilingTex,
-      roughness: 0.85,
+      roughness: 0.88,
       metalness: 0.02,
-      emissive: new THREE.Color(0xe6b84c),
-      emissiveIntensity: 0.16,
+      emissive: new THREE.Color(0xefe2ca),
+      emissiveIntensity: 0.08,
       side: THREE.FrontSide
     });
 
-    // Premium Architectural 3-Wall Designs for First Shop (Travertine, Fluted Bronze, Brass Mouldings & Dim-Yellow Cove)
+    // Refined Luxury 3-Wall Designs for All Shops (Tonal Parisian Boiserie, Sculpted Fluted Walnut, Satin-Bronze Trim — No Yellow Strips)
     function createFirstShopBackWallTexture() {
       const canvas = document.createElement('canvas');
       canvas.width = 2048;
@@ -740,80 +725,74 @@
 
       // 1. Honed Cream Travertine Base
       const bg = ctx.createLinearGradient(0, 0, 0, 1024);
-      bg.addColorStop(0, '#e3d6be');
-      bg.addColorStop(0.5, '#ede2cd');
-      bg.addColorStop(1, '#dfd0b5');
+      bg.addColorStop(0, '#e6dac4');
+      bg.addColorStop(0.5, '#f0e6d3');
+      bg.addColorStop(1, '#e1d3ba');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, 2048, 1024);
 
       // Subtle horizontal travertine stone veining
       for (let i = 0; i < 65; i++) {
         const vy = Math.random() * 940;
-        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(155, 132, 98, 0.08)' : 'rgba(255, 250, 238, 0.09)';
-        ctx.fillRect(0, vy, 2048, 1 + Math.random() * 2.5);
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(150, 128, 94, 0.07)' : 'rgba(255, 250, 240, 0.08)';
+        ctx.fillRect(0, vy, 2048, 1 + Math.random() * 2);
       }
 
-      // 2. Left & Right Fluted Smoked-Walnut / Bronze Slat Bays
-      const fluteRegions = [[90, 440], [1608, 1958]];
+      // 2. Left & Right Sculpted Fluted Smoked-Oak Columns
+      const fluteRegions = [[90, 420], [1628, 1958]];
       fluteRegions.forEach(([xStart, xEnd]) => {
-        ctx.fillStyle = '#2a241d';
-        ctx.fillRect(xStart, 50, xEnd - xStart, 900);
+        ctx.fillStyle = '#332b22';
+        ctx.fillRect(xStart, 60, xEnd - xStart, 890);
         for (let fx = xStart + 6; fx < xEnd - 4; fx += 14) {
           const fg = ctx.createLinearGradient(fx, 0, fx + 12, 0);
-          fg.addColorStop(0, '#1a1510');
-          fg.addColorStop(0.45, '#594a38');
-          fg.addColorStop(0.7, '#3b3024');
-          fg.addColorStop(1, '#18130e');
+          fg.addColorStop(0, '#221c15');
+          fg.addColorStop(0.45, '#685743');
+          fg.addColorStop(0.7, '#473a2c');
+          fg.addColorStop(1, '#1e1812');
           ctx.fillStyle = fg;
-          ctx.fillRect(fx, 54, 11, 892);
+          ctx.fillRect(fx, 64, 11, 882);
         }
-        // Brushed brass perimeter trim around fluted bay
-        ctx.strokeStyle = '#cfa84e';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(xStart, 50, xEnd - xStart, 900);
+        // Slim satin-bronze trim
+        ctx.strokeStyle = '#b89b5e';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(xStart, 60, xEnd - xStart, 890);
       });
 
-      // 3. Center Grand Architectural Feature Alcove with Geometric Brass Moulding & Dim-Yellow Cove
-      const cx1 = 520, cx2 = 1528, cy1 = 70, cy2 = 910;
-      ctx.fillStyle = '#e7dac2';
+      // 3. Center Architectural Tonal Boiserie & Arched Niche Feature (No Yellow Strip)
+      const cx1 = 500, cx2 = 1548, cy1 = 75, cy2 = 905;
+      ctx.fillStyle = '#eae0cc';
       ctx.fillRect(cx1, cy1, cx2 - cx1, cy2 - cy1);
 
-      // Subtle diamond/chevron architectural relief pattern inside center panel
-      ctx.strokeStyle = 'rgba(160, 134, 92, 0.16)';
-      ctx.lineWidth = 2;
-      for (let gx = cx1 + 40; gx < cx2 - 40; gx += 84) {
-        for (let gy = cy1 + 40; gy < cy2 - 40; gy += 84) {
-          ctx.beginPath();
-          ctx.moveTo(gx, gy - 32);
-          ctx.lineTo(gx + 32, gy);
-          ctx.lineTo(gx, gy + 32);
-          ctx.lineTo(gx - 32, gy);
-          ctx.closePath();
-          ctx.stroke();
-        }
-      }
-
-      // Soft dim-yellow recessed perimeter cove inside center frame
-      ctx.save();
-      ctx.shadowColor = 'rgba(230, 180, 55, 0.8)';
-      ctx.shadowBlur = 22;
-      ctx.strokeStyle = '#e8ba4c';
-      ctx.lineWidth = 6;
-      ctx.strokeRect(cx1 + 12, cy1 + 12, (cx2 - cx1) - 24, (cy2 - cy1) - 24);
-      ctx.restore();
-
-      // Outer & inner dark bronze + brushed brass architectural frame
-      ctx.strokeStyle = '#241f18';
-      ctx.lineWidth = 10;
+      // Soft sculpted stone moulding frame
+      ctx.strokeStyle = 'rgba(135, 115, 85, 0.45)';
+      ctx.lineWidth = 5;
       ctx.strokeRect(cx1, cy1, cx2 - cx1, cy2 - cy1);
-      ctx.strokeStyle = '#cfa84e';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(cx1 + 26, cy1 + 26, (cx2 - cx1) - 52, (cy2 - cy1) - 52);
+      ctx.strokeStyle = 'rgba(255, 250, 240, 0.65)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cx1 + 6, cy1 + 6, (cx2 - cx1) - 12, (cy2 - cy1) - 12);
 
-      // 4. Dark Nero Marble Baseboard Plinth & Gold Hairline Reveal
+      // Subtle inner satin-bronze hairline frame
+      ctx.strokeStyle = '#b89b5e';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cx1 + 28, cy1 + 28, (cx2 - cx1) - 56, (cy2 - cy1) - 56);
+
+      // Graceful recessed central arch relief
+      const archCX = 1024;
+      ctx.fillStyle = '#e3d6be';
+      ctx.beginPath();
+      ctx.arc(archCX, 340, 220, Math.PI, 0);
+      ctx.lineTo(archCX + 220, 840);
+      ctx.lineTo(archCX - 220, 840);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(135, 115, 85, 0.42)';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // 4. Dark Nero Marble Baseboard Plinth & Satin-Bronze Hairline Reveal
       ctx.fillStyle = '#141312';
       ctx.fillRect(0, 954, 2048, 70);
-      ctx.fillStyle = '#cfa84e';
+      ctx.fillStyle = '#b89b5e';
       ctx.fillRect(0, 950, 2048, 4);
 
       const tex = new THREE.CanvasTexture(canvas);
@@ -830,63 +809,75 @@
 
       // 1. Matching Honed Cream Travertine Base
       const bg = ctx.createLinearGradient(0, 0, 0, 1024);
-      bg.addColorStop(0, '#e3d6be');
-      bg.addColorStop(0.5, '#ede2cd');
-      bg.addColorStop(1, '#dfd0b5');
+      bg.addColorStop(0, '#e6dac4');
+      bg.addColorStop(0.5, '#f0e6d3');
+      bg.addColorStop(1, '#e1d3ba');
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, 1024, 1024);
 
       for (let i = 0; i < 40; i++) {
         const vy = Math.random() * 940;
-        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(155, 132, 98, 0.08)' : 'rgba(255, 250, 238, 0.09)';
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(150, 128, 94, 0.07)' : 'rgba(255, 250, 240, 0.08)';
         ctx.fillRect(0, vy, 1024, 1 + Math.random() * 2);
       }
 
-      // 2. Luxury 3-Bay Architectural Moulding Panels with Brushed Brass Borders
-      const bays = [[56, 300], [344, 680], [724, 968]];
+      // 2. Sculpted Tonal Parisian Boiserie Panels (Clean Recessed Relief, No Heavy Black Boxes, No Yellow Strips)
+      const bays = [[52, 290], [354, 670], [734, 972]];
       bays.forEach(([bx1, bx2], idx) => {
         const bw = bx2 - bx1;
-        // Subtle recessed inner panel
-        ctx.fillStyle = idx === 1 ? '#e5d7be' : '#eadec7';
-        ctx.fillRect(bx1, 70, bw, 830);
+        // Upper tall panel & lower dado wainscot panel
+        const sections = [
+          [75, 635],  // upper panel
+          [695, 210]  // lower dado panel
+        ];
+        sections.forEach(([sy, sh]) => {
+          ctx.fillStyle = '#eae0cc';
+          ctx.fillRect(bx1, sy, bw, sh);
 
-        // Dark bronze outer moulding + brushed brass inner trim
-        ctx.strokeStyle = '#2b241c';
-        ctx.lineWidth = 6;
-        ctx.strokeRect(bx1, 70, bw, 830);
-        ctx.strokeStyle = '#cfa84e';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(bx1 + 18, 88, bw - 36, 794);
+          // Soft stone shadow & highlight bevel
+          ctx.strokeStyle = 'rgba(135, 115, 85, 0.42)';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(bx1, sy, bw, sh);
+          ctx.strokeStyle = 'rgba(255, 250, 240, 0.65)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(bx1 + 5, sy + 5, bw - 10, sh - 10);
 
-        // Center architectural arch motif inside middle bay
+          // Delicate satin-bronze inner hairline
+          ctx.strokeStyle = 'rgba(184, 155, 94, 0.65)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(bx1 + 18, sy + 18, bw - 36, sh - 36);
+        });
+
+        // Subtle arched relief inside center upper bay
         if (idx === 1) {
-          ctx.strokeStyle = 'rgba(195, 158, 72, 0.55)';
+          ctx.strokeStyle = 'rgba(135, 115, 85, 0.35)';
           ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.arc(bx1 + bw / 2, 320, bw * 0.28, Math.PI, 0);
-          ctx.lineTo(bx1 + bw / 2 + bw * 0.28, 820);
-          ctx.lineTo(bx1 + bw / 2 - bw * 0.28, 820);
+          ctx.arc(bx1 + bw / 2, 260, bw * 0.25, Math.PI, 0);
+          ctx.lineTo(bx1 + bw / 2 + bw * 0.25, 650);
+          ctx.lineTo(bx1 + bw / 2 - bw * 0.25, 650);
           ctx.closePath();
           ctx.stroke();
         }
       });
 
-      // 3. Two Slim Vertical Recessed Dim-Yellow LED Light Reveals between Bays
-      [322, 702].forEach(lx => {
-        ctx.fillStyle = '#1b1915';
-        ctx.fillRect(lx - 7, 50, 14, 900);
-        ctx.save();
-        ctx.shadowColor = 'rgba(235, 180, 55, 0.8)';
-        ctx.shadowBlur = 16;
-        ctx.fillStyle = '#e8ba4c';
-        ctx.fillRect(lx - 3, 56, 6, 888);
-        ctx.restore();
+      // 3. Two Slim Vertical Fluted Smoked-Oak Pilasters between Bays (No Yellow Strips)
+      [310, 690].forEach(px => {
+        ctx.fillStyle = '#332b22';
+        ctx.fillRect(px, 60, 24, 890);
+        for (let fx = px + 2; fx < px + 22; fx += 7) {
+          ctx.fillStyle = '#5a4b3a';
+          ctx.fillRect(fx, 64, 4, 882);
+        }
+        ctx.strokeStyle = '#b89b5e';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(px, 60, 24, 890);
       });
 
-      // 4. Matching Dark Nero Marble Baseboard Plinth & Gold Hairline Reveal
+      // 4. Matching Dark Nero Marble Baseboard Plinth & Satin-Bronze Hairline Reveal
       ctx.fillStyle = '#141312';
       ctx.fillRect(0, 954, 1024, 70);
-      ctx.fillStyle = '#cfa84e';
+      ctx.fillStyle = '#b89b5e';
       ctx.fillRect(0, 950, 1024, 4);
 
       const tex = new THREE.CanvasTexture(canvas);
@@ -1103,7 +1094,7 @@
         [xBack, MALL_HEIGHT, zStart], // BL: Back-North
         [xBack, MALL_HEIGHT, zEnd]    // BR: Back-South
       );
-      const shopCeiling = new THREE.Mesh(ceilGeo, i === 0 ? firstShopCeilingMat : shopCeilingMat);
+      const shopCeiling = new THREE.Mesh(ceilGeo, firstShopCeilingMat);
       scene.add(shopCeiling);
 
       // C) Boutique Back Display Wall at x = xBack (-14.0m)
@@ -1113,7 +1104,7 @@
         [xBack, 0, zStart],           // BL: Bottom-North
         [xBack, 0, zEnd]              // BR: Bottom-South
       );
-      const backWall = new THREE.Mesh(backWallGeo, i === 0 ? firstShopBackWallMat : shopBackWallMat);
+      const backWall = new THREE.Mesh(backWallGeo, firstShopBackWallMat);
       scene.add(backWall);
 
       // D) Boutique Dividing Side Walls
@@ -1124,7 +1115,7 @@
         [xFront, 0, zStart],           // BL: Front-Bottom
         [xBack, 0, zStart]             // BR: Back-Bottom
       );
-      const northSideWall = new THREE.Mesh(northWallGeo, i === 0 ? firstShopSideWallMat : shopSideWallMat);
+      const northSideWall = new THREE.Mesh(northWallGeo, firstShopSideWallMat);
       scene.add(northSideWall);
 
       // South Side Wall (at z = zEnd)
@@ -1134,7 +1125,7 @@
         [xBack, 0, zEnd],              // BL: Back-Bottom
         [xFront, 0, zEnd]              // BR: Front-Bottom
       );
-      const southSideWall = new THREE.Mesh(southWallGeo, i === 0 ? firstShopSideWallMat : shopSideWallMat);
+      const southSideWall = new THREE.Mesh(southWallGeo, firstShopSideWallMat);
       scene.add(southSideWall);
 
       // E) Solid 3D Overhead Fascia Beam across entrance (y = 4.8 to 6.4, x = -6.0 to -6.5)
@@ -1333,14 +1324,8 @@
       const boutiquePlanter = createLuxuryPlanter(-halfW + 0.85, zStart - pillarWidth / 2);
       scene.add(boutiquePlanter);
 
-      // H) Warm Glowing Boutique Interior Lighting
-      // Soft central downlight radiating warm architectural light from ceiling
-      const shopLight = new THREE.PointLight(
-        i === 0 ? 0xffd77d : 0xffe8c2,
-        i === 0 ? 1.05 : 1.8,
-        22,
-        1.8
-      );
+      // H) Warm Glowing Boutique Interior Lighting (Uniform across all shops)
+      const shopLight = new THREE.PointLight(0xfff0d4, 1.15, 22, 1.8);
       shopLight.position.set(-halfW - shopWidth / 2, MALL_HEIGHT - 1.0, zCenter);
       scene.add(shopLight);
     }
