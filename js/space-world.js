@@ -565,14 +565,22 @@
       }
     });
 
-    // 2. SOLID JET-BLACK ULTRA-BOLD TYPOGRAPHY: "WE WILL DEFINETLY GET EACH OTHER"
-    ctx.font = '900 70px -apple-system, BlinkMacSystemFont, "Montserrat", "Cinzel", "Arial Black", "Playfair Display", Georgia, serif';
+    // 2. SOLID JET-BLACK ULTRA-BOLD TYPOGRAPHY: WRITTEN EXACTLY ONCE FROM START TO END
+    // Zero overlapping: Each word has its own dedicated spacious gallery section!
+    ctx.font = '900 76px -apple-system, BlinkMacSystemFont, "Montserrat", "Cinzel", "Arial Black", "Playfair Display", Georgia, serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const quoteText = 'W E   W I L L   D E F I N E T L Y   G E T   E A C H   O T H E R';
+    const words = [
+      { text: 'W E', x: 3820 },
+      { text: 'W I L L', x: 3260 },
+      { text: 'D E F I N E T L Y', x: 2360 },
+      { text: 'G E T', x: 1540 },
+      { text: 'E A C H', x: 960 },
+      { text: 'O T H E R', x: 360 }
+    ];
 
-    bayCenters.forEach(cx => {
+    words.forEach(w => {
       // Subtle ambient contact shadow for clean architectural depth
       ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
       ctx.shadowBlur = 6;
@@ -583,8 +591,8 @@
       ctx.fillStyle = '#050608';
       ctx.strokeStyle = '#050608';
       ctx.lineWidth = 5;
-      ctx.strokeText(quoteText, cx, 370);
-      ctx.fillText(quoteText, cx, 370);
+      ctx.strokeText(w.text, w.x, 256);
+      ctx.fillText(w.text, w.x, 256);
     });
 
     const texture = new THREE.CanvasTexture(canvas);
