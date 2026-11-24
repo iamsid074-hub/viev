@@ -80,6 +80,14 @@
     tvX: 5.91,
     unlocked: false
   };
+
+  // Shop 2 Back-Wall OLED LED Video & Proximity Audio State
+  const shop2VideoState = {
+    video: null,
+    tex: null,
+    tvPos: { x: -13.9, z: -21.0 },
+    unlocked: false
+  };
   let lookTouchId = null;
   let prevPointerX = 0;
   let prevPointerY = 0;
@@ -1168,12 +1176,12 @@
       shopLedMount.position.set(xBack + 0.025, shopLedY, zCenter);
       scene.add(shopLedMount);
 
-      // Brushed dark-metal backing chassis
+      // Brushed dark-metal backing chassis (spaced cleanly behind screen to prevent mobile Z-fighting)
       const shopLedChassis = new THREE.Mesh(
-        new THREE.BoxGeometry(0.035, shopLedH, shopLedW),
+        new THREE.BoxGeometry(0.024, shopLedH, shopLedW),
         shopLedChassisMat
       );
-      shopLedChassis.position.set(xBack + 0.068, shopLedY, zCenter);
+      shopLedChassis.position.set(xBack + 0.055, shopLedY, zCenter);
       scene.add(shopLedChassis);
 
       // Raised slim 4-sided perimeter bezel frame
@@ -1193,7 +1201,7 @@
       sRightRim.position.set(xBack + 0.078, shopLedY, zCenter - shopLedW / 2 - shopLedRimT / 2);
       scene.add(sRightRim);
 
-      // Large OLED glass panel facing +X (First Shop shows interactive audio clip player)
+      // Large OLED glass panel facing +X (Shop 1: Audio Visualizer, Shop 2: Video, Shops 3-4: Blank OLED)
       const shopLedScreenGeo = new THREE.PlaneGeometry(shopLedW, shopLedH);
       shopLedScreenGeo.rotateY(Math.PI / 2);
       let activeScreenMat = shopLedGlassMat;
@@ -1205,11 +1213,62 @@
           emissive: new THREE.Color(0xffffff),
           emissiveIntensity: 0.95,
           roughness: 0.08,
-          metalness: 0.15
+          metalness: 0.15,
+          polygonOffset: true,
+          polygonOffsetFactor: -2,
+          polygonOffsetUnits: -2
+        });
+      } else if (i === 1) {
+        if (!shop2VideoState.video) {
+          const s2Vid = document.createElement('video');
+          s2Vid.src = 'assets/video/shop2_led.mp4';
+          s2Vid.loop = true;
+          s2Vid.muted = true;
+          s2Vid.playsInline = true;
+          s2Vid.setAttribute('playsinline', '');
+          s2Vid.preload = 'auto';
+          s2Vid.volume = 0;
+
+          const s2Tex = new THREE.VideoTexture(s2Vid);
+          s2Tex.encoding = THREE.sRGBEncoding;
+          s2Tex.minFilter = THREE.LinearFilter;
+          s2Tex.magFilter = THREE.LinearFilter;
+
+          shop2VideoState.video = s2Vid;
+          shop2VideoState.tex = s2Tex;
+          shop2VideoState.tvPos = { x: xBack + 0.098, z: zCenter };
+
+          const unlockS2Audio = () => {
+            if (shop2VideoState.unlocked) return;
+            shop2VideoState.unlocked = true;
+            s2Vid.muted = false;
+            s2Vid.play().catch(() => {});
+          };
+          window.addEventListener('pointerdown', unlockS2Audio, { once: true, passive: true });
+          window.addEventListener('keydown', unlockS2Audio, { once: true, passive: true });
+
+          s2Vid.play().then(() => {
+            s2Vid.muted = false;
+            shop2VideoState.unlocked = true;
+          }).catch(() => {
+            s2Vid.muted = true;
+            s2Vid.play().catch(() => {});
+          });
+        }
+        activeScreenMat = new THREE.MeshStandardMaterial({
+          map: shop2VideoState.tex,
+          emissiveMap: shop2VideoState.tex,
+          emissive: new THREE.Color(0xffffff),
+          emissiveIntensity: 0.94,
+          roughness: 0.08,
+          metalness: 0.15,
+          polygonOffset: true,
+          polygonOffsetFactor: -2,
+          polygonOffsetUnits: -2
         });
       }
       const shopLedScreen = new THREE.Mesh(shopLedScreenGeo, activeScreenMat);
-      shopLedScreen.position.set(xBack + 0.088, shopLedY, zCenter);
+      shopLedScreen.position.set(xBack + 0.098, shopLedY, zCenter);
       scene.add(shopLedScreen);
 
       // Tiny standby indicator LED dot on bottom-right bezel
@@ -1570,7 +1629,7 @@
         if (corridorVideoState.unlocked) return;
         corridorVideoState.unlocked = true;
         vid.muted = false;
-        vid.play().catch(() => {});
+        vid.play().catch(() => { });
       };
       window.addEventListener('pointerdown', unlockCorridorAudio, { once: true, passive: true });
       window.addEventListener('keydown', unlockCorridorAudio, { once: true, passive: true });
@@ -1581,7 +1640,7 @@
         corridorVideoState.unlocked = true;
       }).catch(() => {
         vid.muted = true;
-        vid.play().catch(() => {});
+        vid.play().catch(() => { });
       });
     }
 
@@ -2472,6 +2531,27 @@
     }
   }
 
+  function updateShop2LedProximityAudio() {
+    const vid = shop2VideoState.video;
+    if (!vid || !camera) return;
+
+    const inShop2 = (camera.position.x < -5.8 && camera.position.z <= -12.0 && camera.position.z >= -30.0);
+    if (!inShop2 || firstShopAudioState.isPlaying) {
+      vid.volume = 0;
+      return;
+    }
+
+    const dx = camera.position.x - shop2VideoState.tvPos.x;
+    const dz = camera.position.z - shop2VideoState.tvPos.z;
+    const dist = Math.hypot(dx, dz);
+    if (dist >= 9.5) {
+      vid.volume = 0;
+    } else {
+      const norm = Math.min(1, Math.max(0, (9.5 - dist) / 7.5));
+      vid.volume = Math.pow(norm, 1.5) * 0.28;
+    }
+  }
+
   /**
    * Render Loop
    */
@@ -2492,6 +2572,7 @@
     updateFirstShopLightingFade();
     renderFirstShopLedScreen(false);
     updateCorridorLedProximityAudio();
+    updateShop2LedProximityAudio();
 
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
@@ -2501,7 +2582,10 @@
     if (isRunning) return;
     isRunning = true;
     if (corridorVideoState.video) {
-      corridorVideoState.video.play().catch(() => {});
+      corridorVideoState.video.play().catch(() => { });
+    }
+    if (shop2VideoState.video) {
+      shop2VideoState.video.play().catch(() => { });
     }
     onWindowResize();
     animFrameId = requestAnimationFrame(animate);
@@ -2511,6 +2595,9 @@
     isRunning = false;
     if (corridorVideoState.video) {
       corridorVideoState.video.pause();
+    }
+    if (shop2VideoState.video) {
+      shop2VideoState.video.pause();
     }
     if (firstShopAudioState.audio && firstShopAudioState.isPlaying) {
       firstShopAudioState.audio.pause();
