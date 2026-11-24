@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="css/exxclusive.css?v=7.4">
   <link rel="stylesheet" href="css/exxclusive-3.css?v=19.1">
   <link rel="stylesheet" href="css/letters.css?v=5.1">
-  <link rel="stylesheet" href="css/space-world.css?v=1.0">
+  <link rel="stylesheet" href="css/space-world.css?v=2.0">
 
   <!-- High-Priority Instant Visual Preloads -->
   <link rel="preload" as="image" href="assets/befikre_logo.webp" type="image/webp">
@@ -1370,42 +1370,32 @@
 
           </div>
 
-          <!-- SUBPAGE: SPACE (3D REAL STRAIGHT LANE WORLD) -->
+          <!-- SUBPAGE: SPACE (3D REAL MALL LANE WORLD) -->
           <div class="subpage-body-container" id="subpage-space" style="display: none;">
             <div class="space-canvas-wrapper" id="space-canvas-wrap"></div>
 
-            <!-- VisionOS Floating HUD Overlay -->
-            <div class="space-hud-overlay">
-              <div class="space-hud-top">
-                <div class="space-title-pill">
-                  <span class="space-pulse-beacon"></span>
-                  <span class="space-title-text">SPACE • Real Straight Lane</span>
-                </div>
-              </div>
+            <!-- Sleek Minimal Top Navigation (Back to Settings) -->
+            <div class="space-top-nav">
+              <button type="button" class="space-back-pill" id="space-custom-back-btn" aria-label="Back to Settings">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Settings</span>
+              </button>
+            </div>
 
-              <div class="space-hud-bottom">
-                <div class="space-gesture-hint" id="space-gesture-hint">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 9l6 6-6 6"></path>
-                    <path d="M4 4v7a4 4 0 0 0 4 4h11"></path>
+            <!-- Portrait Rotate Hint Overlay (Option B: Auto-Orient with Hint) -->
+            <div class="space-rotate-hint-overlay" id="space-rotate-overlay">
+              <div class="rotate-hint-card">
+                <div class="rotate-icon-wrap">
+                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
                   </svg>
-                  <span>Drag screen to look around • Tap to explore</span>
                 </div>
-                <div class="space-action-bar">
-                  <button type="button" class="space-pill-action is-active" id="space-btn-cruise">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                    </svg>
-                    <span>Gliding Forward</span>
-                  </button>
-                  <button type="button" class="space-pill-action" id="space-btn-reset">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                      <path d="M3 3v5h5"></path>
-                    </svg>
-                    <span>Center View</span>
-                  </button>
-                </div>
+                <h3 class="rotate-hint-title">Rotate to Landscape</h3>
+                <p class="rotate-hint-desc">For the best cinematic 3D Mall experience, turn your phone horizontally.</p>
+                <button type="button" class="rotate-dismiss-btn" id="space-rotate-dismiss">Stay in Portrait</button>
               </div>
             </div>
           </div>
@@ -2376,7 +2366,7 @@
   <script src="js/push-notifications.js?v=2.1"></script>
   <script src="js/letters.js?v=5.1"></script>
   <script src="js/three.min.js"></script>
-  <script src="js/space-world.js?v=1.0"></script>
+  <script src="js/space-world.js?v=2.0"></script>
   <script src="js/app.js?v=8.1"></script>
 </body>
 </html>

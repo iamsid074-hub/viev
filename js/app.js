@@ -743,7 +743,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('is-exxclusive-active');
     document.documentElement.classList.remove('is-exxclusive-active');
     if (typeof window.setFloatingNavVisible === 'function') {
-      window.setFloatingNavVisible(true);
+      window.setFloatingNavVisible(targetId !== 'subpage-space');
     }
 
     // Scroll subpage to top
