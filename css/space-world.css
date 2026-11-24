@@ -215,19 +215,18 @@ body.has-space-active .apple-floating-dock {
 }
 
 /* =========================================================
-   PROXIMITY TV AUDIO CONTROL PILL (Bottom-Center)
-   Appears when near First Shop OLED TV
+   PROXIMITY TV MEDIA CONTROL PILL (Top-Right, under Luxe Promenade)
+   Appears when near Shop 1, 2, or 3 OLED TV
    ========================================================= */
 .space-tv-audio-btn {
   position: absolute;
-  bottom: 72px;
-  left: 50%;
-  transform: translateX(-50%) translateY(14px);
+  top: max(env(safe-area-inset-left, 0px), 58px);
+  right: max(env(safe-area-inset-top, 0px), 24px);
   z-index: 60;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 22px;
+  padding: 9px 20px;
   background: rgba(14, 12, 10, 0.86);
   backdrop-filter: blur(22px) saturate(180%);
   -webkit-backdrop-filter: blur(22px) saturate(180%);
@@ -235,20 +234,21 @@ body.has-space-active .apple-floating-dock {
   border-radius: 999px;
   color: #fff2cc;
   font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.4px;
   cursor: pointer;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65), 0 0 18px rgba(255, 195, 60, 0.16);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.28s ease, transform 0.28s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  transform: translateY(-8px);
+  transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .space-tv-audio-btn.is-visible {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 
 .space-tv-audio-btn:hover {
@@ -257,7 +257,7 @@ body.has-space-active .apple-floating-dock {
 }
 
 .space-tv-audio-btn:active {
-  transform: translateX(-50%) scale(0.97);
+  transform: scale(0.96);
 }
 
 .space-tv-audio-btn .tv-audio-dot {
@@ -286,7 +286,8 @@ body.has-space-active .apple-floating-dock {
 
 @media (max-width: 600px) and (orientation: portrait) {
   .space-tv-audio-btn {
-    bottom: 28px;
+    top: max(env(safe-area-inset-left, 0px), 56px);
+    right: max(env(safe-area-inset-top, 0px), 18px);
   }
 }
 

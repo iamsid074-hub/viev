@@ -86,7 +86,7 @@
     video: null,
     tex: null,
     tvPos: { x: -13.9, z: -21.0 },
-    unlocked: false
+    isPlaying: false
   };
 
   // Shop 3 (LED3) Back-Wall OLED LED Video & Proximity Audio State
@@ -94,7 +94,14 @@
     video: null,
     tex: null,
     tvPos: { x: -13.9, z: -39.0 },
-    unlocked: false
+    isPlaying: false
+  };
+
+  // Per-Shop Smooth Lighting Fade State (Shops 0, 1, 2)
+  const shopLightingStates = {
+    0: { mats: null, normalLight: null, dimYellowLight: null, fadeCur: 0, fadeTarget: 0 },
+    1: { mats: null, normalLight: null, dimYellowLight: null, fadeCur: 0, fadeTarget: 0 },
+    2: { mats: null, normalLight: null, dimYellowLight: null, fadeCur: 0, fadeTarget: 0 }
   };
   let lookTouchId = null;
   let prevPointerX = 0;
@@ -1105,17 +1112,17 @@
       const zEnd = zStart - shopSpan;  // -12, -30, -48, -66
       const zCenter = (zStart + zEnd) / 2;
 
-      // Shop 0 uses cloned materials so its lights/surfaces can dim independently during audio playback
+      // Shops 0, 1, 2 use cloned materials so each shop's lights/surfaces can fade independently during LED playback
       let curFloorMat = shopFloorMat;
       let curCeilingMat = firstShopCeilingMat;
       let curBackWallMat = firstShopBackWallMat;
       let curSideWallMat = firstShopSideWallMat;
-      if (i === 0) {
+      if (i <= 2) {
         curFloorMat = shopFloorMat.clone();
         curCeilingMat = firstShopCeilingMat.clone();
         curBackWallMat = firstShopBackWallMat.clone();
         curSideWallMat = firstShopSideWallMat.clone();
-        firstShopAudioState.shop0Mats = {
+        shopLightingStates[i].mats = {
           floor: curFloorMat,
           ceiling: curCeilingMat,
           backWall: curBackWallMat,
@@ -1231,11 +1238,16 @@
           const s2Vid = document.createElement('video');
           s2Vid.src = 'assets/video/shop2_led.mp4';
           s2Vid.loop = true;
-          s2Vid.muted = true;
+          s2Vid.muted = false;
           s2Vid.playsInline = true;
           s2Vid.setAttribute('playsinline', '');
-          s2Vid.preload = 'auto';
-          s2Vid.volume = 0;
+          s2Vid.preload = 'metadata';
+          s2Vid.volume = 0.45;
+          s2Vid.addEventListener('loadeddata', () => {
+            if (!shop2VideoState.isPlaying) {
+              try { s2Vid.currentTime = 0.5; } catch (_) {}
+            }
+          });
 
           const s2Tex = new THREE.VideoTexture(s2Vid);
           s2Tex.encoding = THREE.sRGBEncoding;
@@ -1245,23 +1257,6 @@
           shop2VideoState.video = s2Vid;
           shop2VideoState.tex = s2Tex;
           shop2VideoState.tvPos = { x: xBack + 0.098, z: zCenter };
-
-          const unlockS2Audio = () => {
-            if (shop2VideoState.unlocked) return;
-            shop2VideoState.unlocked = true;
-            s2Vid.muted = false;
-            s2Vid.play().catch(() => {});
-          };
-          window.addEventListener('pointerdown', unlockS2Audio, { once: true, passive: true });
-          window.addEventListener('keydown', unlockS2Audio, { once: true, passive: true });
-
-          s2Vid.play().then(() => {
-            s2Vid.muted = false;
-            shop2VideoState.unlocked = true;
-          }).catch(() => {
-            s2Vid.muted = true;
-            s2Vid.play().catch(() => {});
-          });
         }
         activeScreenMat = new THREE.MeshStandardMaterial({
           map: shop2VideoState.tex,
@@ -1279,11 +1274,16 @@
           const s3Vid = document.createElement('video');
           s3Vid.src = 'video/video_20261024_234728.mp4';
           s3Vid.loop = true;
-          s3Vid.muted = true;
+          s3Vid.muted = false;
           s3Vid.playsInline = true;
           s3Vid.setAttribute('playsinline', '');
           s3Vid.preload = 'metadata';
-          s3Vid.volume = 0;
+          s3Vid.volume = 0.45;
+          s3Vid.addEventListener('loadeddata', () => {
+            if (!shop3VideoState.isPlaying) {
+              try { s3Vid.currentTime = 0.5; } catch (_) {}
+            }
+          });
 
           const s3Tex = new THREE.VideoTexture(s3Vid);
           s3Tex.encoding = THREE.sRGBEncoding;
@@ -1293,23 +1293,6 @@
           shop3VideoState.video = s3Vid;
           shop3VideoState.tex = s3Tex;
           shop3VideoState.tvPos = { x: xBack + 0.098, z: zCenter };
-
-          const unlockS3Audio = () => {
-            if (shop3VideoState.unlocked) return;
-            shop3VideoState.unlocked = true;
-            s3Vid.muted = false;
-            s3Vid.play().catch(() => {});
-          };
-          window.addEventListener('pointerdown', unlockS3Audio, { once: true, passive: true });
-          window.addEventListener('keydown', unlockS3Audio, { once: true, passive: true });
-
-          s3Vid.play().then(() => {
-            s3Vid.muted = false;
-            shop3VideoState.unlocked = true;
-          }).catch(() => {
-            s3Vid.muted = true;
-            s3Vid.play().catch(() => {});
-          });
         }
         activeScreenMat = new THREE.MeshStandardMaterial({
           map: shop3VideoState.tex,
@@ -1557,12 +1540,12 @@
       shopLight.position.set(-halfW - shopWidth / 2, MALL_HEIGHT - 1.0, zCenter);
       scene.add(shopLight);
 
-      if (i === 0) {
-        firstShopAudioState.normalLight = shopLight;
+      if (i <= 2) {
+        shopLightingStates[i].normalLight = shopLight;
         const dimYellowLight = new THREE.PointLight(0xffb41f, 0, 18, 2.0);
         dimYellowLight.position.set(-halfW - shopWidth / 2, MALL_HEIGHT - 1.2, zCenter);
         scene.add(dimYellowLight);
-        firstShopAudioState.dimYellowLight = dimYellowLight;
+        shopLightingStates[i].dimYellowLight = dimYellowLight;
       }
     }
 
@@ -2306,16 +2289,17 @@
   const _cNormEmis = new THREE.Color(0x2b2010);
   const _cDimEmis = new THREE.Color(0x3d2908);
 
-  function applyFirstShopLightingProgress(t) {
-    const st = firstShopAudioState;
+  function applyShopLightingProgress(idx, t) {
+    const st = shopLightingStates[idx];
+    if (!st) return;
     if (st.normalLight) {
       st.normalLight.intensity = 1.15 * (1 - t);
     }
     if (st.dimYellowLight) {
       st.dimYellowLight.intensity = 0.34 * t;
     }
-    if (st.shop0Mats) {
-      const { floor, ceiling, backWall, sideWall } = st.shop0Mats;
+    if (st.mats) {
+      const { floor, ceiling, backWall, sideWall } = st.mats;
       floor.color.copy(_cWhite).lerp(_cDimFloor, t);
       ceiling.color.copy(_cWhite).lerp(_cDimCeil, t);
       ceiling.emissiveIntensity = 0.08 * (1 - t);
@@ -2330,37 +2314,105 @@
     }
   }
 
-  function setFirstShopAudioLighting(isAudioPlaying) {
-    firstShopAudioState.lightFadeTarget = isAudioPlaying ? 1 : 0;
-  }
-
-  function updateFirstShopLightingFade() {
-    const st = firstShopAudioState;
-    const diff = st.lightFadeTarget - st.lightFadeCurrent;
-    if (Math.abs(diff) < 0.002) {
-      if (st.lightFadeCurrent !== st.lightFadeTarget) {
-        st.lightFadeCurrent = st.lightFadeTarget;
-        applyFirstShopLightingProgress(st.lightFadeCurrent);
-      }
-      return;
+  function setShopAudioLighting(idx, isMediaPlaying) {
+    if (shopLightingStates[idx]) {
+      shopLightingStates[idx].fadeTarget = isMediaPlaying ? 1 : 0;
     }
-    st.lightFadeCurrent += diff * 0.04; // smooth ~1.2s cinema fade in & fade out
-    applyFirstShopLightingProgress(st.lightFadeCurrent);
   }
 
-  function updateAudioButtonUI() {
+  function updateAllShopLightingFades() {
+    [0, 1, 2].forEach(idx => {
+      const st = shopLightingStates[idx];
+      if (!st) return;
+      const diff = st.fadeTarget - st.fadeCur;
+      if (Math.abs(diff) < 0.002) {
+        if (st.fadeCur !== st.fadeTarget) {
+          st.fadeCur = st.fadeTarget;
+          applyShopLightingProgress(idx, st.fadeCur);
+        }
+        return;
+      }
+      st.fadeCur += diff * 0.04; // smooth ~1.2s cinema fade in & fade out
+      applyShopLightingProgress(idx, st.fadeCur);
+    });
+  }
+
+  function getNearbyShopLedIndex() {
+    if (!camera || camera.position.x >= -5.8) return null;
+    const z = camera.position.z;
+    const x = camera.position.x;
+    if (z <= 6 && z >= -12) {
+      const d = Math.hypot(x - firstShopAudioState.tvPos.x, z - firstShopAudioState.tvPos.z);
+      return d < 9.5 ? 0 : null;
+    }
+    if (z < -12 && z >= -30) {
+      const d = Math.hypot(x - shop2VideoState.tvPos.x, z - shop2VideoState.tvPos.z);
+      return d < 9.5 ? 1 : null;
+    }
+    if (z < -30 && z >= -48) {
+      const d = Math.hypot(x - shop3VideoState.tvPos.x, z - shop3VideoState.tvPos.z);
+      return d < 9.5 ? 2 : null;
+    }
+    return null;
+  }
+
+  function getPlayingShopLedIndex() {
+    if (firstShopAudioState.isPlaying) return 0;
+    if (shop2VideoState.isPlaying) return 1;
+    if (shop3VideoState.isPlaying) return 2;
+    return null;
+  }
+
+  function isShopLedPlaying(idx) {
+    if (idx === 0) return firstShopAudioState.isPlaying;
+    if (idx === 1) return shop2VideoState.isPlaying;
+    if (idx === 2) return shop3VideoState.isPlaying;
+    return false;
+  }
+
+  function pauseShopLed(idx) {
+    if (idx === 0 && firstShopAudioState.isPlaying) {
+      if (firstShopAudioState.audio) firstShopAudioState.audio.pause();
+      firstShopAudioState.isPlaying = false;
+      setShopAudioLighting(0, false);
+      renderFirstShopLedScreen(true);
+    } else if (idx === 1 && shop2VideoState.isPlaying) {
+      if (shop2VideoState.video) shop2VideoState.video.pause();
+      shop2VideoState.isPlaying = false;
+      setShopAudioLighting(1, false);
+    } else if (idx === 2 && shop3VideoState.isPlaying) {
+      if (shop3VideoState.video) shop3VideoState.video.pause();
+      shop3VideoState.isPlaying = false;
+      setShopAudioLighting(2, false);
+    }
+  }
+
+  function updateShopLedButtonUI() {
     const btn = document.getElementById('space-tv-audio-btn');
     const icon = document.getElementById('space-tv-audio-icon');
     const label = document.getElementById('space-tv-audio-label');
     if (!btn || !icon || !label) return;
-    if (firstShopAudioState.isPlaying) {
+
+    const nearbyIdx = getNearbyShopLedIndex();
+    const playingIdx = getPlayingShopLedIndex();
+    const targetIdx = nearbyIdx !== null ? nearbyIdx : playingIdx;
+
+    if (targetIdx === null) {
+      btn.classList.remove('is-visible', 'is-playing');
+      return;
+    }
+
+    btn.classList.add('is-visible');
+    const activePlaying = isShopLedPlaying(targetIdx);
+    const mediaWord = targetIdx === 0 ? 'Audio' : 'Video';
+    if (activePlaying) {
       btn.classList.add('is-playing');
       icon.textContent = '❚❚';
-      label.textContent = 'Pause Audio';
+      label.textContent = 'Pause ' + mediaWord;
     } else {
       btn.classList.remove('is-playing');
       icon.textContent = '▶';
-      label.textContent = 'Play Audio';
+      label.textContent = 'Play ' + mediaWord;
     }
   }
 
@@ -2493,8 +2545,8 @@
       audio.addEventListener('loadedmetadata', () => renderFirstShopLedScreen(true));
       audio.addEventListener('ended', () => {
         st.isPlaying = false;
-        setFirstShopAudioLighting(false);
-        updateAudioButtonUI();
+        setShopAudioLighting(0, false);
+        updateShopLedButtonUI();
         renderFirstShopLedScreen(true);
       });
       st.audio = audio;
@@ -2506,15 +2558,25 @@
       if (btn) {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          if (!st.audio) return;
-          if (st.isPlaying) {
-            st.audio.pause();
-            st.isPlaying = false;
-            setFirstShopAudioLighting(false);
-            updateAudioButtonUI();
-            renderFirstShopLedScreen(true);
-          } else {
-            // Initialize Web Audio API Analyser on user gesture
+          const nearbyIdx = getNearbyShopLedIndex();
+          const playingIdx = getPlayingShopLedIndex();
+          const targetIdx = nearbyIdx !== null ? nearbyIdx : playingIdx;
+          if (targetIdx === null) return;
+
+          // If target shop LED is already playing, pause it
+          if (isShopLedPlaying(targetIdx)) {
+            pauseShopLed(targetIdx);
+            updateShopLedButtonUI();
+            return;
+          }
+
+          // Pause any other playing shop LED before starting this one
+          [0, 1, 2].forEach(idx => {
+            if (idx !== targetIdx) pauseShopLed(idx);
+          });
+
+          if (targetIdx === 0) {
+            if (!st.audio) return;
             if (!st.audioCtx) {
               try {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -2534,9 +2596,25 @@
             }
             st.audio.play().then(() => {
               st.isPlaying = true;
-              setFirstShopAudioLighting(true);
-              updateAudioButtonUI();
+              setShopAudioLighting(0, true);
+              updateShopLedButtonUI();
               renderFirstShopLedScreen(true);
+            }).catch(() => { });
+          } else if (targetIdx === 1 && shop2VideoState.video) {
+            shop2VideoState.video.muted = false;
+            shop2VideoState.video.volume = 0.45;
+            shop2VideoState.video.play().then(() => {
+              shop2VideoState.isPlaying = true;
+              setShopAudioLighting(1, true);
+              updateShopLedButtonUI();
+            }).catch(() => { });
+          } else if (targetIdx === 2 && shop3VideoState.video) {
+            shop3VideoState.video.muted = false;
+            shop3VideoState.video.volume = 0.45;
+            shop3VideoState.video.play().then(() => {
+              shop3VideoState.isPlaying = true;
+              setShopAudioLighting(2, true);
+              updateShopLedButtonUI();
             }).catch(() => { });
           }
         });
@@ -2546,26 +2624,12 @@
     renderFirstShopLedScreen(true);
   }
 
-  function updateFirstShopProximityUI() {
-    const btn = document.getElementById('space-tv-audio-btn');
-    if (!btn || !camera) return;
-    const dx = camera.position.x - firstShopAudioState.tvPos.x;
-    const dz = camera.position.z - firstShopAudioState.tvPos.z;
-    const dist = Math.hypot(dx, dz);
-    const insideFirstShopNearTv = (camera.position.x < -5.8 && camera.position.z <= 6 && camera.position.z >= -12 && dist < 9.5);
-    if (insideFirstShopNearTv || firstShopAudioState.isPlaying) {
-      btn.classList.add('is-visible');
-    } else {
-      btn.classList.remove('is-visible');
-    }
-  }
-
   function updateCorridorLedProximityAudio() {
     const vid = corridorVideoState.video;
     if (!vid || !camera) return;
 
-    // Duck corridor video audio completely while First Shop Voice Note is playing or when inside a shop
-    if (firstShopAudioState.isPlaying || camera.position.x < -5.8 || corridorVideoState.tvZList.length === 0) {
+    // Duck corridor video audio completely while any Shop LED is playing or when inside a shop
+    if (getPlayingShopLedIndex() !== null || camera.position.x < -5.8 || corridorVideoState.tvZList.length === 0) {
       vid.volume = 0;
       return;
     }
@@ -2587,48 +2651,6 @@
     }
   }
 
-  function updateShop2LedProximityAudio() {
-    const vid = shop2VideoState.video;
-    if (!vid || !camera) return;
-
-    const inShop2 = (camera.position.x < -5.8 && camera.position.z <= -12.0 && camera.position.z >= -30.0);
-    if (!inShop2 || firstShopAudioState.isPlaying) {
-      vid.volume = 0;
-      return;
-    }
-
-    const dx = camera.position.x - shop2VideoState.tvPos.x;
-    const dz = camera.position.z - shop2VideoState.tvPos.z;
-    const dist = Math.hypot(dx, dz);
-    if (dist >= 9.5) {
-      vid.volume = 0;
-    } else {
-      const norm = Math.min(1, Math.max(0, (9.5 - dist) / 7.5));
-      vid.volume = Math.pow(norm, 1.5) * 0.28;
-    }
-  }
-
-  function updateShop3LedProximityAudio() {
-    const vid = shop3VideoState.video;
-    if (!vid || !camera) return;
-
-    const inShop3 = (camera.position.x < -5.8 && camera.position.z <= -30.0 && camera.position.z >= -48.0);
-    if (!inShop3 || firstShopAudioState.isPlaying) {
-      vid.volume = 0;
-      return;
-    }
-
-    const dx = camera.position.x - shop3VideoState.tvPos.x;
-    const dz = camera.position.z - shop3VideoState.tvPos.z;
-    const dist = Math.hypot(dx, dz);
-    if (dist >= 9.5) {
-      vid.volume = 0;
-    } else {
-      const norm = Math.min(1, Math.max(0, (9.5 - dist) / 7.5));
-      vid.volume = Math.pow(norm, 1.5) * 0.28;
-    }
-  }
-
   /**
    * Render Loop
    */
@@ -2644,13 +2666,11 @@
     // Update First-Person Walking Movement from Joystick
     updatePlayerMovement();
 
-    // Update First Shop TV Proximity Button, Smooth Light Fade & Real-Time LED Visualizer
-    updateFirstShopProximityUI();
-    updateFirstShopLightingFade();
+    // Update Unified Shop LED Top-Right Button, Smooth Light Fades & Real-Time LED Visualizer
+    updateShopLedButtonUI();
+    updateAllShopLightingFades();
     renderFirstShopLedScreen(false);
     updateCorridorLedProximityAudio();
-    updateShop2LedProximityAudio();
-    updateShop3LedProximityAudio();
 
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
@@ -2662,12 +2682,6 @@
     if (corridorVideoState.video) {
       corridorVideoState.video.play().catch(() => { });
     }
-    if (shop2VideoState.video) {
-      shop2VideoState.video.play().catch(() => { });
-    }
-    if (shop3VideoState.video) {
-      shop3VideoState.video.play().catch(() => { });
-    }
     onWindowResize();
     animFrameId = requestAnimationFrame(animate);
   }
@@ -2677,21 +2691,8 @@
     if (corridorVideoState.video) {
       corridorVideoState.video.pause();
     }
-    if (shop2VideoState.video) {
-      shop2VideoState.video.pause();
-    }
-    if (shop3VideoState.video) {
-      shop3VideoState.video.pause();
-    }
-    if (firstShopAudioState.audio && firstShopAudioState.isPlaying) {
-      firstShopAudioState.audio.pause();
-      firstShopAudioState.isPlaying = false;
-      setFirstShopAudioLighting(false);
-      updateAudioButtonUI();
-      renderFirstShopLedScreen(true);
-    }
-    const btn = document.getElementById('space-tv-audio-btn');
-    if (btn) btn.classList.remove('is-visible');
+    [0, 1, 2].forEach(idx => pauseShopLed(idx));
+    updateShopLedButtonUI();
     if (animFrameId) {
       cancelAnimationFrame(animFrameId);
       animFrameId = null;
