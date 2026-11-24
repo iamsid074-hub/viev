@@ -1112,7 +1112,7 @@
       const zEnd = zStart - shopSpan;  // -12, -30, -48, -66
       const zCenter = (zStart + zEnd) / 2;
 
-      // Shops 0, 1, 2 use cloned materials so each shop's lights/surfaces can fade independently during LED playback
+      // Shops 0, 1, 2 use cloned materials so each shop's lights/surfaces can fade independently
       let curFloorMat = shopFloorMat;
       let curCeilingMat = firstShopCeilingMat;
       let curBackWallMat = firstShopBackWallMat;
@@ -1238,16 +1238,12 @@
           const s2Vid = document.createElement('video');
           s2Vid.src = 'assets/video/shop2_led.mp4';
           s2Vid.loop = true;
-          s2Vid.muted = false;
+          s2Vid.muted = true; // auto-play muted immediately without Play button
           s2Vid.playsInline = true;
           s2Vid.setAttribute('playsinline', '');
-          s2Vid.preload = 'metadata';
+          s2Vid.preload = 'auto';
           s2Vid.volume = 0.45;
-          s2Vid.addEventListener('loadeddata', () => {
-            if (!shop2VideoState.isPlaying) {
-              try { s2Vid.currentTime = 0.5; } catch (_) {}
-            }
-          });
+          s2Vid.play().catch(() => { });
 
           const s2Tex = new THREE.VideoTexture(s2Vid);
           s2Tex.encoding = THREE.sRGBEncoding;
@@ -1272,18 +1268,14 @@
       } else if (i === 2) {
         if (!shop3VideoState.video) {
           const s3Vid = document.createElement('video');
-          s3Vid.src = 'video/video_20261024_234728.mp4';
+          s3Vid.src = 'assets/video/shop3_led.mp4';
           s3Vid.loop = true;
-          s3Vid.muted = false;
+          s3Vid.muted = true; // auto-play muted immediately without Play button
           s3Vid.playsInline = true;
           s3Vid.setAttribute('playsinline', '');
-          s3Vid.preload = 'metadata';
+          s3Vid.preload = 'auto';
           s3Vid.volume = 0.45;
-          s3Vid.addEventListener('loadeddata', () => {
-            if (!shop3VideoState.isPlaying) {
-              try { s3Vid.currentTime = 0.5; } catch (_) {}
-            }
-          });
+          s3Vid.play().catch(() => { });
 
           const s3Tex = new THREE.VideoTexture(s3Vid);
           s3Tex.encoding = THREE.sRGBEncoding;
@@ -2332,7 +2324,7 @@
         }
         return;
       }
-      st.fadeCur += diff * 0.04; // smooth ~1.2s cinema fade in & fade out
+      st.fadeCur += diff * 0.04;
       applyShopLightingProgress(idx, st.fadeCur);
     });
   }
@@ -2377,11 +2369,11 @@
       setShopAudioLighting(0, false);
       renderFirstShopLedScreen(true);
     } else if (idx === 1 && shop2VideoState.isPlaying) {
-      if (shop2VideoState.video) shop2VideoState.video.pause();
+      if (shop2VideoState.video) shop2VideoState.video.muted = true; // keep video playing visually, mute audio
       shop2VideoState.isPlaying = false;
       setShopAudioLighting(1, false);
     } else if (idx === 2 && shop3VideoState.isPlaying) {
-      if (shop3VideoState.video) shop3VideoState.video.pause();
+      if (shop3VideoState.video) shop3VideoState.video.muted = true; // keep video playing visually, mute audio
       shop3VideoState.isPlaying = false;
       setShopAudioLighting(2, false);
     }
@@ -2563,14 +2555,12 @@
           const targetIdx = nearbyIdx !== null ? nearbyIdx : playingIdx;
           if (targetIdx === null) return;
 
-          // If target shop LED is already playing, pause it
           if (isShopLedPlaying(targetIdx)) {
             pauseShopLed(targetIdx);
             updateShopLedButtonUI();
             return;
           }
 
-          // Pause any other playing shop LED before starting this one
           [0, 1, 2].forEach(idx => {
             if (idx !== targetIdx) pauseShopLed(idx);
           });
@@ -2628,7 +2618,6 @@
     const vid = corridorVideoState.video;
     if (!vid || !camera) return;
 
-    // Duck corridor video audio completely while any Shop LED is playing or when inside a shop
     if (getPlayingShopLedIndex() !== null || camera.position.x < -5.8 || corridorVideoState.tvZList.length === 0) {
       vid.volume = 0;
       return;
@@ -2642,7 +2631,6 @@
       if (d < minDist) minDist = d;
     }
 
-    // Only audible when approaching/near a corridor LED (< 8.0m); peaks at low 22% volume right next to it
     if (minDist >= 8.0) {
       vid.volume = 0;
     } else {
@@ -2657,16 +2645,13 @@
   function animate() {
     if (!isRunning) return;
 
-    // Smooth camera inertia damping (Lerp)
     currentYaw += (targetYaw - currentYaw) * 0.09;
     currentPitch += (targetPitch - currentPitch) * 0.09;
 
     camera.rotation.set(currentPitch, currentYaw, 0, 'YXZ');
 
-    // Update First-Person Walking Movement from Joystick
     updatePlayerMovement();
 
-    // Update Unified Shop LED Top-Right Button, Smooth Light Fades & Real-Time LED Visualizer
     updateShopLedButtonUI();
     updateAllShopLightingFades();
     renderFirstShopLedScreen(false);
@@ -2682,6 +2667,12 @@
     if (corridorVideoState.video) {
       corridorVideoState.video.play().catch(() => { });
     }
+    if (shop2VideoState.video) {
+      shop2VideoState.video.play().catch(() => { });
+    }
+    if (shop3VideoState.video) {
+      shop3VideoState.video.play().catch(() => { });
+    }
     onWindowResize();
     animFrameId = requestAnimationFrame(animate);
   }
@@ -2690,6 +2681,12 @@
     isRunning = false;
     if (corridorVideoState.video) {
       corridorVideoState.video.pause();
+    }
+    if (shop2VideoState.video) {
+      shop2VideoState.video.pause();
+    }
+    if (shop3VideoState.video) {
+      shop3VideoState.video.pause();
     }
     [0, 1, 2].forEach(idx => pauseShopLed(idx));
     updateShopLedButtonUI();
