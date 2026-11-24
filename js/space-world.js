@@ -1107,6 +1107,131 @@
       scene.add(yellowWash);
     });
 
+    // 4.2. Sleek Digital LED Display Screens on Right Wall Opposite Every Shop
+    function createShopLedScreenTexture(brandName, idx) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // Deep OLED obsidian background
+      ctx.fillStyle = '#06070b';
+      ctx.fillRect(0, 0, 1024, 512);
+
+      // Subtle warm champagne ambient radial glow in screen center
+      const rad = ctx.createRadialGradient(512, 256, 30, 512, 256, 460);
+      rad.addColorStop(0, 'rgba(255, 215, 130, 0.22)');
+      rad.addColorStop(0.55, 'rgba(212, 175, 55, 0.08)');
+      rad.addColorStop(1, 'rgba(6, 7, 11, 0)');
+      ctx.fillStyle = rad;
+      ctx.fillRect(0, 0, 1024, 512);
+
+      // Diagonal subtle glass sheen
+      const sheen = ctx.createLinearGradient(0, 0, 1024, 512);
+      sheen.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+      sheen.addColorStop(0.45, 'rgba(255, 255, 255, 0)');
+      sheen.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+      ctx.fillStyle = sheen;
+      ctx.fillRect(0, 0, 1024, 512);
+
+      // Minimalist golden hairline inner border
+      ctx.strokeStyle = 'rgba(235, 198, 110, 0.55)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(28, 28, 968, 456);
+
+      // Subtle corner accent ticks
+      ctx.strokeStyle = 'rgba(255, 232, 170, 0.9)';
+      ctx.lineWidth = 4;
+      const cLen = 28;
+      [[28, 28, 1, 1], [996, 28, -1, 1], [28, 484, 1, -1], [996, 484, -1, -1]].forEach(([cx, cy, dx, dy]) => {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy + dy * cLen);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx + dx * cLen, cy);
+        ctx.stroke();
+      });
+
+      // Editorial Brand Title
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(255, 210, 110, 0.55)';
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = '#fff3d6';
+      ctx.font = '700 84px "Playfair Display", Georgia, serif';
+      ctx.fillText(brandName, 512, 228);
+
+      // Subtitle
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = '#d9b55b';
+      ctx.font = '500 22px "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif';
+      const subtitles = [
+        'H A U T E   J O A I L L E R I E   &   A T E L I E R',
+        'N E W   S E A S O N   E D I T I O N',
+        'F L A G S H I P   E X P E R I E N C E',
+        'M A I S O N   D E   L U X E'
+      ];
+      ctx.fillText(subtitles[idx % subtitles.length], 512, 316);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.encoding = THREE.sRGBEncoding;
+      tex.anisotropy = 16;
+      return tex;
+    }
+
+    const ledBezelMat = new THREE.MeshStandardMaterial({
+      color: 0x0d0f14,
+      roughness: 0.25,
+      metalness: 0.85
+    });
+    const ledHaloMat = new THREE.MeshStandardMaterial({
+      color: 0xffdc78,
+      emissive: new THREE.Color(0xffc947),
+      emissiveIntensity: 0.9,
+      roughness: 0.3
+    });
+
+    const ledWidth = 5.2;
+    const ledHeight = 2.3;
+    const ledCenterY = 4.25; // Cleanly above the eye-level quote (y ~ 2.0m) and below the yellow lamps (y ~ 6.1m)
+
+    boutiqueBrands.forEach((brand, i) => {
+      const zStart = 6 - i * shopSpan;
+      const zEnd = zStart - shopSpan;
+      const zCenter = (zStart + zEnd) / 2;
+
+      // Subtle warm backlight halo plate behind the LED bezel
+      const haloPlane = new THREE.Mesh(
+        new THREE.BoxGeometry(0.02, ledHeight + 0.22, ledWidth + 0.22),
+        ledHaloMat
+      );
+      haloPlane.position.set(halfW - 0.015, ledCenterY, zCenter);
+      scene.add(haloPlane);
+
+      // Slim matte-black anodized aluminum bezel
+      const bezelBox = new THREE.Mesh(
+        new THREE.BoxGeometry(0.07, ledHeight + 0.12, ledWidth + 0.12),
+        ledBezelMat
+      );
+      bezelBox.position.set(halfW - 0.045, ledCenterY, zCenter);
+      scene.add(bezelBox);
+
+      // Active Glowing High-Definition LED Display Screen facing -X (toward the opposite shop)
+      const screenTex = createShopLedScreenTexture(brand, i);
+      const screenMat = new THREE.MeshStandardMaterial({
+        map: screenTex,
+        emissiveMap: screenTex,
+        emissive: new THREE.Color(0xffffff),
+        emissiveIntensity: 0.9,
+        roughness: 0.12,
+        metalness: 0.15
+      });
+      const screenGeo = new THREE.PlaneGeometry(ledWidth, ledHeight);
+      screenGeo.rotateY(-Math.PI / 2); // face -X into corridor
+      const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+      screenMesh.position.set(halfW - 0.085, ledCenterY, zCenter);
+      scene.add(screenMesh);
+    });
+
     // Luxury Planters placed rhythmically along the Right Gallery Wall
     const rightPlanterZList = [4, -16, -36, -56, -72];
     rightPlanterZList.forEach(pz => {
