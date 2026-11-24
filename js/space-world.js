@@ -621,14 +621,14 @@
     ceilingMesh.position.set(0, MALL_HEIGHT, -MALL_LENGTH / 2 + 8);
     scene.add(ceilingMesh);
 
-    // 3. OPEN WALKABLE LUXURY BOUTIQUES ON LEFT SIDE (MODULAR ARCHITECTURAL MODEL)
+    // 3. OPEN WALKABLE LUXURY BOUTIQUES ON LEFT SIDE (SOLID 3D ARCHITECTURAL MODEL)
     const boutiqueBrands = [
       'ARANY & CO.',
       'ZARA',
       'APPLE',
       'CARTIER'
     ];
-    const shopSpan = 18; // Each shop is 18m long along Z
+    const shopSpan = 18; // Each shop is 18m long along Z (Contiguous: +6 to -66)
     const shopWidth = SHOP_DEPTH; // Extends 8m to the left: from x = -6 to x = -14
     const xFront = -halfW; // -6.0m (promenade portal line)
     const xBack = -halfW - shopWidth; // -14.0m (rear display wall)
@@ -636,33 +636,33 @@
     // Load High-Resolution Modular Shop Textures
     const textureLoader = new THREE.TextureLoader();
 
-    const shopFloorTexture = textureLoader.load('assets/shop_model/shop_floor.png');
-    shopFloorTexture.encoding = THREE.sRGBEncoding;
-
-    const shopCeilingTexture = textureLoader.load('assets/shop_model/shop_ceiling.png');
-    shopCeilingTexture.encoding = THREE.sRGBEncoding;
-
-    const shopBackWallTexture = textureLoader.load('assets/shop_model/shop_back_wall.png');
-    shopBackWallTexture.encoding = THREE.sRGBEncoding;
-
-    const shopSideWallTexture = textureLoader.load('assets/shop_model/shop_side_wall.png');
-    shopSideWallTexture.encoding = THREE.sRGBEncoding;
-
-    const shopPortalTextures = {
-      'ARANY & CO.': textureLoader.load('assets/shop_model/shop_portal_arany.png'),
-      'ZARA': textureLoader.load('assets/shop_model/shop_portal_zara.png'),
-      'APPLE': textureLoader.load('assets/shop_model/shop_portal_apple.png'),
-      'CARTIER': textureLoader.load('assets/shop_model/shop_portal_cartier.png')
-    };
-    Object.values(shopPortalTextures).forEach(tex => {
+    function setupTexture(tex) {
       tex.encoding = THREE.sRGBEncoding;
-    });
+      tex.anisotropy = 16;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.generateMipmaps = true;
+      return tex;
+    }
+
+    const shopFloorTexture = setupTexture(textureLoader.load('assets/shop_model/shop_floor.png'));
+    const shopCeilingTexture = setupTexture(textureLoader.load('assets/shop_model/shop_ceiling.png'));
+    const shopBackWallTexture = setupTexture(textureLoader.load('assets/shop_model/shop_back_wall.png'));
+    const shopSideWallTexture = setupTexture(textureLoader.load('assets/shop_model/shop_side_wall.png'));
+    const pillarFaceTexture = setupTexture(textureLoader.load('assets/shop_model/pillar_face.png'));
+
+    const shopFasciaTextures = {
+      'ARANY & CO.': setupTexture(textureLoader.load('assets/shop_model/fascia_arany.png')),
+      'ZARA': setupTexture(textureLoader.load('assets/shop_model/fascia_zara.png')),
+      'APPLE': setupTexture(textureLoader.load('assets/shop_model/fascia_apple.png')),
+      'CARTIER': setupTexture(textureLoader.load('assets/shop_model/fascia_cartier.png'))
+    };
 
     const shopFloorMat = new THREE.MeshStandardMaterial({
       map: shopFloorTexture,
       roughness: 0.15,
       metalness: 0.22,
-      side: THREE.DoubleSide
+      side: THREE.FrontSide
     });
 
     const shopCeilingMat = new THREE.MeshStandardMaterial({
@@ -671,7 +671,7 @@
       metalness: 0.15,
       emissive: new THREE.Color(0xffedd0),
       emissiveIntensity: 0.45,
-      side: THREE.DoubleSide
+      side: THREE.FrontSide
     });
 
     const shopBackWallMat = new THREE.MeshStandardMaterial({
@@ -680,7 +680,7 @@
       metalness: 0.2,
       emissive: new THREE.Color(0xffdfa0),
       emissiveIntensity: 0.28,
-      side: THREE.DoubleSide
+      side: THREE.FrontSide
     });
 
     const shopSideWallMat = new THREE.MeshStandardMaterial({
@@ -689,7 +689,22 @@
       metalness: 0.2,
       emissive: new THREE.Color(0xffe8ba),
       emissiveIntensity: 0.22,
-      side: THREE.DoubleSide
+      side: THREE.FrontSide
+    });
+
+    // Solid dark marble material for structural pillar returns, soffits & returns
+    const darkPillarMat = new THREE.MeshStandardMaterial({
+      color: 0x111318,
+      roughness: 0.22,
+      metalness: 0.35
+    });
+
+    const pillarFaceMat = new THREE.MeshStandardMaterial({
+      map: pillarFaceTexture,
+      roughness: 0.2,
+      metalness: 0.3,
+      emissive: new THREE.Color(0xffdf9e),
+      emissiveIntensity: 0.35
     });
 
     // Helper: Build seamless mathematical quad buffer geometry joining all 4 corners perfectly
@@ -719,21 +734,19 @@
       return geo;
     }
 
-    // Portal Return Jambs & Arch Soffit Material (gives 3D architectural frame depth)
-    const portalFrameMat = new THREE.MeshStandardMaterial({
-      color: 0x181a20,
-      roughness: 0.25,
-      metalness: 0.35
-    });
+    const fasciaHeight = 1.6; // from y = 4.8m to y = 6.4m
+    const fasciaDepth = 0.5;  // from x = -6.0m to x = -6.5m
+    const pillarWidth = 1.0;  // 1m wide pillars along Z
+    const openEntranceHeight = MALL_HEIGHT - fasciaHeight; // 4.8m clear walking height
 
+    // Contiguous shop placement: each shop joins the next with ZERO GAP
     for (let i = 0; i < boutiqueBrands.length; i++) {
       const brand = boutiqueBrands[i];
-      const zCenter = 6 - i * (shopSpan + 2) - shopSpan / 2; // Center Z of this shop
-      const zStart = zCenter + shopSpan / 2;
-      const zEnd = zCenter - shopSpan / 2;
+      const zStart = 6 - i * shopSpan; // 6, -12, -30, -48
+      const zEnd = zStart - shopSpan;  // -12, -30, -48, -66
+      const zCenter = (zStart + zEnd) / 2;
 
       // A) Boutique Interior Polished Marble Floor (Perfect joint at y = 0.01)
-      // Front is at x = xFront, Back is at x = xBack, North is zStart, South is zEnd
       const floorGeo = createModularQuad(
         [xBack, 0.01, zStart], // TL: Back-North
         [xBack, 0.01, zEnd],   // TR: Back-South
@@ -745,16 +758,15 @@
 
       // B) Boutique Interior Recessed Tray Ceiling (Perfect joint at y = MALL_HEIGHT)
       const ceilGeo = createModularQuad(
-        [xBack, MALL_HEIGHT, zStart], // TL: Back-North
-        [xBack, MALL_HEIGHT, zEnd],   // TR: Back-South
-        [xFront, MALL_HEIGHT, zStart],// BL: Front-North
-        [xFront, MALL_HEIGHT, zEnd]   // BR: Front-South
+        [xFront, MALL_HEIGHT, zStart],// TL: Front-North
+        [xFront, MALL_HEIGHT, zEnd],  // TR: Front-South
+        [xBack, MALL_HEIGHT, zStart], // BL: Back-North
+        [xBack, MALL_HEIGHT, zEnd]    // BR: Back-South
       );
       const shopCeiling = new THREE.Mesh(ceilGeo, shopCeilingMat);
       scene.add(shopCeiling);
 
       // C) Boutique Back Display Wall at x = xBack (-14.0m)
-      // Fluted panels on sides, warm illuminated cove center, bottom baseboard meeting floor
       const backWallGeo = createModularQuad(
         [xBack, MALL_HEIGHT, zStart], // TL: Top-North
         [xBack, MALL_HEIGHT, zEnd],   // TR: Top-South
@@ -785,59 +797,60 @@
       const southSideWall = new THREE.Mesh(southWallGeo, shopSideWallMat);
       scene.add(southSideWall);
 
-      // E) Front Entrance Portal Arch (at x = xFront = -6.0m)
-      // Grand dark marble arch with vertical LED light strips in pillars & illuminated brand fascia
-      const portalGeo = createModularQuad(
-        [xFront, MALL_HEIGHT, zStart], // TL: Top-North
-        [xFront, MALL_HEIGHT, zEnd],   // TR: Top-South
-        [xFront, 0, zStart],           // BL: Bottom-North
-        [xFront, 0, zEnd]              // BR: Bottom-South
-      );
-      const portalMat = new THREE.MeshStandardMaterial({
-        map: shopPortalTextures[brand] || shopPortalTextures['ARANY & CO.'],
-        transparent: true,
-        alphaTest: 0.15,
-        roughness: 0.25,
-        metalness: 0.35,
+      // E) Solid 3D Overhead Fascia Beam across entrance (y = 4.8 to 6.4, x = -6.0 to -6.5)
+      // Front face is 4K crystal-clear brand signage; other faces are deep polished dark marble
+      const fasciaTexture = shopFasciaTextures[brand] || shopFasciaTextures['ARANY & CO.'];
+      const fasciaFrontMat = new THREE.MeshStandardMaterial({
+        map: fasciaTexture,
+        roughness: 0.2,
+        metalness: 0.25,
         emissive: new THREE.Color(0xffdf9e),
-        emissiveIntensity: 0.35,
-        side: THREE.DoubleSide
+        emissiveIntensity: 0.28
       });
-      const portalMesh = new THREE.Mesh(portalGeo, portalMat);
-      scene.add(portalMesh);
 
-      // Architectural Depth Return for Portal Frame (0.45m thick into store)
-      // Left Pillar Jamb
-      const leftPillarBox = new THREE.Mesh(
-        new THREE.BoxGeometry(0.5, MALL_HEIGHT, 0.7),
-        portalFrameMat
-      );
-      leftPillarBox.position.set(xFront - 0.25, halfH, zStart - 0.35);
-      scene.add(leftPillarBox);
+      // Box materials: [+x, -x, +y, -y, +z, -z]
+      const fasciaBoxMats = [
+        fasciaFrontMat, // +X: facing corridor (crystal clear 4K brand fascia)
+        darkPillarMat,  // -X: facing into boutique
+        darkPillarMat,  // +Y: top meeting ceiling
+        darkPillarMat,  // -Y: underside entrance soffit
+        darkPillarMat,  // +Z: north end
+        darkPillarMat   // -Z: south end
+      ];
+      const fasciaGeo = new THREE.BoxGeometry(fasciaDepth, fasciaHeight, shopSpan);
+      const fasciaMesh = new THREE.Mesh(fasciaGeo, fasciaBoxMats);
+      fasciaMesh.position.set(xFront - fasciaDepth / 2, MALL_HEIGHT - fasciaHeight / 2, zCenter);
+      scene.add(fasciaMesh);
 
-      // Right Pillar Jamb
-      const rightPillarBox = new THREE.Mesh(
-        new THREE.BoxGeometry(0.5, MALL_HEIGHT, 0.7),
-        portalFrameMat
-      );
-      rightPillarBox.position.set(xFront - 0.25, halfH, zEnd + 0.35);
-      scene.add(rightPillarBox);
+      // F) Solid Architectural Left & Right Pillars with Vertical Warm LED Channels
+      // Pillar materials: [+x, -x, +y, -y, +z, -z]
+      const pillarMats = [
+        pillarFaceMat, // +X: front face with vertical warm LED channel
+        darkPillarMat, // -X: back return
+        darkPillarMat, // +Y: top
+        darkPillarMat, // -Y: bottom
+        darkPillarMat, // +Z: side
+        darkPillarMat  // -Z: inner entrance jamb
+      ];
+      const pillarGeo = new THREE.BoxGeometry(fasciaDepth, MALL_HEIGHT, pillarWidth);
 
-      // Fascia Return Soffit
-      const soffitBox = new THREE.Mesh(
-        new THREE.BoxGeometry(0.5, 0.3, shopSpan - 1.4),
-        portalFrameMat
-      );
-      soffitBox.position.set(xFront - 0.25, MALL_HEIGHT - 1.65, zCenter);
-      scene.add(soffitBox);
+      // Left Pillar (North side of entrance)
+      const leftPillar = new THREE.Mesh(pillarGeo, pillarMats);
+      leftPillar.position.set(xFront - fasciaDepth / 2, halfH, zStart - pillarWidth / 2);
+      scene.add(leftPillar);
 
-      // F) 3D Luxury Green Planter outside each Boutique Pillar
-      const boutiquePlanter = createLuxuryPlanter(-halfW + 0.9, zStart - 0.8);
+      // Right Pillar (South side of entrance)
+      const rightPillar = new THREE.Mesh(pillarGeo, pillarMats);
+      rightPillar.position.set(xFront - fasciaDepth / 2, halfH, zEnd + pillarWidth / 2);
+      scene.add(rightPillar);
+
+      // G) 3D Luxury Green Planter outside each Boutique Pillar
+      const boutiquePlanter = createLuxuryPlanter(-halfW + 0.85, zStart - pillarWidth / 2);
       scene.add(boutiquePlanter);
 
-      // G) Warm Glowing Boutique Interior Lighting
+      // H) Warm Glowing Boutique Interior Lighting
       // Soft central downlight radiating warm architectural light from ceiling tray
-      const shopLight = new THREE.PointLight(0xffe8c2, 1.6, 20, 1.8);
+      const shopLight = new THREE.PointLight(0xffe8c2, 1.8, 22, 1.8);
       shopLight.position.set(-halfW - shopWidth / 2, MALL_HEIGHT - 1.0, zCenter);
       scene.add(shopLight);
     }
@@ -1331,14 +1344,14 @@
       // Axis-independent collision sliding (diagonal movement slides along walls smoothly)
       let nextX = camera.position.x + deltaX;
       nextX = Math.min(5.2, Math.max(-13.2, nextX));
-      if (nextX < -5.8 && [-13, -33, -53].some(divZ => Math.abs(camera.position.z - divZ) < 0.65)) {
+      if (nextX < -5.8 && [-12, -30, -48].some(divZ => Math.abs(camera.position.z - divZ) < 0.65)) {
         nextX = camera.position.x;
       }
       camera.position.x = nextX;
 
       let nextZ = camera.position.z + deltaZ;
-      nextZ = Math.min(6.0, Math.max(-72.0, nextZ));
-      if (camera.position.x < -5.8 && [-13, -33, -53].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
+      nextZ = Math.min(6.0, Math.max(-66.0, nextZ));
+      if (camera.position.x < -5.8 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
       }
       camera.position.z = nextZ;
