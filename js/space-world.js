@@ -58,6 +58,8 @@
     dimYellowLight: null,
     shop0Mats: null,
     tvPos: { x: -13.9, z: -3.0 },
+    lightFadeCurrent: 0,
+    lightFadeTarget: 0,
     lastDrawTime: 0,
     btnBound: false
   };
@@ -2143,40 +2145,53 @@
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
   }
 
-  function setFirstShopAudioLighting(isAudioPlaying) {
+  const _cWhite = new THREE.Color(0xffffff);
+  const _cDimFloor = new THREE.Color(0x4a391b);
+  const _cDimCeil = new THREE.Color(0x3a2b12);
+  const _cDimWall = new THREE.Color(0x453417);
+  const _cNormEmis = new THREE.Color(0x2b2010);
+  const _cDimEmis = new THREE.Color(0x3d2908);
+
+  function applyFirstShopLightingProgress(t) {
     const st = firstShopAudioState;
     if (st.normalLight) {
-      st.normalLight.intensity = isAudioPlaying ? 0 : 1.15;
+      st.normalLight.intensity = 1.15 * (1 - t);
     }
     if (st.dimYellowLight) {
-      st.dimYellowLight.intensity = isAudioPlaying ? 0.34 : 0;
+      st.dimYellowLight.intensity = 0.34 * t;
     }
     if (st.shop0Mats) {
       const { floor, ceiling, backWall, sideWall } = st.shop0Mats;
-      if (isAudioPlaying) {
-        // Turn off bright normal lighting & bathe only first shop in extreme dim yellow
-        floor.color.setHex(0x4a391b);
-        ceiling.color.setHex(0x3a2b12);
-        ceiling.emissiveIntensity = 0.0;
-        backWall.color.setHex(0x453417);
-        backWall.emissive.setHex(0x3d2908);
-        backWall.emissiveIntensity = 0.05;
-        sideWall.color.setHex(0x453417);
-        sideWall.emissive.setHex(0x3d2908);
-        sideWall.emissiveIntensity = 0.05;
-      } else {
-        // Restore normal first shop lighting
-        floor.color.setHex(0xffffff);
-        ceiling.color.setHex(0xffffff);
-        ceiling.emissiveIntensity = 0.08;
-        backWall.color.setHex(0xffffff);
-        backWall.emissive.setHex(0x2b2010);
-        backWall.emissiveIntensity = 0.08;
-        sideWall.color.setHex(0xffffff);
-        sideWall.emissive.setHex(0x2b2010);
-        sideWall.emissiveIntensity = 0.08;
-      }
+      floor.color.copy(_cWhite).lerp(_cDimFloor, t);
+      ceiling.color.copy(_cWhite).lerp(_cDimCeil, t);
+      ceiling.emissiveIntensity = 0.08 * (1 - t);
+
+      backWall.color.copy(_cWhite).lerp(_cDimWall, t);
+      backWall.emissive.copy(_cNormEmis).lerp(_cDimEmis, t);
+      backWall.emissiveIntensity = 0.08 - 0.03 * t;
+
+      sideWall.color.copy(_cWhite).lerp(_cDimWall, t);
+      sideWall.emissive.copy(_cNormEmis).lerp(_cDimEmis, t);
+      sideWall.emissiveIntensity = 0.08 - 0.03 * t;
     }
+  }
+
+  function setFirstShopAudioLighting(isAudioPlaying) {
+    firstShopAudioState.lightFadeTarget = isAudioPlaying ? 1 : 0;
+  }
+
+  function updateFirstShopLightingFade() {
+    const st = firstShopAudioState;
+    const diff = st.lightFadeTarget - st.lightFadeCurrent;
+    if (Math.abs(diff) < 0.002) {
+      if (st.lightFadeCurrent !== st.lightFadeTarget) {
+        st.lightFadeCurrent = st.lightFadeTarget;
+        applyFirstShopLightingProgress(st.lightFadeCurrent);
+      }
+      return;
+    }
+    st.lightFadeCurrent += diff * 0.04; // smooth ~1.2s cinema fade in & fade out
+    applyFirstShopLightingProgress(st.lightFadeCurrent);
   }
 
   function updateAudioButtonUI() {
@@ -2241,11 +2256,6 @@
     rad.addColorStop(1, 'rgba(5, 6, 10, 0)');
     ctx.fillStyle = rad;
     ctx.fillRect(0, 0, W, H);
-
-    // Hairline gold border
-    ctx.strokeStyle = st.isPlaying ? 'rgba(255, 210, 95, 0.55)' : 'rgba(255, 210, 95, 0.22)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(26, 26, W - 52, H - 52);
 
     // Top Header
     ctx.textAlign = 'left';
@@ -2411,8 +2421,9 @@
     // Update First-Person Walking Movement from Joystick
     updatePlayerMovement();
 
-    // Update First Shop TV Proximity Button & Real-Time LED Visualizer
+    // Update First Shop TV Proximity Button, Smooth Light Fade & Real-Time LED Visualizer
     updateFirstShopProximityUI();
+    updateFirstShopLightingFade();
     renderFirstShopLedScreen(false);
 
     renderer.render(scene, camera);
