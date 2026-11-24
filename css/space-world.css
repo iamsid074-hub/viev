@@ -1,6 +1,7 @@
 /* =========================================================
    SPACE 3D WORLD: ULTRA-PREMIUM LUXURY MALL LANE
    Automatic Landscape Orientation • Dedicated Fullscreen Overlay
+   Open Boutiques • Low-Opacity Analog Movement Joystick
    ========================================================= */
 
 /* Dedicated Direct Body Fullscreen Overlay (Zero clipping, Zero dock overlap) */
@@ -148,6 +149,60 @@ body.has-space-active .apple-floating-dock {
   border-radius: 50%;
   background: #ffd778;
   box-shadow: 0 0 10px #ffd778;
+}
+
+/* =========================================================
+   LOW-OPACITY ANALOG MOVEMENT JOYSTICK (Bottom-Left)
+   Ultra-Subtle Liquid Glass Finish • Touch-Action None
+   ========================================================= */
+.space-joystick-zone {
+  position: absolute;
+  bottom: max(env(safe-area-inset-bottom, 0px), 26px);
+  left: max(env(safe-area-inset-left, 0px), 28px);
+  width: 104px;
+  height: 104px;
+  z-index: 60;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0.28;
+  transition: opacity 0.25s ease;
+}
+
+.space-joystick-zone.is-active {
+  opacity: 0.58;
+}
+
+.space-joystick-base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 70%, transparent 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.space-joystick-thumb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  margin-left: -22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(212, 175, 55, 0.2) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  transition: transform 0.06s ease-out;
+  will-change: transform;
 }
 
 /* Nav Badge in Settings */
