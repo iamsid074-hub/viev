@@ -1,0 +1,543 @@
+/* =========================================================
+   THE GRAND MONUMENT: GOLDEN WALKWAY (VIEV OS)
+   A Timeless Milestone Sanctuary for Princess Digi & Virat
+   Deep Obsidian • Starlight Gold • VisionOS Liquid Glass
+   ========================================================= */
+
+/* --- SUBPAGE CONTAINER OVERRIDES --- */
+#subpage-monument {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 10px 4px 60px 4px;
+  box-sizing: border-box;
+}
+
+/* --- AMBIENT CANVAS BACKGROUND --- */
+.monument-ambient-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.65;
+}
+
+/* --- MONUMENT HERO SECTION --- */
+.monument-hero-stage {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 24px 16px 32px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.monument-crest-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.04) 70%, transparent 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  box-shadow: 0 0 32px rgba(212, 175, 55, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  color: #f7d57f;
+  animation: monumentCrestPulse 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes monumentCrestPulse {
+  0% { transform: scale(0.97); box-shadow: 0 0 24px rgba(212, 175, 55, 0.25); }
+  100% { transform: scale(1.03); box-shadow: 0 0 38px rgba(212, 175, 55, 0.5); }
+}
+
+.monument-kicker {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.9);
+  margin-bottom: 6px;
+}
+
+.monument-hero-title {
+  font-family: "Cinzel", "Playfair Display", Georgia, serif;
+  font-size: clamp(26px, 6vw, 34px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #ffffff 0%, #fff0c7 35%, #ffd778 70%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 20px rgba(212, 175, 55, 0.3);
+}
+
+.monument-hero-subtitle {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 18px 0;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.monument-live-counter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: rgba(212, 175, 55, 0.10);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34c759;
+  box-shadow: 0 0 10px #34c759;
+  animation: liveDotBlink 1.8s ease-in-out infinite;
+}
+
+@keyframes liveDotBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.live-counter-text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #fff2cc;
+}
+
+/* --- THE GOLDEN WALKWAY SPINE --- */
+.monument-walkway-track {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 10px 0 40px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Glowing center line that connects all milestones */
+.monument-spine-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 28px;
+  width: 2px;
+  background: linear-gradient(180deg, 
+    rgba(212, 175, 55, 0.9) 0%, 
+    rgba(255, 215, 0, 0.7) 40%, 
+    rgba(212, 175, 55, 0.8) 85%, 
+    rgba(212, 175, 55, 0.1) 100%
+  );
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6), 0 0 2px rgba(255, 255, 255, 0.8);
+  z-index: 1;
+}
+
+@media (min-width: 480px) {
+  .monument-spine-line {
+    left: 36px;
+  }
+}
+
+/* --- MILESTONE ITEM BLOCK --- */
+.monument-item {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+  box-sizing: border-box;
+}
+
+/* Milestone Node Circle / Arch Crest */
+.monument-node-anchor {
+  position: relative;
+  z-index: 3;
+  width: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.monument-node-orb {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(20, 20, 26, 0.92);
+  border: 1.5px solid rgba(212, 175, 55, 0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7), 0 0 16px rgba(212, 175, 55, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd778;
+  font-size: 15px;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.monument-item.is-today .monument-node-orb {
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, rgba(26, 22, 10, 0.95) 80%);
+  border-color: #ffd700;
+  box-shadow: 0 0 28px rgba(255, 215, 0, 0.7), inset 0 1px 2px #ffffff;
+  animation: todayNodePulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes todayNodePulse {
+  0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+  100% { transform: scale(1.12); box-shadow: 0 0 34px rgba(255, 215, 0, 0.9); }
+}
+
+.monument-item.is-horizon .monument-node-orb {
+  border-color: rgba(160, 140, 255, 0.6);
+  color: #c7b8ff;
+  box-shadow: 0 0 20px rgba(160, 140, 255, 0.4);
+}
+
+/* Milestone Card Body (Interactive Liquid Glass) */
+.monument-card {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 2px solid rgba(212, 175, 55, 0.5);
+  border-radius: 20px;
+  padding: 16px 18px;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.25s ease, 
+              background 0.25s ease, 
+              box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.monument-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.8), rgba(255, 255, 255, 0.2), transparent);
+}
+
+.monument-card:hover {
+  transform: translateY(-3px) scale(1.01);
+  border-color: rgba(212, 175, 55, 0.6);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(212, 175, 55, 0.04) 100%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(212, 175, 55, 0.25);
+}
+
+.monument-card:active {
+  transform: scale(0.98);
+}
+
+.monument-item.is-today .monument-card {
+  border-left-color: #ffd700;
+  border-color: rgba(212, 175, 55, 0.45);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.65), 0 0 28px rgba(212, 175, 55, 0.2);
+}
+
+.monument-item.is-horizon .monument-card {
+  border-left-color: #a08cff;
+  border-color: rgba(160, 140, 255, 0.3);
+}
+
+/* Card Header */
+.monument-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.monument-day-badge {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fce49e;
+  background: rgba(212, 175, 55, 0.16);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  padding: 2.5px 8px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.monument-item.is-today .monument-day-badge {
+  background: #ffd700;
+  color: #1a1400;
+  border-color: #ffd700;
+  font-weight: 800;
+}
+
+.monument-date-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.monument-card-title {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.monument-card-subtitle {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 215, 120, 0.85);
+  margin: 0 0 8px 0;
+  line-height: 1.35;
+}
+
+.monument-card-desc {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+  margin: 0 0 10px 0;
+}
+
+.monument-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.monument-card-hint {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(212, 175, 55, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.monument-card-arrow {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.monument-card:hover .monument-card-arrow {
+  transform: translateX(3px);
+}
+
+/* --- MONUMENT DETAIL MODAL --- */
+.monument-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100050;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.monument-detail-modal.is-open {
+  display: flex;
+  animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.monument-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+.monument-modal-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 390px;
+  background: linear-gradient(135deg, rgba(26, 22, 15, 0.96) 0%, rgba(14, 14, 18, 0.98) 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border-radius: 28px;
+  padding: 28px 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 45px rgba(212, 175, 55, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  animation: modalScaleUp 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+@keyframes modalScaleUp {
+  from { transform: scale(0.92) translateY(12px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.monument-modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.monument-modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  transform: scale(1.08);
+}
+
+.monument-modal-seal {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 16px auto;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.35) 0%, rgba(212, 175, 55, 0.05) 75%);
+  border: 1.5px solid rgba(212, 175, 55, 0.6);
+  box-shadow: 0 0 24px rgba(212, 175, 55, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  color: #ffd778;
+}
+
+.monument-modal-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffd778;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  margin-bottom: 12px;
+}
+
+.monument-modal-title {
+  font-family: "Cinzel", "Playfair Display", Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+}
+
+.monument-modal-subtitle {
+  font-size: 13px;
+  color: rgba(212, 175, 55, 0.9);
+  margin: 0 0 18px 0;
+  font-weight: 500;
+}
+
+.monument-modal-quote-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-left: 3px solid #d4af37;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.monument-modal-quote-text {
+  font-size: 13.5px;
+  font-style: italic;
+  color: #fff4d1;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.monument-modal-story {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+  text-align: left;
+}
+
+.monument-modal-done-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.35) 0%, rgba(212, 175, 55, 0.15) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: #fff6d6;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.monument-modal-done-btn:hover {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.55) 0%, rgba(212, 175, 55, 0.25) 100%);
+  transform: translateY(-1px);
+}
+
+.monument-modal-done-btn:active {
+  transform: scale(0.98);
+}
+
+/* Settings Nav Badge for Monument */
+.monument-nav-badge {
+  font-family: var(--font-main);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(212, 175, 55, 0.18);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #ffd778;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.monument-icon-wrap {
+  color: #ffd778;
+}
