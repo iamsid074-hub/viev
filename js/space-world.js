@@ -471,12 +471,12 @@
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Clean Architectural Gallery Matte Off-White Wall
+    // Warm Luxury Cream Limestone Wall
     const bgGrad = ctx.createLinearGradient(0, 0, 0, 512);
-    bgGrad.addColorStop(0, '#ebedf2');
-    bgGrad.addColorStop(0.12, '#f6f7fa');
-    bgGrad.addColorStop(0.88, '#f6f7fa');
-    bgGrad.addColorStop(1, '#e4e7ed');
+    bgGrad.addColorStop(0, '#e8dcc6');
+    bgGrad.addColorStop(0.12, '#f3e9d6');
+    bgGrad.addColorStop(0.88, '#f3e9d6');
+    bgGrad.addColorStop(1, '#e2d4ba');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 4096, 512);
 
@@ -588,11 +588,12 @@
     darkFloor.position.set(halfW - darkFloorWidth / 2, 0, -MALL_LENGTH / 2 + 8);
     scene.add(darkFloor);
 
-    // B) Left Storefront Apron: Polished White Calacatta Marble Apron
+    // B) Left Storefront Apron: Warm Cream Marble Apron
     const whiteFloorWidth = 3.2;
     const whiteFloorGeo = new THREE.PlaneGeometry(whiteFloorWidth, MALL_LENGTH);
     whiteFloorGeo.rotateX(-Math.PI / 2);
     const whiteFloorMat = new THREE.MeshStandardMaterial({
+      color: 0xf4ead8,
       map: createCalacattaWhiteMarbleTexture(),
       roughness: 0.40,
       metalness: 0.05,
@@ -629,11 +630,12 @@
     const ceilingGeo = new THREE.PlaneGeometry(MALL_WIDTH, MALL_LENGTH);
     ceilingGeo.rotateX(Math.PI / 2);
     const ceilingMat = new THREE.MeshStandardMaterial({
+      color: 0xf6ecda,
       map: corridorCeilingTex,
-      roughness: 0.80,
-      metalness: 0.06,
-      emissive: new THREE.Color(0xfff5ea),
-      emissiveIntensity: 0.20, // refined, softly illuminated ceiling without blown-out glow
+      roughness: 0.84,
+      metalness: 0.04,
+      emissive: new THREE.Color(0xf5e2be),
+      emissiveIntensity: 0.14, // soft warm cream ceiling without blowing out
       side: THREE.DoubleSide
     });
     const ceilingMesh = new THREE.Mesh(ceilingGeo, ceilingMat);
@@ -1044,63 +1046,65 @@
     rightWallGeo.computeVertexNormals();
 
     const rightWallMat = new THREE.MeshStandardMaterial({
+      color: 0xf5ead6,
       map: createWhiteWallWithTextTexture(),
-      roughness: 0.82,
-      metalness: 0.02,
+      roughness: 0.88,
+      metalness: 0.01,
       side: THREE.FrontSide
     });
     const rightWall = new THREE.Mesh(rightWallGeo, rightWallMat);
     rightWall.position.set(halfW, halfH, -MALL_LENGTH / 2 + 8);
     scene.add(rightWall);
 
-    // 4.1. Right Wall & Ceiling Junction: Dim Yellow Architectural Cove & Minimal Sconce Lamps
+    // 4.1. Right Wall & Ceiling Junction: Glowing Yellow Architectural Cove & Sconce Lamps
     const corniceZ = -MALL_LENGTH / 2 + 8;
     const corniceHousingMat = new THREE.MeshStandardMaterial({
-      color: 0x161820,
+      color: 0x1a1814,
       roughness: 0.35,
-      metalness: 0.72
+      metalness: 0.65
     });
-    const dimYellowLampMat = new THREE.MeshStandardMaterial({
-      color: 0xf2cd74,
-      emissive: new THREE.Color(0xe5b242),
-      emissiveIntensity: 0.55,
-      roughness: 0.25,
-      metalness: 0.1
+    const yellowLampGlowMat = new THREE.MeshStandardMaterial({
+      color: 0xffdc5e,
+      emissive: new THREE.Color(0xffbe1a),
+      emissiveIntensity: 1.5,
+      roughness: 0.2,
+      metalness: 0.05
     });
 
-    // Continuous shadow-gap cornice lip framing the cove along the right wall-ceiling seam
-    const rightCorniceLip = new THREE.Mesh(
-      new THREE.BoxGeometry(0.10, 0.05, MALL_LENGTH),
+    // Slim backing rail along the right wall-ceiling seam (behind/above lamp so lamp glows clearly into corridor)
+    const rightCorniceRail = new THREE.Mesh(
+      new THREE.BoxGeometry(0.05, 0.04, MALL_LENGTH),
       corniceHousingMat
     );
-    rightCorniceLip.position.set(halfW - 0.09, MALL_HEIGHT - 0.11, corniceZ);
-    scene.add(rightCorniceLip);
+    rightCorniceRail.position.set(halfW - 0.03, MALL_HEIGHT - 0.03, corniceZ);
+    scene.add(rightCorniceRail);
 
-    // Continuous dim yellow linear cove lamp tucked inside the cornice
+    // Continuous glowing yellow linear cove lamp facing directly into the corridor & downward
     const rightCoveLamp = new THREE.Mesh(
-      new THREE.BoxGeometry(0.06, 0.04, MALL_LENGTH),
-      dimYellowLampMat
+      new THREE.BoxGeometry(0.08, 0.055, MALL_LENGTH),
+      yellowLampGlowMat
     );
-    rightCoveLamp.position.set(halfW - 0.035, MALL_HEIGHT - 0.06, corniceZ);
+    rightCoveLamp.position.set(halfW - 0.06, MALL_HEIGHT - 0.08, corniceZ);
     scene.add(rightCoveLamp);
 
-    // Minimal linear architectural sconce lamps spaced rhythmically along the upper right wall-ceiling corner
+    // Minimal linear architectural sconce lamps with downward/forward glowing yellow diffusers
     const rightLampZList = [2, -12, -26, -40, -54, -68];
-    const sconceBodyGeo = new THREE.BoxGeometry(0.11, 0.07, 1.5);
-    const sconceGlowGeo = new THREE.BoxGeometry(0.08, 0.025, 1.42);
+    const sconceBodyGeo = new THREE.BoxGeometry(0.10, 0.045, 1.5);
+    const sconceGlowGeo = new THREE.BoxGeometry(0.11, 0.055, 1.44);
     rightLampZList.forEach(lz => {
       const sconceBody = new THREE.Mesh(sconceBodyGeo, corniceHousingMat);
-      sconceBody.position.set(halfW - 0.06, MALL_HEIGHT - 0.28, lz);
+      sconceBody.position.set(halfW - 0.055, MALL_HEIGHT - 0.24, lz);
       scene.add(sconceBody);
 
-      const sconceGlow = new THREE.Mesh(sconceGlowGeo, dimYellowLampMat);
-      sconceGlow.position.set(halfW - 0.06, MALL_HEIGHT - 0.235, lz);
+      // Glowing yellow lamp tube placed below & in front of the bracket so it visibly glows yellow
+      const sconceGlow = new THREE.Mesh(sconceGlowGeo, yellowLampGlowMat);
+      sconceGlow.position.set(halfW - 0.075, MALL_HEIGHT - 0.29, lz);
       scene.add(sconceGlow);
 
-      // Soft dim yellow ambient wash onto the upper right wall & ceiling corner
-      const dimYellowWash = new THREE.PointLight(0xffcf6e, 0.35, 9, 2.0);
-      dimYellowWash.position.set(halfW - 0.35, MALL_HEIGHT - 0.38, lz);
-      scene.add(dimYellowWash);
+      // Warm yellow ambient wash onto the upper right cream wall & ceiling corner
+      const yellowWash = new THREE.PointLight(0xffc93c, 0.58, 11, 2.0);
+      yellowWash.position.set(halfW - 0.45, MALL_HEIGHT - 0.42, lz);
+      scene.add(yellowWash);
     });
 
     // Luxury Planters placed rhythmically along the Right Gallery Wall
@@ -1132,13 +1136,13 @@
     for (let i = 0; i < lightCount; i++) {
       const zPos = 8 - i * lightSpacing;
 
-      // Soft architectural downlight (minimal specular flare on floor)
-      const spotLight = new THREE.PointLight(0xfff4e4, 0.65, 14, 2.0);
+      // Soft architectural cream downlight (minimal cream reflection on floor)
+      const spotLight = new THREE.PointLight(0xf7e3be, 0.58, 14, 2.0);
       spotLight.position.set(0, MALL_HEIGHT - 0.4, zPos);
       scene.add(spotLight);
 
-      // Soft diffuse gallery wall wash
-      const rightLight = new THREE.PointLight(0xfff8ee, 0.25, 12, 2.0);
+      // Soft diffuse cream gallery wall wash
+      const rightLight = new THREE.PointLight(0xf6e2bc, 0.22, 12, 2.0);
       rightLight.position.set(halfW - 1.5, 3.2, zPos);
       scene.add(rightLight);
     }
@@ -1181,11 +1185,11 @@
     renderer.domElement.id = 'space-three-canvas';
     canvasWrap.appendChild(renderer.domElement);
 
-    // 4. Ambient and Directional Lights for realistic specular sheen
-    const ambientLight = new THREE.AmbientLight(0xfff5ea, 0.95);
+    // 4. Ambient and Directional Lights for warm cream tone & minimal reflection
+    const ambientLight = new THREE.AmbientLight(0xf5e6cc, 0.72);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffeed6, 1.25);
+    const dirLight = new THREE.DirectionalLight(0xf7e2bc, 0.85);
     dirLight.position.set(4, 12, 8);
     scene.add(dirLight);
 
