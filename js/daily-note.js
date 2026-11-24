@@ -14,15 +14,13 @@
 // =========================================================
 const DAILY_NOTE_CONFIG = {
   // Unique question key (updating this automatically resets attempts for new questions)
-  questionId: "digi_note_dbms_paper_23_nov_2026",
+  questionId: "digi_note_kismat_se_hara_24_nov_2026",
 
   // Note message jo unlock hone par dikhega:
-  noteText: `23 , DBMS ka paper hai baby . 
-Mujhe padhne ka man to nhi ho rha hai 
-Balki tujhe yaad kare ja rha hu mai .
-Tu bhi mujhe yaad kar mujhe nhi pta . 
-Kissiyan de mujhe jitne ho ske 
-Muuumaa....`,
+  noteText: `Agar Mai Milun Kahin Tere Bina 
+To Smj Lena Kismat Se Mai Hara Hu 
+Nhi To Kya Cheez Thi Mujhe Harane Vali 
+Jo Ajj Apni Hi Cheez Ko Mai Hara Hu`,
 
   // Note Memory Photo:
   imageUrl: "assets/daily_note.jpg",
