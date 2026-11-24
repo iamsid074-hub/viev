@@ -517,68 +517,22 @@
     ctx.fillStyle = 'rgba(212, 175, 55, 0.55)';
     ctx.fillRect(0, 502, 4096, 10);
 
-    const bayCenters = [512, 1536, 2560, 3584];
-
-    // 1. Floating Illuminated Backlit Display Lightboxes (Matching Photo)
-    bayCenters.forEach((cx, idx) => {
-      const frameW = 460;
-      const frameH = 210;
-      const frameX = cx - frameW / 2;
-      const frameY = 60;
-
-      // Warm halo backlight
-      ctx.save();
-      ctx.shadowColor = 'rgba(255, 235, 180, 0.5)';
-      ctx.shadowBlur = 24;
-      ctx.fillStyle = '#11141c';
-      ctx.fillRect(frameX, frameY, frameW, frameH);
-      ctx.restore();
-
-      // Champagne gold slim frame border
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.65)';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(frameX, frameY, frameW, frameH);
-
-      // Artwork inside frame (e.g. Glowing Apple logo on Bay 2, Luxury motif on others)
-      if (idx === 1) {
-        // Glowing Apple logo
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = '#ffffff';
-        ctx.shadowBlur = 18;
-        ctx.font = 'bold 58px -apple-system, BlinkMacSystemFont, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('', cx, frameY + frameH / 2);
-      } else {
-        // High-end minimalist luxury geometric art lines
-        ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(cx, frameY + frameH / 2, 48, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.fillStyle = '#ffd778';
-        ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, "Cinzel", Georgia, serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('EDITION', cx, frameY + frameH / 2);
-      }
-    });
-
-    // 2. SOLID JET-BLACK ULTRA-BOLD TYPOGRAPHY: WRITTEN EXACTLY ONCE FROM START TO END
-    // Zero overlapping: Each word has its own dedicated spacious gallery section!
-    ctx.font = '900 76px -apple-system, BlinkMacSystemFont, "Montserrat", "Cinzel", "Arial Black", "Playfair Display", Georgia, serif';
+    // SOLID JET-BLACK ULTRA-BOLD TYPOGRAPHY: ONE CONTINUOUS HORIZONTAL LINE AT NATURAL EYE LEVEL
+    // Starts with "WE" on the left, running continuously to "OTHER" on the right
+    ctx.font = '900 80px -apple-system, BlinkMacSystemFont, "Montserrat", "Cinzel", "Arial Black", "Playfair Display", Georgia, serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     const words = [
-      { text: 'W E', x: 3820 },
-      { text: 'W I L L', x: 3260 },
-      { text: 'D E F I N E T L Y', x: 2360 },
-      { text: 'G E T', x: 1540 },
-      { text: 'E A C H', x: 960 },
-      { text: 'O T H E R', x: 360 }
+      { text: 'W E', x: 380 },
+      { text: 'W I L L', x: 980 },
+      { text: 'D E F I N E T L Y', x: 1880 },
+      { text: 'G E T', x: 2700 },
+      { text: 'E A C H', x: 3340 },
+      { text: 'O T H E R', x: 3850 }
     ];
+
+    const eyeLevelY = 350; // Natural human eye height (~2.0m from floor, not high up on ceiling)
 
     words.forEach(w => {
       // Subtle ambient contact shadow for clean architectural depth
@@ -591,8 +545,8 @@
       ctx.fillStyle = '#050608';
       ctx.strokeStyle = '#050608';
       ctx.lineWidth = 5;
-      ctx.strokeText(w.text, w.x, 256);
-      ctx.fillText(w.text, w.x, 256);
+      ctx.strokeText(w.text, w.x, eyeLevelY);
+      ctx.fillText(w.text, w.x, eyeLevelY);
     });
 
     const texture = new THREE.CanvasTexture(canvas);
