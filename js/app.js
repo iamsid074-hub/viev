@@ -719,9 +719,6 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (targetId === 'subpage-notifications') {
         navCenterTitle.textContent = 'Notifications';
         navCenterTitle.style.display = 'block';
-      } else if (targetId === 'subpage-monument') {
-        navCenterTitle.textContent = 'The Monument';
-        navCenterTitle.style.display = 'block';
       } else {
         navCenterTitle.textContent = '';
         navCenterTitle.style.display = 'none';
@@ -758,10 +755,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (targetId === 'subpage-notifications') {
       if (window.vievNotifications && typeof window.vievNotifications.updateUI === 'function') {
         window.vievNotifications.updateUI();
-      }
-    } else if (targetId === 'subpage-monument') {
-      if (window.vievMonument && typeof window.vievMonument.init === 'function') {
-        window.vievMonument.init();
       }
     }
   }
