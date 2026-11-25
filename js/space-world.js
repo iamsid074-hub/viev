@@ -107,6 +107,15 @@
     1: { mats: null, normalLight: null, dimYellowLight: null, fadeCur: 0, fadeTarget: 0 },
     2: { mats: null, normalLight: null, dimYellowLight: null, fadeCur: 0, fadeTarget: 0 }
   };
+
+  // Far-End Premium Wood Wall Automatic Double Doors State
+  const cinemaDoorState = {
+    leftGroup: null,
+    rightGroup: null,
+    doorZ: -76.0,
+    openProgress: 0,
+    targetProgress: 0
+  };
   let lookTouchId = null;
   let prevPointerX = 0;
   let prevPointerY = 0;
@@ -1796,20 +1805,281 @@
       scene.add(p);
     });
 
-    // 5. FAR END GRAND FEATURE WALL: "VIEV - EXPLORE MORE"
-    const endWallGeo = new THREE.PlaneGeometry(MALL_WIDTH, MALL_HEIGHT);
-    const endWallMat = new THREE.MeshStandardMaterial({
-      map: createFarEndFeatureTexture(),
-      roughness: 0.35,
-      metalness: 0.25
-    });
-    const endWall = new THREE.Mesh(endWallGeo, endWallMat);
-    endWall.position.set(0, halfH, -MALL_LENGTH + 8);
-    scene.add(endWall);
+    // 5. FAR END LARGE PREMIUM WOOD WALL, AUTOMATIC DOUBLE DOORS & EMPTY CINEMA HALL
+    const zEndWall = -MALL_LENGTH + 8; // -76.0m
+    cinemaDoorState.doorZ = zEndWall;
 
-    // Dedicated feature wall warm spotlight
+    // Close left corridor wall cleanly between Shop 4 (-66m) and Wood Wall (-76m)
+    const leftTailGeo = new THREE.PlaneGeometry(10.0, MALL_HEIGHT);
+    leftTailGeo.rotateY(Math.PI / 2);
+    const leftTailWall = new THREE.Mesh(leftTailGeo, firstShopSideWallMat);
+    leftTailWall.position.set(-halfW, halfH, -71.0);
+    scene.add(leftTailWall);
+
+    function createPremiumWoodWallTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+
+      // Deep rich walnut wood base
+      const baseGrad = ctx.createLinearGradient(0, 0, 1024, 0);
+      baseGrad.addColorStop(0, '#3a2414');
+      baseGrad.addColorStop(0.5, '#4b301b');
+      baseGrad.addColorStop(1, '#362112');
+      ctx.fillStyle = baseGrad;
+      ctx.fillRect(0, 0, 1024, 1024);
+
+      // Vertical architectural wood slat grooves & natural grain
+      for (let x = 0; x < 1024; x += 24) {
+        const g = ctx.createLinearGradient(x, 0, x + 24, 0);
+        g.addColorStop(0, 'rgba(20, 10, 4, 0.45)');
+        g.addColorStop(0.2, 'rgba(110, 72, 42, 0.22)');
+        g.addColorStop(0.75, 'rgba(58, 36, 18, 0.10)');
+        g.addColorStop(1, 'rgba(18, 9, 4, 0.50)');
+        ctx.fillStyle = g;
+        ctx.fillRect(x, 0, 24, 1024);
+      }
+
+      // Fine organic wood grain streaks
+      for (let i = 0; i < 420; i++) {
+        const gx = Math.random() * 1024;
+        const gy = Math.random() * 1024;
+        const gh = 40 + Math.random() * 160;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(25, 12, 5, 0.16)' : 'rgba(130, 88, 52, 0.12)';
+        ctx.fillRect(gx, gy, 1.5, gh);
+      }
+
+      // Subtle brushed-brass horizontal reveal trims
+      ctx.fillStyle = 'rgba(205, 168, 92, 0.55)';
+      ctx.fillRect(0, 28, 1024, 4);
+      ctx.fillRect(0, 992, 1024, 4);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.encoding = THREE.sRGBEncoding;
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      tex.anisotropy = 16;
+      return tex;
+    }
+
+    function createPremiumDoorLeafTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#362112';
+      ctx.fillRect(0, 0, 512, 1024);
+
+      for (let i = 0; i < 240; i++) {
+        const gx = Math.random() * 512;
+        const gy = Math.random() * 1024;
+        ctx.fillStyle = Math.random() > 0.5 ? 'rgba(18, 9, 4, 0.22)' : 'rgba(115, 76, 44, 0.14)';
+        ctx.fillRect(gx, gy, 2, 50 + Math.random() * 120);
+      }
+
+      // Sculpted luxury double-panel geometric brass inlay
+      [[48, 54, 416, 560], [48, 650, 416, 310]].forEach(([px, py, pw, ph]) => {
+        ctx.fillStyle = '#2b1a0d';
+        ctx.fillRect(px, py, pw, ph);
+        ctx.strokeStyle = '#c8a04d';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(px, py, pw, ph);
+        ctx.strokeStyle = 'rgba(220, 185, 105, 0.45)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(px + 14, py + 14, pw - 28, ph - 28);
+      });
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.encoding = THREE.sRGBEncoding;
+      tex.anisotropy = 16;
+      return tex;
+    }
+
+    const woodWallTex = createPremiumWoodWallTexture();
+    const woodWallMat = new THREE.MeshStandardMaterial({
+      map: woodWallTex,
+      roughness: 0.52,
+      metalness: 0.08
+    });
+    const doorLeafMat = new THREE.MeshStandardMaterial({
+      map: createPremiumDoorLeafTexture(),
+      roughness: 0.42,
+      metalness: 0.12
+    });
+    const doorBrassTrimMat = new THREE.MeshStandardMaterial({
+      color: 0xd4af37,
+      roughness: 0.22,
+      metalness: 0.88,
+      emissive: new THREE.Color(0x6e5415),
+      emissiveIntensity: 0.18
+    });
+
+    const doorOpenW = 4.6; // 4.6m wide double doorway (-2.3 to +2.3)
+    const doorOpenH = 4.6; // 4.6m tall double doorway
+    const woodWallDepth = 0.45;
+    const sideWoodW = (MALL_WIDTH - doorOpenW) / 2; // 3.7m each side
+
+    // Left Wood Wall Wing
+    const leftWoodWall = new THREE.Mesh(
+      new THREE.BoxGeometry(sideWoodW, MALL_HEIGHT, woodWallDepth),
+      woodWallMat
+    );
+    leftWoodWall.position.set(-halfW + sideWoodW / 2, halfH, zEndWall);
+    scene.add(leftWoodWall);
+
+    // Right Wood Wall Wing
+    const rightWoodWall = new THREE.Mesh(
+      new THREE.BoxGeometry(sideWoodW, MALL_HEIGHT, woodWallDepth),
+      woodWallMat
+    );
+    rightWoodWall.position.set(halfW - sideWoodW / 2, halfH, zEndWall);
+    scene.add(rightWoodWall);
+
+    // Overhead Wood Header above Double Doors
+    const headerWoodH = MALL_HEIGHT - doorOpenH; // 1.8m
+    const topWoodWall = new THREE.Mesh(
+      new THREE.BoxGeometry(doorOpenW, headerWoodH, woodWallDepth),
+      woodWallMat
+    );
+    topWoodWall.position.set(0, doorOpenH + headerWoodH / 2, zEndWall);
+    scene.add(topWoodWall);
+
+    // Brushed Brass Architectural Door Frame Architrave
+    const frameThick = 0.12;
+    const frameDepth = woodWallDepth + 0.06;
+    const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, doorOpenH, frameDepth), doorBrassTrimMat);
+    leftFrame.position.set(-doorOpenW / 2 + frameThick / 2, doorOpenH / 2, zEndWall);
+    scene.add(leftFrame);
+
+    const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, doorOpenH, frameDepth), doorBrassTrimMat);
+    rightFrame.position.set(doorOpenW / 2 - frameThick / 2, doorOpenH / 2, zEndWall);
+    scene.add(rightFrame);
+
+    const topFrame = new THREE.Mesh(new THREE.BoxGeometry(doorOpenW, frameThick, frameDepth), doorBrassTrimMat);
+    topFrame.position.set(0, doorOpenH - frameThick / 2, zEndWall);
+    scene.add(topFrame);
+
+    // Premium Automatic Double Doors (Hinged at Left & Right Jambs, swinging smoothly open into Cinema Hall)
+    const leafW = (doorOpenW - frameThick * 2) / 2 - 0.01; // ~2.17m each leaf
+    const leafH = doorOpenH - frameThick - 0.02;
+    const leafThick = 0.10;
+    const cinemaHandleGeo = new THREE.CylinderGeometry(0.024, 0.024, 1.5, 16);
+
+    // Left Door Leaf Group
+    const leftCinemaDoorGroup = new THREE.Group();
+    leftCinemaDoorGroup.position.set(-doorOpenW / 2 + frameThick, 0, zEndWall);
+    const leftLeafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafThick), doorLeafMat);
+    leftLeafMesh.position.set(leafW / 2, leafH / 2 + 0.01, 0);
+    leftCinemaDoorGroup.add(leftLeafMesh);
+    // Front & back vertical brass pull handles
+    const lHandleF = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
+    lHandleF.position.set(leafW - 0.22, 1.45, leafThick / 2 + 0.045);
+    leftCinemaDoorGroup.add(lHandleF);
+    const lHandleB = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
+    lHandleB.position.set(leafW - 0.22, 1.45, -(leafThick / 2 + 0.045));
+    leftCinemaDoorGroup.add(lHandleB);
+    scene.add(leftCinemaDoorGroup);
+
+    // Right Door Leaf Group
+    const rightCinemaDoorGroup = new THREE.Group();
+    rightCinemaDoorGroup.position.set(doorOpenW / 2 - frameThick, 0, zEndWall);
+    const rightLeafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafThick), doorLeafMat);
+    rightLeafMesh.position.set(-leafW / 2, leafH / 2 + 0.01, 0);
+    rightCinemaDoorGroup.add(rightLeafMesh);
+    const rHandleF = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
+    rHandleF.position.set(-(leafW - 0.22), 1.45, leafThick / 2 + 0.045);
+    rightCinemaDoorGroup.add(rHandleF);
+    const rHandleB = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
+    rHandleB.position.set(-(leafW - 0.22), 1.45, -(leafThick / 2 + 0.045));
+    rightCinemaDoorGroup.add(rHandleB);
+    scene.add(rightCinemaDoorGroup);
+
+    cinemaDoorState.leftGroup = leftCinemaDoorGroup;
+    cinemaDoorState.rightGroup = rightCinemaDoorGroup;
+
+    // 5.1. EMPTY CINEMA HALL AREA BEHIND THE DOUBLE DOORS (z = -76m to -104m, width = 24m, height = 8.4m)
+    const hallW = 24.0;
+    const hallL = 28.0;
+    const hallH = 8.4;
+    const hallCenterZ = zEndWall - hallL / 2; // -90.0m
+
+    const hallFloorMat = new THREE.MeshStandardMaterial({
+      color: 0x0f1016,
+      roughness: 0.92,
+      metalness: 0.05
+    });
+    const hallWallMat = new THREE.MeshStandardMaterial({
+      color: 0x13141c,
+      roughness: 0.85,
+      metalness: 0.08,
+      side: THREE.DoubleSide
+    });
+    const hallCeilingMat = new THREE.MeshStandardMaterial({
+      color: 0x0b0c10,
+      roughness: 0.9,
+      metalness: 0.05,
+      side: THREE.DoubleSide
+    });
+
+    // Empty Cinema Hall Floor
+    const hallFloorGeo = new THREE.PlaneGeometry(hallW, hallL);
+    hallFloorGeo.rotateX(-Math.PI / 2);
+    const hallFloor = new THREE.Mesh(hallFloorGeo, hallFloorMat);
+    hallFloor.position.set(0, 0.004, hallCenterZ);
+    scene.add(hallFloor);
+
+    // Empty Cinema Hall Ceiling
+    const hallCeilGeo = new THREE.PlaneGeometry(hallW, hallL);
+    hallCeilGeo.rotateX(Math.PI / 2);
+    const hallCeil = new THREE.Mesh(hallCeilGeo, hallCeilingMat);
+    hallCeil.position.set(0, hallH, hallCenterZ);
+    scene.add(hallCeil);
+
+    // Back Wall (z = -104m)
+    const hallBackWall = new THREE.Mesh(new THREE.PlaneGeometry(hallW, hallH), hallWallMat);
+    hallBackWall.position.set(0, hallH / 2, zEndWall - hallL);
+    scene.add(hallBackWall);
+
+    // Left & Right Side Walls (x = -12m and x = +12m)
+    const hallSideGeo = new THREE.PlaneGeometry(hallL, hallH);
+    hallSideGeo.rotateY(Math.PI / 2);
+    const hallLeftWall = new THREE.Mesh(hallSideGeo, hallWallMat);
+    hallLeftWall.position.set(-hallW / 2, hallH / 2, hallCenterZ);
+    scene.add(hallLeftWall);
+
+    const hallRightWall = new THREE.Mesh(hallSideGeo, hallWallMat);
+    hallRightWall.position.set(hallW / 2, hallH / 2, hallCenterZ);
+    scene.add(hallRightWall);
+
+    // Front Return Wings closing wider Cinema Hall around the 12m corridor (z = -76m)
+    const hallReturnW = (hallW - MALL_WIDTH) / 2; // 6m each side
+    const hallFrontLeft = new THREE.Mesh(new THREE.PlaneGeometry(hallReturnW, hallH), hallWallMat);
+    hallFrontLeft.position.set(-halfW - hallReturnW / 2, hallH / 2, zEndWall);
+    scene.add(hallFrontLeft);
+
+    const hallFrontRight = new THREE.Mesh(new THREE.PlaneGeometry(hallReturnW, hallH), hallWallMat);
+    hallFrontRight.position.set(halfW + hallReturnW / 2, hallH / 2, zEndWall);
+    scene.add(hallFrontRight);
+
+    // Upper header return above corridor height (y = 6.4m to 8.4m at z = -76m)
+    const hallFrontTop = new THREE.Mesh(new THREE.PlaneGeometry(MALL_WIDTH, hallH - MALL_HEIGHT), hallWallMat);
+    hallFrontTop.position.set(0, MALL_HEIGHT + (hallH - MALL_HEIGHT) / 2, zEndWall);
+    scene.add(hallFrontTop);
+
+    // Subtle warm ambient lights inside the empty Cinema Hall
+    const hallLight1 = new THREE.PointLight(0xffdfb0, 0.95, 28, 1.8);
+    hallLight1.position.set(0, 6.2, zEndWall - 8);
+    scene.add(hallLight1);
+
+    const hallLight2 = new THREE.PointLight(0xffdfb0, 0.75, 28, 1.8);
+    hallLight2.position.set(0, 6.2, zEndWall - 20);
+    scene.add(hallLight2);
+
+    // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
     const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
-    featureWallSpot.position.set(0, 3.8, -MALL_LENGTH + 14);
+    featureWallSpot.position.set(0, 3.8, zEndWall + 6);
     scene.add(featureWallSpot);
 
     // 6. Warm Interior Point Lights along Main Promenade (Refined minimal ambient illumination)
@@ -2234,8 +2504,16 @@
 
       // Axis-independent collision sliding (diagonal movement slides along walls smoothly)
       let nextX = camera.position.x + deltaX;
-      nextX = Math.min(5.2, Math.max(-13.2, nextX));
-      if (nextX < -5.8 && [-12, -30, -48].some(divZ => Math.abs(camera.position.z - divZ) < 0.65)) {
+      if (camera.position.z < -76.2) {
+        // Inside wider Empty Cinema Hall (-11m to +11m)
+        nextX = Math.min(11.0, Math.max(-11.0, nextX));
+      } else if (camera.position.z < -66.0) {
+        // Corridor tail between Shop 4 and Wood Wall (-5.2m to +5.2m)
+        nextX = Math.min(5.2, Math.max(-5.2, nextX));
+      } else {
+        nextX = Math.min(5.2, Math.max(-13.2, nextX));
+      }
+      if (nextX < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(camera.position.z - divZ) < 0.65)) {
         nextX = camera.position.x;
       }
       // Fixed glass storefront window collision (x = -6.0): central 4.4m doorway allows entrance
@@ -2251,9 +2529,16 @@
       camera.position.x = nextX;
 
       let nextZ = camera.position.z + deltaZ;
-      nextZ = Math.min(6.0, Math.max(-66.0, nextZ));
-      if (camera.position.x < -5.8 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
+      nextZ = Math.min(6.0, Math.max(-102.5, nextZ));
+      if (camera.position.x < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
+      }
+      // Far-end Wood Wall & Double Doorway collision at z = -76.0m
+      if (Math.abs(nextZ - cinemaDoorState.doorZ) < 0.55) {
+        const inDoorOpening = Math.abs(camera.position.x) < 1.85 && cinemaDoorState.openProgress > 0.35;
+        if (!inDoorOpening) {
+          nextZ = camera.position.z;
+        }
       }
       camera.position.z = nextZ;
 
@@ -2663,6 +2948,19 @@
     }
   }
 
+  function updateCinemaDoors() {
+    if (!cinemaDoorState.leftGroup || !cinemaDoorState.rightGroup || !camera) return;
+    const dist = Math.hypot(camera.position.x, camera.position.z - cinemaDoorState.doorZ);
+    cinemaDoorState.targetProgress = dist < 7.5 ? 1 : 0;
+    const diff = cinemaDoorState.targetProgress - cinemaDoorState.openProgress;
+    if (Math.abs(diff) > 0.001) {
+      cinemaDoorState.openProgress += diff * 0.065;
+      const angle = cinemaDoorState.openProgress * (Math.PI * 0.48);
+      cinemaDoorState.leftGroup.rotation.y = angle;
+      cinemaDoorState.rightGroup.rotation.y = -angle;
+    }
+  }
+
   /**
    * Render Loop
    */
@@ -2680,6 +2978,7 @@
     updateAllShopLightingFades();
     renderFirstShopLedScreen(false);
     updateCorridorLedProximityAudio();
+    updateCinemaDoors();
 
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
