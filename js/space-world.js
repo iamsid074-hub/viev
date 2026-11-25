@@ -85,6 +85,8 @@
   const shop2VideoState = {
     video: null,
     tex: null,
+    posterTex: null,
+    mat: null,
     tvPos: { x: -13.9, z: -21.0 },
     isPlaying: false
   };
@@ -93,6 +95,8 @@
   const shop3VideoState = {
     video: null,
     tex: null,
+    posterTex: null,
+    mat: null,
     tvPos: { x: -13.9, z: -39.0 },
     isPlaying: false
   };
@@ -1235,15 +1239,15 @@
         });
       } else if (i === 1) {
         if (!shop2VideoState.video) {
+          const s2Poster = setupTexture(textureLoader.load('assets/video/shop2_poster.jpg'));
           const s2Vid = document.createElement('video');
           s2Vid.src = 'assets/video/shop2_led.mp4';
           s2Vid.loop = true;
-          s2Vid.muted = true; // auto-play muted immediately without Play button
+          s2Vid.muted = false;
           s2Vid.playsInline = true;
           s2Vid.setAttribute('playsinline', '');
-          s2Vid.preload = 'auto';
+          s2Vid.preload = 'metadata';
           s2Vid.volume = 0.45;
-          s2Vid.play().catch(() => { });
 
           const s2Tex = new THREE.VideoTexture(s2Vid);
           s2Tex.encoding = THREE.sRGBEncoding;
@@ -1252,30 +1256,40 @@
 
           shop2VideoState.video = s2Vid;
           shop2VideoState.tex = s2Tex;
+          shop2VideoState.posterTex = s2Poster;
           shop2VideoState.tvPos = { x: xBack + 0.098, z: zCenter };
+
+          s2Vid.addEventListener('playing', () => {
+            if (shop2VideoState.mat && shop2VideoState.tex) {
+              shop2VideoState.mat.map = shop2VideoState.tex;
+              shop2VideoState.mat.emissiveMap = shop2VideoState.tex;
+              shop2VideoState.mat.needsUpdate = true;
+            }
+          });
         }
         activeScreenMat = new THREE.MeshStandardMaterial({
-          map: shop2VideoState.tex,
-          emissiveMap: shop2VideoState.tex,
+          map: shop2VideoState.posterTex,
+          emissiveMap: shop2VideoState.posterTex,
           emissive: new THREE.Color(0xffffff),
-          emissiveIntensity: 0.94,
+          emissiveIntensity: 0.92,
           roughness: 0.08,
           metalness: 0.15,
           polygonOffset: true,
           polygonOffsetFactor: -2,
           polygonOffsetUnits: -2
         });
+        shop2VideoState.mat = activeScreenMat;
       } else if (i === 2) {
         if (!shop3VideoState.video) {
+          const s3Poster = setupTexture(textureLoader.load('assets/video/shop3_poster.jpg'));
           const s3Vid = document.createElement('video');
           s3Vid.src = 'assets/video/shop3_led.mp4';
           s3Vid.loop = true;
-          s3Vid.muted = true; // auto-play muted immediately without Play button
+          s3Vid.muted = false;
           s3Vid.playsInline = true;
           s3Vid.setAttribute('playsinline', '');
-          s3Vid.preload = 'auto';
+          s3Vid.preload = 'metadata';
           s3Vid.volume = 0.45;
-          s3Vid.play().catch(() => { });
 
           const s3Tex = new THREE.VideoTexture(s3Vid);
           s3Tex.encoding = THREE.sRGBEncoding;
@@ -1284,19 +1298,29 @@
 
           shop3VideoState.video = s3Vid;
           shop3VideoState.tex = s3Tex;
+          shop3VideoState.posterTex = s3Poster;
           shop3VideoState.tvPos = { x: xBack + 0.098, z: zCenter };
+
+          s3Vid.addEventListener('playing', () => {
+            if (shop3VideoState.mat && shop3VideoState.tex) {
+              shop3VideoState.mat.map = shop3VideoState.tex;
+              shop3VideoState.mat.emissiveMap = shop3VideoState.tex;
+              shop3VideoState.mat.needsUpdate = true;
+            }
+          });
         }
         activeScreenMat = new THREE.MeshStandardMaterial({
-          map: shop3VideoState.tex,
-          emissiveMap: shop3VideoState.tex,
+          map: shop3VideoState.posterTex,
+          emissiveMap: shop3VideoState.posterTex,
           emissive: new THREE.Color(0xffffff),
-          emissiveIntensity: 0.94,
+          emissiveIntensity: 0.92,
           roughness: 0.08,
           metalness: 0.15,
           polygonOffset: true,
           polygonOffsetFactor: -2,
           polygonOffsetUnits: -2
         });
+        shop3VideoState.mat = activeScreenMat;
       }
       const shopLedScreen = new THREE.Mesh(shopLedScreenGeo, activeScreenMat);
       shopLedScreen.position.set(xBack + 0.098, shopLedY, zCenter);
@@ -2369,11 +2393,11 @@
       setShopAudioLighting(0, false);
       renderFirstShopLedScreen(true);
     } else if (idx === 1 && shop2VideoState.isPlaying) {
-      if (shop2VideoState.video) shop2VideoState.video.muted = true; // keep video playing visually, mute audio
+      if (shop2VideoState.video) shop2VideoState.video.pause();
       shop2VideoState.isPlaying = false;
       setShopAudioLighting(1, false);
     } else if (idx === 2 && shop3VideoState.isPlaying) {
-      if (shop3VideoState.video) shop3VideoState.video.muted = true; // keep video playing visually, mute audio
+      if (shop3VideoState.video) shop3VideoState.video.pause();
       shop3VideoState.isPlaying = false;
       setShopAudioLighting(2, false);
     }
