@@ -2138,8 +2138,254 @@
     scene.add(hallLight1);
 
     const hallLight2 = new THREE.PointLight(0xffdfb0, 0.95, 36, 1.8);
-    hallLight2.position.set(hallCenterX, 10.2, zEndWall - 29);
+    hallLight2.position.set(hallCenterX, 10.6, zEndWall - 29);
     scene.add(hallLight2);
+
+    const hallLight3 = new THREE.PointLight(0xffdca8, 0.85, 28, 1.8);
+    hallLight3.position.set(-15.5, 10.6, -104.5);
+    scene.add(hallLight3);
+
+    const hallLight4 = new THREE.PointLight(0xffe2b5, 0.9, 28, 1.8);
+    hallLight4.position.set(-8.8, 10.8, -111.0);
+    scene.add(hallLight4);
+
+    // 5.2. LUXURY CINEMA SEATING ARRANGEMENT ON UPPER HALL (4 Left + Walkway + 8 Centre + Walkway + 4 Right + Top VIP Recliners)
+    // Shared Materials for Luxury Seats & Special Recliners
+    const luxVelvetMat = new THREE.MeshStandardMaterial({
+      color: 0x5c1122,
+      roughness: 0.78,
+      metalness: 0.05
+    });
+    const luxLeatherTrimMat = new THREE.MeshStandardMaterial({
+      color: 0x1e1512,
+      roughness: 0.45,
+      metalness: 0.12
+    });
+    const vipReclinerMat = new THREE.MeshStandardMaterial({
+      color: 0x4b2616,
+      roughness: 0.48,
+      metalness: 0.1
+    });
+    const vipPillowMat = new THREE.MeshStandardMaterial({
+      color: 0x693720,
+      roughness: 0.55,
+      metalness: 0.06
+    });
+    const seatBaseMat = new THREE.MeshStandardMaterial({
+      color: 0x101117,
+      roughness: 0.75,
+      metalness: 0.25
+    });
+
+    // Shared Geometries for Standard Luxury Cinema Seat (1.20m pitch, comfortable spacing)
+    const seatGeo = {
+      pedestal: new THREE.BoxGeometry(0.50, 0.22, 0.48),
+      cushion: new THREE.BoxGeometry(0.72, 0.16, 0.64),
+      backrest: new THREE.BoxGeometry(0.72, 0.74, 0.16),
+      headrest: new THREE.BoxGeometry(0.58, 0.22, 0.14),
+      armrest: new THREE.BoxGeometry(0.13, 0.10, 0.62),
+      armSupport: new THREE.BoxGeometry(0.11, 0.34, 0.44),
+      cupRing: new THREE.CylinderGeometry(0.045, 0.04, 0.04, 14)
+    };
+
+    // Shared Geometries for Top VIP Special Recliner (1.60m pitch, extra-wide + footrest)
+    const vipGeo = {
+      pedestal: new THREE.BoxGeometry(0.76, 0.20, 0.62),
+      cushion: new THREE.BoxGeometry(0.96, 0.20, 0.74),
+      backrest: new THREE.BoxGeometry(0.96, 0.86, 0.20),
+      headrest: new THREE.BoxGeometry(0.74, 0.28, 0.18),
+      footrest: new THREE.BoxGeometry(0.88, 0.14, 0.56),
+      armrest: new THREE.BoxGeometry(0.20, 0.28, 0.78),
+      cupRing: new THREE.CylinderGeometry(0.05, 0.045, 0.045, 16)
+    };
+
+    /**
+     * Places a single luxury cinema seat facing +Z at (x, floorY, z)
+     */
+    function addLuxurySeat(x, floorY, z) {
+      const g = new THREE.Group();
+      g.position.set(x, floorY, z);
+
+      const ped = new THREE.Mesh(seatGeo.pedestal, seatBaseMat);
+      ped.position.set(0, 0.11, -0.02);
+      g.add(ped);
+
+      const cushion = new THREE.Mesh(seatGeo.cushion, luxVelvetMat);
+      cushion.position.set(0, 0.29, 0.05);
+      g.add(cushion);
+
+      const back = new THREE.Mesh(seatGeo.backrest, luxVelvetMat);
+      back.position.set(0, 0.68, -0.24);
+      back.rotation.x = -0.16;
+      g.add(back);
+
+      const head = new THREE.Mesh(seatGeo.headrest, luxLeatherTrimMat);
+      head.position.set(0, 1.10, -0.31);
+      head.rotation.x = -0.12;
+      g.add(head);
+
+      [-0.425, 0.425].forEach((ax) => {
+        const sup = new THREE.Mesh(seatGeo.armSupport, seatBaseMat);
+        sup.position.set(ax, 0.19, -0.02);
+        g.add(sup);
+
+        const arm = new THREE.Mesh(seatGeo.armrest, luxLeatherTrimMat);
+        arm.position.set(ax, 0.42, 0.04);
+        g.add(arm);
+      });
+
+      const cup = new THREE.Mesh(seatGeo.cupRing, doorBrassTrimMat);
+      cup.position.set(0.425, 0.475, 0.27);
+      g.add(cup);
+
+      scene.add(g);
+    }
+
+    /**
+     * Places a Top VIP Special Recliner facing +Z at (x, floorY, z)
+     */
+    function addVipRecliner(x, floorY, z) {
+      const g = new THREE.Group();
+      g.position.set(x, floorY, z);
+
+      const ped = new THREE.Mesh(vipGeo.pedestal, seatBaseMat);
+      ped.position.set(0, 0.10, -0.04);
+      g.add(ped);
+
+      const cushion = new THREE.Mesh(vipGeo.cushion, vipReclinerMat);
+      cushion.position.set(0, 0.30, 0.02);
+      cushion.rotation.x = -0.06;
+      g.add(cushion);
+
+      const back = new THREE.Mesh(vipGeo.backrest, vipReclinerMat);
+      back.position.set(0, 0.68, -0.36);
+      back.rotation.x = -0.36;
+      g.add(back);
+
+      const head = new THREE.Mesh(vipGeo.headrest, vipPillowMat);
+      head.position.set(0, 1.08, -0.52);
+      head.rotation.x = -0.25;
+      g.add(head);
+
+      // Extended angled plush footrest
+      const foot = new THREE.Mesh(vipGeo.footrest, vipPillowMat);
+      foot.position.set(0, 0.25, 0.62);
+      foot.rotation.x = 0.42;
+      g.add(foot);
+
+      [-0.58, 0.58].forEach((ax) => {
+        const arm = new THREE.Mesh(vipGeo.armrest, luxLeatherTrimMat);
+        arm.position.set(ax, 0.36, 0.0);
+        g.add(arm);
+      });
+
+      const cup = new THREE.Mesh(vipGeo.cupRing, doorBrassTrimMat);
+      cup.position.set(0.58, 0.51, 0.28);
+      g.add(cup);
+
+      scene.add(g);
+    }
+
+    // Seating Row Tiers & Walkways to Upside (z = -98.2m to -108.6m)
+    // X-layout (24.0m total):
+    //   Left 4 seats:   -20.30 to -15.50 (4 x 1.20m pitch)
+    //   Left Walkway:   -15.50 to -13.70 (1.80m wide stepped aisle)
+    //   Centre 8 seats: -13.70 to  -4.10 (8 x 1.20m pitch)
+    //   Right Walkway:   -4.10 to  -2.30 (1.80m wide stepped aisle)
+    //   Right 4 seats:   -2.30 to  +2.50 (4 x 1.20m pitch)
+    const rowStartZ = -98.2;
+    const rowDepth = 2.6;
+    const rowRise = 0.35;
+    const rowCount = 4;
+    const walkwayCenters = [-14.60, -3.20];
+    const walkwayW = 1.80;
+
+    // Helper to generate seat X centers for a block
+    const blockSeatXs = (startX, count, pitch) =>
+      Array.from({ length: count }, (_, i) => startX + pitch / 2 + i * pitch);
+
+    const stdSeatXs = [
+      ...blockSeatXs(-20.30, 4, 1.20), // Extreme Left 4 seats
+      ...blockSeatXs(-13.70, 8, 1.20), // Centre 8 seats
+      ...blockSeatXs(-2.30, 4, 1.20)   // Right 4 seats
+    ];
+
+    for (let r = 0; r < rowCount; r++) {
+      const rowFloorY = totalStairHeight + (r + 1) * rowRise;
+      const riserH = (r + 1) * rowRise;
+      const rowCenterZ = rowStartZ - r * rowDepth - rowDepth / 2;
+
+      // Solid Seating Tier Deck across Cinema Hall
+      const tierDeck = new THREE.Mesh(
+        new THREE.BoxGeometry(hallW, riserH, rowDepth),
+        hallFloorMat
+      );
+      tierDeck.position.set(hallCenterX, totalStairHeight + riserH / 2, rowCenterZ);
+      scene.add(tierDeck);
+
+      // Front half-step in both Left & Right Walkways for smooth walking up
+      const halfStepY = totalStairHeight + r * rowRise + rowRise * 0.5;
+      walkwayCenters.forEach((wx) => {
+        const wStep = new THREE.Mesh(
+          new THREE.BoxGeometry(walkwayW, rowRise * 0.5, rowDepth * 0.5),
+          hallFloorMat
+        );
+        wStep.position.set(wx, halfStepY - rowRise * 0.25, rowCenterZ + rowDepth * 0.25);
+        scene.add(wStep);
+
+        // Warm amber LED step-edge strips in each walkway
+        const ledFront = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
+        ledFront.position.set(wx, halfStepY + 0.008, rowCenterZ + rowDepth * 0.5 - 0.03);
+        scene.add(ledFront);
+
+        const ledMid = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
+        ledMid.position.set(wx, rowFloorY + 0.008, rowCenterZ - 0.03);
+        scene.add(ledMid);
+      });
+
+      // Place all 16 luxury seats in this row
+      stdSeatXs.forEach((sx) => addLuxurySeat(sx, rowFloorY, rowCenterZ));
+    }
+
+    // Top VIP Special Recliner Terrace (z = -108.6m to -114.0m, y = 6.75m)
+    const vipDeckStartZ = rowStartZ - rowCount * rowDepth; // -108.6m
+    const vipDeckLen = vipDeckStartZ - (zEndWall - hallL); // 5.4m
+    const vipFloorY = totalStairHeight + rowCount * rowRise + 0.45; // 6.75m
+    const vipRiserH = vipFloorY - totalStairHeight; // 1.85m
+
+    const vipDeck = new THREE.Mesh(
+      new THREE.BoxGeometry(hallW, vipRiserH, vipDeckLen),
+      hallFloorMat
+    );
+    vipDeck.position.set(hallCenterX, totalStairHeight + vipRiserH / 2, vipDeckStartZ - vipDeckLen / 2);
+    scene.add(vipDeck);
+
+    // Intermediate step in both walkways up to the Top VIP Recliner Terrace
+    const vipHalfY = totalStairHeight + rowCount * rowRise + 0.225;
+    walkwayCenters.forEach((wx) => {
+      const wStep = new THREE.Mesh(
+        new THREE.BoxGeometry(walkwayW, 0.225, 1.3),
+        hallFloorMat
+      );
+      wStep.position.set(wx, vipHalfY - 0.1125, vipDeckStartZ - 0.65);
+      scene.add(wStep);
+
+      const led1 = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
+      led1.position.set(wx, vipHalfY + 0.008, vipDeckStartZ - 0.03);
+      scene.add(led1);
+
+      const led2 = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
+      led2.position.set(wx, vipFloorY + 0.008, vipDeckStartZ - 1.33);
+      scene.add(led2);
+    });
+
+    // Place Top VIP Special Recliner Seats (3 Left + 6 Centre + 3 Right = 12 VIP Recliners)
+    const vipSeatXs = [
+      ...blockSeatXs(-20.30, 3, 1.60), // Extreme Left 3 VIP Recliners
+      ...blockSeatXs(-13.70, 6, 1.60), // Centre 6 VIP Recliners
+      ...blockSeatXs(-2.30, 3, 1.60)   // Right 3 VIP Recliners
+    ];
+    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -111.7));
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
     const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
@@ -2613,8 +2859,14 @@
       }
       camera.position.z = nextZ;
 
-      // Walkable Upstairs Height inside Walled Staircase (14 steps z = -79m to -95.8m) -> Flat Surface (y = 4.90m)
+      // Walkable Upstairs Height inside Walled Staircase -> Upper Cross-Aisle -> Tiered Walkways -> Top VIP Terrace
       const getCinemaFloorY = (z) => {
+        if (z < -109.9) return 6.75; // Top VIP Special Recliner Terrace
+        if (z < -108.6) return 6.525; // Intermediate walkway step up to VIP Terrace
+        if (z < -98.2) {
+          const halfStep = Math.min(7, Math.max(0, Math.floor((-98.2 - z) / 1.3)));
+          return 4.90 + (halfStep + 1) * 0.175;
+        }
         if (z < -95.8) return 4.90;
         if (z < -79.0) {
           const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - z) / 1.2) + 1));
@@ -2629,9 +2881,16 @@
       const targetEyeY = baseFloorY + cameraY + Math.sin(walkStepTime) * 0.022;
       camera.position.y += (targetEyeY - camera.position.y) * 0.16;
     } else {
-      // Smooth return to resting eye level on current stair/flat deck
+      // Smooth return to resting eye level on current stair/walkway/terrace
       let baseFloorY = 0;
-      if (camera.position.z < -95.8) {
+      if (camera.position.z < -109.9) {
+        baseFloorY = 6.75;
+      } else if (camera.position.z < -108.6) {
+        baseFloorY = 6.525;
+      } else if (camera.position.z < -98.2) {
+        const halfStep = Math.min(7, Math.max(0, Math.floor((-98.2 - camera.position.z) / 1.3)));
+        baseFloorY = 4.90 + (halfStep + 1) * 0.175;
+      } else if (camera.position.z < -95.8) {
         baseFloorY = 4.90;
       } else if (camera.position.z < -79.0) {
         const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - camera.position.z) / 1.2) + 1));
