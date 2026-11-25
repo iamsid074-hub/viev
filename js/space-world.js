@@ -1999,16 +1999,24 @@
     cinemaDoorState.leftGroup = leftCinemaDoorGroup;
     cinemaDoorState.rightGroup = rightCinemaDoorGroup;
 
-    // 5.1. EMPTY CINEMA HALL AREA BEHIND THE DOUBLE DOORS (z = -76m to -104m, width = 24m, height = 8.4m)
+    // 5.1. RIGHT-SIDE ENTRY EMPTY CINEMA HALL WITH STEPPED UPSTAIRS STAIRS (x = -20.8m to +3.2m, z = -76m to -106m)
     const hallW = 24.0;
-    const hallL = 28.0;
-    const hallH = 8.4;
-    const hallCenterZ = zEndWall - hallL / 2; // -90.0m
+    const hallL = 30.0;
+    const hallH = 10.5;
+    const hallMinX = -20.8;
+    const hallMaxX = 3.2; // Right wall sits right beside the +2.3m door jamb so you enter on the RIGHT side!
+    const hallCenterX = (hallMinX + hallMaxX) / 2; // -8.8m
+    const hallCenterZ = zEndWall - hallL / 2;      // -91.0m
 
     const hallFloorMat = new THREE.MeshStandardMaterial({
       color: 0x0f1016,
       roughness: 0.92,
       metalness: 0.05
+    });
+    const hallRiserMat = new THREE.MeshStandardMaterial({
+      color: 0x090a0f,
+      roughness: 0.9,
+      metalness: 0.08
     });
     const hallWallMat = new THREE.MeshStandardMaterial({
       color: 0x13141c,
@@ -2022,59 +2030,108 @@
       metalness: 0.05,
       side: THREE.DoubleSide
     });
+    const stepLedMat = new THREE.MeshStandardMaterial({
+      color: 0xffd269,
+      emissive: new THREE.Color(0xe5a825),
+      emissiveIntensity: 0.95,
+      roughness: 0.25
+    });
 
-    // Empty Cinema Hall Floor
-    const hallFloorGeo = new THREE.PlaneGeometry(hallW, hallL);
-    hallFloorGeo.rotateX(-Math.PI / 2);
-    const hallFloor = new THREE.Mesh(hallFloorGeo, hallFloorMat);
-    hallFloor.position.set(0, 0.004, hallCenterZ);
-    scene.add(hallFloor);
+    // Entry Landing Floor (z = -76m to -80m, flat y = 0)
+    const landingGeo = new THREE.PlaneGeometry(hallW, 4.0);
+    landingGeo.rotateX(-Math.PI / 2);
+    const landingFloor = new THREE.Mesh(landingGeo, hallFloorMat);
+    landingFloor.position.set(hallCenterX, 0.004, zEndWall - 2.0);
+    scene.add(landingFloor);
 
-    // Empty Cinema Hall Ceiling
+    // 12 Stepped Cinema Tiers & Right-Side Upstairs Stairs (rising from z = -80m to -104m, y = 0.25m to +3.0m)
+    const stairCount = 12;
+    const stairDepth = 2.0;
+    const stairRise = 0.25;
+    const stairStartZ = zEndWall - 4.0; // -80.0m
+    for (let s = 0; s < stairCount; s++) {
+      const topY = (s + 1) * stairRise;
+      const tierZ = stairStartZ - s * stairDepth - stairDepth / 2;
+
+      // Solid stepped tier across entire Cinema Hall width
+      const tierBox = new THREE.Mesh(
+        new THREE.BoxGeometry(hallW, topY, stairDepth),
+        hallFloorMat
+      );
+      tierBox.position.set(hallCenterX, topY / 2, tierZ);
+      scene.add(tierBox);
+
+      // Warm dim-yellow LED step-edge nose strip along the Right-Side Upstairs Aisle (x = -2.2m to +3.0m)
+      const stepLed = new THREE.Mesh(
+        new THREE.BoxGeometry(5.2, 0.035, 0.05),
+        stepLedMat
+      );
+      stepLed.position.set(0.4, topY + 0.008, tierZ + stairDepth / 2 - 0.03);
+      scene.add(stepLed);
+    }
+
+    // Top Upstairs Rear Landing Platform (z = -104m to -106m, y = 3.0m)
+    const topLandingBox = new THREE.Mesh(
+      new THREE.BoxGeometry(hallW, stairCount * stairRise, 2.0),
+      hallFloorMat
+    );
+    topLandingBox.position.set(hallCenterX, (stairCount * stairRise) / 2, zEndWall - hallL + 1.0);
+    scene.add(topLandingBox);
+
+    // Brushed-Brass Wall Handrail along Right-Side Upstairs Aisle (x = +3.0m)
+    const railRun = stairCount * stairDepth; // 24m
+    const railRise = stairCount * stairRise; // 3.0m
+    const railLen = Math.hypot(railRun, railRise);
+    const railAngle = Math.atan2(railRise, railRun);
+    const handrailMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.03, 0.03, railLen, 12),
+      doorBrassTrimMat
+    );
+    handrailMesh.rotation.x = Math.PI / 2 - railAngle;
+    handrailMesh.position.set(hallMaxX - 0.16, 0.95 + railRise / 2, stairStartZ - railRun / 2);
+    scene.add(handrailMesh);
+
+    // High Acoustic Cinema Ceiling (y = 10.5m)
     const hallCeilGeo = new THREE.PlaneGeometry(hallW, hallL);
     hallCeilGeo.rotateX(Math.PI / 2);
     const hallCeil = new THREE.Mesh(hallCeilGeo, hallCeilingMat);
-    hallCeil.position.set(0, hallH, hallCenterZ);
+    hallCeil.position.set(hallCenterX, hallH, hallCenterZ);
     scene.add(hallCeil);
 
-    // Back Wall (z = -104m)
+    // Back Wall (z = -106m)
     const hallBackWall = new THREE.Mesh(new THREE.PlaneGeometry(hallW, hallH), hallWallMat);
-    hallBackWall.position.set(0, hallH / 2, zEndWall - hallL);
+    hallBackWall.position.set(hallCenterX, hallH / 2, zEndWall - hallL);
     scene.add(hallBackWall);
 
-    // Left & Right Side Walls (x = -12m and x = +12m)
+    // Left & Right Cinema Walls (x = -20.8m and x = +3.2m)
     const hallSideGeo = new THREE.PlaneGeometry(hallL, hallH);
     hallSideGeo.rotateY(Math.PI / 2);
     const hallLeftWall = new THREE.Mesh(hallSideGeo, hallWallMat);
-    hallLeftWall.position.set(-hallW / 2, hallH / 2, hallCenterZ);
+    hallLeftWall.position.set(hallMinX, hallH / 2, hallCenterZ);
     scene.add(hallLeftWall);
 
     const hallRightWall = new THREE.Mesh(hallSideGeo, hallWallMat);
-    hallRightWall.position.set(hallW / 2, hallH / 2, hallCenterZ);
+    hallRightWall.position.set(hallMaxX, hallH / 2, hallCenterZ);
     scene.add(hallRightWall);
 
-    // Front Return Wings closing wider Cinema Hall around the 12m corridor (z = -76m)
-    const hallReturnW = (hallW - MALL_WIDTH) / 2; // 6m each side
-    const hallFrontLeft = new THREE.Mesh(new THREE.PlaneGeometry(hallReturnW, hallH), hallWallMat);
-    hallFrontLeft.position.set(-halfW - hallReturnW / 2, hallH / 2, zEndWall);
+    // Front Return Wings closing Cinema Hall cleanly around the corridor & doorway (z = -76m)
+    const hallFrontLeftW = (-halfW) - hallMinX; // 14.8m (-20.8 to -6.0)
+    const hallFrontLeft = new THREE.Mesh(new THREE.PlaneGeometry(hallFrontLeftW, hallH), hallWallMat);
+    hallFrontLeft.position.set(hallMinX + hallFrontLeftW / 2, hallH / 2, zEndWall);
     scene.add(hallFrontLeft);
 
-    const hallFrontRight = new THREE.Mesh(new THREE.PlaneGeometry(hallReturnW, hallH), hallWallMat);
-    hallFrontRight.position.set(halfW + hallReturnW / 2, hallH / 2, zEndWall);
-    scene.add(hallFrontRight);
-
-    // Upper header return above corridor height (y = 6.4m to 8.4m at z = -76m)
-    const hallFrontTop = new THREE.Mesh(new THREE.PlaneGeometry(MALL_WIDTH, hallH - MALL_HEIGHT), hallWallMat);
-    hallFrontTop.position.set(0, MALL_HEIGHT + (hallH - MALL_HEIGHT) / 2, zEndWall);
+    // Upper header return above corridor height (y = 6.4m to 10.5m at z = -76m)
+    const hallFrontTop = new THREE.Mesh(new THREE.PlaneGeometry(hallMaxX - (-halfW), hallH - MALL_HEIGHT), hallWallMat);
+    hallFrontTop.position.set((hallMaxX - halfW) / 2, MALL_HEIGHT + (hallH - MALL_HEIGHT) / 2, zEndWall);
     scene.add(hallFrontTop);
 
-    // Subtle warm ambient lights inside the empty Cinema Hall
-    const hallLight1 = new THREE.PointLight(0xffdfb0, 0.95, 28, 1.8);
-    hallLight1.position.set(0, 6.2, zEndWall - 8);
+    // Subtle warm ambient lights inside the Cinema Hall & Upstairs Tiers
+    const hallLight1 = new THREE.PointLight(0xffdfb0, 0.95, 32, 1.8);
+    hallLight1.position.set(hallCenterX + 4, 7.2, zEndWall - 8);
     scene.add(hallLight1);
 
-    const hallLight2 = new THREE.PointLight(0xffdfb0, 0.75, 28, 1.8);
-    hallLight2.position.set(0, 6.2, zEndWall - 20);
+    const hallLight2 = new THREE.PointLight(0xffdfb0, 0.85, 32, 1.8);
+    hallLight2.position.set(hallCenterX, 8.2, zEndWall - 22);
     scene.add(hallLight2);
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
@@ -2505,8 +2562,8 @@
       // Axis-independent collision sliding (diagonal movement slides along walls smoothly)
       let nextX = camera.position.x + deltaX;
       if (camera.position.z < -76.2) {
-        // Inside wider Empty Cinema Hall (-11m to +11m)
-        nextX = Math.min(11.0, Math.max(-11.0, nextX));
+        // Inside Right-Side Entry Cinema Hall (-19.8m to +2.2m)
+        nextX = Math.min(2.2, Math.max(-19.8, nextX));
       } else if (camera.position.z < -66.0) {
         // Corridor tail between Shop 4 and Wood Wall (-5.2m to +5.2m)
         nextX = Math.min(5.2, Math.max(-5.2, nextX));
@@ -2529,7 +2586,7 @@
       camera.position.x = nextX;
 
       let nextZ = camera.position.z + deltaZ;
-      nextZ = Math.min(6.0, Math.max(-102.5, nextZ));
+      nextZ = Math.min(6.0, Math.max(-105.0, nextZ));
       if (camera.position.x < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
       }
@@ -2542,12 +2599,25 @@
       }
       camera.position.z = nextZ;
 
-      // Subtle natural human walking head bob
+      // Walkable Upstairs Height inside Cinema Hall (stepped tiers rising from z = -80m to -104m)
+      let baseFloorY = 0;
+      if (camera.position.z < -80.0) {
+        const stepIdx = Math.min(12, Math.max(0, Math.floor((-80.0 - camera.position.z) / 2.0) + 1));
+        baseFloorY = stepIdx * 0.25;
+      }
+
+      // Subtle natural human walking head bob smoothly tracking upstairs elevation
       walkStepTime += keysPressed.sprint ? 0.22 : 0.14;
-      camera.position.y = cameraY + Math.sin(walkStepTime) * 0.022;
+      const targetEyeY = baseFloorY + cameraY + Math.sin(walkStepTime) * 0.022;
+      camera.position.y += (targetEyeY - camera.position.y) * 0.16;
     } else {
-      // Smooth return to resting eye level
-      camera.position.y += (cameraY - camera.position.y) * 0.1;
+      // Smooth return to resting eye level on current tier
+      let baseFloorY = 0;
+      if (camera.position.z < -80.0) {
+        const stepIdx = Math.min(12, Math.max(0, Math.floor((-80.0 - camera.position.z) / 2.0) + 1));
+        baseFloorY = stepIdx * 0.25;
+      }
+      camera.position.y += ((baseFloorY + cameraY) - camera.position.y) * 0.12;
     }
   }
 
