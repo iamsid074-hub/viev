@@ -1986,14 +1986,14 @@
     cinemaDoorState.doorGroup = singleCinemaDoorGroup;
     cinemaDoorState.doorX = doorCenterX;
 
-    // 5.1. RIGHT-SIDE ENTRY WALLED STAIRCASE (>10 STEPS, HIGH RISE) & FLAT UPPER CINEMA HALL (z = -76m to -114m)
+    // 5.1. RIGHT-SIDE ENTRY WALLED STAIRCASE (>10 STEPS, HIGH RISE) & AUDITORIUM CINEMA HALL (z = -76m to -105m)
     const hallW = 24.0;
-    const hallL = 38.0;
+    const hallL = 29.0;
     const hallH = 12.5;
     const hallMinX = -20.8;
     const hallMaxX = 3.2; // Right wall sits beside the right-side entry corridor
     const hallCenterX = (hallMinX + hallMaxX) / 2; // -8.8m
-    const hallCenterZ = zEndWall - hallL / 2;      // -95.0m
+    const hallCenterZ = zEndWall - hallL / 2;      // -90.5m
 
     const stairCorridorMinX = -1.6; // Left stair wall keeps same 4.8m width all the way up the stairs
     const stairCorridorW = hallMaxX - stairCorridorMinX; // 4.8m (-1.6m to +3.2m)
@@ -2067,8 +2067,8 @@
     stairLeftWall.position.set(stairCorridorMinX, hallH / 2, zEndWall - stairWallLen / 2);
     scene.add(stairLeftWall);
 
-    // Flat Upper Cinema Hall Surface after the Stairs End (z = -95.8m to -114.0m, flat y = 4.90m)
-    const flatHallLen = stairEndZ - (zEndWall - hallL); // 18.2m
+    // Flat Upper Cinema Hall Cross-Walkway & Top Terrace after the Stairs End (z = -95.8m to -105.0m, flat y = 4.90m)
+    const flatHallLen = stairEndZ - (zEndWall - hallL); // 9.2m
     const flatUpperDeck = new THREE.Mesh(
       new THREE.BoxGeometry(hallW, totalStairHeight, flatHallLen),
       hallFloorMat
@@ -2076,14 +2076,14 @@
     flatUpperDeck.position.set(hallCenterX, totalStairHeight / 2, stairEndZ - flatHallLen / 2);
     scene.add(flatUpperDeck);
 
-    // Subtle divider wall closing the left void under/behind the upper deck at z = -95.8m (x = -20.8m to -1.6m)
-    const lowerDropWallW = stairCorridorMinX - hallMinX; // 19.2m
-    const lowerDropWall = new THREE.Mesh(
-      new THREE.PlaneGeometry(lowerDropWallW, totalStairHeight),
-      hallWallMat
-    );
-    lowerDropWall.position.set(hallMinX + lowerDropWallW / 2, totalStairHeight / 2, stairEndZ);
-    scene.add(lowerDropWall);
+    // Front Auditorium Stage Floor beside the Stairs (x = -20.8m to -1.6m, z = -76.0m to -83.0m, y = 0)
+    const audW = stairCorridorMinX - hallMinX; // 19.2m
+    const audCenterX = (hallMinX + stairCorridorMinX) / 2; // -11.2m
+    const audStageGeo = new THREE.PlaneGeometry(audW, 7.0);
+    audStageGeo.rotateX(-Math.PI / 2);
+    const audStageFloor = new THREE.Mesh(audStageGeo, hallFloorMat);
+    audStageFloor.position.set(audCenterX, 0.004, zEndWall - 3.5);
+    scene.add(audStageFloor);
 
     // Brushed-Brass Wall Handrail along Right-Side Upstairs Staircase (x = +3.04m)
     const railRun = stairCount * stairDepth; // 16.8m
@@ -2132,226 +2132,242 @@
     hallFrontTop.position.set((hallMaxX - halfW) / 2, MALL_HEIGHT + (hallH - MALL_HEIGHT) / 2, zEndWall);
     scene.add(hallFrontTop);
 
-    // Subtle warm ambient lights inside the Staircase & Flat Upper Cinema Hall
+    // Subtle warm ambient lights inside the Staircase & Auditorium Cinema Hall
     const hallLight1 = new THREE.PointLight(0xffdfb0, 0.95, 32, 1.8);
     hallLight1.position.set(stairCenterX, 8.2, zEndWall - 11);
     scene.add(hallLight1);
 
-    const hallLight2 = new THREE.PointLight(0xffdfb0, 0.95, 36, 1.8);
-    hallLight2.position.set(hallCenterX, 10.6, zEndWall - 29);
+    const hallLight2 = new THREE.PointLight(0xffdfb0, 1.0, 36, 1.8);
+    hallLight2.position.set(audCenterX, 10.2, -89.0);
     scene.add(hallLight2);
 
-    const hallLight3 = new THREE.PointLight(0xffdca8, 0.85, 28, 1.8);
-    hallLight3.position.set(-15.5, 10.6, -104.5);
+    const hallLight3 = new THREE.PointLight(0xffdca8, 0.9, 28, 1.8);
+    hallLight3.position.set(-16.0, 10.6, -98.0);
     scene.add(hallLight3);
 
-    const hallLight4 = new THREE.PointLight(0xffe2b5, 0.9, 28, 1.8);
-    hallLight4.position.set(-8.8, 10.8, -111.0);
+    const hallLight4 = new THREE.PointLight(0xffe2b5, 0.95, 30, 1.8);
+    hallLight4.position.set(-6.0, 10.8, -100.5);
     scene.add(hallLight4);
 
-    // 5.2. LUXURY CINEMA SEATING ARRANGEMENT ON UPPER HALL (4 Left + Walkway + 8 Centre + Walkway + 4 Right + Top VIP Recliners)
-    // Shared Materials for Luxury Seats & Special Recliners
-    const luxVelvetMat = new THREE.MeshStandardMaterial({
-      color: 0x5c1122,
-      roughness: 0.78,
-      metalness: 0.05
-    });
-    const luxLeatherTrimMat = new THREE.MeshStandardMaterial({
-      color: 0x1e1512,
-      roughness: 0.45,
-      metalness: 0.12
-    });
-    const vipReclinerMat = new THREE.MeshStandardMaterial({
-      color: 0x4b2616,
+    // 5.2. VIEV LUXURY CINEMA SEATS BESIDE STAIRS (x = -20.8m to -1.6m, z = -83.0m to -95.8m) & TOP VIP RECLINERS
+    // Shared Canvas Texture for Gold "VIEV" Headrest Branding
+    const vievHeadCanvas = document.createElement('canvas');
+    vievHeadCanvas.width = 256;
+    vievHeadCanvas.height = 128;
+    const vhCtx = vievHeadCanvas.getContext('2d');
+    vhCtx.fillStyle = '#c7b299';
+    vhCtx.fillRect(0, 0, 256, 128);
+    vhCtx.font = '600 44px "Cinzel", Georgia, serif';
+    vhCtx.textAlign = 'center';
+    vhCtx.textBaseline = 'middle';
+    vhCtx.fillStyle = '#e6c26e';
+    vhCtx.fillText('VIEV', 128, 64);
+    const vievHeadTex = new THREE.CanvasTexture(vievHeadCanvas);
+    vievHeadTex.colorSpace = THREE.SRGBColorSpace;
+
+    // Materials matching VIEV Luxury Seat Model (Champagne Leather + Glossy Obsidian Pods + Warm Gold LED + Brass)
+    const seatLeatherMat = new THREE.MeshStandardMaterial({
+      color: 0xc7b299,
       roughness: 0.48,
-      metalness: 0.1
-    });
-    const vipPillowMat = new THREE.MeshStandardMaterial({
-      color: 0x693720,
-      roughness: 0.55,
       metalness: 0.06
     });
-    const seatBaseMat = new THREE.MeshStandardMaterial({
-      color: 0x101117,
-      roughness: 0.75,
-      metalness: 0.25
+    const seatHeadFrontMat = new THREE.MeshStandardMaterial({
+      map: vievHeadTex,
+      roughness: 0.48,
+      metalness: 0.08
+    });
+    const seatObsidianMat = new THREE.MeshStandardMaterial({
+      color: 0x121010,
+      roughness: 0.22,
+      metalness: 0.35
+    });
+    const seatArmLedMat = new THREE.MeshStandardMaterial({
+      color: 0xffe099,
+      emissive: new THREE.Color(0xffaa2b),
+      emissiveIntensity: 1.35,
+      roughness: 0.2
     });
 
-    // Shared Geometries for Standard Luxury Cinema Seat (1.20m pitch, comfortable spacing)
+    // Shared Geometries for Standard VIEV Luxury Seat (1.25m pitch)
     const seatGeo = {
-      pedestal: new THREE.BoxGeometry(0.50, 0.22, 0.48),
-      cushion: new THREE.BoxGeometry(0.72, 0.16, 0.64),
-      backrest: new THREE.BoxGeometry(0.72, 0.74, 0.16),
-      headrest: new THREE.BoxGeometry(0.58, 0.22, 0.14),
-      armrest: new THREE.BoxGeometry(0.13, 0.10, 0.62),
-      armSupport: new THREE.BoxGeometry(0.11, 0.34, 0.44),
-      cupRing: new THREE.CylinderGeometry(0.045, 0.04, 0.04, 14)
+      base: new THREE.BoxGeometry(0.88, 0.08, 0.72),
+      cushion: new THREE.BoxGeometry(0.62, 0.24, 0.64),
+      backSeg: new THREE.BoxGeometry(0.62, 0.22, 0.17),
+      headrest: new THREE.BoxGeometry(0.58, 0.28, 0.19),
+      headLogo: new THREE.PlaneGeometry(0.46, 0.22),
+      armPod: new THREE.BoxGeometry(0.17, 0.50, 0.74),
+      armPad: new THREE.BoxGeometry(0.16, 0.07, 0.60),
+      armLedV: new THREE.BoxGeometry(0.025, 0.44, 0.025),
+      armLedH: new THREE.BoxGeometry(0.025, 0.025, 0.56),
+      cupRing: new THREE.CylinderGeometry(0.045, 0.04, 0.045, 16)
     };
 
-    // Shared Geometries for Top VIP Special Recliner (1.60m pitch, extra-wide + footrest)
+    // Shared Geometries for Top VIP VIEV Special Recliner (1.60m pitch, wider + extended footrest)
     const vipGeo = {
-      pedestal: new THREE.BoxGeometry(0.76, 0.20, 0.62),
-      cushion: new THREE.BoxGeometry(0.96, 0.20, 0.74),
-      backrest: new THREE.BoxGeometry(0.96, 0.86, 0.20),
-      headrest: new THREE.BoxGeometry(0.74, 0.28, 0.18),
-      footrest: new THREE.BoxGeometry(0.88, 0.14, 0.56),
-      armrest: new THREE.BoxGeometry(0.20, 0.28, 0.78),
-      cupRing: new THREE.CylinderGeometry(0.05, 0.045, 0.045, 16)
+      base: new THREE.BoxGeometry(1.08, 0.08, 0.80),
+      cushion: new THREE.BoxGeometry(0.80, 0.25, 0.70),
+      backSeg: new THREE.BoxGeometry(0.80, 0.24, 0.18),
+      headrest: new THREE.BoxGeometry(0.74, 0.30, 0.20),
+      headLogo: new THREE.PlaneGeometry(0.56, 0.25),
+      footrest: new THREE.BoxGeometry(0.76, 0.14, 0.54),
+      armPod: new THREE.BoxGeometry(0.20, 0.52, 0.80),
+      armPad: new THREE.BoxGeometry(0.19, 0.075, 0.66),
+      armLedV: new THREE.BoxGeometry(0.028, 0.46, 0.028),
+      armLedH: new THREE.BoxGeometry(0.028, 0.028, 0.62),
+      cupRing: new THREE.CylinderGeometry(0.05, 0.045, 0.05, 16)
     };
 
-    /**
-     * Places a single luxury cinema seat facing +Z at (x, floorY, z)
-     */
+    function buildVievSeat(g, geo, isRecliner) {
+      const recline = isRecliner ? -0.34 : -0.15;
+      const armX = isRecliner ? 0.50 : 0.395;
+
+      const base = new THREE.Mesh(geo.base, seatObsidianMat);
+      base.position.set(0, 0.04, 0.0);
+      g.add(base);
+
+      const cushion = new THREE.Mesh(geo.cushion, seatLeatherMat);
+      cushion.position.set(0, 0.20, 0.06);
+      if (isRecliner) cushion.rotation.x = -0.05;
+      g.add(cushion);
+
+      // 3-ribbed plush leather backrest + VIEV headrest
+      const backGroup = new THREE.Group();
+      backGroup.position.set(0, 0.30, -0.22);
+      backGroup.rotation.x = recline;
+      [0.14, 0.36, 0.58].forEach((by) => {
+        const seg = new THREE.Mesh(geo.backSeg, seatLeatherMat);
+        seg.position.set(0, by, 0);
+        backGroup.add(seg);
+      });
+      const head = new THREE.Mesh(geo.headrest, seatLeatherMat);
+      head.position.set(0, 0.85, 0.02);
+      backGroup.add(head);
+
+      const logoPlane = new THREE.Mesh(geo.headLogo, seatHeadFrontMat);
+      logoPlane.position.set(0, 0.85, 0.118);
+      backGroup.add(logoPlane);
+      g.add(backGroup);
+
+      // Extended footrest for Top VIP Recliners
+      if (isRecliner) {
+        const foot = new THREE.Mesh(geo.footrest, seatLeatherMat);
+        foot.position.set(0, 0.22, 0.64);
+        foot.rotation.x = 0.42;
+        g.add(foot);
+      }
+
+      // Glossy black side pods + champagne arm pads + warm gold LED strips + brass cup holder
+      [-armX, armX].forEach((ax, idx) => {
+        const pod = new THREE.Mesh(geo.armPod, seatObsidianMat);
+        pod.position.set(ax, 0.29, 0.02);
+        g.add(pod);
+
+        const pad = new THREE.Mesh(geo.armPad, seatLeatherMat);
+        pad.position.set(ax, 0.57, -0.02);
+        g.add(pad);
+
+        const innerSign = idx === 0 ? 1 : -1;
+        const ledV = new THREE.Mesh(geo.armLedV, seatArmLedMat);
+        ledV.position.set(ax + innerSign * 0.05, 0.30, 0.39);
+        g.add(ledV);
+
+        const ledH = new THREE.Mesh(geo.armLedH, seatArmLedMat);
+        ledH.position.set(ax + innerSign * 0.05, 0.525, 0.09);
+        g.add(ledH);
+      });
+
+      const cup = new THREE.Mesh(geo.cupRing, doorBrassTrimMat);
+      cup.position.set(armX, 0.56, 0.31);
+      g.add(cup);
+    }
+
     function addLuxurySeat(x, floorY, z) {
       const g = new THREE.Group();
       g.position.set(x, floorY, z);
-
-      const ped = new THREE.Mesh(seatGeo.pedestal, seatBaseMat);
-      ped.position.set(0, 0.11, -0.02);
-      g.add(ped);
-
-      const cushion = new THREE.Mesh(seatGeo.cushion, luxVelvetMat);
-      cushion.position.set(0, 0.29, 0.05);
-      g.add(cushion);
-
-      const back = new THREE.Mesh(seatGeo.backrest, luxVelvetMat);
-      back.position.set(0, 0.68, -0.24);
-      back.rotation.x = -0.16;
-      g.add(back);
-
-      const head = new THREE.Mesh(seatGeo.headrest, luxLeatherTrimMat);
-      head.position.set(0, 1.10, -0.31);
-      head.rotation.x = -0.12;
-      g.add(head);
-
-      [-0.425, 0.425].forEach((ax) => {
-        const sup = new THREE.Mesh(seatGeo.armSupport, seatBaseMat);
-        sup.position.set(ax, 0.19, -0.02);
-        g.add(sup);
-
-        const arm = new THREE.Mesh(seatGeo.armrest, luxLeatherTrimMat);
-        arm.position.set(ax, 0.42, 0.04);
-        g.add(arm);
-      });
-
-      const cup = new THREE.Mesh(seatGeo.cupRing, doorBrassTrimMat);
-      cup.position.set(0.425, 0.475, 0.27);
-      g.add(cup);
-
+      buildVievSeat(g, seatGeo, false);
       scene.add(g);
     }
 
-    /**
-     * Places a Top VIP Special Recliner facing +Z at (x, floorY, z)
-     */
     function addVipRecliner(x, floorY, z) {
       const g = new THREE.Group();
       g.position.set(x, floorY, z);
-
-      const ped = new THREE.Mesh(vipGeo.pedestal, seatBaseMat);
-      ped.position.set(0, 0.10, -0.04);
-      g.add(ped);
-
-      const cushion = new THREE.Mesh(vipGeo.cushion, vipReclinerMat);
-      cushion.position.set(0, 0.30, 0.02);
-      cushion.rotation.x = -0.06;
-      g.add(cushion);
-
-      const back = new THREE.Mesh(vipGeo.backrest, vipReclinerMat);
-      back.position.set(0, 0.68, -0.36);
-      back.rotation.x = -0.36;
-      g.add(back);
-
-      const head = new THREE.Mesh(vipGeo.headrest, vipPillowMat);
-      head.position.set(0, 1.08, -0.52);
-      head.rotation.x = -0.25;
-      g.add(head);
-
-      // Extended angled plush footrest
-      const foot = new THREE.Mesh(vipGeo.footrest, vipPillowMat);
-      foot.position.set(0, 0.25, 0.62);
-      foot.rotation.x = 0.42;
-      g.add(foot);
-
-      [-0.58, 0.58].forEach((ax) => {
-        const arm = new THREE.Mesh(vipGeo.armrest, luxLeatherTrimMat);
-        arm.position.set(ax, 0.36, 0.0);
-        g.add(arm);
-      });
-
-      const cup = new THREE.Mesh(vipGeo.cupRing, doorBrassTrimMat);
-      cup.position.set(0.58, 0.51, 0.28);
-      g.add(cup);
-
+      buildVievSeat(g, vipGeo, true);
       scene.add(g);
     }
-
-    // Seating Row Tiers & Walkways to Upside (z = -98.2m to -108.6m)
-    // X-layout (24.0m total):
-    //   Left 4 seats:   -20.30 to -15.50 (4 x 1.20m pitch)
-    //   Left Walkway:   -15.50 to -13.70 (1.80m wide stepped aisle)
-    //   Centre 8 seats: -13.70 to  -4.10 (8 x 1.20m pitch)
-    //   Right Walkway:   -4.10 to  -2.30 (1.80m wide stepped aisle)
-    //   Right 4 seats:   -2.30 to  +2.50 (4 x 1.20m pitch)
-    const rowStartZ = -98.2;
-    const rowDepth = 2.6;
-    const rowRise = 0.35;
-    const rowCount = 4;
-    const walkwayCenters = [-14.60, -3.20];
-    const walkwayW = 1.80;
 
     // Helper to generate seat X centers for a block
     const blockSeatXs = (startX, count, pitch) =>
       Array.from({ length: count }, (_, i) => startX + pitch / 2 + i * pitch);
 
+    // 4 Stepped Auditorium Tiers BESIDE the Stairs (x = -20.8m to -1.6m, z = -83.0m to -95.8m)
+    // X-layout (19.2m total beside stair wall):
+    //   Extreme Left 4 seats: -20.45 to -15.45 (4 x 1.25m)
+    //   Left Walkway:         -15.45 to -13.85 (1.60m stepped walkway)
+    //   Centre 5 seats:       -13.85 to  -7.60 (5 x 1.25m)
+    //   Right Walkway:         -7.60 to  -6.00 (1.60m stepped walkway)
+    //   Right Side 3 seats:    -6.00 to  -2.25 (3 x 1.25m)
+    const rowStartZ = -83.0;
+    const rowDepth = 3.2;
+    const rowRise = 1.00;
+    const rowCount = 4;
+    const walkwayCenters = [-14.65, -6.80];
+    const walkwayW = 1.60;
+
     const stdSeatXs = [
-      ...blockSeatXs(-20.30, 4, 1.20), // Extreme Left 4 seats
-      ...blockSeatXs(-13.70, 8, 1.20), // Centre 8 seats
-      ...blockSeatXs(-2.30, 4, 1.20)   // Right 4 seats
+      ...blockSeatXs(-20.45, 4, 1.25), // Extreme Left 4 seats
+      ...blockSeatXs(-13.85, 5, 1.25), // Centre 5 seats
+      ...blockSeatXs(-6.00, 3, 1.25)   // Right 3 seats beside stair wall
     ];
 
     for (let r = 0; r < rowCount; r++) {
-      const rowFloorY = totalStairHeight + (r + 1) * rowRise;
-      const riserH = (r + 1) * rowRise;
+      const rowFloorY = (r + 1) * rowRise; // 1.0m, 2.0m, 3.0m, 4.0m
       const rowCenterZ = rowStartZ - r * rowDepth - rowDepth / 2;
 
-      // Solid Seating Tier Deck across Cinema Hall
+      // Solid Tier Box beside the stair wall
       const tierDeck = new THREE.Mesh(
-        new THREE.BoxGeometry(hallW, riserH, rowDepth),
+        new THREE.BoxGeometry(audW, rowFloorY, rowDepth),
         hallFloorMat
       );
-      tierDeck.position.set(hallCenterX, totalStairHeight + riserH / 2, rowCenterZ);
+      tierDeck.position.set(audCenterX, rowFloorY / 2, rowCenterZ);
       scene.add(tierDeck);
 
-      // Front half-step in both Left & Right Walkways for smooth walking up
-      const halfStepY = totalStairHeight + r * rowRise + rowRise * 0.5;
-      walkwayCenters.forEach((wx) => {
-        const wStep = new THREE.Mesh(
-          new THREE.BoxGeometry(walkwayW, rowRise * 0.5, rowDepth * 0.5),
-          hallFloorMat
-        );
-        wStep.position.set(wx, halfStepY - rowRise * 0.25, rowCenterZ + rowDepth * 0.25);
-        scene.add(wStep);
+      // 3 smooth walkway steps inside each row tier (going up along -Z)
+      const subStepCount = 3;
+      const subStepDepth = rowDepth / subStepCount;
+      const subStepRise = rowRise / subStepCount;
+      for (let ss = 0; ss < subStepCount; ss++) {
+        const ssTopY = r * rowRise + (ss + 1) * subStepRise;
+        const ssZ = (rowStartZ - r * rowDepth) - ss * subStepDepth - subStepDepth / 2;
+        walkwayCenters.forEach((wx) => {
+          const wStep = new THREE.Mesh(
+            new THREE.BoxGeometry(walkwayW, subStepRise, subStepDepth),
+            hallFloorMat
+          );
+          wStep.position.set(wx, ssTopY - subStepRise / 2, ssZ);
+          scene.add(wStep);
 
-        // Warm amber LED step-edge strips in each walkway
-        const ledFront = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
-        ledFront.position.set(wx, halfStepY + 0.008, rowCenterZ + rowDepth * 0.5 - 0.03);
-        scene.add(ledFront);
+          const wLed = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
+          wLed.position.set(wx, ssTopY + 0.008, ssZ + subStepDepth / 2 - 0.03);
+          scene.add(wLed);
+        });
+      }
 
-        const ledMid = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
-        ledMid.position.set(wx, rowFloorY + 0.008, rowCenterZ - 0.03);
-        scene.add(ledMid);
-      });
-
-      // Place all 16 luxury seats in this row
+      // Place all 12 luxury VIEV seats in this row
       stdSeatXs.forEach((sx) => addLuxurySeat(sx, rowFloorY, rowCenterZ));
     }
 
-    // Top VIP Special Recliner Terrace (z = -108.6m to -114.0m, y = 6.75m)
-    const vipDeckStartZ = rowStartZ - rowCount * rowDepth; // -108.6m
-    const vipDeckLen = vipDeckStartZ - (zEndWall - hallL); // 5.4m
-    const vipFloorY = totalStairHeight + rowCount * rowRise + 0.45; // 6.75m
-    const vipRiserH = vipFloorY - totalStairHeight; // 1.85m
+    // Final walkway steps bridging Row 4 (y = 4.0m) up to Top Cross-Walkway (y = 4.90m at z = -95.8m)
+    walkwayCenters.forEach((wx) => {
+      const bridgeLed = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.035, 0.05), stepLedMat);
+      bridgeLed.position.set(wx, totalStairHeight + 0.008, stairEndZ - 0.03);
+      scene.add(bridgeLed);
+    });
+
+    // Top VIP Special Recliner Terrace (z = -98.8m to -105.0m, y = 5.30m)
+    const vipDeckStartZ = -98.8;
+    const vipDeckLen = vipDeckStartZ - (zEndWall - hallL); // 6.2m
+    const vipFloorY = totalStairHeight + 0.40; // 5.30m
+    const vipRiserH = vipFloorY - totalStairHeight; // 0.40m
 
     const vipDeck = new THREE.Mesh(
       new THREE.BoxGeometry(hallW, vipRiserH, vipDeckLen),
@@ -2360,32 +2376,20 @@
     vipDeck.position.set(hallCenterX, totalStairHeight + vipRiserH / 2, vipDeckStartZ - vipDeckLen / 2);
     scene.add(vipDeck);
 
-    // Intermediate step in both walkways up to the Top VIP Recliner Terrace
-    const vipHalfY = totalStairHeight + rowCount * rowRise + 0.225;
+    // Walkway step up to VIP Recliner Terrace
     walkwayCenters.forEach((wx) => {
-      const wStep = new THREE.Mesh(
-        new THREE.BoxGeometry(walkwayW, 0.225, 1.3),
-        hallFloorMat
-      );
-      wStep.position.set(wx, vipHalfY - 0.1125, vipDeckStartZ - 0.65);
-      scene.add(wStep);
-
-      const led1 = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
-      led1.position.set(wx, vipHalfY + 0.008, vipDeckStartZ - 0.03);
-      scene.add(led1);
-
-      const led2 = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
-      led2.position.set(wx, vipFloorY + 0.008, vipDeckStartZ - 1.33);
-      scene.add(led2);
+      const vipLed = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.035, 0.05), stepLedMat);
+      vipLed.position.set(wx, vipFloorY + 0.008, vipDeckStartZ - 0.03);
+      scene.add(vipLed);
     });
 
-    // Place Top VIP Special Recliner Seats (3 Left + 6 Centre + 3 Right = 12 VIP Recliners)
+    // Place Top VIP Special Recliner Seats (3 Extreme Left + 5 Centre + 3 Right = 11 VIP Recliners)
     const vipSeatXs = [
-      ...blockSeatXs(-20.30, 3, 1.60), // Extreme Left 3 VIP Recliners
-      ...blockSeatXs(-13.70, 6, 1.60), // Centre 6 VIP Recliners
-      ...blockSeatXs(-2.30, 3, 1.60)   // Right 3 VIP Recliners
+      ...blockSeatXs(-20.45, 3, 1.65), // Extreme Left 3 VIP Recliners
+      ...blockSeatXs(-14.20, 5, 1.65), // Centre 5 VIP Recliners
+      ...blockSeatXs(-2.80, 3, 1.65)   // Right 3 VIP Recliners
     ];
-    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -111.7));
+    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -101.8));
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
     const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
@@ -2842,11 +2846,7 @@
       camera.position.x = nextX;
 
       let nextZ = camera.position.z + deltaZ;
-      nextZ = Math.min(6.0, Math.max(-113.0, nextZ));
-      // Prevent walking off the flat upper deck edge into the drop left of the stair wall
-      if (camera.position.x < -0.95 && camera.position.z < -95.8 && nextZ > -96.2) {
-        nextZ = -96.2;
-      }
+      nextZ = Math.min(6.0, Math.max(-104.0, nextZ));
       if (camera.position.x < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
       }
@@ -2859,22 +2859,25 @@
       }
       camera.position.z = nextZ;
 
-      // Walkable Upstairs Height inside Walled Staircase -> Upper Cross-Aisle -> Tiered Walkways -> Top VIP Terrace
-      const getCinemaFloorY = (z) => {
-        if (z < -109.9) return 6.75; // Top VIP Special Recliner Terrace
-        if (z < -108.6) return 6.525; // Intermediate walkway step up to VIP Terrace
-        if (z < -98.2) {
-          const halfStep = Math.min(7, Math.max(0, Math.floor((-98.2 - z) / 1.3)));
-          return 4.90 + (halfStep + 1) * 0.175;
+      // Walkable Upstairs Height inside Walled Staircase & Auditorium Tiers beside Stairs -> Top VIP Terrace
+      const getCinemaFloorY = (x, z) => {
+        if (z < -98.8) return 5.30; // Top VIP Special Recliner Terrace
+        if (z < -95.8) return 4.90; // Upper Cross-Walkway
+        if (x < -1.6) {
+          // Auditorium beside stairs (z = -83.0m to -95.8m)
+          if (z < -83.0) {
+            const subStep = Math.min(11, Math.max(0, Math.floor((-83.0 - z) / (3.2 / 3))));
+            return (subStep + 1) * (1.0 / 3);
+          }
+          return 0;
         }
-        if (z < -95.8) return 4.90;
         if (z < -79.0) {
           const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - z) / 1.2) + 1));
           return stepIdx * 0.35;
         }
         return 0;
       };
-      const baseFloorY = getCinemaFloorY(camera.position.z);
+      const baseFloorY = getCinemaFloorY(camera.position.x, camera.position.z);
 
       // Subtle natural human walking head bob smoothly tracking upstairs elevation
       walkStepTime += keysPressed.sprint ? 0.22 : 0.14;
@@ -2883,15 +2886,13 @@
     } else {
       // Smooth return to resting eye level on current stair/walkway/terrace
       let baseFloorY = 0;
-      if (camera.position.z < -109.9) {
-        baseFloorY = 6.75;
-      } else if (camera.position.z < -108.6) {
-        baseFloorY = 6.525;
-      } else if (camera.position.z < -98.2) {
-        const halfStep = Math.min(7, Math.max(0, Math.floor((-98.2 - camera.position.z) / 1.3)));
-        baseFloorY = 4.90 + (halfStep + 1) * 0.175;
+      if (camera.position.z < -98.8) {
+        baseFloorY = 5.30;
       } else if (camera.position.z < -95.8) {
         baseFloorY = 4.90;
+      } else if (camera.position.x < -1.6 && camera.position.z < -83.0) {
+        const subStep = Math.min(11, Math.max(0, Math.floor((-83.0 - camera.position.z) / (3.2 / 3))));
+        baseFloorY = (subStep + 1) * (1.0 / 3);
       } else if (camera.position.z < -79.0) {
         const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - camera.position.z) / 1.2) + 1));
         baseFloorY = stepIdx * 0.35;
