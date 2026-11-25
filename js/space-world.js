@@ -2691,12 +2691,6 @@
     if (corridorVideoState.video) {
       corridorVideoState.video.play().catch(() => { });
     }
-    if (shop2VideoState.video) {
-      shop2VideoState.video.play().catch(() => { });
-    }
-    if (shop3VideoState.video) {
-      shop3VideoState.video.play().catch(() => { });
-    }
     onWindowResize();
     animFrameId = requestAnimationFrame(animate);
   }
