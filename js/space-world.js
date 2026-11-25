@@ -108,10 +108,10 @@
     2: { mats: null, normalLight: null, dimYellowLight: null, fadeCur: 0, fadeTarget: 0 }
   };
 
-  // Far-End Premium Wood Wall Automatic Double Doors State
+  // Far-End Premium Wood Wall Automatic Single Door State
   const cinemaDoorState = {
-    leftGroup: null,
-    rightGroup: null,
+    doorGroup: null,
+    doorX: 0.8,
     doorZ: -76.0,
     openProgress: 0,
     targetProgress: 0
@@ -1916,107 +1916,93 @@
       emissiveIntensity: 0.18
     });
 
-    const doorOpenW = 4.6; // 4.6m wide double doorway (-2.3 to +2.3)
-    const doorOpenH = 4.6; // 4.6m tall double doorway
+    const doorCenterX = 0.8; // Right-side entry single door centered at x = +0.8m (-0.4m to +2.0m)
+    const doorOpenW = 2.4;   // 2.4m wide grand single doorway
+    const doorOpenH = 4.4;   // 4.4m tall grand single doorway
     const woodWallDepth = 0.45;
-    const sideWoodW = (MALL_WIDTH - doorOpenW) / 2; // 3.7m each side
+    const leftWoodW = (doorCenterX - doorOpenW / 2) - (-halfW); // 5.6m (-6.0 to -0.4)
+    const rightWoodW = halfW - (doorCenterX + doorOpenW / 2);   // 4.0m (+2.0 to +6.0)
 
     // Left Wood Wall Wing
     const leftWoodWall = new THREE.Mesh(
-      new THREE.BoxGeometry(sideWoodW, MALL_HEIGHT, woodWallDepth),
+      new THREE.BoxGeometry(leftWoodW, MALL_HEIGHT, woodWallDepth),
       woodWallMat
     );
-    leftWoodWall.position.set(-halfW + sideWoodW / 2, halfH, zEndWall);
+    leftWoodWall.position.set(-halfW + leftWoodW / 2, halfH, zEndWall);
     scene.add(leftWoodWall);
 
     // Right Wood Wall Wing
     const rightWoodWall = new THREE.Mesh(
-      new THREE.BoxGeometry(sideWoodW, MALL_HEIGHT, woodWallDepth),
+      new THREE.BoxGeometry(rightWoodW, MALL_HEIGHT, woodWallDepth),
       woodWallMat
     );
-    rightWoodWall.position.set(halfW - sideWoodW / 2, halfH, zEndWall);
+    rightWoodWall.position.set(halfW - rightWoodW / 2, halfH, zEndWall);
     scene.add(rightWoodWall);
 
-    // Overhead Wood Header above Double Doors
-    const headerWoodH = MALL_HEIGHT - doorOpenH; // 1.8m
+    // Overhead Wood Header above Single Door
+    const headerWoodH = MALL_HEIGHT - doorOpenH; // 2.0m
     const topWoodWall = new THREE.Mesh(
       new THREE.BoxGeometry(doorOpenW, headerWoodH, woodWallDepth),
       woodWallMat
     );
-    topWoodWall.position.set(0, doorOpenH + headerWoodH / 2, zEndWall);
+    topWoodWall.position.set(doorCenterX, doorOpenH + headerWoodH / 2, zEndWall);
     scene.add(topWoodWall);
 
     // Brushed Brass Architectural Door Frame Architrave
     const frameThick = 0.12;
     const frameDepth = woodWallDepth + 0.06;
     const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, doorOpenH, frameDepth), doorBrassTrimMat);
-    leftFrame.position.set(-doorOpenW / 2 + frameThick / 2, doorOpenH / 2, zEndWall);
+    leftFrame.position.set(doorCenterX - doorOpenW / 2 + frameThick / 2, doorOpenH / 2, zEndWall);
     scene.add(leftFrame);
 
     const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, doorOpenH, frameDepth), doorBrassTrimMat);
-    rightFrame.position.set(doorOpenW / 2 - frameThick / 2, doorOpenH / 2, zEndWall);
+    rightFrame.position.set(doorCenterX + doorOpenW / 2 - frameThick / 2, doorOpenH / 2, zEndWall);
     scene.add(rightFrame);
 
     const topFrame = new THREE.Mesh(new THREE.BoxGeometry(doorOpenW, frameThick, frameDepth), doorBrassTrimMat);
-    topFrame.position.set(0, doorOpenH - frameThick / 2, zEndWall);
+    topFrame.position.set(doorCenterX, doorOpenH - frameThick / 2, zEndWall);
     scene.add(topFrame);
 
-    // Premium Automatic Double Doors (Hinged at Left & Right Jambs, swinging smoothly open into Cinema Hall)
-    const leafW = (doorOpenW - frameThick * 2) / 2 - 0.01; // ~2.17m each leaf
+    // Premium Automatic Single Door (Hinged at Left Jamb, swinging smoothly inward into Stair Corridor)
+    const leafW = doorOpenW - frameThick * 2 - 0.02; // ~2.14m wide single door leaf
     const leafH = doorOpenH - frameThick - 0.02;
     const leafThick = 0.10;
-    const cinemaHandleGeo = new THREE.CylinderGeometry(0.024, 0.024, 1.5, 16);
+    const cinemaHandleGeo = new THREE.CylinderGeometry(0.026, 0.026, 1.55, 16);
 
-    // Left Door Leaf Group
-    const leftCinemaDoorGroup = new THREE.Group();
-    leftCinemaDoorGroup.position.set(-doorOpenW / 2 + frameThick, 0, zEndWall);
-    const leftLeafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafThick), doorLeafMat);
-    leftLeafMesh.position.set(leafW / 2, leafH / 2 + 0.01, 0);
-    leftCinemaDoorGroup.add(leftLeafMesh);
-    // Front & back vertical brass pull handles
-    const lHandleF = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
-    lHandleF.position.set(leafW - 0.22, 1.45, leafThick / 2 + 0.045);
-    leftCinemaDoorGroup.add(lHandleF);
-    const lHandleB = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
-    lHandleB.position.set(leafW - 0.22, 1.45, -(leafThick / 2 + 0.045));
-    leftCinemaDoorGroup.add(lHandleB);
-    scene.add(leftCinemaDoorGroup);
+    const singleCinemaDoorGroup = new THREE.Group();
+    singleCinemaDoorGroup.position.set(doorCenterX - doorOpenW / 2 + frameThick, 0, zEndWall);
+    const singleLeafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafThick), doorLeafMat);
+    singleLeafMesh.position.set(leafW / 2, leafH / 2 + 0.01, 0);
+    singleCinemaDoorGroup.add(singleLeafMesh);
+    // Front & back vertical brass pull handles on the latch side
+    const sHandleF = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
+    sHandleF.position.set(leafW - 0.22, 1.45, leafThick / 2 + 0.045);
+    singleCinemaDoorGroup.add(sHandleF);
+    const sHandleB = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
+    sHandleB.position.set(leafW - 0.22, 1.45, -(leafThick / 2 + 0.045));
+    singleCinemaDoorGroup.add(sHandleB);
+    scene.add(singleCinemaDoorGroup);
 
-    // Right Door Leaf Group
-    const rightCinemaDoorGroup = new THREE.Group();
-    rightCinemaDoorGroup.position.set(doorOpenW / 2 - frameThick, 0, zEndWall);
-    const rightLeafMesh = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, leafThick), doorLeafMat);
-    rightLeafMesh.position.set(-leafW / 2, leafH / 2 + 0.01, 0);
-    rightCinemaDoorGroup.add(rightLeafMesh);
-    const rHandleF = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
-    rHandleF.position.set(-(leafW - 0.22), 1.45, leafThick / 2 + 0.045);
-    rightCinemaDoorGroup.add(rHandleF);
-    const rHandleB = new THREE.Mesh(cinemaHandleGeo, doorBrassTrimMat);
-    rHandleB.position.set(-(leafW - 0.22), 1.45, -(leafThick / 2 + 0.045));
-    rightCinemaDoorGroup.add(rHandleB);
-    scene.add(rightCinemaDoorGroup);
+    cinemaDoorState.doorGroup = singleCinemaDoorGroup;
+    cinemaDoorState.doorX = doorCenterX;
 
-    cinemaDoorState.leftGroup = leftCinemaDoorGroup;
-    cinemaDoorState.rightGroup = rightCinemaDoorGroup;
-
-    // 5.1. RIGHT-SIDE ENTRY EMPTY CINEMA HALL WITH STEPPED UPSTAIRS STAIRS (x = -20.8m to +3.2m, z = -76m to -106m)
+    // 5.1. RIGHT-SIDE ENTRY WALLED STAIRCASE (>10 STEPS, HIGH RISE) & FLAT UPPER CINEMA HALL (z = -76m to -114m)
     const hallW = 24.0;
-    const hallL = 30.0;
-    const hallH = 10.5;
+    const hallL = 38.0;
+    const hallH = 12.5;
     const hallMinX = -20.8;
-    const hallMaxX = 3.2; // Right wall sits right beside the +2.3m door jamb so you enter on the RIGHT side!
+    const hallMaxX = 3.2; // Right wall sits beside the right-side entry corridor
     const hallCenterX = (hallMinX + hallMaxX) / 2; // -8.8m
-    const hallCenterZ = zEndWall - hallL / 2;      // -91.0m
+    const hallCenterZ = zEndWall - hallL / 2;      // -95.0m
+
+    const stairCorridorMinX = -1.6; // Left stair wall keeps same 4.8m width all the way up the stairs
+    const stairCorridorW = hallMaxX - stairCorridorMinX; // 4.8m (-1.6m to +3.2m)
+    const stairCenterX = (stairCorridorMinX + hallMaxX) / 2; // +0.8m (aligned with single door)
 
     const hallFloorMat = new THREE.MeshStandardMaterial({
       color: 0x0f1016,
       roughness: 0.92,
       metalness: 0.05
-    });
-    const hallRiserMat = new THREE.MeshStandardMaterial({
-      color: 0x090a0f,
-      roughness: 0.9,
-      metalness: 0.08
     });
     const hallWallMat = new THREE.MeshStandardMaterial({
       color: 0x13141c,
@@ -2037,50 +2023,71 @@
       roughness: 0.25
     });
 
-    // Entry Landing Floor (z = -76m to -80m, flat y = 0)
-    const landingGeo = new THREE.PlaneGeometry(hallW, 4.0);
+    // Entry Landing Floor inside Stair Corridor (z = -76m to -79m, flat y = 0)
+    const landingDepth = 3.0;
+    const landingGeo = new THREE.PlaneGeometry(stairCorridorW, landingDepth);
     landingGeo.rotateX(-Math.PI / 2);
     const landingFloor = new THREE.Mesh(landingGeo, hallFloorMat);
-    landingFloor.position.set(hallCenterX, 0.004, zEndWall - 2.0);
+    landingFloor.position.set(stairCenterX, 0.004, zEndWall - landingDepth / 2);
     scene.add(landingFloor);
 
-    // 12 Stepped Cinema Tiers & Right-Side Upstairs Stairs (rising from z = -80m to -104m, y = 0.25m to +3.0m)
-    const stairCount = 12;
-    const stairDepth = 2.0;
-    const stairRise = 0.25;
-    const stairStartZ = zEndWall - 4.0; // -80.0m
+    // 14 High-Rise Upstairs Stairs inside Walled Right-Side Corridor (z = -79.0m to -95.8m, y = 0.35m to +4.90m)
+    const stairCount = 14;
+    const stairDepth = 1.2;
+    const stairRise = 0.35;
+    const totalStairHeight = stairCount * stairRise; // 4.90m
+    const stairStartZ = zEndWall - landingDepth;     // -79.0m
+    const stairEndZ = stairStartZ - stairCount * stairDepth; // -95.8m
+
     for (let s = 0; s < stairCount; s++) {
       const topY = (s + 1) * stairRise;
       const tierZ = stairStartZ - s * stairDepth - stairDepth / 2;
 
-      // Solid stepped tier across entire Cinema Hall width
-      const tierBox = new THREE.Mesh(
-        new THREE.BoxGeometry(hallW, topY, stairDepth),
+      const stepBox = new THREE.Mesh(
+        new THREE.BoxGeometry(stairCorridorW, topY, stairDepth),
         hallFloorMat
       );
-      tierBox.position.set(hallCenterX, topY / 2, tierZ);
-      scene.add(tierBox);
+      stepBox.position.set(stairCenterX, topY / 2, tierZ);
+      scene.add(stepBox);
 
-      // Warm dim-yellow LED step-edge nose strip along the Right-Side Upstairs Aisle (x = -2.2m to +3.0m)
+      // Warm dim-yellow LED step-edge nose strip across the stair width
       const stepLed = new THREE.Mesh(
-        new THREE.BoxGeometry(5.2, 0.035, 0.05),
+        new THREE.BoxGeometry(stairCorridorW - 0.12, 0.035, 0.05),
         stepLedMat
       );
-      stepLed.position.set(0.4, topY + 0.008, tierZ + stairDepth / 2 - 0.03);
+      stepLed.position.set(stairCenterX, topY + 0.008, tierZ + stairDepth / 2 - 0.03);
       scene.add(stepLed);
     }
 
-    // Top Upstairs Rear Landing Platform (z = -104m to -106m, y = 3.0m)
-    const topLandingBox = new THREE.Mesh(
-      new THREE.BoxGeometry(hallW, stairCount * stairRise, 2.0),
+    // Left Stair Wall (at x = -1.6m, same distance till the stairs end: z = -76.0m to -95.8m)
+    const stairWallLen = zEndWall - stairEndZ; // 19.8m
+    const stairLeftWallGeo = new THREE.PlaneGeometry(stairWallLen, hallH);
+    stairLeftWallGeo.rotateY(Math.PI / 2);
+    const stairLeftWall = new THREE.Mesh(stairLeftWallGeo, hallWallMat);
+    stairLeftWall.position.set(stairCorridorMinX, hallH / 2, zEndWall - stairWallLen / 2);
+    scene.add(stairLeftWall);
+
+    // Flat Upper Cinema Hall Surface after the Stairs End (z = -95.8m to -114.0m, flat y = 4.90m)
+    const flatHallLen = stairEndZ - (zEndWall - hallL); // 18.2m
+    const flatUpperDeck = new THREE.Mesh(
+      new THREE.BoxGeometry(hallW, totalStairHeight, flatHallLen),
       hallFloorMat
     );
-    topLandingBox.position.set(hallCenterX, (stairCount * stairRise) / 2, zEndWall - hallL + 1.0);
-    scene.add(topLandingBox);
+    flatUpperDeck.position.set(hallCenterX, totalStairHeight / 2, stairEndZ - flatHallLen / 2);
+    scene.add(flatUpperDeck);
 
-    // Brushed-Brass Wall Handrail along Right-Side Upstairs Aisle (x = +3.0m)
-    const railRun = stairCount * stairDepth; // 24m
-    const railRise = stairCount * stairRise; // 3.0m
+    // Subtle divider wall closing the left void under/behind the upper deck at z = -95.8m (x = -20.8m to -1.6m)
+    const lowerDropWallW = stairCorridorMinX - hallMinX; // 19.2m
+    const lowerDropWall = new THREE.Mesh(
+      new THREE.PlaneGeometry(lowerDropWallW, totalStairHeight),
+      hallWallMat
+    );
+    lowerDropWall.position.set(hallMinX + lowerDropWallW / 2, totalStairHeight / 2, stairEndZ);
+    scene.add(lowerDropWall);
+
+    // Brushed-Brass Wall Handrail along Right-Side Upstairs Staircase (x = +3.04m)
+    const railRun = stairCount * stairDepth; // 16.8m
+    const railRise = totalStairHeight;       // 4.90m
     const railLen = Math.hypot(railRun, railRise);
     const railAngle = Math.atan2(railRise, railRun);
     const handrailMesh = new THREE.Mesh(
@@ -2091,14 +2098,14 @@
     handrailMesh.position.set(hallMaxX - 0.16, 0.95 + railRise / 2, stairStartZ - railRun / 2);
     scene.add(handrailMesh);
 
-    // High Acoustic Cinema Ceiling (y = 10.5m)
+    // High Acoustic Cinema Ceiling (y = 12.5m)
     const hallCeilGeo = new THREE.PlaneGeometry(hallW, hallL);
     hallCeilGeo.rotateX(Math.PI / 2);
     const hallCeil = new THREE.Mesh(hallCeilGeo, hallCeilingMat);
     hallCeil.position.set(hallCenterX, hallH, hallCenterZ);
     scene.add(hallCeil);
 
-    // Back Wall (z = -106m)
+    // Back Wall (z = -114m)
     const hallBackWall = new THREE.Mesh(new THREE.PlaneGeometry(hallW, hallH), hallWallMat);
     hallBackWall.position.set(hallCenterX, hallH / 2, zEndWall - hallL);
     scene.add(hallBackWall);
@@ -2120,18 +2127,18 @@
     hallFrontLeft.position.set(hallMinX + hallFrontLeftW / 2, hallH / 2, zEndWall);
     scene.add(hallFrontLeft);
 
-    // Upper header return above corridor height (y = 6.4m to 10.5m at z = -76m)
+    // Upper header return above corridor height (y = 6.4m to 12.5m at z = -76m)
     const hallFrontTop = new THREE.Mesh(new THREE.PlaneGeometry(hallMaxX - (-halfW), hallH - MALL_HEIGHT), hallWallMat);
     hallFrontTop.position.set((hallMaxX - halfW) / 2, MALL_HEIGHT + (hallH - MALL_HEIGHT) / 2, zEndWall);
     scene.add(hallFrontTop);
 
-    // Subtle warm ambient lights inside the Cinema Hall & Upstairs Tiers
+    // Subtle warm ambient lights inside the Staircase & Flat Upper Cinema Hall
     const hallLight1 = new THREE.PointLight(0xffdfb0, 0.95, 32, 1.8);
-    hallLight1.position.set(hallCenterX + 4, 7.2, zEndWall - 8);
+    hallLight1.position.set(stairCenterX, 8.2, zEndWall - 11);
     scene.add(hallLight1);
 
-    const hallLight2 = new THREE.PointLight(0xffdfb0, 0.85, 32, 1.8);
-    hallLight2.position.set(hallCenterX, 8.2, zEndWall - 22);
+    const hallLight2 = new THREE.PointLight(0xffdfb0, 0.95, 36, 1.8);
+    hallLight2.position.set(hallCenterX, 10.2, zEndWall - 29);
     scene.add(hallLight2);
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
@@ -2561,9 +2568,12 @@
 
       // Axis-independent collision sliding (diagonal movement slides along walls smoothly)
       let nextX = camera.position.x + deltaX;
-      if (camera.position.z < -76.2) {
-        // Inside Right-Side Entry Cinema Hall (-19.8m to +2.2m)
-        nextX = Math.min(2.2, Math.max(-19.8, nextX));
+      if (camera.position.z < -95.8) {
+        // Flat Upper Cinema Hall after stairs end (-19.8m to +2.55m)
+        nextX = Math.min(2.55, Math.max(-19.8, nextX));
+      } else if (camera.position.z < -76.2) {
+        // Walled Right-Side Staircase Corridor (-0.95m to +2.55m between left stair wall and right wall)
+        nextX = Math.min(2.55, Math.max(-0.95, nextX));
       } else if (camera.position.z < -66.0) {
         // Corridor tail between Shop 4 and Wood Wall (-5.2m to +5.2m)
         nextX = Math.min(5.2, Math.max(-5.2, nextX));
@@ -2586,36 +2596,46 @@
       camera.position.x = nextX;
 
       let nextZ = camera.position.z + deltaZ;
-      nextZ = Math.min(6.0, Math.max(-105.0, nextZ));
+      nextZ = Math.min(6.0, Math.max(-113.0, nextZ));
+      // Prevent walking off the flat upper deck edge into the drop left of the stair wall
+      if (camera.position.x < -0.95 && camera.position.z < -95.8 && nextZ > -96.2) {
+        nextZ = -96.2;
+      }
       if (camera.position.x < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
       }
-      // Far-end Wood Wall & Double Doorway collision at z = -76.0m
+      // Far-end Wood Wall & Single Doorway collision at z = -76.0m
       if (Math.abs(nextZ - cinemaDoorState.doorZ) < 0.55) {
-        const inDoorOpening = Math.abs(camera.position.x) < 1.85 && cinemaDoorState.openProgress > 0.35;
+        const inDoorOpening = Math.abs(camera.position.x - cinemaDoorState.doorX) < 0.85 && cinemaDoorState.openProgress > 0.35;
         if (!inDoorOpening) {
           nextZ = camera.position.z;
         }
       }
       camera.position.z = nextZ;
 
-      // Walkable Upstairs Height inside Cinema Hall (stepped tiers rising from z = -80m to -104m)
-      let baseFloorY = 0;
-      if (camera.position.z < -80.0) {
-        const stepIdx = Math.min(12, Math.max(0, Math.floor((-80.0 - camera.position.z) / 2.0) + 1));
-        baseFloorY = stepIdx * 0.25;
-      }
+      // Walkable Upstairs Height inside Walled Staircase (14 steps z = -79m to -95.8m) -> Flat Surface (y = 4.90m)
+      const getCinemaFloorY = (z) => {
+        if (z < -95.8) return 4.90;
+        if (z < -79.0) {
+          const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - z) / 1.2) + 1));
+          return stepIdx * 0.35;
+        }
+        return 0;
+      };
+      const baseFloorY = getCinemaFloorY(camera.position.z);
 
       // Subtle natural human walking head bob smoothly tracking upstairs elevation
       walkStepTime += keysPressed.sprint ? 0.22 : 0.14;
       const targetEyeY = baseFloorY + cameraY + Math.sin(walkStepTime) * 0.022;
       camera.position.y += (targetEyeY - camera.position.y) * 0.16;
     } else {
-      // Smooth return to resting eye level on current tier
+      // Smooth return to resting eye level on current stair/flat deck
       let baseFloorY = 0;
-      if (camera.position.z < -80.0) {
-        const stepIdx = Math.min(12, Math.max(0, Math.floor((-80.0 - camera.position.z) / 2.0) + 1));
-        baseFloorY = stepIdx * 0.25;
+      if (camera.position.z < -95.8) {
+        baseFloorY = 4.90;
+      } else if (camera.position.z < -79.0) {
+        const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - camera.position.z) / 1.2) + 1));
+        baseFloorY = stepIdx * 0.35;
       }
       camera.position.y += ((baseFloorY + cameraY) - camera.position.y) * 0.12;
     }
@@ -3019,15 +3039,14 @@
   }
 
   function updateCinemaDoors() {
-    if (!cinemaDoorState.leftGroup || !cinemaDoorState.rightGroup || !camera) return;
-    const dist = Math.hypot(camera.position.x, camera.position.z - cinemaDoorState.doorZ);
+    if (!cinemaDoorState.doorGroup || !camera) return;
+    const dist = Math.hypot(camera.position.x - cinemaDoorState.doorX, camera.position.z - cinemaDoorState.doorZ);
     cinemaDoorState.targetProgress = dist < 7.5 ? 1 : 0;
     const diff = cinemaDoorState.targetProgress - cinemaDoorState.openProgress;
     if (Math.abs(diff) > 0.001) {
       cinemaDoorState.openProgress += diff * 0.065;
       const angle = cinemaDoorState.openProgress * (Math.PI * 0.48);
-      cinemaDoorState.leftGroup.rotation.y = angle;
-      cinemaDoorState.rightGroup.rotation.y = -angle;
+      cinemaDoorState.doorGroup.rotation.y = angle;
     }
   }
 
