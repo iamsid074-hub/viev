@@ -2284,6 +2284,7 @@
     function addLuxurySeat(x, floorY, z) {
       const g = new THREE.Group();
       g.position.set(x, floorY, z);
+      g.rotation.y = Math.PI; // Face -Z (toward Cinema Screen wall at z = -105m)
       buildVievSeat(g, seatGeo, false);
       scene.add(g);
     }
@@ -2291,6 +2292,7 @@
     function addVipRecliner(x, floorY, z) {
       const g = new THREE.Group();
       g.position.set(x, floorY, z);
+      g.rotation.y = Math.PI; // Face -Z (toward Cinema Screen wall at z = -105m)
       buildVievSeat(g, vipGeo, true);
       scene.add(g);
     }
@@ -2299,19 +2301,28 @@
     const blockSeatXs = (startX, count, pitch) =>
       Array.from({ length: count }, (_, i) => startX + pitch / 2 + i * pitch);
 
-    // 4 Stepped Auditorium Tiers BESIDE the Stairs (x = -20.8m to -1.6m, z = -83.0m to -95.8m)
+    // 4 INCLINING Auditorium Tiers BESIDE the Stairs (x = -20.8m to -1.6m)
+    // Rising UPWARD from z = -94.0m (y = 4.90m) toward z = -76.0m (y = 7.65m)
     // X-layout (19.2m total beside stair wall):
     //   Extreme Left 4 seats: -20.45 to -15.45 (4 x 1.25m)
     //   Left Walkway:         -15.45 to -13.85 (1.60m stepped walkway)
     //   Centre 5 seats:       -13.85 to  -7.60 (5 x 1.25m)
     //   Right Walkway:         -7.60 to  -6.00 (1.60m stepped walkway)
     //   Right Side 3 seats:    -6.00 to  -2.25 (3 x 1.25m)
-    const rowStartZ = -83.0;
-    const rowDepth = 3.2;
-    const rowRise = 1.00;
+    const rowStartZ = -94.0;
+    const rowDepth = 2.8;
+    const rowRise = 0.55;
     const rowCount = 4;
     const walkwayCenters = [-14.65, -6.80];
     const walkwayW = 1.60;
+
+    // Flat transition deck at top of stairs (z = -95.8m to -94.0m, y = 4.90m)
+    const audEntryDeck = new THREE.Mesh(
+      new THREE.BoxGeometry(audW, totalStairHeight, 1.8),
+      hallFloorMat
+    );
+    audEntryDeck.position.set(audCenterX, totalStairHeight / 2, -94.9);
+    scene.add(audEntryDeck);
 
     const stdSeatXs = [
       ...blockSeatXs(-20.45, 4, 1.25), // Extreme Left 4 seats
@@ -2320,10 +2331,10 @@
     ];
 
     for (let r = 0; r < rowCount; r++) {
-      const rowFloorY = (r + 1) * rowRise; // 1.0m, 2.0m, 3.0m, 4.0m
-      const rowCenterZ = rowStartZ - r * rowDepth - rowDepth / 2;
+      const rowFloorY = totalStairHeight + (r + 1) * rowRise; // 5.45m, 6.00m, 6.55m, 7.10m
+      const rowCenterZ = rowStartZ + r * rowDepth + rowDepth / 2;
 
-      // Solid Tier Box beside the stair wall
+      // Solid Inclining Tier Box beside the stair wall
       const tierDeck = new THREE.Mesh(
         new THREE.BoxGeometry(audW, rowFloorY, rowDepth),
         hallFloorMat
@@ -2331,13 +2342,13 @@
       tierDeck.position.set(audCenterX, rowFloorY / 2, rowCenterZ);
       scene.add(tierDeck);
 
-      // 3 smooth walkway steps inside each row tier (going up along -Z)
-      const subStepCount = 3;
+      // 2 smooth walkway steps inside each row tier (going UP along +Z)
+      const subStepCount = 2;
       const subStepDepth = rowDepth / subStepCount;
       const subStepRise = rowRise / subStepCount;
       for (let ss = 0; ss < subStepCount; ss++) {
-        const ssTopY = r * rowRise + (ss + 1) * subStepRise;
-        const ssZ = (rowStartZ - r * rowDepth) - ss * subStepDepth - subStepDepth / 2;
+        const ssTopY = totalStairHeight + r * rowRise + (ss + 1) * subStepRise;
+        const ssZ = (rowStartZ + r * rowDepth) + ss * subStepDepth + subStepDepth / 2;
         walkwayCenters.forEach((wx) => {
           const wStep = new THREE.Mesh(
             new THREE.BoxGeometry(walkwayW, subStepRise, subStepDepth),
@@ -2347,49 +2358,69 @@
           scene.add(wStep);
 
           const wLed = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.03, 0.045), stepLedMat);
-          wLed.position.set(wx, ssTopY + 0.008, ssZ + subStepDepth / 2 - 0.03);
+          wLed.position.set(wx, ssTopY + 0.008, ssZ - subStepDepth / 2 + 0.03);
           scene.add(wLed);
         });
       }
 
-      // Place all 12 luxury VIEV seats in this row
+      // Place all 12 luxury VIEV seats in this row (facing -Z)
       stdSeatXs.forEach((sx) => addLuxurySeat(sx, rowFloorY, rowCenterZ));
     }
 
-    // Final walkway steps bridging Row 4 (y = 4.0m) up to Top Cross-Walkway (y = 4.90m at z = -95.8m)
-    walkwayCenters.forEach((wx) => {
-      const bridgeLed = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.035, 0.05), stepLedMat);
-      bridgeLed.position.set(wx, totalStairHeight + 0.008, stairEndZ - 0.03);
-      scene.add(bridgeLed);
-    });
-
-    // Top VIP Special Recliner Terrace (z = -98.8m to -105.0m, y = 5.30m)
-    const vipDeckStartZ = -98.8;
-    const vipDeckLen = vipDeckStartZ - (zEndWall - hallL); // 6.2m
-    const vipFloorY = totalStairHeight + 0.40; // 5.30m
-    const vipRiserH = vipFloorY - totalStairHeight; // 0.40m
+    // Top VIP Special Recliner Terrace at the Top of the Incline (z = -82.8m to -76.0m, y = 7.65m)
+    const vipDeckStartZ = rowStartZ + rowCount * rowDepth; // -82.8m
+    const vipDeckLen = zEndWall - vipDeckStartZ; // 6.8m (-82.8 to -76.0)
+    const vipFloorY = totalStairHeight + (rowCount + 1) * rowRise; // 7.65m
 
     const vipDeck = new THREE.Mesh(
-      new THREE.BoxGeometry(hallW, vipRiserH, vipDeckLen),
+      new THREE.BoxGeometry(audW, vipFloorY, vipDeckLen),
       hallFloorMat
     );
-    vipDeck.position.set(hallCenterX, totalStairHeight + vipRiserH / 2, vipDeckStartZ - vipDeckLen / 2);
+    vipDeck.position.set(audCenterX, vipFloorY / 2, vipDeckStartZ + vipDeckLen / 2);
     scene.add(vipDeck);
 
-    // Walkway step up to VIP Recliner Terrace
+    // Walkway step up to Top VIP Recliner Terrace (2 steps along +Z)
     walkwayCenters.forEach((wx) => {
-      const vipLed = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.035, 0.05), stepLedMat);
-      vipLed.position.set(wx, vipFloorY + 0.008, vipDeckStartZ - 0.03);
-      scene.add(vipLed);
+      const midY = totalStairHeight + rowCount * rowRise + rowRise * 0.5;
+      const wStep = new THREE.Mesh(new THREE.BoxGeometry(walkwayW, rowRise * 0.5, 1.4), hallFloorMat);
+      wStep.position.set(wx, midY - rowRise * 0.25, vipDeckStartZ + 0.7);
+      scene.add(wStep);
+
+      const vipLed1 = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.035, 0.05), stepLedMat);
+      vipLed1.position.set(wx, midY + 0.008, vipDeckStartZ + 0.03);
+      scene.add(vipLed1);
+
+      const vipLed2 = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.14, 0.035, 0.05), stepLedMat);
+      vipLed2.position.set(wx, vipFloorY + 0.008, vipDeckStartZ + 1.43);
+      scene.add(vipLed2);
     });
 
-    // Place Top VIP Special Recliner Seats (3 Extreme Left + 5 Centre + 3 Right = 11 VIP Recliners)
+    // Place Top VIP Special Recliner Seats at the Top of the Incline (3 Left + 5 Centre + 3 Right = 11 VIP Recliners)
     const vipSeatXs = [
       ...blockSeatXs(-20.45, 3, 1.65), // Extreme Left 3 VIP Recliners
       ...blockSeatXs(-14.20, 5, 1.65), // Centre 5 VIP Recliners
       ...blockSeatXs(-2.80, 3, 1.65)   // Right 3 VIP Recliners
     ];
-    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -101.8));
+    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -79.2));
+
+    // Cinema Screen Accent Frame on Back Wall (z = -104.8m) facing the seats
+    const screenFrame = new THREE.Mesh(
+      new THREE.BoxGeometry(17.6, 7.2, 0.12),
+      doorBrassTrimMat
+    );
+    screenFrame.position.set(audCenterX, 7.8, zEndWall - hallL + 0.08);
+    scene.add(screenFrame);
+    const screenMat = new THREE.MeshStandardMaterial({
+      color: 0x0b0c12,
+      roughness: 0.4,
+      metalness: 0.1
+    });
+    const screenSurface = new THREE.Mesh(
+      new THREE.BoxGeometry(17.2, 6.8, 0.15),
+      screenMat
+    );
+    screenSurface.position.set(audCenterX, 7.8, zEndWall - hallL + 0.10);
+    scene.add(screenSurface);
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
     const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
@@ -2819,11 +2850,16 @@
       // Axis-independent collision sliding (diagonal movement slides along walls smoothly)
       let nextX = camera.position.x + deltaX;
       if (camera.position.z < -95.8) {
-        // Flat Upper Cinema Hall after stairs end (-19.8m to +2.55m)
+        // Upper Flat Cross-Walkway behind stairs (-19.8m to +2.55m)
         nextX = Math.min(2.55, Math.max(-19.8, nextX));
       } else if (camera.position.z < -76.2) {
-        // Walled Right-Side Staircase Corridor (-0.95m to +2.55m between left stair wall and right wall)
-        nextX = Math.min(2.55, Math.max(-0.95, nextX));
+        if (camera.position.x < -1.6) {
+          // Inside Inclined Auditorium Seating Area (-19.8m to -2.2m, separated from stairs by left stair wall at -1.6m)
+          nextX = Math.min(-2.2, Math.max(-19.8, nextX));
+        } else {
+          // Inside Walled Right-Side Staircase Corridor (-0.95m to +2.55m)
+          nextX = Math.min(2.55, Math.max(-0.95, nextX));
+        }
       } else if (camera.position.z < -66.0) {
         // Corridor tail between Shop 4 and Wood Wall (-5.2m to +5.2m)
         nextX = Math.min(5.2, Math.max(-5.2, nextX));
@@ -2850,8 +2886,10 @@
       if (camera.position.x < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
       }
-      // Far-end Wood Wall & Single Doorway collision at z = -76.0m
-      if (Math.abs(nextZ - cinemaDoorState.doorZ) < 0.55) {
+      // Far-end Wood Wall & Single Doorway collision at z = -76.0m (only for stair corridor / mall side, auditorium stops at -76.6m)
+      if (camera.position.x < -1.6 && camera.position.z < -76.2) {
+        nextZ = Math.max(-104.0, Math.min(-76.6, nextZ));
+      } else if (Math.abs(nextZ - cinemaDoorState.doorZ) < 0.55) {
         const inDoorOpening = Math.abs(camera.position.x - cinemaDoorState.doorX) < 0.85 && cinemaDoorState.openProgress > 0.35;
         if (!inDoorOpening) {
           nextZ = camera.position.z;
@@ -2859,17 +2897,18 @@
       }
       camera.position.z = nextZ;
 
-      // Walkable Upstairs Height inside Walled Staircase & Auditorium Tiers beside Stairs -> Top VIP Terrace
+      // Walkable Upstairs Height inside Walled Staircase -> Flat Upper Cross-Walkway -> Inclining Auditorium & Top VIP Terrace
       const getCinemaFloorY = (x, z) => {
-        if (z < -98.8) return 5.30; // Top VIP Special Recliner Terrace
-        if (z < -95.8) return 4.90; // Upper Cross-Walkway
+        if (z < -95.8) return 4.90; // Upper flat landing behind stairs
         if (x < -1.6) {
-          // Auditorium beside stairs (z = -83.0m to -95.8m)
-          if (z < -83.0) {
-            const subStep = Math.min(11, Math.max(0, Math.floor((-83.0 - z) / (3.2 / 3))));
-            return (subStep + 1) * (1.0 / 3);
+          // Inclined Auditorium beside stairs (rises UPWARD from z = -94.0m @ 4.90m to z = -82.8m @ 7.10m -> VIP @ 7.65m)
+          if (z >= -81.4) return 7.65; // Top VIP Special Recliner Terrace
+          if (z >= -82.8) return 7.375; // Step up to VIP Terrace
+          if (z > -94.0) {
+            const subStep = Math.min(7, Math.max(0, Math.floor((z - (-94.0)) / 1.4)));
+            return 4.90 + (subStep + 1) * 0.275;
           }
-          return 0;
+          return 4.90;
         }
         if (z < -79.0) {
           const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - z) / 1.2) + 1));
@@ -2884,15 +2923,19 @@
       const targetEyeY = baseFloorY + cameraY + Math.sin(walkStepTime) * 0.022;
       camera.position.y += (targetEyeY - camera.position.y) * 0.16;
     } else {
-      // Smooth return to resting eye level on current stair/walkway/terrace
+      // Smooth return to resting eye level on current stair/incline/terrace
       let baseFloorY = 0;
-      if (camera.position.z < -98.8) {
-        baseFloorY = 5.30;
-      } else if (camera.position.z < -95.8) {
+      if (camera.position.z < -95.8) {
         baseFloorY = 4.90;
-      } else if (camera.position.x < -1.6 && camera.position.z < -83.0) {
-        const subStep = Math.min(11, Math.max(0, Math.floor((-83.0 - camera.position.z) / (3.2 / 3))));
-        baseFloorY = (subStep + 1) * (1.0 / 3);
+      } else if (camera.position.x < -1.6) {
+        if (camera.position.z >= -81.4) baseFloorY = 7.65;
+        else if (camera.position.z >= -82.8) baseFloorY = 7.375;
+        else if (camera.position.z > -94.0) {
+          const subStep = Math.min(7, Math.max(0, Math.floor((camera.position.z - (-94.0)) / 1.4)));
+          baseFloorY = 4.90 + (subStep + 1) * 0.275;
+        } else {
+          baseFloorY = 4.90;
+        }
       } else if (camera.position.z < -79.0) {
         const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - camera.position.z) / 1.2) + 1));
         baseFloorY = stepIdx * 0.35;
