@@ -2098,12 +2098,183 @@
     handrailMesh.position.set(hallMaxX - 0.16, 0.95 + railRise / 2, stairStartZ - railRun / 2);
     scene.add(handrailMesh);
 
-    // High Acoustic Cinema Ceiling (y = 12.5m)
+    // High Luxury Coffered Acoustic Cinema Ceiling (y = 16.5m, fitted proportionally to 24m x 29m hall)
+    const ceilCanvas = document.createElement('canvas');
+    ceilCanvas.width = 256;
+    ceilCanvas.height = 256;
+    const cCtx = ceilCanvas.getContext('2d');
+    cCtx.fillStyle = '#171412';
+    cCtx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 3600; i++) {
+      const shade = 18 + Math.floor(Math.random() * 14);
+      cCtx.fillStyle = `rgb(${shade + 2},${shade},${shade - 2})`;
+      cCtx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+    }
+    const ceilSuedeTex = new THREE.CanvasTexture(ceilCanvas);
+    ceilSuedeTex.wrapS = THREE.RepeatWrapping;
+    ceilSuedeTex.wrapT = THREE.RepeatWrapping;
+    ceilSuedeTex.repeat.set(6, 6);
+    ceilSuedeTex.colorSpace = THREE.SRGBColorSpace;
+
+    const ceilSoffitMat = new THREE.MeshStandardMaterial({
+      map: ceilSuedeTex,
+      color: 0x26211d,
+      roughness: 0.86,
+      metalness: 0.08
+    });
+    const ceilPanelMat = new THREE.MeshStandardMaterial({
+      map: ceilSuedeTex,
+      color: 0x1c1815,
+      roughness: 0.92,
+      metalness: 0.04
+    });
+    const ceilShadowMat = new THREE.MeshStandardMaterial({
+      color: 0x070606,
+      roughness: 0.95,
+      metalness: 0.05
+    });
+    const ceilCoveLedMat = new THREE.MeshStandardMaterial({
+      color: 0xffe4a8,
+      emissive: new THREE.Color(0xffab36),
+      emissiveIntensity: 1.55,
+      roughness: 0.2
+    });
+    const downlightRimMat = new THREE.MeshStandardMaterial({
+      color: 0x1b1815,
+      roughness: 0.45,
+      metalness: 0.6
+    });
+    const downlightDiscMat = new THREE.MeshStandardMaterial({
+      color: 0xfff0cc,
+      emissive: new THREE.Color(0xffcf78),
+      emissiveIntensity: 1.8,
+      roughness: 0.15
+    });
+
+    // Dark shadow-gap structural ceiling backing at y = hallH
     const hallCeilGeo = new THREE.PlaneGeometry(hallW, hallL);
     hallCeilGeo.rotateX(Math.PI / 2);
-    const hallCeil = new THREE.Mesh(hallCeilGeo, hallCeilingMat);
+    const hallCeil = new THREE.Mesh(hallCeilGeo, ceilShadowMat);
     hallCeil.position.set(hallCenterX, hallH, hallCenterZ);
     scene.add(hallCeil);
+
+    // Helper to place a 3D recessed circular ceiling downlight facing -Y
+    const dlRimGeo = new THREE.RingGeometry(0.19, 0.27, 24);
+    dlRimGeo.rotateX(Math.PI / 2);
+    const dlDiscGeo = new THREE.CircleGeometry(0.19, 24);
+    dlDiscGeo.rotateX(Math.PI / 2);
+    function addCeilDownlight(x, y, z) {
+      const rim = new THREE.Mesh(dlRimGeo, downlightRimMat);
+      rim.position.set(x, y - 0.004, z);
+      scene.add(rim);
+      const disc = new THREE.Mesh(dlDiscGeo, downlightDiscMat);
+      disc.position.set(x, y - 0.007, z);
+      scene.add(disc);
+    }
+
+    // 1. Outer Perimeter Drop Soffit (2.1m side bands, 2.4m front/back bands, drop 0.36m)
+    const outerBandW = 2.1;
+    const outerBandL = 2.4;
+    const outerDropH = 0.36;
+    const outerDropY = hallH - outerDropH / 2;
+
+    const soffitLeft = new THREE.Mesh(new THREE.BoxGeometry(outerBandW, outerDropH, hallL), ceilSoffitMat);
+    soffitLeft.position.set(hallMinX + outerBandW / 2, outerDropY, hallCenterZ);
+    scene.add(soffitLeft);
+
+    const soffitRight = new THREE.Mesh(new THREE.BoxGeometry(outerBandW, outerDropH, hallL), ceilSoffitMat);
+    soffitRight.position.set(hallMaxX - outerBandW / 2, outerDropY, hallCenterZ);
+    scene.add(soffitRight);
+
+    const innerOpenW = hallW - outerBandW * 2; // 19.8m
+    const soffitFront = new THREE.Mesh(new THREE.BoxGeometry(innerOpenW, outerDropH, outerBandL), ceilSoffitMat);
+    soffitFront.position.set(hallCenterX, outerDropY, zEndWall - outerBandL / 2);
+    scene.add(soffitFront);
+
+    const soffitBack = new THREE.Mesh(new THREE.BoxGeometry(innerOpenW, outerDropH, outerBandL), ceilSoffitMat);
+    soffitBack.position.set(hallCenterX, outerDropY, zEndWall - hallL + outerBandL / 2);
+    scene.add(soffitBack);
+
+    // 4 Recessed Downlights along Left & Right Outer Soffit Bands
+    const outerLightZs = [-80.2, -87.0, -94.0, -100.8];
+    outerLightZs.forEach((lz) => {
+      addCeilDownlight(hallMinX + outerBandW / 2, hallH - outerDropH, lz);
+      addCeilDownlight(hallMaxX - outerBandW / 2, hallH - outerDropH, lz);
+    });
+
+    // 2. Perimeter Warm-Gold Cove LED Reveal around Inner Opening (19.8m x 24.2m)
+    const innerOpenL = hallL - outerBandL * 2; // 24.2m
+    const coveY = hallH - 0.18;
+    const coveLedThick = 0.08;
+    [
+      { w: coveLedThick, l: innerOpenL, x: hallCenterX - innerOpenW / 2 + 0.05, z: hallCenterZ },
+      { w: coveLedThick, l: innerOpenL, x: hallCenterX + innerOpenW / 2 - 0.05, z: hallCenterZ },
+      { w: innerOpenW, l: coveLedThick, x: hallCenterX, z: hallCenterZ + innerOpenL / 2 - 0.05 },
+      { w: innerOpenW, l: coveLedThick, x: hallCenterX, z: hallCenterZ - innerOpenL / 2 + 0.05 }
+    ].forEach((seg) => {
+      const coveLed = new THREE.Mesh(new THREE.BoxGeometry(seg.w, 0.07, seg.l), ceilCoveLedMat);
+      coveLed.position.set(seg.x, coveY, seg.z);
+      scene.add(coveLed);
+    });
+
+    // 3. Inner Drop Frame (1.35m band inside cove, creating deep recessed coffer reveal)
+    const innerBand = 1.35;
+    const innerGap = 0.32; // Recessed cove gap between outer soffit and inner frame
+    const frameW = innerOpenW - innerGap * 2; // 19.16m
+    const frameL = innerOpenL - innerGap * 2; // 23.56m
+    const frameDropH = 0.28;
+    const frameDropY = hallH - frameDropH / 2;
+
+    const frameLeft = new THREE.Mesh(new THREE.BoxGeometry(innerBand, frameDropH, frameL), ceilSoffitMat);
+    frameLeft.position.set(hallCenterX - frameW / 2 + innerBand / 2, frameDropY, hallCenterZ);
+    scene.add(frameLeft);
+
+    const frameRight = new THREE.Mesh(new THREE.BoxGeometry(innerBand, frameDropH, frameL), ceilSoffitMat);
+    frameRight.position.set(hallCenterX + frameW / 2 - innerBand / 2, frameDropY, hallCenterZ);
+    scene.add(frameRight);
+
+    const gridW = frameW - innerBand * 2; // 16.46m
+    const frameFront = new THREE.Mesh(new THREE.BoxGeometry(gridW, frameDropH, innerBand), ceilSoffitMat);
+    frameFront.position.set(hallCenterX, frameDropY, hallCenterZ + frameL / 2 - innerBand / 2);
+    scene.add(frameFront);
+
+    const frameBack = new THREE.Mesh(new THREE.BoxGeometry(gridW, frameDropH, innerBand), ceilSoffitMat);
+    frameBack.position.set(hallCenterX, frameDropY, hallCenterZ - frameL / 2 + innerBand / 2);
+    scene.add(frameBack);
+
+    // 4. Central 4x4 Coffered Acoustic Panel Grid (16 panels with shadow gaps & 4+4 outer-column downlights)
+    const gridL = frameL - innerBand * 2; // 20.86m
+    const cols = 4;
+    const rows = 4;
+    const seamGap = 0.12;
+    const panelW = (gridW - seamGap * (cols + 1)) / cols;
+    const panelL = (gridL - seamGap * (rows + 1)) / rows;
+    const panelThick = 0.14;
+    const panelY = hallH - panelThick / 2;
+    const panelGeo = new THREE.BoxGeometry(panelW, panelThick, panelL);
+
+    for (let r = 0; r < rows; r++) {
+      const pz = (hallCenterZ + gridL / 2) - seamGap - panelL / 2 - r * (panelL + seamGap);
+      for (let c = 0; c < cols; c++) {
+        const px = (hallCenterX - gridW / 2) + seamGap + panelW / 2 + c * (panelW + seamGap);
+        const panel = new THREE.Mesh(panelGeo, ceilPanelMat);
+        panel.position.set(px, panelY, pz);
+        scene.add(panel);
+
+        // Recessed circular downlights in the 2 outer coffer columns (c === 0 and c === 3)
+        if (c === 0 || c === cols - 1) {
+          addCeilDownlight(px, hallH - panelThick, pz);
+        }
+      }
+    }
+
+    // Soft warm cove wash lights illuminating the coffered ceiling contours
+    const coveWash1 = new THREE.PointLight(0xffcf88, 0.75, 22, 1.8);
+    coveWash1.position.set(hallCenterX - 6.0, hallH - 1.4, hallCenterZ + 5.0);
+    scene.add(coveWash1);
+    const coveWash2 = new THREE.PointLight(0xffcf88, 0.75, 22, 1.8);
+    coveWash2.position.set(hallCenterX + 6.0, hallH - 1.4, hallCenterZ - 5.0);
+    scene.add(coveWash2);
 
     // Back Wall (z = -114m)
     const hallBackWall = new THREE.Mesh(new THREE.PlaneGeometry(hallW, hallH), hallWallMat);
