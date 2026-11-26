@@ -116,6 +116,7 @@
     openProgress: 0,
     targetProgress: 0
   };
+  const cinemaSeatColliders = [];
   let lookTouchId = null;
   let prevPointerX = 0;
   let prevPointerY = 0;
@@ -2463,37 +2464,65 @@
     hallLight4.position.set(-6.0, 10.8, -100.5);
     scene.add(hallLight4);
 
-    // 5.2. VIEV LUXURY CINEMA SEATS BESIDE STAIRS (x = -20.8m to -1.6m, z = -83.0m to -95.8m) & TOP VIP RECLINERS
+    // 5.2. SCULPTED SEAMLESS VIEV LUXURY CINEMA SEATS & PHYSICAL COLLIDERS
+    cinemaSeatColliders.length = 0;
+
+    // Rich Warm Champagne-Taupe Stitched Leather Texture (prevents white blowout, shows leather grain & seams)
+    const leatherCanvas = document.createElement('canvas');
+    leatherCanvas.width = 256;
+    leatherCanvas.height = 256;
+    const lCtx = leatherCanvas.getContext('2d');
+    lCtx.fillStyle = '#9c846d';
+    lCtx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 5000; i++) {
+      const d = Math.random() > 0.5 ? 'rgba(255,245,232,0.06)' : 'rgba(42,30,20,0.09)';
+      lCtx.fillStyle = d;
+      lCtx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+    }
+    // Subtle stitched leather perimeter seam
+    lCtx.strokeStyle = 'rgba(58, 42, 28, 0.35)';
+    lCtx.setLineDash([5, 4]);
+    lCtx.lineWidth = 2;
+    lCtx.strokeRect(10, 10, 236, 236);
+    const leatherTex = new THREE.CanvasTexture(leatherCanvas);
+    leatherTex.colorSpace = THREE.SRGBColorSpace;
+
     // Shared Canvas Texture for Gold "VIEV" Headrest Branding
     const vievHeadCanvas = document.createElement('canvas');
     vievHeadCanvas.width = 256;
     vievHeadCanvas.height = 128;
     const vhCtx = vievHeadCanvas.getContext('2d');
-    vhCtx.fillStyle = '#c7b299';
+    vhCtx.fillStyle = '#9c846d';
     vhCtx.fillRect(0, 0, 256, 128);
+    vhCtx.strokeStyle = 'rgba(58, 42, 28, 0.35)';
+    vhCtx.setLineDash([4, 4]);
+    vhCtx.lineWidth = 2;
+    vhCtx.strokeRect(8, 8, 240, 112);
+    vhCtx.setLineDash([]);
     vhCtx.font = '600 44px "Cinzel", Georgia, serif';
     vhCtx.textAlign = 'center';
     vhCtx.textBaseline = 'middle';
-    vhCtx.fillStyle = '#e6c26e';
+    vhCtx.fillStyle = '#e8c468';
     vhCtx.fillText('VIEV', 128, 64);
     const vievHeadTex = new THREE.CanvasTexture(vievHeadCanvas);
     vievHeadTex.colorSpace = THREE.SRGBColorSpace;
 
-    // Materials matching VIEV Luxury Seat Model (Champagne Leather + Glossy Obsidian Pods + Warm Gold LED + Brass)
+    // Materials matching VIEV Luxury Seat Model (Supple Champagne-Taupe Leather + Glossy Obsidian Pods + Warm LED + Brass)
     const seatLeatherMat = new THREE.MeshStandardMaterial({
-      color: 0xc7b299,
-      roughness: 0.48,
-      metalness: 0.06
+      map: leatherTex,
+      color: 0xffffff,
+      roughness: 0.64,
+      metalness: 0.04
     });
     const seatHeadFrontMat = new THREE.MeshStandardMaterial({
       map: vievHeadTex,
-      roughness: 0.48,
-      metalness: 0.08
+      roughness: 0.62,
+      metalness: 0.06
     });
     const seatObsidianMat = new THREE.MeshStandardMaterial({
-      color: 0x121010,
-      roughness: 0.22,
-      metalness: 0.35
+      color: 0x131111,
+      roughness: 0.24,
+      metalness: 0.36
     });
     const seatArmLedMat = new THREE.MeshStandardMaterial({
       color: 0xffe099,
@@ -2502,97 +2531,176 @@
       roughness: 0.2
     });
 
-    // Shared Geometries for Standard VIEV Luxury Seat (1.25m pitch)
-    const seatGeo = {
-      base: new THREE.BoxGeometry(0.88, 0.08, 0.72),
-      cushion: new THREE.BoxGeometry(0.62, 0.24, 0.64),
-      backSeg: new THREE.BoxGeometry(0.62, 0.22, 0.17),
-      headrest: new THREE.BoxGeometry(0.58, 0.28, 0.19),
-      headLogo: new THREE.PlaneGeometry(0.46, 0.22),
-      armPod: new THREE.BoxGeometry(0.17, 0.50, 0.74),
-      armPad: new THREE.BoxGeometry(0.16, 0.07, 0.60),
-      armLedV: new THREE.BoxGeometry(0.025, 0.44, 0.025),
-      armLedH: new THREE.BoxGeometry(0.025, 0.025, 0.56),
-      cupRing: new THREE.CylinderGeometry(0.045, 0.04, 0.045, 16)
+    // Helper: Extrude a 2D (z, y) side profile centered on X = 0 with smooth rounded bevels
+    function makeSculptedProfile(shape, width, bevelSize, bevelThick) {
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: width,
+        bevelEnabled: true,
+        bevelSegments: 4,
+        steps: 1,
+        bevelSize: bevelSize,
+        bevelThickness: bevelThick
+      });
+      geo.rotateY(-Math.PI / 2);
+      geo.translate(width / 2, 0, 0);
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    // Cushion with curved waterfall front
+    const makeCushionGeo = (w) => {
+      const s = new THREE.Shape();
+      s.moveTo(-0.26, 0.06);
+      s.lineTo(0.28, 0.06);
+      s.quadraticCurveTo(0.37, 0.08, 0.36, 0.21);
+      s.quadraticCurveTo(0.35, 0.29, 0.22, 0.29);
+      s.lineTo(-0.26, 0.27);
+      s.closePath();
+      return makeSculptedProfile(s, w, 0.032, 0.032);
     };
 
-    // Shared Geometries for Top VIP VIEV Special Recliner (1.60m pitch, wider + extended footrest)
-    const vipGeo = {
-      base: new THREE.BoxGeometry(1.08, 0.08, 0.80),
-      cushion: new THREE.BoxGeometry(0.80, 0.25, 0.70),
-      backSeg: new THREE.BoxGeometry(0.80, 0.24, 0.18),
-      headrest: new THREE.BoxGeometry(0.74, 0.30, 0.20),
-      headLogo: new THREE.PlaneGeometry(0.56, 0.25),
-      footrest: new THREE.BoxGeometry(0.76, 0.14, 0.54),
-      armPod: new THREE.BoxGeometry(0.20, 0.52, 0.80),
-      armPad: new THREE.BoxGeometry(0.19, 0.075, 0.66),
-      armLedV: new THREE.BoxGeometry(0.028, 0.46, 0.028),
-      armLedH: new THREE.BoxGeometry(0.028, 0.028, 0.62),
-      cupRing: new THREE.CylinderGeometry(0.05, 0.045, 0.05, 16)
+    // Sculpted glossy-obsidian armrest pod with curved front shoulder
+    const makePodGeo = (w, len, h) => {
+      const s = new THREE.Shape();
+      s.moveTo(-len * 0.48, 0.02);
+      s.lineTo(len * 0.48, 0.02);
+      s.lineTo(len * 0.48, h * 0.80);
+      s.quadraticCurveTo(len * 0.46, h, len * 0.24, h);
+      s.lineTo(-len * 0.42, h);
+      s.quadraticCurveTo(-len * 0.48, h, -len * 0.48, h * 0.86);
+      s.closePath();
+      return makeSculptedProfile(s, w, 0.02, 0.02);
     };
+
+    // Pillowed backrest bolster (overlaps seamlessly so zero air gaps)
+    const makeBolsterGeo = (w, h, d) => {
+      const s = new THREE.Shape();
+      s.moveTo(-d / 2, 0);
+      s.lineTo(d * 0.35, 0);
+      s.quadraticCurveTo(d * 0.58, h * 0.5, d * 0.35, h);
+      s.lineTo(-d / 2, h);
+      s.closePath();
+      return makeSculptedProfile(s, w, 0.035, 0.035);
+    };
+
+    // Plush rounded headrest pillow
+    const makeHeadrestGeo = (w, h, d) => {
+      const s = new THREE.Shape();
+      s.moveTo(-d * 0.4, 0);
+      s.lineTo(d * 0.35, 0);
+      s.quadraticCurveTo(d * 0.58, h * 0.5, d * 0.32, h);
+      s.lineTo(-d * 0.38, h);
+      s.closePath();
+      return makeSculptedProfile(s, w, 0.04, 0.04);
+    };
+
+    // Shared Sculpted Geometries for Standard VIEV Luxury Seat (1.25m pitch, seamless fit)
+    const seatGeo = {
+      base: new THREE.BoxGeometry(0.92, 0.07, 0.72),
+      cushion: makeCushionGeo(0.56),
+      backShell: new THREE.BoxGeometry(0.62, 0.90, 0.08),
+      backSeg: makeBolsterGeo(0.56, 0.23, 0.14),
+      headrest: makeHeadrestGeo(0.54, 0.24, 0.16),
+      headLogo: new THREE.PlaneGeometry(0.44, 0.20),
+      armPod: makePodGeo(0.14, 0.74, 0.49),
+      armPad: makeBolsterGeo(0.14, 0.055, 0.56),
+      armLedV: new THREE.BoxGeometry(0.022, 0.40, 0.022),
+      armLedH: new THREE.BoxGeometry(0.022, 0.022, 0.50),
+      cupWell: new THREE.CylinderGeometry(0.042, 0.038, 0.03, 16),
+      cupRing: new THREE.TorusGeometry(0.044, 0.008, 10, 20)
+    };
+    seatGeo.cupRing.rotateX(Math.PI / 2);
+
+    // Shared Sculpted Geometries for Top VIP VIEV Special Recliner (1.65m pitch, wider + flush footrest)
+    const vipGeo = {
+      base: new THREE.BoxGeometry(1.14, 0.07, 0.80),
+      cushion: makeCushionGeo(0.74),
+      backShell: new THREE.BoxGeometry(0.80, 0.96, 0.09),
+      backSeg: makeBolsterGeo(0.74, 0.25, 0.16),
+      headrest: makeHeadrestGeo(0.70, 0.26, 0.18),
+      headLogo: new THREE.PlaneGeometry(0.54, 0.22),
+      footrest: makeCushionGeo(0.70),
+      armPod: makePodGeo(0.16, 0.80, 0.52),
+      armPad: makeBolsterGeo(0.16, 0.06, 0.62),
+      armLedV: new THREE.BoxGeometry(0.025, 0.43, 0.025),
+      armLedH: new THREE.BoxGeometry(0.025, 0.025, 0.56),
+      cupWell: new THREE.CylinderGeometry(0.046, 0.042, 0.03, 16),
+      cupRing: new THREE.TorusGeometry(0.048, 0.009, 10, 20)
+    };
+    vipGeo.cupRing.rotateX(Math.PI / 2);
 
     function buildVievSeat(g, geo, isRecliner) {
-      const recline = isRecliner ? -0.34 : -0.15;
-      const armX = isRecliner ? 0.50 : 0.395;
+      const recline = isRecliner ? -0.34 : -0.16;
+      const armX = isRecliner ? 0.46 : 0.365; // Flush against cushion edges (zero gap!)
 
       const base = new THREE.Mesh(geo.base, seatObsidianMat);
-      base.position.set(0, 0.04, 0.0);
+      base.position.set(0, 0.035, 0.0);
       g.add(base);
 
       const cushion = new THREE.Mesh(geo.cushion, seatLeatherMat);
-      cushion.position.set(0, 0.20, 0.06);
+      cushion.position.set(0, 0.04, 0.05);
       if (isRecliner) cushion.rotation.x = -0.05;
       g.add(cushion);
 
-      // 3-ribbed plush leather backrest + VIEV headrest
+      // Continuous sculpted backrest + dark rear shell + overlapping tufted bolsters
       const backGroup = new THREE.Group();
-      backGroup.position.set(0, 0.30, -0.22);
+      backGroup.position.set(0, 0.24, -0.22);
       backGroup.rotation.x = recline;
-      [0.14, 0.36, 0.58].forEach((by) => {
+
+      const shell = new THREE.Mesh(geo.backShell, seatObsidianMat);
+      shell.position.set(0, 0.45, -0.05);
+      backGroup.add(shell);
+
+      [0.02, 0.23, 0.44].forEach((by) => {
         const seg = new THREE.Mesh(geo.backSeg, seatLeatherMat);
-        seg.position.set(0, by, 0);
+        seg.position.set(0, by, 0.03);
         backGroup.add(seg);
       });
+
       const head = new THREE.Mesh(geo.headrest, seatLeatherMat);
-      head.position.set(0, 0.85, 0.02);
+      head.position.set(0, 0.66, 0.05);
       backGroup.add(head);
 
       const logoPlane = new THREE.Mesh(geo.headLogo, seatHeadFrontMat);
-      logoPlane.position.set(0, 0.85, 0.118);
+      logoPlane.position.set(0, 0.78, 0.165);
       backGroup.add(logoPlane);
       g.add(backGroup);
 
-      // Extended footrest for Top VIP Recliners
+      // Flush extended legrest/footrest for Top VIP Recliners
       if (isRecliner) {
         const foot = new THREE.Mesh(geo.footrest, seatLeatherMat);
-        foot.position.set(0, 0.22, 0.64);
-        foot.rotation.x = 0.42;
+        foot.position.set(0, 0.10, 0.56);
+        foot.rotation.x = 0.45;
         g.add(foot);
       }
 
-      // Glossy black side pods + champagne arm pads + warm gold LED strips + brass cup holder
+      // Sculpted obsidian side pods flush with cushion + curved arm pads + warm LED + recessed brass cup holder
       [-armX, armX].forEach((ax, idx) => {
         const pod = new THREE.Mesh(geo.armPod, seatObsidianMat);
-        pod.position.set(ax, 0.29, 0.02);
+        pod.position.set(ax, 0.03, 0.02);
         g.add(pod);
 
         const pad = new THREE.Mesh(geo.armPad, seatLeatherMat);
-        pad.position.set(ax, 0.57, -0.02);
+        pad.position.set(ax, isRecliner ? 0.54 : 0.51, -0.04);
         g.add(pad);
 
         const innerSign = idx === 0 ? 1 : -1;
         const ledV = new THREE.Mesh(geo.armLedV, seatArmLedMat);
-        ledV.position.set(ax + innerSign * 0.05, 0.30, 0.39);
+        ledV.position.set(ax + innerSign * 0.045, 0.26, 0.38);
         g.add(ledV);
 
         const ledH = new THREE.Mesh(geo.armLedH, seatArmLedMat);
-        ledH.position.set(ax + innerSign * 0.05, 0.525, 0.09);
+        ledH.position.set(ax + innerSign * 0.045, isRecliner ? 0.515 : 0.485, 0.08);
         g.add(ledH);
       });
 
-      const cup = new THREE.Mesh(geo.cupRing, doorBrassTrimMat);
-      cup.position.set(armX, 0.56, 0.31);
-      g.add(cup);
+      const cupWell = new THREE.Mesh(geo.cupWell, seatObsidianMat);
+      cupWell.position.set(armX, isRecliner ? 0.555 : 0.525, 0.30);
+      g.add(cupWell);
+
+      const cupRing = new THREE.Mesh(geo.cupRing, doorBrassTrimMat);
+      cupRing.position.set(armX, isRecliner ? 0.572 : 0.542, 0.30);
+      g.add(cupRing);
     }
 
     function addLuxurySeat(x, floorY, z) {
@@ -2601,6 +2709,11 @@
       g.rotation.y = Math.PI; // Face -Z (toward Cinema Screen wall at z = -105m)
       buildVievSeat(g, seatGeo, false);
       scene.add(g);
+      cinemaSeatColliders.push({
+        minX: x - 0.47, maxX: x + 0.47,
+        minZ: z - 0.38, maxZ: z + 0.38,
+        minY: floorY
+      });
     }
 
     function addVipRecliner(x, floorY, z) {
@@ -2609,6 +2722,11 @@
       g.rotation.y = Math.PI; // Face -Z (toward Cinema Screen wall at z = -105m)
       buildVievSeat(g, vipGeo, true);
       scene.add(g);
+      cinemaSeatColliders.push({
+        minX: x - 0.58, maxX: x + 0.58,
+        minZ: z - 0.78, maxZ: z + 0.45,
+        minY: floorY
+      });
     }
 
     // Helper to generate seat X centers for a block
@@ -3301,6 +3419,25 @@
           }
         }
       }
+      // Physical Cinema Seat Collision Helper (prevents walking through any seat)
+      const isBlockedBySeat = (x, z, curY) => {
+        if (z >= -76.0 || cinemaSeatColliders.length === 0) return false;
+        const pad = 0.24;
+        const approxFloorY = curY - cameraY;
+        for (let i = 0; i < cinemaSeatColliders.length; i++) {
+          const c = cinemaSeatColliders[i];
+          if (Math.abs(approxFloorY - c.minY) < 0.85 &&
+              x >= c.minX - pad && x <= c.maxX + pad &&
+              z >= c.minZ - pad && z <= c.maxZ + pad) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      if (isBlockedBySeat(nextX, camera.position.z, camera.position.y)) {
+        nextX = camera.position.x;
+      }
       camera.position.x = nextX;
 
       let nextZ = camera.position.z + deltaZ;
@@ -3318,6 +3455,9 @@
         if (!inDoorOpening) {
           nextZ = camera.position.z;
         }
+      }
+      if (isBlockedBySeat(camera.position.x, nextZ, camera.position.y)) {
+        nextZ = camera.position.z;
       }
       camera.position.z = nextZ;
 
