@@ -2143,10 +2143,10 @@
     scene.add(exitSignMesh);
 
     // Brushed-Bronze Double-Light Cylindrical Wall Sconces along Right Stair Wall (x = +3.10m)
-    const sconcePlateGeo = new THREE.BoxGeometry(0.05, 0.56, 0.18);
-    const sconceCylGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.42, 18);
-    const sconceGlowGeo = new THREE.CircleGeometry(0.068, 16);
-    const sconceGlowMat = new THREE.MeshStandardMaterial({
+    const cinemaSconcePlateGeo = new THREE.BoxGeometry(0.05, 0.56, 0.18);
+    const cinemaSconceCylGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.42, 18);
+    const cinemaSconceGlowGeo = new THREE.CircleGeometry(0.068, 16);
+    const cinemaSconceGlowMat = new THREE.MeshStandardMaterial({
       color: 0xffe4ad,
       emissive: new THREE.Color(0xffb448),
       emissiveIntensity: 1.8,
@@ -2154,17 +2154,17 @@
     });
     [-82.0, -87.5, -93.0].forEach((sz, idx) => {
       const sy = 3.2 + idx * 1.35;
-      const plate = new THREE.Mesh(sconcePlateGeo, doorBrassTrimMat);
+      const plate = new THREE.Mesh(cinemaSconcePlateGeo, doorBrassTrimMat);
       plate.position.set(hallMaxX - 0.04, sy, sz);
       scene.add(plate);
-      const cyl = new THREE.Mesh(sconceCylGeo, doorBrassTrimMat);
+      const cyl = new THREE.Mesh(cinemaSconceCylGeo, doorBrassTrimMat);
       cyl.position.set(hallMaxX - 0.14, sy, sz);
       scene.add(cyl);
-      const topGlow = new THREE.Mesh(sconceGlowGeo, sconceGlowMat);
+      const topGlow = new THREE.Mesh(cinemaSconceGlowGeo, cinemaSconceGlowMat);
       topGlow.rotation.x = -Math.PI / 2;
       topGlow.position.set(hallMaxX - 0.14, sy + 0.212, sz);
       scene.add(topGlow);
-      const botGlow = new THREE.Mesh(sconceGlowGeo, sconceGlowMat);
+      const botGlow = new THREE.Mesh(cinemaSconceGlowGeo, cinemaSconceGlowMat);
       botGlow.rotation.x = Math.PI / 2;
       botGlow.position.set(hallMaxX - 0.14, sy - 0.212, sz);
       scene.add(botGlow);
@@ -2204,7 +2204,7 @@
       railBar.position.set(rx, 0.95 + railRise / 2, stairStartZ - railRun / 2);
       scene.add(railBar);
 
-      const railLed = new THREE.Mesh(railLedGeo, sconceGlowMat);
+      const railLed = new THREE.Mesh(railLedGeo, cinemaSconceGlowMat);
       railLed.rotation.x = -railAngle;
       railLed.position.set(rx, 0.91 + railRise / 2, stairStartZ - railRun / 2);
       scene.add(railLed);
@@ -2752,11 +2752,11 @@
       tweeter.position.set(sideSign * 0.16, 0.16, 0);
       cabGroup.add(tweeter);
 
-      const ledTop = new THREE.Mesh(spkEdgeHGeo, sconceGlowMat);
+      const ledTop = new THREE.Mesh(spkEdgeHGeo, cinemaSconceGlowMat);
       ledTop.position.set(sideSign * 0.165, 0.34, 0);
       cabGroup.add(ledTop);
 
-      const ledFront = new THREE.Mesh(spkEdgeVGeo, sconceGlowMat);
+      const ledFront = new THREE.Mesh(spkEdgeVGeo, cinemaSconceGlowMat);
       ledFront.position.set(sideSign * 0.165, 0, 0.21);
       cabGroup.add(ledFront);
 
