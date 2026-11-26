@@ -1989,7 +1989,7 @@
     // 5.1. RIGHT-SIDE ENTRY WALLED STAIRCASE (>10 STEPS, HIGH RISE) & AUDITORIUM CINEMA HALL (z = -76m to -105m)
     const hallW = 24.0;
     const hallL = 29.0;
-    const hallH = 12.5;
+    const hallH = 16.5;
     const hallMinX = -20.8;
     const hallMaxX = 3.2; // Right wall sits beside the right-side entry corridor
     const hallCenterX = (hallMinX + hallMaxX) / 2; // -8.8m
@@ -2403,23 +2403,32 @@
     ];
     vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -79.2));
 
-    // Cinema Screen Accent Frame on Back Wall (z = -104.8m) facing the seats
-    const screenFrame = new THREE.Mesh(
-      new THREE.BoxGeometry(17.6, 7.2, 0.12),
-      doorBrassTrimMat
+    // Giant True-Black Cinema Display on Back Wall (z = -104.9m) with ultra-thin micro-bezel
+    const displayW = 22.8;
+    const displayH = 10.4;
+    const displayY = 10.6; // Spans y = 5.4m to 15.8m under the 16.5m ceiling
+    const microBezelMat = new THREE.MeshStandardMaterial({
+      color: 0x070709,
+      roughness: 0.65,
+      metalness: 0.25
+    });
+    const screenBezel = new THREE.Mesh(
+      new THREE.BoxGeometry(displayW + 0.08, displayH + 0.08, 0.12),
+      microBezelMat
     );
-    screenFrame.position.set(audCenterX, 7.8, zEndWall - hallL + 0.08);
-    scene.add(screenFrame);
+    screenBezel.position.set(hallCenterX, displayY, zEndWall - hallL + 0.06);
+    scene.add(screenBezel);
+
     const screenMat = new THREE.MeshStandardMaterial({
-      color: 0x0b0c12,
-      roughness: 0.4,
-      metalness: 0.1
+      color: 0x030304,
+      roughness: 0.96,
+      metalness: 0.0
     });
     const screenSurface = new THREE.Mesh(
-      new THREE.BoxGeometry(17.2, 6.8, 0.15),
+      new THREE.BoxGeometry(displayW, displayH, 0.14),
       screenMat
     );
-    screenSurface.position.set(audCenterX, 7.8, zEndWall - hallL + 0.10);
+    screenSurface.position.set(hallCenterX, displayY, zEndWall - hallL + 0.08);
     scene.add(screenSurface);
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
