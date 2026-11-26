@@ -2111,11 +2111,12 @@
       scene.add(stepLed);
     }
 
-    // Sloped Stair Divider Parapet Wall (top half removed! Slopes from y = 5.75m at z = -95.8m up to y = 9.25m at z = -76.0m)
+    // Sloped Stair Divider Parapet Wall (stops cleanly at Top VIP Terrace z = -80.7m so it never cuts across VIP seats!)
+    const divEndZ = -80.7;
     const stairWallShape = new THREE.Shape();
     stairWallShape.moveTo(stairEndZ, 0);
-    stairWallShape.lineTo(zEndWall, 0);
-    stairWallShape.lineTo(zEndWall, 9.25);
+    stairWallShape.lineTo(divEndZ, 0);
+    stairWallShape.lineTo(divEndZ, 8.95);
     stairWallShape.lineTo(stairEndZ, 5.75);
     stairWallShape.closePath();
     const stairWallGeo = new THREE.ExtrudeGeometry(stairWallShape, { depth: 0.24, bevelEnabled: false });
@@ -2125,13 +2126,13 @@
     scene.add(stairLeftWall);
 
     // Sloped Wood/Brass Top Cap along the Stair Divider Wall
-    const divRun = zEndWall - stairEndZ; // 19.8m
-    const divRise = 9.25 - 5.75;         // 3.50m
+    const divRun = divEndZ - stairEndZ; // 15.1m
+    const divRise = 8.95 - 5.75;        // 3.20m
     const divLen = Math.hypot(divRun, divRise);
     const divAngle = Math.atan2(divRise, divRun);
     const divCap = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.08, divLen), doorBrassTrimMat);
     divCap.rotation.x = -divAngle;
-    divCap.position.set(stairCorridorMinX, (5.75 + 9.25) / 2 + 0.04, (stairEndZ + zEndWall) / 2);
+    divCap.position.set(stairCorridorMinX, (5.75 + 8.95) / 2 + 0.04, (stairEndZ + divEndZ) / 2);
     scene.add(divCap);
 
     // Glowing Green "EXIT" Sign above the Cinema Doorway (z = -76.24m, x = +0.8m, y = 4.65m)
@@ -2754,13 +2755,13 @@
       scene.add(cap);
     });
 
-    // Place Top VIP Special Recliner Seats at the Top of the Incline (3 Left + 5 Centre + 3 Right = 11 VIP Recliners)
+    // Place Top VIP Special Recliner Seats tucked cleanly near the back wall (z = -76.85m, minimal rear gap)
     const vipSeatXs = [
       ...blockSeatXs(-20.45, 3, 1.65), // Extreme Left 3 VIP Recliners
       ...blockSeatXs(-14.20, 5, 1.65), // Centre 5 VIP Recliners
       ...blockSeatXs(-2.80, 3, 1.65)   // Right 3 VIP Recliners
     ];
-    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -78.1));
+    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -76.85));
 
     // Recessed Glass Projection Booth Window (Top Centre of Back/Top Wall at z = -76.08m, y = 11.8m)
     const projFrame = new THREE.Mesh(new THREE.BoxGeometry(3.8, 1.35, 0.12), seatObsidianMat);
@@ -2804,7 +2805,7 @@
     // Sloped Wood/Brass Trim Rail along Left Auditorium Wall beside Incline (x = -20.6m)
     const wallSlopeCap = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, divLen), doorBrassTrimMat);
     wallSlopeCap.rotation.x = -divAngle;
-    wallSlopeCap.position.set(hallMinX + 0.20, (5.3 + 8.8) / 2, (stairEndZ + zEndWall) / 2);
+    wallSlopeCap.position.set(hallMinX + 0.20, (5.3 + 8.5) / 2, (stairEndZ + divEndZ) / 2);
     scene.add(wallSlopeCap);
 
     // Giant True-Black Cinema Display on Back Wall (z = -104.9m) with ultra-thin micro-bezel
