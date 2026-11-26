@@ -2075,15 +2075,39 @@
       roughness: 0.25
     });
 
-    // Entry Landing Floor inside Stair Corridor (z = -76m to -79m, flat y = 0)
+    // Deep Matte Cotton-Black Carpet/Fabric Material (for Entrance Stairs & Front Display Stage)
+    const cottonCanvas = document.createElement('canvas');
+    cottonCanvas.width = 128;
+    cottonCanvas.height = 128;
+    const ctCtx = cottonCanvas.getContext('2d');
+    ctCtx.fillStyle = '#09090b';
+    ctCtx.fillRect(0, 0, 128, 128);
+    for (let i = 0; i < 2400; i++) {
+      const v = 6 + Math.floor(Math.random() * 8);
+      ctCtx.fillStyle = `rgb(${v},${v},${v + 2})`;
+      ctCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
+    }
+    const cottonBlackTex = new THREE.CanvasTexture(cottonCanvas);
+    cottonBlackTex.wrapS = THREE.RepeatWrapping;
+    cottonBlackTex.wrapT = THREE.RepeatWrapping;
+    cottonBlackTex.repeat.set(14, 14);
+    cottonBlackTex.colorSpace = THREE.SRGBColorSpace;
+    const cottonBlackFloorMat = new THREE.MeshStandardMaterial({
+      map: cottonBlackTex,
+      color: 0xffffff,
+      roughness: 0.96,
+      metalness: 0.01
+    });
+
+    // Entry Landing Floor inside Stair Corridor (z = -76m to -79m, flat y = 0, Cotton Black)
     const landingDepth = 3.0;
     const landingGeo = new THREE.PlaneGeometry(stairCorridorW, landingDepth);
     landingGeo.rotateX(-Math.PI / 2);
-    const landingFloor = new THREE.Mesh(landingGeo, hallFloorMat);
+    const landingFloor = new THREE.Mesh(landingGeo, cottonBlackFloorMat);
     landingFloor.position.set(stairCenterX, 0.004, zEndWall - landingDepth / 2);
     scene.add(landingFloor);
 
-    // 14 High-Rise Upstairs Stairs inside Walled Right-Side Corridor (z = -79.0m to -95.8m, y = 0.35m to +4.90m)
+    // 14 High-Rise Upstairs Stairs inside Walled Right-Side Corridor (z = -79.0m to -95.8m, Cotton Black)
     const stairCount = 14;
     const stairDepth = 1.2;
     const stairRise = 0.35;
@@ -2097,7 +2121,7 @@
 
       const stepBox = new THREE.Mesh(
         new THREE.BoxGeometry(stairCorridorW, topY, stairDepth),
-        hallFloorMat
+        cottonBlackFloorMat
       );
       stepBox.position.set(stairCenterX, topY / 2, tierZ);
       scene.add(stepBox);
@@ -2177,30 +2201,6 @@
       });
     });
 
-    // Deep Matte Cotton-Black Carpet/Fabric Material for Front Display Stage Floor
-    const cottonCanvas = document.createElement('canvas');
-    cottonCanvas.width = 128;
-    cottonCanvas.height = 128;
-    const ctCtx = cottonCanvas.getContext('2d');
-    ctCtx.fillStyle = '#09090b';
-    ctCtx.fillRect(0, 0, 128, 128);
-    for (let i = 0; i < 2400; i++) {
-      const v = 6 + Math.floor(Math.random() * 8);
-      ctCtx.fillStyle = `rgb(${v},${v},${v + 2})`;
-      ctCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
-    }
-    const cottonBlackTex = new THREE.CanvasTexture(cottonCanvas);
-    cottonBlackTex.wrapS = THREE.RepeatWrapping;
-    cottonBlackTex.wrapT = THREE.RepeatWrapping;
-    cottonBlackTex.repeat.set(14, 14);
-    cottonBlackTex.colorSpace = THREE.SRGBColorSpace;
-    const cottonBlackFloorMat = new THREE.MeshStandardMaterial({
-      map: cottonBlackTex,
-      color: 0xffffff,
-      roughness: 0.96,
-      metalness: 0.01
-    });
-
     // Flat Front Stage Floor in front of Giant Cinema Display (z = -95.8m to -105.0m, y = 4.90m, Cotton Black)
     const flatHallLen = stairEndZ - (zEndWall - hallL); // 9.2m
     const flatUpperDeck = new THREE.Mesh(
@@ -2218,29 +2218,6 @@
     const audStageFloor = new THREE.Mesh(audStageGeo, hallFloorMat);
     audStageFloor.position.set(audCenterX, 0.004, zEndWall - 3.5);
     scene.add(audStageFloor);
-
-    // Under-Lit Brushed-Brass Handrails along BOTH Stair Corridor Walls (x = +3.04m and x = -1.44m)
-    const railRun = stairCount * stairDepth; // 16.8m
-    const railRise = totalStairHeight;       // 4.90m
-    const railLen = Math.hypot(railRun, railRise);
-    const railAngle = Math.atan2(railRise, railRun);
-    [hallMaxX - 0.16, stairCorridorMinX + 0.16].forEach((rx) => {
-      const handrailMesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.032, 0.032, railLen, 12),
-        doorBrassTrimMat
-      );
-      handrailMesh.rotation.x = Math.PI / 2 - railAngle;
-      handrailMesh.position.set(rx, 0.95 + railRise / 2, stairStartZ - railRun / 2);
-      scene.add(handrailMesh);
-
-      const railLed = new THREE.Mesh(
-        new THREE.BoxGeometry(0.025, 0.02, railLen - 0.2),
-        stepLedMat
-      );
-      railLed.rotation.x = -railAngle;
-      railLed.position.set(rx, 0.91 + railRise / 2, stairStartZ - railRun / 2);
-      scene.add(railLed);
-    });
 
     // High Luxury Starry-Night Coffered Acoustic Cinema Ceiling (y = 16.5m, fitted proportionally to 24m x 29m hall)
     const ceilCanvas = document.createElement('canvas');
@@ -2795,27 +2772,41 @@
     projGlass.position.set(audCenterX, 11.8, zEndWall - 0.13);
     scene.add(projGlass);
 
-    // 3D Vertical Acoustic Wall Bays & Angled Surround Sound Speakers along Left Auditorium Wall (x = -20.8m)
+    // 3D Vertical Acoustic Wall Bays & Angled Surround Sound Speakers on BOTH Side Walls (x = -20.8m & x = +3.2m)
     const spkCabinetGeo = new THREE.BoxGeometry(0.32, 0.62, 0.42);
     const spkConeGeo = new THREE.CylinderGeometry(0.11, 0.07, 0.04, 16);
     spkConeGeo.rotateZ(Math.PI / 2);
     for (let b = 0; b < 6; b++) {
       const bayZ = -102.5 + b * 4.5;
-      const bayPanel = new THREE.Mesh(new THREE.BoxGeometry(0.18, hallH - 0.6, 3.8), hallWallMat);
-      bayPanel.position.set(hallMinX + 0.09, hallH / 2, bayZ);
-      scene.add(bayPanel);
+      const bayLeft = new THREE.Mesh(new THREE.BoxGeometry(0.18, hallH - 0.6, 3.8), hallWallMat);
+      bayLeft.position.set(hallMinX + 0.09, hallH / 2, bayZ);
+      scene.add(bayLeft);
+
+      const bayRight = new THREE.Mesh(new THREE.BoxGeometry(0.18, hallH - 0.6, 3.8), hallWallMat);
+      bayRight.position.set(hallMaxX - 0.09, hallH / 2, bayZ);
+      scene.add(bayRight);
     }
     [-98.0, -92.5, -87.0, -81.5].forEach((sz, idx) => {
       const spkY = 9.4 + idx * 0.45;
-      const spkGroup = new THREE.Group();
-      spkGroup.position.set(hallMinX + 0.28, spkY, sz);
-      spkGroup.rotation.z = -0.22;
-      const cab = new THREE.Mesh(spkCabinetGeo, seatObsidianMat);
-      spkGroup.add(cab);
-      const cone = new THREE.Mesh(spkConeGeo, ceilShadowMat);
-      cone.position.set(0.16, -0.06, 0);
-      spkGroup.add(cone);
-      scene.add(spkGroup);
+      // Left Wall Speaker
+      const spkL = new THREE.Group();
+      spkL.position.set(hallMinX + 0.28, spkY, sz);
+      spkL.rotation.z = -0.22;
+      spkL.add(new THREE.Mesh(spkCabinetGeo, seatObsidianMat));
+      const coneL = new THREE.Mesh(spkConeGeo, ceilShadowMat);
+      coneL.position.set(0.16, -0.06, 0);
+      spkL.add(coneL);
+      scene.add(spkL);
+
+      // Right Wall Speaker (exact mirror)
+      const spkR = new THREE.Group();
+      spkR.position.set(hallMaxX - 0.28, spkY, sz);
+      spkR.rotation.z = 0.22;
+      spkR.add(new THREE.Mesh(spkCabinetGeo, seatObsidianMat));
+      const coneR = new THREE.Mesh(spkConeGeo, ceilShadowMat);
+      coneR.position.set(-0.16, -0.06, 0);
+      spkR.add(coneR);
+      scene.add(spkR);
     });
 
     // Sloped Wood/Brass Trim Rail along Left Auditorium Wall beside Incline (x = -20.6m)
