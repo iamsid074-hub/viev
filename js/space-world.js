@@ -1999,67 +1999,58 @@
     const stairCorridorW = hallMaxX - stairCorridorMinX; // 4.8m (-1.6m to +3.2m)
     const stairCenterX = (stairCorridorMinX + hallMaxX) / 2; // +0.8m (aligned with single door)
 
-    // Procedural Luxury Royal Crimson Velvet Carpet Texture (woven art-deco diamond + pile grain)
+    // Procedural Luxury Cream / Champagne Woven Boucle Carpet Texture (Asset Pack)
     const carpetCanvas = document.createElement('canvas');
     carpetCanvas.width = 256;
     carpetCanvas.height = 256;
     const cpCtx = carpetCanvas.getContext('2d');
-    cpCtx.fillStyle = '#4e0a14';
+    cpCtx.fillStyle = '#c4ae92';
     cpCtx.fillRect(0, 0, 256, 256);
-
-    // Subtle woven geometric diamond lattice
-    cpCtx.strokeStyle = 'rgba(98, 18, 30, 0.55)';
-    cpCtx.lineWidth = 2;
-    for (let y = -128; y < 384; y += 32) {
-      cpCtx.beginPath();
-      cpCtx.moveTo(0, y);
-      cpCtx.lineTo(256, y + 256);
-      cpCtx.stroke();
-      cpCtx.beginPath();
-      cpCtx.moveTo(256, y);
-      cpCtx.lineTo(0, y + 256);
-      cpCtx.stroke();
-    }
-    // Fine velvet pile micro-grain
-    for (let i = 0; i < 6500; i++) {
-      const bright = Math.random() > 0.5;
-      cpCtx.fillStyle = bright ? 'rgba(130, 24, 38, 0.24)' : 'rgba(28, 4, 8, 0.30)';
+    for (let i = 0; i < 9500; i++) {
+      const bright = Math.random() > 0.48;
+      cpCtx.fillStyle = bright ? 'rgba(222, 206, 182, 0.35)' : 'rgba(138, 118, 92, 0.28)';
       cpCtx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
     }
-    const redCarpetTex = new THREE.CanvasTexture(carpetCanvas);
-    redCarpetTex.wrapS = THREE.RepeatWrapping;
-    redCarpetTex.wrapT = THREE.RepeatWrapping;
-    redCarpetTex.repeat.set(14, 14);
-    redCarpetTex.colorSpace = THREE.SRGBColorSpace;
+    const creamCarpetTex = new THREE.CanvasTexture(carpetCanvas);
+    creamCarpetTex.wrapS = THREE.RepeatWrapping;
+    creamCarpetTex.wrapT = THREE.RepeatWrapping;
+    creamCarpetTex.repeat.set(16, 16);
+    creamCarpetTex.colorSpace = THREE.SRGBColorSpace;
 
     const hallFloorMat = new THREE.MeshStandardMaterial({
-      map: redCarpetTex,
+      map: creamCarpetTex,
       color: 0xffffff,
-      roughness: 0.94,
+      roughness: 0.95,
       metalness: 0.02
     });
-    // Deep Luxury Crimson Acoustic Wall Texture (vertical fabric pleats)
+    const chromeNosingMat = new THREE.MeshStandardMaterial({
+      color: 0xc8cdd4,
+      roughness: 0.20,
+      metalness: 0.88
+    });
+
+    // Deep Luxury Plum / Wine Matte Acoustic Wall Finish
     const wallAccCanvas = document.createElement('canvas');
     wallAccCanvas.width = 128;
     wallAccCanvas.height = 128;
     const waCtx = wallAccCanvas.getContext('2d');
-    waCtx.fillStyle = '#3a0b12';
+    waCtx.fillStyle = '#3b1320';
     waCtx.fillRect(0, 0, 128, 128);
-    for (let x = 0; x < 128; x += 8) {
-      waCtx.fillStyle = x % 16 === 0 ? 'rgba(72, 16, 26, 0.45)' : 'rgba(22, 4, 8, 0.45)';
-      waCtx.fillRect(x, 0, 4, 128);
+    for (let i = 0; i < 2200; i++) {
+      waCtx.fillStyle = Math.random() > 0.5 ? 'rgba(82, 26, 44, 0.28)' : 'rgba(28, 8, 14, 0.32)';
+      waCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
     }
     const wallAccTex = new THREE.CanvasTexture(wallAccCanvas);
     wallAccTex.wrapS = THREE.RepeatWrapping;
     wallAccTex.wrapT = THREE.RepeatWrapping;
-    wallAccTex.repeat.set(24, 6);
+    wallAccTex.repeat.set(18, 6);
     wallAccTex.colorSpace = THREE.SRGBColorSpace;
 
     const hallWallMat = new THREE.MeshStandardMaterial({
       map: wallAccTex,
       color: 0xffffff,
-      roughness: 0.88,
-      metalness: 0.04,
+      roughness: 0.90,
+      metalness: 0.03,
       side: THREE.DoubleSide
     });
     const hallCeilingMat = new THREE.MeshStandardMaterial({
@@ -2102,22 +2093,85 @@
       stepBox.position.set(stairCenterX, topY / 2, tierZ);
       scene.add(stepBox);
 
-      // Warm dim-yellow LED step-edge nose strip across the stair width
+      // Brushed-Chrome Step Nosing + Warm LED Strip tucked beneath
+      const stepNosing = new THREE.Mesh(
+        new THREE.BoxGeometry(stairCorridorW - 0.06, 0.025, 0.065),
+        chromeNosingMat
+      );
+      stepNosing.position.set(stairCenterX, topY + 0.012, tierZ + stairDepth / 2 - 0.02);
+      scene.add(stepNosing);
+
       const stepLed = new THREE.Mesh(
-        new THREE.BoxGeometry(stairCorridorW - 0.12, 0.035, 0.05),
+        new THREE.BoxGeometry(stairCorridorW - 0.12, 0.028, 0.035),
         stepLedMat
       );
-      stepLed.position.set(stairCenterX, topY + 0.008, tierZ + stairDepth / 2 - 0.03);
+      stepLed.position.set(stairCenterX, topY - 0.015, tierZ + stairDepth / 2 - 0.008);
       scene.add(stepLed);
     }
 
-    // Left Stair Wall (at x = -1.6m, same distance till the stairs end: z = -76.0m to -95.8m)
+    // Left Stair Divider Wall (x = -1.6m, z = -76.0m to -95.8m, capped nicely along the slope)
     const stairWallLen = zEndWall - stairEndZ; // 19.8m
     const stairLeftWallGeo = new THREE.PlaneGeometry(stairWallLen, hallH);
     stairLeftWallGeo.rotateY(Math.PI / 2);
     const stairLeftWall = new THREE.Mesh(stairLeftWallGeo, hallWallMat);
     stairLeftWall.position.set(stairCorridorMinX, hallH / 2, zEndWall - stairWallLen / 2);
     scene.add(stairLeftWall);
+
+    // Glowing Green EXIT Sign above the Cinema Hall Entry Door (visible from inside hall)
+    const exitCanvas = document.createElement('canvas');
+    exitCanvas.width = 256;
+    exitCanvas.height = 96;
+    const exCtx = exitCanvas.getContext('2d');
+    exCtx.fillStyle = '#092b14';
+    exCtx.fillRect(0, 0, 256, 96);
+    exCtx.strokeStyle = '#1fe066';
+    exCtx.lineWidth = 6;
+    exCtx.strokeRect(6, 6, 244, 84);
+    exCtx.font = 'bold 54px sans-serif';
+    exCtx.textAlign = 'center';
+    exCtx.textBaseline = 'middle';
+    exCtx.fillStyle = '#3cff88';
+    exCtx.fillText('EXIT', 128, 50);
+    const exitTex = new THREE.CanvasTexture(exitCanvas);
+    exitTex.colorSpace = THREE.SRGBColorSpace;
+    const exitSignMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(0.95, 0.36, 0.08),
+      new THREE.MeshStandardMaterial({ map: exitTex, emissive: new THREE.Color(0x16b850), emissiveIntensity: 0.9, roughness: 0.2 })
+    );
+    exitSignMesh.rotation.y = Math.PI;
+    exitSignMesh.position.set(doorCenterX, doorOpenH + 0.32, zEndWall - 0.28);
+    scene.add(exitSignMesh);
+
+    // Brushed-Bronze Double-Light Cylindrical Wall Sconces along Right Stair Wall (x = +3.10m)
+    const sconcePlateGeo = new THREE.BoxGeometry(0.05, 0.56, 0.18);
+    const sconceCylGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.42, 18);
+    const sconceGlowGeo = new THREE.CircleGeometry(0.068, 16);
+    const sconceGlowMat = new THREE.MeshStandardMaterial({
+      color: 0xffe4ad,
+      emissive: new THREE.Color(0xffb448),
+      emissiveIntensity: 1.8,
+      roughness: 0.15
+    });
+    [-82.0, -87.5, -93.0].forEach((sz, idx) => {
+      const sy = 3.2 + idx * 1.35;
+      const plate = new THREE.Mesh(sconcePlateGeo, doorBrassTrimMat);
+      plate.position.set(hallMaxX - 0.04, sy, sz);
+      scene.add(plate);
+      const cyl = new THREE.Mesh(sconceCylGeo, doorBrassTrimMat);
+      cyl.position.set(hallMaxX - 0.14, sy, sz);
+      scene.add(cyl);
+      const topGlow = new THREE.Mesh(sconceGlowGeo, sconceGlowMat);
+      topGlow.rotation.x = -Math.PI / 2;
+      topGlow.position.set(hallMaxX - 0.14, sy + 0.212, sz);
+      scene.add(topGlow);
+      const botGlow = new THREE.Mesh(sconceGlowGeo, sconceGlowMat);
+      botGlow.rotation.x = Math.PI / 2;
+      botGlow.position.set(hallMaxX - 0.14, sy - 0.212, sz);
+      scene.add(botGlow);
+      const sconceLight = new THREE.PointLight(0xffcb7d, 0.75, 8.5, 2.0);
+      sconceLight.position.set(hallMaxX - 0.45, sy, sz);
+      scene.add(sconceLight);
+    });
 
     // Flat Upper Cinema Hall Cross-Walkway & Top Terrace after the Stairs End (z = -95.8m to -105.0m, flat y = 4.90m)
     const flatHallLen = stairEndZ - (zEndWall - hallL); // 9.2m
@@ -2137,18 +2191,24 @@
     audStageFloor.position.set(audCenterX, 0.004, zEndWall - 3.5);
     scene.add(audStageFloor);
 
-    // Brushed-Brass Wall Handrail along Right-Side Upstairs Staircase (x = +3.04m)
+    // Under-Lit Brushed-Bronze Wall Handrails along BOTH sides of the Upstairs Staircase (x = +3.04m & x = -1.44m)
     const railRun = stairCount * stairDepth; // 16.8m
     const railRise = totalStairHeight;       // 4.90m
     const railLen = Math.hypot(railRun, railRise);
     const railAngle = Math.atan2(railRise, railRun);
-    const handrailMesh = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.03, 0.03, railLen, 12),
-      doorBrassTrimMat
-    );
-    handrailMesh.rotation.x = Math.PI / 2 - railAngle;
-    handrailMesh.position.set(hallMaxX - 0.16, 0.95 + railRise / 2, stairStartZ - railRun / 2);
-    scene.add(handrailMesh);
+    const railBarGeo = new THREE.BoxGeometry(0.065, 0.055, railLen);
+    const railLedGeo = new THREE.BoxGeometry(0.032, 0.025, railLen - 0.1);
+    [hallMaxX - 0.16, stairCorridorMinX + 0.16].forEach((rx) => {
+      const railBar = new THREE.Mesh(railBarGeo, doorBrassTrimMat);
+      railBar.rotation.x = -railAngle;
+      railBar.position.set(rx, 0.95 + railRise / 2, stairStartZ - railRun / 2);
+      scene.add(railBar);
+
+      const railLed = new THREE.Mesh(railLedGeo, sconceGlowMat);
+      railLed.rotation.x = -railAngle;
+      railLed.position.set(rx, 0.91 + railRise / 2, stairStartZ - railRun / 2);
+      scene.add(railLed);
+    });
 
     // High Luxury Coffered Acoustic Cinema Ceiling (y = 16.5m, fitted proportionally to 24m x 29m hall)
     const ceilCanvas = document.createElement('canvas');
@@ -2294,7 +2354,31 @@
     frameBack.position.set(hallCenterX, frameDropY, hallCenterZ - frameL / 2 + innerBand / 2);
     scene.add(frameBack);
 
-    // 4. Central 4x4 Coffered Acoustic Panel Grid (16 panels with shadow gaps & 4+4 outer-column downlights)
+    // 4. Central 4x4 Starry-Night Coffered Acoustic Panel Grid (16 panels with pinpoint fiber-optic stars & 4+4 downlights)
+    const starCanvas = document.createElement('canvas');
+    starCanvas.width = 256;
+    starCanvas.height = 256;
+    const stCtx = starCanvas.getContext('2d');
+    stCtx.fillStyle = '#151314';
+    stCtx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 140; i++) {
+      const r = Math.random() > 0.85 ? 1.6 : 0.9;
+      stCtx.fillStyle = Math.random() > 0.3 ? 'rgba(255, 246, 224, 0.9)' : 'rgba(255, 214, 148, 0.75)';
+      stCtx.beginPath();
+      stCtx.arc(Math.random() * 256, Math.random() * 256, r, 0, Math.PI * 2);
+      stCtx.fill();
+    }
+    const ceilStarTex = new THREE.CanvasTexture(starCanvas);
+    ceilStarTex.colorSpace = THREE.SRGBColorSpace;
+    const ceilStarPanelMat = new THREE.MeshStandardMaterial({
+      map: ceilStarTex,
+      emissiveMap: ceilStarTex,
+      emissive: new THREE.Color(0xffe8c2),
+      emissiveIntensity: 0.42,
+      roughness: 0.92,
+      metalness: 0.04
+    });
+
     const gridL = frameL - innerBand * 2; // 20.86m
     const cols = 4;
     const rows = 4;
@@ -2309,7 +2393,7 @@
       const pz = (hallCenterZ + gridL / 2) - seamGap - panelL / 2 - r * (panelL + seamGap);
       for (let c = 0; c < cols; c++) {
         const px = (hallCenterX - gridW / 2) + seamGap + panelW / 2 + c * (panelW + seamGap);
-        const panel = new THREE.Mesh(panelGeo, ceilPanelMat);
+        const panel = new THREE.Mesh(panelGeo, ceilStarPanelMat);
         panel.position.set(px, panelY, pz);
         scene.add(panel);
 
@@ -2372,151 +2456,109 @@
     hallLight4.position.set(-6.0, 10.8, -100.5);
     scene.add(hallLight4);
 
-    // 5.2. VIEV LUXURY CINEMA SEATS BESIDE STAIRS (x = -20.8m to -1.6m, z = -83.0m to -95.8m) & TOP VIP RECLINERS
-    // Shared Canvas Texture for Gold "VIEV" Headrest Branding
-    const vievHeadCanvas = document.createElement('canvas');
-    vievHeadCanvas.width = 256;
-    vievHeadCanvas.height = 128;
-    const vhCtx = vievHeadCanvas.getContext('2d');
-    vhCtx.fillStyle = '#c7b299';
-    vhCtx.fillRect(0, 0, 256, 128);
-    vhCtx.font = '600 44px "Cinzel", Georgia, serif';
-    vhCtx.textAlign = 'center';
-    vhCtx.textBaseline = 'middle';
-    vhCtx.fillStyle = '#e6c26e';
-    vhCtx.fillText('VIEV', 128, 64);
-    const vievHeadTex = new THREE.CanvasTexture(vievHeadCanvas);
-    vievHeadTex.colorSpace = THREE.SRGBColorSpace;
-
-    // Materials matching VIEV Luxury Seat Model (Champagne Leather + Glossy Obsidian Pods + Warm Gold LED + Brass)
-    const seatLeatherMat = new THREE.MeshStandardMaterial({
-      color: 0xc7b299,
-      roughness: 0.48,
+    // 5.2. LUXE CINEMA RECLINER SEATING (Charcoal-Black & Wine-Burgundy Asset Pack)
+    const charcoalLeatherMat = new THREE.MeshStandardMaterial({
+      color: 0x2a2a2d,
+      roughness: 0.62,
       metalness: 0.06
     });
-    const seatHeadFrontMat = new THREE.MeshStandardMaterial({
-      map: vievHeadTex,
-      roughness: 0.48,
-      metalness: 0.08
+    const wineLeatherMat = new THREE.MeshStandardMaterial({
+      color: 0x541822,
+      roughness: 0.60,
+      metalness: 0.06
     });
     const seatObsidianMat = new THREE.MeshStandardMaterial({
-      color: 0x121010,
-      roughness: 0.22,
+      color: 0x111114,
+      roughness: 0.35,
       metalness: 0.35
     });
-    const seatArmLedMat = new THREE.MeshStandardMaterial({
-      color: 0xffe099,
-      emissive: new THREE.Color(0xffaa2b),
-      emissiveIntensity: 1.35,
-      roughness: 0.2
-    });
 
-    // Shared Geometries for Standard VIEV Luxury Seat (1.25m pitch)
+    // Shared Geometries for Luxe Cinema Seat (1.25m pitch, rounded quilted cushions + recessed cup holders)
     const seatGeo = {
-      base: new THREE.BoxGeometry(0.88, 0.08, 0.72),
-      cushion: new THREE.BoxGeometry(0.62, 0.24, 0.64),
-      backSeg: new THREE.BoxGeometry(0.62, 0.22, 0.17),
-      headrest: new THREE.BoxGeometry(0.58, 0.28, 0.19),
-      headLogo: new THREE.PlaneGeometry(0.46, 0.22),
-      armPod: new THREE.BoxGeometry(0.17, 0.50, 0.74),
-      armPad: new THREE.BoxGeometry(0.16, 0.07, 0.60),
-      armLedV: new THREE.BoxGeometry(0.025, 0.44, 0.025),
-      armLedH: new THREE.BoxGeometry(0.025, 0.025, 0.56),
-      cupRing: new THREE.CylinderGeometry(0.045, 0.04, 0.045, 16)
+      base: new THREE.BoxGeometry(0.96, 0.22, 0.72),
+      cushion: new THREE.BoxGeometry(0.64, 0.20, 0.66),
+      backSeg: new THREE.BoxGeometry(0.64, 0.24, 0.18),
+      headrest: new THREE.BoxGeometry(0.62, 0.28, 0.20),
+      armPod: new THREE.BoxGeometry(0.18, 0.56, 0.76),
+      armTop: new THREE.BoxGeometry(0.18, 0.08, 0.72),
+      cupRing: new THREE.CylinderGeometry(0.048, 0.044, 0.03, 16)
     };
 
-    // Shared Geometries for Top VIP VIEV Special Recliner (1.60m pitch, wider + extended footrest)
+    // Shared Geometries for Top VIP Special Recliner (1.65m pitch, wider + extended footrest)
     const vipGeo = {
-      base: new THREE.BoxGeometry(1.08, 0.08, 0.80),
-      cushion: new THREE.BoxGeometry(0.80, 0.25, 0.70),
-      backSeg: new THREE.BoxGeometry(0.80, 0.24, 0.18),
-      headrest: new THREE.BoxGeometry(0.74, 0.30, 0.20),
-      headLogo: new THREE.PlaneGeometry(0.56, 0.25),
-      footrest: new THREE.BoxGeometry(0.76, 0.14, 0.54),
-      armPod: new THREE.BoxGeometry(0.20, 0.52, 0.80),
-      armPad: new THREE.BoxGeometry(0.19, 0.075, 0.66),
-      armLedV: new THREE.BoxGeometry(0.028, 0.46, 0.028),
-      armLedH: new THREE.BoxGeometry(0.028, 0.028, 0.62),
-      cupRing: new THREE.CylinderGeometry(0.05, 0.045, 0.05, 16)
+      base: new THREE.BoxGeometry(1.16, 0.22, 0.80),
+      cushion: new THREE.BoxGeometry(0.82, 0.22, 0.72),
+      backSeg: new THREE.BoxGeometry(0.82, 0.25, 0.20),
+      headrest: new THREE.BoxGeometry(0.78, 0.30, 0.22),
+      footrest: new THREE.BoxGeometry(0.78, 0.15, 0.54),
+      armPod: new THREE.BoxGeometry(0.21, 0.58, 0.82),
+      armTop: new THREE.BoxGeometry(0.21, 0.085, 0.78),
+      cupRing: new THREE.CylinderGeometry(0.052, 0.046, 0.035, 16)
     };
 
-    function buildVievSeat(g, geo, isRecliner) {
-      const recline = isRecliner ? -0.34 : -0.15;
-      const armX = isRecliner ? 0.50 : 0.395;
+    function buildLuxeRecliner(g, geo, mat, isRecliner) {
+      const recline = isRecliner ? -0.34 : -0.17;
+      const armX = isRecliner ? 0.51 : 0.405;
 
-      const base = new THREE.Mesh(geo.base, seatObsidianMat);
-      base.position.set(0, 0.04, 0.0);
+      const base = new THREE.Mesh(geo.base, mat);
+      base.position.set(0, 0.11, 0.0);
       g.add(base);
 
-      const cushion = new THREE.Mesh(geo.cushion, seatLeatherMat);
-      cushion.position.set(0, 0.20, 0.06);
+      const cushion = new THREE.Mesh(geo.cushion, mat);
+      cushion.position.set(0, 0.27, 0.06);
       if (isRecliner) cushion.rotation.x = -0.05;
       g.add(cushion);
 
-      // 3-ribbed plush leather backrest + VIEV headrest
+      // 3-tier quilted leather backrest + plush headrest
       const backGroup = new THREE.Group();
-      backGroup.position.set(0, 0.30, -0.22);
+      backGroup.position.set(0, 0.34, -0.22);
       backGroup.rotation.x = recline;
-      [0.14, 0.36, 0.58].forEach((by) => {
-        const seg = new THREE.Mesh(geo.backSeg, seatLeatherMat);
+      [0.14, 0.38, 0.62].forEach((by) => {
+        const seg = new THREE.Mesh(geo.backSeg, mat);
         seg.position.set(0, by, 0);
         backGroup.add(seg);
       });
-      const head = new THREE.Mesh(geo.headrest, seatLeatherMat);
-      head.position.set(0, 0.85, 0.02);
+      const head = new THREE.Mesh(geo.headrest, mat);
+      head.position.set(0, 0.90, 0.01);
       backGroup.add(head);
-
-      const logoPlane = new THREE.Mesh(geo.headLogo, seatHeadFrontMat);
-      logoPlane.position.set(0, 0.85, 0.118);
-      backGroup.add(logoPlane);
       g.add(backGroup);
 
-      // Extended footrest for Top VIP Recliners
       if (isRecliner) {
-        const foot = new THREE.Mesh(geo.footrest, seatLeatherMat);
+        const foot = new THREE.Mesh(geo.footrest, mat);
         foot.position.set(0, 0.22, 0.64);
         foot.rotation.x = 0.42;
         g.add(foot);
       }
 
-      // Glossy black side pods + champagne arm pads + warm gold LED strips + brass cup holder
-      [-armX, armX].forEach((ax, idx) => {
-        const pod = new THREE.Mesh(geo.armPod, seatObsidianMat);
-        pod.position.set(ax, 0.29, 0.02);
+      // Wraparound padded armrests + metallic recessed cup-holders
+      [-armX, armX].forEach((ax) => {
+        const pod = new THREE.Mesh(geo.armPod, mat);
+        pod.position.set(ax, 0.28, 0.02);
         g.add(pod);
 
-        const pad = new THREE.Mesh(geo.armPad, seatLeatherMat);
-        pad.position.set(ax, 0.57, -0.02);
-        g.add(pad);
+        const topPad = new THREE.Mesh(geo.armTop, mat);
+        topPad.position.set(ax, 0.56, 0.02);
+        g.add(topPad);
 
-        const innerSign = idx === 0 ? 1 : -1;
-        const ledV = new THREE.Mesh(geo.armLedV, seatArmLedMat);
-        ledV.position.set(ax + innerSign * 0.05, 0.30, 0.39);
-        g.add(ledV);
-
-        const ledH = new THREE.Mesh(geo.armLedH, seatArmLedMat);
-        ledH.position.set(ax + innerSign * 0.05, 0.525, 0.09);
-        g.add(ledH);
+        const cup = new THREE.Mesh(geo.cupRing, chromeNosingMat);
+        cup.position.set(ax, 0.60, 0.28);
+        g.add(cup);
       });
-
-      const cup = new THREE.Mesh(geo.cupRing, doorBrassTrimMat);
-      cup.position.set(armX, 0.56, 0.31);
-      g.add(cup);
     }
 
-    function addLuxurySeat(x, floorY, z) {
+    function addLuxurySeat(x, floorY, z, mat) {
       const g = new THREE.Group();
       g.position.set(x, floorY, z);
-      g.rotation.y = Math.PI; // Face -Z (toward Cinema Screen wall at z = -105m)
-      buildVievSeat(g, seatGeo, false);
+      g.rotation.y = Math.PI;
+      buildLuxeRecliner(g, seatGeo, mat, false);
       scene.add(g);
     }
 
-    function addVipRecliner(x, floorY, z) {
+    function addVipRecliner(x, floorY, z, mat) {
       const g = new THREE.Group();
       g.position.set(x, floorY, z);
-      g.rotation.y = Math.PI; // Face -Z (toward Cinema Screen wall at z = -105m)
-      buildVievSeat(g, vipGeo, true);
+      g.rotation.y = Math.PI;
+      buildLuxeRecliner(g, vipGeo, mat, true);
       scene.add(g);
     }
 
@@ -2547,22 +2589,26 @@
     audEntryDeck.position.set(audCenterX, totalStairHeight / 2, -94.9);
     scene.add(audEntryDeck);
 
-    // Front Entry Safety Railing along Row 1 Right Block (x = -6.00m to -2.25m at z = -94.0m)
-    const railPostGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.85, 10);
+    // Brushed-Chrome Front Entry Safety Railing along Row 1 Right Block (x = -6.00m to -2.25m at z = -94.0m)
+    const railPostGeo = new THREE.CylinderGeometry(0.032, 0.032, 0.90, 14);
+    const railFlangeGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.025, 16);
     [-5.95, -4.125, -2.30].forEach((rx) => {
-      const post = new THREE.Mesh(railPostGeo, seatObsidianMat);
-      post.position.set(rx, totalStairHeight + 0.425, rowStartZ + 0.04);
+      const post = new THREE.Mesh(railPostGeo, chromeNosingMat);
+      post.position.set(rx, totalStairHeight + 0.45, rowStartZ + 0.04);
       scene.add(post);
+      const flange = new THREE.Mesh(railFlangeGeo, chromeNosingMat);
+      flange.position.set(rx, totalStairHeight + 0.012, rowStartZ + 0.04);
+      scene.add(flange);
     });
-    const frontRailTop = new THREE.Mesh(new THREE.BoxGeometry(3.75, 0.05, 0.06), doorBrassTrimMat);
-    frontRailTop.position.set(-4.125, totalStairHeight + 0.85, rowStartZ + 0.04);
+    const frontRailTop = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 3.78, 16), chromeNosingMat);
+    frontRailTop.rotation.z = Math.PI / 2;
+    frontRailTop.position.set(-4.125, totalStairHeight + 0.90, rowStartZ + 0.04);
     scene.add(frontRailTop);
 
-    const stdSeatXs = [
-      ...blockSeatXs(-20.45, 4, 1.25), // Extreme Left 4 seats
-      ...blockSeatXs(-13.85, 5, 1.25), // Centre 5 seats
-      ...blockSeatXs(-6.00, 3, 1.25)   // Right 3 seats beside stair wall
-    ];
+    // Seat columns: Extreme Left (4), Centre (5), Right (3) — alternating Charcoal-Black & Wine-Burgundy
+    const leftBlockXs = blockSeatXs(-20.45, 4, 1.25);
+    const centerBlockXs = blockSeatXs(-13.85, 5, 1.25);
+    const rightBlockXs = blockSeatXs(-6.00, 3, 1.25);
 
     for (let r = 0; r < rowCount; r++) {
       const rowFloorY = totalStairHeight + (r + 1) * rowRise; // 5.32m up to 7.84m
@@ -2591,14 +2637,23 @@
           wStep.position.set(wx, ssTopY - subStepRise / 2, ssZ);
           scene.add(wStep);
 
-          const wLed = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.12, 0.03, 0.045), stepLedMat);
-          wLed.position.set(wx, ssTopY + 0.008, ssZ - subStepDepth / 2 + 0.03);
+          const wNosing = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.06, 0.022, 0.055), chromeNosingMat);
+          wNosing.position.set(wx, ssTopY + 0.011, ssZ - subStepDepth / 2 + 0.02);
+          scene.add(wNosing);
+
+          const wLed = new THREE.Mesh(new THREE.BoxGeometry(walkwayW - 0.12, 0.024, 0.03), stepLedMat);
+          wLed.position.set(wx, ssTopY - 0.012, ssZ - subStepDepth / 2 + 0.008);
           scene.add(wLed);
         });
       }
 
-      // Place all 12 luxury VIEV seats in this row (facing -Z)
-      stdSeatXs.forEach((sx) => addLuxurySeat(sx, rowFloorY, rowCenterZ));
+      // Place all 12 Luxe Cinema seats in this row (Charcoal-Black & Wine-Burgundy alternating)
+      const leftMat = r < 2 ? wineLeatherMat : charcoalLeatherMat;
+      const centerMat = r >= 2 && r <= 4 ? wineLeatherMat : charcoalLeatherMat;
+      const rightMat = r < 2 ? charcoalLeatherMat : wineLeatherMat;
+      leftBlockXs.forEach((sx) => addLuxurySeat(sx, rowFloorY, rowCenterZ, leftMat));
+      centerBlockXs.forEach((sx) => addLuxurySeat(sx, rowFloorY, rowCenterZ, centerMat));
+      rightBlockXs.forEach((sx) => addLuxurySeat(sx, rowFloorY, rowCenterZ, rightMat));
     }
 
     // Top VIP Special Recliner Terrace at the Top of the Incline (z = -80.7m to -76.0m, y = 8.40m)
@@ -2648,12 +2703,9 @@
     });
 
     // Place Top VIP Special Recliner Seats at the Top of the Incline (3 Left + 5 Centre + 3 Right = 11 VIP Recliners)
-    const vipSeatXs = [
-      ...blockSeatXs(-20.45, 3, 1.65), // Extreme Left 3 VIP Recliners
-      ...blockSeatXs(-14.20, 5, 1.65), // Centre 5 VIP Recliners
-      ...blockSeatXs(-2.80, 3, 1.65)   // Right 3 VIP Recliners
-    ];
-    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -78.1));
+    blockSeatXs(-20.45, 3, 1.65).forEach((vx) => addVipRecliner(vx, vipFloorY, -78.1, charcoalLeatherMat));
+    blockSeatXs(-14.20, 5, 1.65).forEach((vx) => addVipRecliner(vx, vipFloorY, -78.1, wineLeatherMat));
+    blockSeatXs(-2.80, 3, 1.65).forEach((vx) => addVipRecliner(vx, vipFloorY, -78.1, charcoalLeatherMat));
 
     // Recessed Glass Projection Booth Window (Top Centre of Back/Top Wall at z = -76.08m, y = 11.8m)
     const projFrame = new THREE.Mesh(new THREE.BoxGeometry(3.8, 1.35, 0.12), seatObsidianMat);
@@ -2671,19 +2723,51 @@
     projGlass.position.set(audCenterX, 11.8, zEndWall - 0.13);
     scene.add(projGlass);
 
-    // Wall-Mounted Angled Surround Sound Speakers along Left Wall & Right Stair Wall
-    const spkGeo = new THREE.BoxGeometry(0.28, 0.56, 0.36);
+    // Side-Mounted Cinema Speakers (Luxe Asset Pack: Matte Black Wedge + Bronze Mount + Warm LED Edge + Woofer/Tweeter)
+    const spkCabGeo = new THREE.BoxGeometry(0.32, 0.68, 0.44);
+    const spkMountGeo = new THREE.BoxGeometry(0.06, 0.56, 0.34);
+    const spkWooferGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.03, 20);
+    const spkTweeterGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.03, 16);
+    const spkEdgeHGeo = new THREE.BoxGeometry(0.025, 0.025, 0.42);
+    const spkEdgeVGeo = new THREE.BoxGeometry(0.025, 0.66, 0.025);
+    function addSideSpeaker(x, y, z, sideSign) {
+      const sg = new THREE.Group();
+      sg.position.set(x, y, z);
+      const mount = new THREE.Mesh(spkMountGeo, doorBrassTrimMat);
+      mount.position.set(-sideSign * 0.18, 0, 0);
+      sg.add(mount);
+
+      const cabGroup = new THREE.Group();
+      cabGroup.rotation.z = sideSign * 0.18;
+      const cab = new THREE.Mesh(spkCabGeo, seatObsidianMat);
+      cabGroup.add(cab);
+
+      const woofer = new THREE.Mesh(spkWooferGeo, charcoalLeatherMat);
+      woofer.rotation.z = Math.PI / 2;
+      woofer.position.set(sideSign * 0.16, -0.10, 0);
+      cabGroup.add(woofer);
+
+      const tweeter = new THREE.Mesh(spkTweeterGeo, charcoalLeatherMat);
+      tweeter.rotation.z = Math.PI / 2;
+      tweeter.position.set(sideSign * 0.16, 0.16, 0);
+      cabGroup.add(tweeter);
+
+      const ledTop = new THREE.Mesh(spkEdgeHGeo, sconceGlowMat);
+      ledTop.position.set(sideSign * 0.165, 0.34, 0);
+      cabGroup.add(ledTop);
+
+      const ledFront = new THREE.Mesh(spkEdgeVGeo, sconceGlowMat);
+      ledFront.position.set(sideSign * 0.165, 0, 0.21);
+      cabGroup.add(ledFront);
+
+      sg.add(cabGroup);
+      scene.add(sg);
+    }
+
     [-97.0, -91.5, -86.0, -80.5].forEach((sz, idx) => {
       const spkY = 9.4 + idx * 0.45;
-      const leftSpk = new THREE.Mesh(spkGeo, seatObsidianMat);
-      leftSpk.position.set(hallMinX + 0.18, spkY, sz);
-      leftSpk.rotation.z = -0.25;
-      scene.add(leftSpk);
-
-      const rightSpk = new THREE.Mesh(spkGeo, seatObsidianMat);
-      rightSpk.position.set(stairCorridorMinX - 0.18, spkY, sz);
-      rightSpk.rotation.z = 0.25;
-      scene.add(rightSpk);
+      addSideSpeaker(hallMinX + 0.22, spkY, sz, 1);
+      addSideSpeaker(stairCorridorMinX - 0.22, spkY, sz, -1);
     });
 
     // Giant True-Black Cinema Display on Back Wall (z = -104.9m) with ultra-thin micro-bezel
