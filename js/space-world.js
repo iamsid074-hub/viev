@@ -117,6 +117,9 @@
     targetProgress: 0
   };
   const cinemaSeatColliders = [];
+  const cinemaSeats = [];
+  const seatedState = { active: false, seat: null };
+  let lastSeatBarKey = '';
   let lookTouchId = null;
   let prevPointerX = 0;
   let prevPointerY = 0;
@@ -2466,6 +2469,7 @@
 
     // 5.2. SCULPTED SEAMLESS VIEV LUXURY CINEMA SEATS & PHYSICAL COLLIDERS
     cinemaSeatColliders.length = 0;
+    cinemaSeats.length = 0;
 
     // Rich Warm Champagne-Taupe Stitched Leather Texture (prevents white blowout, shows leather grain & seams)
     const leatherCanvas = document.createElement('canvas');
@@ -2487,25 +2491,38 @@
     const leatherTex = new THREE.CanvasTexture(leatherCanvas);
     leatherTex.colorSpace = THREE.SRGBColorSpace;
 
-    // Shared Canvas Texture for Gold "VIEV" Headrest Branding
-    const vievHeadCanvas = document.createElement('canvas');
-    vievHeadCanvas.width = 256;
-    vievHeadCanvas.height = 128;
-    const vhCtx = vievHeadCanvas.getContext('2d');
-    vhCtx.fillStyle = '#9c846d';
-    vhCtx.fillRect(0, 0, 256, 128);
-    vhCtx.strokeStyle = 'rgba(58, 42, 28, 0.35)';
-    vhCtx.setLineDash([4, 4]);
-    vhCtx.lineWidth = 2;
-    vhCtx.strokeRect(8, 8, 240, 112);
-    vhCtx.setLineDash([]);
-    vhCtx.font = '600 44px "Cinzel", Georgia, serif';
-    vhCtx.textAlign = 'center';
-    vhCtx.textBaseline = 'middle';
-    vhCtx.fillStyle = '#e8c468';
-    vhCtx.fillText('VIEV', 128, 64);
-    const vievHeadTex = new THREE.CanvasTexture(vievHeadCanvas);
-    vievHeadTex.colorSpace = THREE.SRGBColorSpace;
+    // Per-seat Numbered Headrest Material Cache (replaces "VIEV" with A1..G12 and V1..V11)
+    const seatHeadMatCache = {};
+    function getSeatHeadMat(label) {
+      if (seatHeadMatCache[label]) return seatHeadMatCache[label];
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 128;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#9c846d';
+      ctx.fillRect(0, 0, 256, 128);
+      ctx.strokeStyle = 'rgba(58, 42, 28, 0.35)';
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 2;
+      ctx.strokeRect(8, 8, 240, 112);
+      ctx.setLineDash([]);
+      ctx.font = '700 54px "Cinzel", Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(24, 16, 10, 0.45)';
+      ctx.fillText(label, 130, 67);
+      ctx.fillStyle = '#f2cf74';
+      ctx.fillText(label, 128, 64);
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      const mat = new THREE.MeshStandardMaterial({
+        map: tex,
+        roughness: 0.62,
+        metalness: 0.06
+      });
+      seatHeadMatCache[label] = mat;
+      return mat;
+    }
 
     // Materials matching VIEV Luxury Seat Model (Supple Champagne-Taupe Leather + Glossy Obsidian Pods + Warm LED + Brass)
     const seatLeatherMat = new THREE.MeshStandardMaterial({
@@ -2513,11 +2530,6 @@
       color: 0xffffff,
       roughness: 0.64,
       metalness: 0.04
-    });
-    const seatHeadFrontMat = new THREE.MeshStandardMaterial({
-      map: vievHeadTex,
-      roughness: 0.62,
-      metalness: 0.06
     });
     const seatObsidianMat = new THREE.MeshStandardMaterial({
       color: 0x131111,
@@ -2629,7 +2641,7 @@
     };
     vipGeo.cupRing.rotateX(Math.PI / 2);
 
-    function buildVievSeat(g, geo, isRecliner) {
+    function buildVievSeat(g, geo, isRecliner, label) {
       const recline = isRecliner ? -0.34 : -0.16;
       const armX = isRecliner ? 0.46 : 0.365; // Flush against cushion edges (zero gap!)
 
@@ -2661,7 +2673,7 @@
       head.position.set(0, 0.66, 0.05);
       backGroup.add(head);
 
-      const logoPlane = new THREE.Mesh(geo.headLogo, seatHeadFrontMat);
+      const logoPlane = new THREE.Mesh(geo.headLogo, getSeatHeadMat(label));
       logoPlane.position.set(0, 0.78, 0.165);
       backGroup.add(logoPlane);
       g.add(backGroup);
@@ -2703,30 +2715,32 @@
       g.add(cupRing);
     }
 
-    function addLuxurySeat(x, floorY, z) {
+    function addLuxurySeat(x, floorY, z, label) {
       const g = new THREE.Group();
       g.position.set(x, floorY, z);
       g.rotation.y = Math.PI; // Face -Z (toward Cinema Screen wall at z = -105m)
-      buildVievSeat(g, seatGeo, false);
+      buildVievSeat(g, seatGeo, false, label);
       scene.add(g);
       cinemaSeatColliders.push({
         minX: x - 0.47, maxX: x + 0.47,
         minZ: z - 0.38, maxZ: z + 0.38,
         minY: floorY
       });
+      cinemaSeats.push({ label, x, floorY, z, isVip: false });
     }
 
-    function addVipRecliner(x, floorY, z) {
+    function addVipRecliner(x, floorY, z, label) {
       const g = new THREE.Group();
       g.position.set(x, floorY, z);
       g.rotation.y = Math.PI; // Face -Z (toward Cinema Screen wall at z = -105m)
-      buildVievSeat(g, vipGeo, true);
+      buildVievSeat(g, vipGeo, true, label);
       scene.add(g);
       cinemaSeatColliders.push({
         minX: x - 0.58, maxX: x + 0.58,
         minZ: z - 0.78, maxZ: z + 0.45,
         minY: floorY
       });
+      cinemaSeats.push({ label, x, floorY, z, isVip: true });
     }
 
     // Helper to generate seat X centers for a block
@@ -2798,8 +2812,9 @@
         });
       }
 
-      // Place all 12 luxury VIEV seats in this row (facing -Z)
-      stdSeatXs.forEach((sx) => addLuxurySeat(sx, rowFloorY, rowCenterZ));
+      // Place all 12 numbered luxury seats in this row (A1..A12 .. G1..G12, facing -Z)
+      const rowLetter = String.fromCharCode(65 + r);
+      stdSeatXs.forEach((sx, si) => addLuxurySeat(sx, rowFloorY, rowCenterZ, `${rowLetter}${si + 1}`));
     }
 
     // Top VIP Special Recliner Terrace Balcony across full Hall Width (y = 8.40m, spanning above door at x = -1.6m to +3.2m)
@@ -2876,7 +2891,7 @@
       ...blockSeatXs(-14.20, 5, 1.65), // Centre 5 VIP Recliners
       ...blockSeatXs(-2.80, 3, 1.65)   // Right 3 VIP Recliners
     ];
-    vipSeatXs.forEach((vx) => addVipRecliner(vx, vipFloorY, -76.85));
+    vipSeatXs.forEach((vx, vi) => addVipRecliner(vx, vipFloorY, -76.85, `V${vi + 1}`));
 
     // Recessed Glass Projection Booth Window (Top Centre of Back/Top Wall at z = -76.08m, y = 11.8m)
     const projFrame = new THREE.Mesh(new THREE.BoxGeometry(3.8, 1.35, 0.12), seatObsidianMat);
@@ -3365,6 +3380,15 @@
     if (keyMag > 0) {
       normKeyX = keyX / keyMag;
       normKeyY = keyY / keyMag;
+    }
+
+    // 0. If seated in a cinema seat, keep camera comfortably at seated eye level
+    if (seatedState.active && seatedState.seat) {
+      const s = seatedState.seat;
+      camera.position.x += (s.x - camera.position.x) * 0.22;
+      camera.position.z += ((s.z - 0.08) - camera.position.z) * 0.22;
+      camera.position.y += ((s.floorY + (s.isVip ? 1.16 : 1.18)) - camera.position.y) * 0.22;
+      return;
     }
 
     // 2. Analog Joystick Vector
@@ -3931,6 +3955,156 @@
     }
   }
 
+  function ensureCinemaSeatBar() {
+    let bar = document.getElementById('cinema-seat-bar');
+    if (bar || !stageElement) return bar;
+    bar = document.createElement('div');
+    bar.id = 'cinema-seat-bar';
+    bar.style.cssText = [
+      'position:absolute',
+      'left:50%',
+      'bottom:76px',
+      'transform:translateX(-50%)',
+      'z-index:25',
+      'display:none',
+      'align-items:center',
+      'gap:8px',
+      'padding:8px 14px',
+      'border-radius:999px',
+      'background:rgba(16,14,15,0.82)',
+      'backdrop-filter:blur(12px)',
+      '-webkit-backdrop-filter:blur(12px)',
+      'border:1px solid rgba(232,196,104,0.38)',
+      'box-shadow:0 8px 28px rgba(0,0,0,0.45)',
+      'font-family:inherit',
+      'pointer-events:auto'
+    ].join(';');
+    stageElement.appendChild(bar);
+    return bar;
+  }
+
+  function sitInSeat(seat) {
+    if (!seat || !camera) return;
+    seatedState.active = true;
+    seatedState.seat = seat;
+    targetYaw = 0; // Smoothly face the Giant Cinema Display (-Z)
+    targetPitch = -0.02;
+    lastSeatBarKey = '';
+  }
+
+  function standUpFromSeat() {
+    if (!seatedState.active || !seatedState.seat || !camera) return;
+    const s = seatedState.seat;
+    seatedState.active = false;
+    seatedState.seat = null;
+    // Step out cleanly into the aisle/legroom in front of the seat
+    camera.position.x = s.x;
+    camera.position.z = s.z - (s.isVip ? 1.05 : 0.72);
+    camera.position.y = s.floorY + cameraY;
+    lastSeatBarKey = '';
+  }
+
+  function updateCinemaSeatPrompt() {
+    if (!camera || !stageElement || cinemaSeats.length === 0) return;
+    const bar = ensureCinemaSeatBar();
+    if (!bar) return;
+
+    if (seatedState.active && seatedState.seat) {
+      const key = `seated:${seatedState.seat.label}`;
+      if (lastSeatBarKey === key) return;
+      lastSeatBarKey = key;
+      bar.innerHTML = '';
+      bar.style.display = 'flex';
+
+      const lbl = document.createElement('span');
+      lbl.textContent = `Seated · ${seatedState.seat.label}`;
+      lbl.style.cssText = 'color:#f3d27a;font-size:12px;font-weight:600;letter-spacing:0.06em;margin-right:4px;';
+      bar.appendChild(lbl);
+
+      const standBtn = document.createElement('button');
+      standBtn.type = 'button';
+      standBtn.textContent = 'Stand Up';
+      standBtn.style.cssText = 'padding:5px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.12);color:#fff;font-size:12px;font-weight:600;cursor:pointer;';
+      standBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        standUpFromSeat();
+      });
+      bar.appendChild(standBtn);
+      return;
+    }
+
+    if (camera.position.z >= -76.0) {
+      if (lastSeatBarKey !== 'hidden') {
+        lastSeatBarKey = 'hidden';
+        bar.style.display = 'none';
+      }
+      return;
+    }
+
+    // Find closest seat within 3.6m (matching player's tier height)
+    let nearest = null;
+    let nearestDist = Infinity;
+    const approxFloorY = camera.position.y - cameraY;
+    for (let i = 0; i < cinemaSeats.length; i++) {
+      const s = cinemaSeats[i];
+      if (Math.abs(approxFloorY - s.floorY) > 1.35) continue;
+      const d = Math.hypot(camera.position.x - s.x, camera.position.z - s.z);
+      if (d < 3.6 && d < nearestDist) {
+        nearestDist = d;
+        nearest = s;
+      }
+    }
+
+    if (!nearest) {
+      if (lastSeatBarKey !== 'hidden') {
+        lastSeatBarKey = 'hidden';
+        bar.style.display = 'none';
+      }
+      return;
+    }
+
+    // Gather nearby set of seats on the same row/block (up to 5 seats, sorted left-to-right)
+    const nearbySet = cinemaSeats
+      .filter((s) => Math.abs(s.z - nearest.z) < 0.45 && Math.abs(s.x - nearest.x) < 3.4)
+      .sort((a, b) => a.x - b.x)
+      .slice(0, 5);
+
+    const key = `near:${nearest.label}:${nearbySet.map((s) => s.label).join(',')}`;
+    if (lastSeatBarKey === key) return;
+    lastSeatBarKey = key;
+
+    bar.innerHTML = '';
+    bar.style.display = 'flex';
+
+    const title = document.createElement('span');
+    title.textContent = 'Sit:';
+    title.style.cssText = 'color:rgba(255,255,255,0.72);font-size:12px;font-weight:500;letter-spacing:0.05em;';
+    bar.appendChild(title);
+
+    nearbySet.forEach((seat) => {
+      const isClosest = seat.label === nearest.label;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = seat.label;
+      btn.style.cssText = [
+        'padding:5px 11px',
+        'border-radius:999px',
+        isClosest
+          ? 'border:1px solid #f0c966;background:rgba(240,201,102,0.22);color:#ffe49e'
+          : 'border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff',
+        'font-size:12px',
+        'font-weight:600',
+        'cursor:pointer',
+        'transition:transform 0.15s ease,background 0.15s ease'
+      ].join(';');
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sitInSeat(seat);
+      });
+      bar.appendChild(btn);
+    });
+  }
+
   /**
    * Render Loop
    */
@@ -3949,6 +4123,7 @@
     renderFirstShopLedScreen(false);
     updateCorridorLedProximityAudio();
     updateCinemaDoors();
+    updateCinemaSeatPrompt();
 
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
