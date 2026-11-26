@@ -2159,18 +2159,18 @@
     scene.add(exitSign);
 
     // 3 Vertical Cylindrical Bronze Wall Sconce Lights along the Right Stair Wall (x = +3.10m)
-    const sconceBodyGeo = new THREE.CylinderGeometry(0.085, 0.085, 0.52, 16);
-    const sconceGlowGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.06, 16);
+    const cinemaSconceBodyGeo = new THREE.CylinderGeometry(0.085, 0.085, 0.52, 16);
+    const cinemaSconceGlowGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.06, 16);
     [
       { z: -81.5, y: 3.4 },
       { z: -86.5, y: 4.8 },
       { z: -91.5, y: 6.2 }
     ].forEach((sc) => {
-      const sBody = new THREE.Mesh(sconceBodyGeo, doorBrassTrimMat);
+      const sBody = new THREE.Mesh(cinemaSconceBodyGeo, doorBrassTrimMat);
       sBody.position.set(hallMaxX - 0.11, sc.y, sc.z);
       scene.add(sBody);
       [-0.27, 0.27].forEach((dy) => {
-        const sGlow = new THREE.Mesh(sconceGlowGeo, stepLedMat);
+        const sGlow = new THREE.Mesh(cinemaSconceGlowGeo, stepLedMat);
         sGlow.position.set(hallMaxX - 0.11, sc.y + dy, sc.z);
         scene.add(sGlow);
       });
