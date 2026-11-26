@@ -1999,10 +1999,44 @@
     const stairCorridorW = hallMaxX - stairCorridorMinX; // 4.8m (-1.6m to +3.2m)
     const stairCenterX = (stairCorridorMinX + hallMaxX) / 2; // +0.8m (aligned with single door)
 
+    // Procedural Luxury Royal Crimson Velvet Carpet Texture (woven art-deco diamond + pile grain)
+    const carpetCanvas = document.createElement('canvas');
+    carpetCanvas.width = 256;
+    carpetCanvas.height = 256;
+    const cpCtx = carpetCanvas.getContext('2d');
+    cpCtx.fillStyle = '#4e0a14';
+    cpCtx.fillRect(0, 0, 256, 256);
+
+    // Subtle woven geometric diamond lattice
+    cpCtx.strokeStyle = 'rgba(98, 18, 30, 0.55)';
+    cpCtx.lineWidth = 2;
+    for (let y = -128; y < 384; y += 32) {
+      cpCtx.beginPath();
+      cpCtx.moveTo(0, y);
+      cpCtx.lineTo(256, y + 256);
+      cpCtx.stroke();
+      cpCtx.beginPath();
+      cpCtx.moveTo(256, y);
+      cpCtx.lineTo(0, y + 256);
+      cpCtx.stroke();
+    }
+    // Fine velvet pile micro-grain
+    for (let i = 0; i < 6500; i++) {
+      const bright = Math.random() > 0.5;
+      cpCtx.fillStyle = bright ? 'rgba(130, 24, 38, 0.24)' : 'rgba(28, 4, 8, 0.30)';
+      cpCtx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+    }
+    const redCarpetTex = new THREE.CanvasTexture(carpetCanvas);
+    redCarpetTex.wrapS = THREE.RepeatWrapping;
+    redCarpetTex.wrapT = THREE.RepeatWrapping;
+    redCarpetTex.repeat.set(14, 14);
+    redCarpetTex.colorSpace = THREE.SRGBColorSpace;
+
     const hallFloorMat = new THREE.MeshStandardMaterial({
-      color: 0x0f1016,
-      roughness: 0.92,
-      metalness: 0.05
+      map: redCarpetTex,
+      color: 0xffffff,
+      roughness: 0.94,
+      metalness: 0.02
     });
     const hallWallMat = new THREE.MeshStandardMaterial({
       color: 0x13141c,
