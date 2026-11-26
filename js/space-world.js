@@ -2822,15 +2822,19 @@
     vipBalconyBridge.position.set(stairCenterX, vipFloorY - 0.25, vipDeckStartZ + vipDeckLen / 2);
     scene.add(vipBalconyBridge);
 
-    // Front Brushed-Steel Balcony Rail above the Stairs (x = -1.6m to +3.2m at z = -80.7m)
-    [-1.4, 0.8, 3.0].forEach((bx) => {
-      const bPost = new THREE.Mesh(railPostGeo, seatObsidianMat);
-      bPost.position.set(bx, vipFloorY + 0.425, vipDeckStartZ + 0.06);
-      scene.add(bPost);
-    });
-    const balconyTopRail = new THREE.Mesh(new THREE.BoxGeometry(stairCorridorW - 0.1, 0.05, 0.06), doorBrassTrimMat);
-    balconyTopRail.position.set(stairCenterX, vipFloorY + 0.85, vipDeckStartZ + 0.06);
-    scene.add(balconyTopRail);
+    // Solid Acoustic Balcony Parapet Wall & Brass Cap above the Stairs (x = -1.6m to +3.2m at z = -80.7m)
+    const balconyParapetWall = new THREE.Mesh(
+      new THREE.BoxGeometry(stairCorridorW, 1.35, 0.16),
+      hallWallMat
+    );
+    balconyParapetWall.position.set(stairCenterX, vipFloorY - 0.50 + 0.675, vipDeckStartZ + 0.08);
+    scene.add(balconyParapetWall);
+    const balconyWallCap = new THREE.Mesh(
+      new THREE.BoxGeometry(stairCorridorW + 0.02, 0.06, 0.20),
+      doorBrassTrimMat
+    );
+    balconyWallCap.position.set(stairCenterX, vipFloorY + 0.85, vipDeckStartZ + 0.08);
+    scene.add(balconyWallCap);
 
     // 4 steps in both walkways up to Top VIP Recliner Terrace (0.14m rise each)
     const vipStepZone = 1.4;
