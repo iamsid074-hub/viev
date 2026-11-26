@@ -3321,8 +3321,9 @@
       }
       camera.position.z = nextZ;
 
-      // Walkable Upstairs Height inside Walled Staircase -> Flat Stage -> 7-Row Steep Incline -> Top VIP Balcony
+      // Walkable Upstairs Height inside Cinema Hall only (z < -76.0m); Main Mall & Shops are always ground level (0)
       const getCinemaFloorY = (x, z, curY) => {
+        if (z >= -76.0) return 0;
         if (z < -95.8) return 4.90;
         if (z >= -80.7 && curY >= 7.0) return 8.40; // Solid Top VIP Balcony across full width
         if (x < -1.6) {
@@ -3350,26 +3351,28 @@
       const targetEyeY = baseFloorY + cameraY + Math.sin(walkStepTime) * 0.022;
       camera.position.y += (targetEyeY - camera.position.y) * 0.16;
     } else {
-      // Smooth return to resting eye level on current stair/incline/terrace
+      // Smooth return to resting eye level on current stair/incline/terrace (or ground 0 in mall/shops)
       let baseFloorY = 0;
-      if (camera.position.z < -95.8) {
-        baseFloorY = 4.90;
-      } else if (camera.position.z >= -80.7 && camera.position.y >= 7.0) {
-        baseFloorY = 8.40;
-      } else if (camera.position.x < -1.6) {
-        if (camera.position.z >= -79.3) baseFloorY = 8.40;
-        else if (camera.position.z >= -80.7) {
-          const vipStep = Math.min(3, Math.max(0, Math.floor((camera.position.z - (-80.7)) / 0.35)));
-          baseFloorY = 7.84 + (vipStep + 1) * 0.14;
-        } else if (camera.position.z > -94.0) {
-          const subStep = Math.min(20, Math.max(0, Math.floor((camera.position.z - (-94.0)) / (1.90 / 3))));
-          baseFloorY = 4.90 + (subStep + 1) * 0.14;
-        } else {
+      if (camera.position.z < -76.0) {
+        if (camera.position.z < -95.8) {
           baseFloorY = 4.90;
+        } else if (camera.position.z >= -80.7 && camera.position.y >= 7.0) {
+          baseFloorY = 8.40;
+        } else if (camera.position.x < -1.6) {
+          if (camera.position.z >= -79.3) baseFloorY = 8.40;
+          else if (camera.position.z >= -80.7) {
+            const vipStep = Math.min(3, Math.max(0, Math.floor((camera.position.z - (-80.7)) / 0.35)));
+            baseFloorY = 7.84 + (vipStep + 1) * 0.14;
+          } else if (camera.position.z > -94.0) {
+            const subStep = Math.min(20, Math.max(0, Math.floor((camera.position.z - (-94.0)) / (1.90 / 3))));
+            baseFloorY = 4.90 + (subStep + 1) * 0.14;
+          } else {
+            baseFloorY = 4.90;
+          }
+        } else if (camera.position.z < -79.0) {
+          const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - camera.position.z) / 1.2) + 1));
+          baseFloorY = stepIdx * 0.35;
         }
-      } else if (camera.position.z < -79.0) {
-        const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - camera.position.z) / 1.2) + 1));
-        baseFloorY = stepIdx * 0.35;
       }
       camera.position.y += ((baseFloorY + cameraY) - camera.position.y) * 0.12;
     }
