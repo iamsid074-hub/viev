@@ -2177,11 +2177,35 @@
       });
     });
 
-    // Flat Upper Cinema Hall Cross-Walkway & Top Terrace after the Stairs End (z = -95.8m to -105.0m, flat y = 4.90m)
+    // Deep Matte Cotton-Black Carpet/Fabric Material for Front Display Stage Floor
+    const cottonCanvas = document.createElement('canvas');
+    cottonCanvas.width = 128;
+    cottonCanvas.height = 128;
+    const ctCtx = cottonCanvas.getContext('2d');
+    ctCtx.fillStyle = '#09090b';
+    ctCtx.fillRect(0, 0, 128, 128);
+    for (let i = 0; i < 2400; i++) {
+      const v = 6 + Math.floor(Math.random() * 8);
+      ctCtx.fillStyle = `rgb(${v},${v},${v + 2})`;
+      ctCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
+    }
+    const cottonBlackTex = new THREE.CanvasTexture(cottonCanvas);
+    cottonBlackTex.wrapS = THREE.RepeatWrapping;
+    cottonBlackTex.wrapT = THREE.RepeatWrapping;
+    cottonBlackTex.repeat.set(14, 14);
+    cottonBlackTex.colorSpace = THREE.SRGBColorSpace;
+    const cottonBlackFloorMat = new THREE.MeshStandardMaterial({
+      map: cottonBlackTex,
+      color: 0xffffff,
+      roughness: 0.96,
+      metalness: 0.01
+    });
+
+    // Flat Front Stage Floor in front of Giant Cinema Display (z = -95.8m to -105.0m, y = 4.90m, Cotton Black)
     const flatHallLen = stairEndZ - (zEndWall - hallL); // 9.2m
     const flatUpperDeck = new THREE.Mesh(
       new THREE.BoxGeometry(hallW, totalStairHeight, flatHallLen),
-      hallFloorMat
+      cottonBlackFloorMat
     );
     flatUpperDeck.position.set(hallCenterX, totalStairHeight / 2, stairEndZ - flatHallLen / 2);
     scene.add(flatUpperDeck);
@@ -2637,16 +2661,8 @@
     audEntryDeck.position.set(audCenterX, totalStairHeight / 2, -94.9);
     scene.add(audEntryDeck);
 
-    // Front Entry Safety Railing along Row 1 Right Block (x = -6.00m to -2.25m at z = -94.0m)
+    // Shared post geometry for Top VIP Balcony railing
     const railPostGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.85, 10);
-    [-5.95, -4.125, -2.30].forEach((rx) => {
-      const post = new THREE.Mesh(railPostGeo, seatObsidianMat);
-      post.position.set(rx, totalStairHeight + 0.425, rowStartZ + 0.04);
-      scene.add(post);
-    });
-    const frontRailTop = new THREE.Mesh(new THREE.BoxGeometry(3.75, 0.05, 0.06), doorBrassTrimMat);
-    frontRailTop.position.set(-4.125, totalStairHeight + 0.85, rowStartZ + 0.04);
-    scene.add(frontRailTop);
 
     const stdSeatXs = [
       ...blockSeatXs(-20.45, 4, 1.25), // Extreme Left 4 seats
@@ -3262,13 +3278,14 @@
       const deltaZ = (-moveZ * (-Math.cos(yaw)) + moveX * (-Math.sin(yaw))) * currentSpeed;
 
       // Axis-independent collision sliding (diagonal movement slides along walls smoothly)
+      const onVipBalcony = camera.position.z < -76.2 && camera.position.z >= -80.7 && camera.position.y >= 7.0;
       let nextX = camera.position.x + deltaX;
-      if (camera.position.z < -95.8) {
-        // Upper Flat Cross-Walkway behind stairs (-19.8m to +2.55m)
+      if (camera.position.z < -95.8 || onVipBalcony) {
+        // Upper Flat Floor behind stairs OR full-width Top VIP Balcony (-19.8m to +2.55m)
         nextX = Math.min(2.55, Math.max(-19.8, nextX));
       } else if (camera.position.z < -76.2) {
         if (camera.position.x < -1.6) {
-          // Inside Inclined Auditorium Seating Area (-19.8m to -2.2m, separated from stairs by left stair wall at -1.6m)
+          // Inside Inclined Auditorium Seating Area (-19.8m to -2.2m, separated from stairs by stair divider wall at -1.6m)
           nextX = Math.min(-2.2, Math.max(-19.8, nextX));
         } else {
           // Inside Walled Right-Side Staircase Corridor (-0.95m to +2.55m)
@@ -3300,8 +3317,10 @@
       if (camera.position.x < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
       }
-      // Far-end Wood Wall & Single Doorway collision at z = -76.0m (only for stair corridor / mall side, auditorium stops at -76.6m)
-      if (camera.position.x < -1.6 && camera.position.z < -76.2) {
+      // Physical Balcony Railing Guard over Entry Stairs (prevents falling off front edge at z = -80.7m when x > -1.6m)
+      if (onVipBalcony && camera.position.x > -1.6) {
+        nextZ = Math.max(-80.2, Math.min(-76.6, nextZ));
+      } else if (camera.position.x < -1.6 && camera.position.z < -76.2) {
         nextZ = Math.max(-104.0, Math.min(-76.6, nextZ));
       } else if (Math.abs(nextZ - cinemaDoorState.doorZ) < 0.55) {
         const inDoorOpening = Math.abs(camera.position.x - cinemaDoorState.doorX) < 0.85 && cinemaDoorState.openProgress > 0.35;
@@ -3311,11 +3330,12 @@
       }
       camera.position.z = nextZ;
 
-      // Walkable Upstairs Height inside Walled Staircase -> Flat Upper Cross-Walkway -> 7-Row Steep Incline (24 steps) -> Top VIP Terrace
-      const getCinemaFloorY = (x, z) => {
+      // Walkable Upstairs Height inside Walled Staircase -> Flat Stage -> 7-Row Steep Incline -> Top VIP Balcony
+      const getCinemaFloorY = (x, z, curY) => {
         if (z < -95.8) return 4.90;
+        if (z >= -80.7 && curY >= 7.0) return 8.40; // Solid Top VIP Balcony across full width
         if (x < -1.6) {
-          if (z >= -79.3) return 8.40; // Top VIP Special Recliner Terrace
+          if (z >= -79.3) return 8.40;
           if (z >= -80.7) {
             const vipStep = Math.min(3, Math.max(0, Math.floor((z - (-80.7)) / 0.35)));
             return 7.84 + (vipStep + 1) * 0.14;
@@ -3332,7 +3352,7 @@
         }
         return 0;
       };
-      const baseFloorY = getCinemaFloorY(camera.position.x, camera.position.z);
+      const baseFloorY = getCinemaFloorY(camera.position.x, camera.position.z, camera.position.y);
 
       // Subtle natural human walking head bob smoothly tracking upstairs elevation
       walkStepTime += keysPressed.sprint ? 0.22 : 0.14;
@@ -3343,6 +3363,8 @@
       let baseFloorY = 0;
       if (camera.position.z < -95.8) {
         baseFloorY = 4.90;
+      } else if (camera.position.z >= -80.7 && camera.position.y >= 7.0) {
+        baseFloorY = 8.40;
       } else if (camera.position.x < -1.6) {
         if (camera.position.z >= -79.3) baseFloorY = 8.40;
         else if (camera.position.z >= -80.7) {
