@@ -2139,15 +2139,15 @@
       roughness: 0.78,
       metalness: 0.05
     });
-    // Luxury Plum/Burgundy Suede Acoustic Panel Material (matching Ticket Room wall reference)
+    // Luxury Wine-Red Suede Acoustic Panel Material for Ticket Room
     const trSuedeCanvas = document.createElement('canvas');
     trSuedeCanvas.width = 128;
     trSuedeCanvas.height = 128;
     const trCtx = trSuedeCanvas.getContext('2d');
-    trCtx.fillStyle = '#471220';
+    trCtx.fillStyle = '#58121f';
     trCtx.fillRect(0, 0, 128, 128);
     for (let i = 0; i < 1400; i++) {
-      trCtx.fillStyle = Math.random() > 0.5 ? 'rgba(95, 28, 46, 0.22)' : 'rgba(28, 6, 12, 0.24)';
+      trCtx.fillStyle = Math.random() > 0.5 ? 'rgba(116, 26, 44, 0.24)' : 'rgba(38, 6, 12, 0.26)';
       trCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
     }
     const trSuedeTex = new THREE.CanvasTexture(trSuedeCanvas);
@@ -2314,21 +2314,16 @@
 
     // 5.0B. LUXURY TICKET COUNTER, 3 POS TERMINALS, SHOWTIME BOARDS & VELVET STANCHIONS
     const tcGroup = new THREE.Group();
-    tcGroup.position.set(-17.8, 0, lrCenterZ); // Faces +X toward the Glass Double Door
+    tcGroup.position.set(-17.8, 0, lrCenterZ);
 
     const tcBodyMat = new THREE.MeshStandardMaterial({ color: 0x1e1e20, roughness: 0.45, metalness: 0.12 });
     const tcTopMat = new THREE.MeshStandardMaterial({ color: 0x111114, roughness: 0.22, metalness: 0.25 });
-    const tcPosScreenMat = new THREE.MeshStandardMaterial({
-      color: 0x7a828e,
-      roughness: 0.35,
-      metalness: 0.55
-    });
+    const tcPosScreenMat = new THREE.MeshStandardMaterial({ color: 0x7a828e, roughness: 0.35, metalness: 0.55 });
 
     const tcStraightL = 4.6;
     const tcDepth = 1.06;
-    const tcRadius = tcDepth / 2; // 0.53m rounded ends
+    const tcRadius = tcDepth / 2;
 
-    // Main curved stadium-shaped obsidian body + rounded end caps
     const tcBody = new THREE.Mesh(new THREE.BoxGeometry(tcDepth, 0.92, tcStraightL), tcBodyMat);
     tcBody.position.set(0, 0.54, 0);
     tcGroup.add(tcBody);
@@ -2351,7 +2346,6 @@
       tcGroup.add(endMarble);
     });
 
-    // Top brushed-gold trim band, bottom brass plinth & recessed under-counter warm LED strip
     const tcTopBrass = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.03, 0.08, tcStraightL), doorBrassTrimMat);
     tcTopBrass.position.set(0, 0.97, 0);
     tcGroup.add(tcTopBrass);
@@ -2364,19 +2358,16 @@
     tcUnderLed.position.set(0.03, 0.02, 0);
     tcGroup.add(tcUnderLed);
 
-    // Dark polished granite countertop
     const tcTopSlab = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.05, 0.07, tcStraightL), tcTopMat);
     tcTopSlab.position.set(0, 1.045, 0);
     tcGroup.add(tcTopSlab);
 
-    // 4 Vertical Gold Trim Dividers splitting front face into 3 luxury bays
     [-tcStraightL / 2, -tcStraightL / 6, tcStraightL / 6, tcStraightL / 2].forEach((dz) => {
       const divBar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.86, 0.035), doorBrassTrimMat);
       divBar.position.set(tcDepth / 2 + 0.012, 0.52, dz);
       tcGroup.add(divBar);
     });
 
-    // 3 Countertop POS Workstations (Monitor + Card Reader + Thermal Ticket Printer)
     const monGeo = new THREE.BoxGeometry(0.035, 0.34, 0.54);
     const standGeo = new THREE.BoxGeometry(0.05, 0.16, 0.07);
     const baseGeo = new THREE.BoxGeometry(0.16, 0.02, 0.20);
@@ -2396,23 +2387,21 @@
       sBase.position.set(-0.04, 1.09, pz);
       tcGroup.add(sBase);
 
-      const printer = new THREE.Mesh(printerGeo, seatObsidianMat);
+      const printer = new THREE.Mesh(printerGeo, tcTopMat);
       printer.position.set(0.08, 1.14, pz + 0.42);
       tcGroup.add(printer);
 
-      const cardTap = new THREE.Mesh(cardGeo, seatObsidianMat);
+      const cardTap = new THREE.Mesh(cardGeo, tcTopMat);
       cardTap.position.set(0.16, 1.14, pz - 0.38);
       cardTap.rotation.z = -0.3;
       tcGroup.add(cardTap);
     });
 
-    // Warm under-counter golden floor wash light
     const tcUnderLight = new THREE.PointLight(0xffcb78, 0.85, 8, 1.8);
     tcUnderLight.position.set(0.85, 0.45, 0);
     tcGroup.add(tcUnderLight);
     scene.add(tcGroup);
 
-    // 3 Digital Showtime & Movie Menu Boards on Back Wall behind Ticket Counter (x = -20.40m)
     const showMovies = [
       { title: 'VIEV EXCLUSIVE', sub: 'SCREENX 270°', time: '07:30 PM  ·  VIP' },
       { title: 'AASHAYEIN', sub: 'DOLBY ATMOS', time: '09:00 PM  ·  HALL 1' },
@@ -2420,7 +2409,7 @@
     ];
     showMovies.forEach((m, idx) => {
       const bz = -72.55 + idx * 1.55;
-      const bFrame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.65, 1.20), seatObsidianMat);
+      const bFrame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.65, 1.20), tcTopMat);
       bFrame.position.set(trBackX + 0.04, 2.85, bz);
       scene.add(bFrame);
 
@@ -2463,7 +2452,6 @@
       scene.add(bScreen);
     });
 
-    // 4 Brushed-Brass Velvet Stanchion Queue Posts in front of Ticket Counter
     const stBaseGeo = new THREE.CylinderGeometry(0.16, 0.18, 0.04, 16);
     const stPoleGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.92, 12);
     const stTopGeo = new THREE.SphereGeometry(0.042, 14, 12);
@@ -4127,12 +4115,8 @@
           }
         }
       }
-      // Physical Cinema Seat & Ticket Counter Collision Helper
+      // Physical Cinema Seat Collision Helper (prevents walking through any seat)
       const isBlockedBySeat = (x, z, curY) => {
-        // Ticket Counter physical collision inside Ticket Room
-        if (z >= -74.2 && z <= -67.8 && x >= -18.6 && x <= -17.0) {
-          return true;
-        }
         if (z >= -76.0 || cinemaSeatColliders.length === 0) return false;
         const pad = 0.24;
         const approxFloorY = curY - cameraY;
