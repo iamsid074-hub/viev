@@ -2157,24 +2157,32 @@
         hand.position.set(ax, 0.84, 0.02);
         emp.add(hand);
       });
-      // Neck, Head & Hair
+      // Neck, Head & Hair (pivoted for player eye-contact)
       const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.06, 0.10, 10), skinMat);
       neck.position.set(0, 1.44, 0);
       emp.add(neck);
+      const headPivot = new THREE.Group();
+      headPivot.position.set(0, 1.50, 0);
       const head = new THREE.Mesh(new THREE.SphereGeometry(0.125, 16, 14), skinMat);
-      head.position.set(0, 1.59, 0);
-      emp.add(head);
+      head.position.set(0, 0.09, 0);
+      headPivot.add(head);
       const hair = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.56), hairMat);
-      hair.position.set(0, 1.61, -0.01);
-      emp.add(hair);
+      hair.position.set(0, 0.11, -0.01);
+      headPivot.add(hair);
+      emp.add(headPivot);
 
       scene.add(emp);
-      return emp;
+      return { group: emp, headPivot, baseRotY: rotY };
     }
 
     // Cinema Gate 1 Attendant & Ticket Counter Staff
-    createVievEmployee(doorCenterX + 1.65, zEndWall + 0.85, 0);
-    createVievEmployee(-18.75, -71.0, Math.PI / 2);
+    spaceNpcState.employees.length = 0;
+    const gateEmp = createVievEmployee(doorCenterX + 1.65, zEndWall + 0.85, 0);
+    gateEmp.roleLabel = 'Gate 1 Staff · Please keep your ticket ready';
+    spaceNpcState.employees.push(gateEmp);
+    const counterEmp = createVievEmployee(-18.75, -71.0, Math.PI / 2);
+    counterEmp.roleLabel = 'Box Office Staff · Welcome to VIEV Cinemas!';
+    spaceNpcState.employees.push(counterEmp);
 
     // 5.0. LEFT WOOD WALL (z = -66m to -76m), AUTOMATIC GLASS DOUBLE DOOR & DARK CHOCOLATE ROOM
     const lrDoorZ = -71.0;
@@ -6021,8 +6029,10 @@
   const spaceNpcState = {
     initialized: false,
     npcs: [],
+    employees: [],
     activeCrowdKey: '',
     lastTickMs: 0,
+    lastBubbleText: '',
     geos: null,
     mats: null
   };
@@ -6159,22 +6169,24 @@
     const neck = new THREE.Mesh(g.neck, skinMat);
     neck.position.set(0, 1.39, 0);
     root.add(neck);
+    const headPivot = new THREE.Group();
+    headPivot.position.set(0, 1.44, 0);
     const head = new THREE.Mesh(g.head, skinMat);
-    head.position.set(0, 1.53, 0);
-    root.add(head);
+    head.position.set(0, 0.09, 0);
+    headPivot.add(head);
     const hair = new THREE.Mesh(g.hair, hairMat);
-    hair.position.set(0, 1.55, -0.01);
-    root.add(hair);
+    hair.position.set(0, 0.11, -0.01);
+    headPivot.add(hair);
+    root.add(headPivot);
 
     scene.add(root);
-    return { group: root, leftLeg, rightLeg, leftKnee, rightKnee, leftArm, rightArm, ticketMesh };
+    return { group: root, leftLeg, rightLeg, leftKnee, rightKnee, leftArm, rightArm, headPivot, ticketMesh };
   }
 
-  function seatNpcActorOnSeat(actor, seat) {
-    // Hips at local y=0.81 -> group.y = floorY - 0.48 places hips cleanly on seat cushion (floorY + 0.33)
-    actor.group.position.set(seat.x, seat.floorY - 0.48, seat.z + 0.04);
-    actor.group.rotation.y = Math.PI;
-    if (seat.isVip) {
+  function seatNpcActorOnPos(actor, x, floorY, z, rotY, isVip) {
+    actor.group.position.set(x, floorY - 0.48, z);
+    actor.group.rotation.y = rotY;
+    if (isVip) {
       actor.leftLeg.rotation.x = -1.18;
       actor.rightLeg.rotation.x = -1.18;
       actor.leftKnee.rotation.x = 0.55;
@@ -6185,6 +6197,10 @@
       actor.leftKnee.rotation.x = Math.PI / 2;
       actor.rightKnee.rotation.x = Math.PI / 2;
     }
+  }
+
+  function seatNpcActorOnSeat(actor, seat) {
+    seatNpcActorOnPos(actor, seat.x, seat.floorY, seat.z + 0.04, Math.PI, seat.isVip);
   }
 
   function buildSeatPathWaypoints(seat) {
@@ -6209,21 +6225,37 @@
 
   function assignNextShopperGoal(npc) {
     const shopCentersZ = [-3, -21, -39, -57];
-    if (Math.random() < 0.65) {
+    const r = Math.random();
+    if (r < 0.50) {
+      // Browse inside a boutique display
       const sz = shopCentersZ[Math.floor(Math.random() * shopCentersZ.length)];
-      const jx = -11.5 + Math.random() * 3.8;
-      const jz = sz + (Math.random() - 0.5) * 4.5;
+      const jx = -11.4 + Math.random() * 3.4;
+      const jz = sz + (Math.random() - 0.5) * 4.2;
       npc.waypoints = [
-        { x: -3.2 + (Math.random() - 0.5) * 1.2, z: sz },
+        { x: -3.4 + (Math.random() - 0.5) * 1.0, z: sz },
         { x: jx, z: jz }
       ];
+      npc.lookRotY = -Math.PI / 2;
+      npc.activity = 'Browsing VIEV Boutique';
+    } else if (r < 0.78) {
+      // Window-watch right-wall OLED TVs or Schedule OLED TV
+      if (Math.random() < 0.35) {
+        npc.waypoints = [{ x: -3.2 + (Math.random() - 0.5) * 2.0, z: -73.4 }];
+        npc.lookRotY = Math.PI;
+        npc.activity = 'Checking Gate 1 Show Schedule';
+      } else {
+        const sz = shopCentersZ[Math.floor(Math.random() * shopCentersZ.length)];
+        npc.waypoints = [{ x: 3.8 + (Math.random() - 0.5) * 0.8, z: sz }];
+        npc.lookRotY = Math.PI / 2;
+        npc.activity = 'Watching Promo OLED Screen';
+      }
     } else {
-      npc.waypoints = [
-        { x: (Math.random() - 0.5) * 6.5, z: 2 - Math.random() * 68 }
-      ];
+      npc.waypoints = [{ x: (Math.random() - 0.5) * 6.0, z: 2 - Math.random() * 68 }];
+      npc.lookRotY = null;
+      npc.activity = 'Strolling Luxe Promenade';
     }
     npc.wpIdx = 0;
-    npc.waitTimer = 2.5 + Math.random() * 4.5;
+    npc.waitTimer = 0;
   }
 
   function syncNpcsForActiveCrowd() {
@@ -6273,61 +6305,86 @@
     userSeats.forEach(s => ticketBookingState.bookedSeatIds.add(s));
 
     if (!targetSlot) return;
+    // Pair adjacent seats for Friends/Couples AI while filling remaining seats
     const desiredCount = Math.min(cinemaSeats.length, SHOW_CROWD_PROFILES[targetSlot.label] || 28);
     const availableSeats = cinemaSeats.filter(s => !userSeats.has(s.label));
-    // Shuffle seats deterministically/randomly so every show fills naturally
-    for (let i = availableSeats.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [availableSeats[i], availableSeats[j]] = [availableSeats[j], availableSeats[i]];
+    const chosenSeats = [];
+    const usedSet = new Set();
+    for (let i = 0; i < availableSeats.length - 1 && chosenSeats.length < desiredCount; i++) {
+      const s1 = availableSeats[i];
+      const s2 = availableSeats[i + 1];
+      if (!usedSet.has(s1.label) && !usedSet.has(s2.label) && Math.abs(s1.z - s2.z) < 0.1 && Math.abs(s1.x - s2.x) < 1.6 && Math.random() < 0.45) {
+        const gid = `grp_${i}`;
+        chosenSeats.push({ seat: s1, groupId: gid, groupSlot: 0 });
+        if (chosenSeats.length < desiredCount) chosenSeats.push({ seat: s2, groupId: gid, groupSlot: 1 });
+        usedSet.add(s1.label);
+        usedSet.add(s2.label);
+      }
     }
-    const chosenSeats = availableSeats.slice(0, Math.min(desiredCount, availableSeats.length));
+    const leftovers = availableSeats.filter(s => !usedSet.has(s.label));
+    for (let i = leftovers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [leftovers[i], leftovers[j]] = [leftovers[j], leftovers[i]];
+    }
+    for (let i = 0; i < leftovers.length && chosenSeats.length < desiredCount; i++) {
+      chosenSeats.push({ seat: leftovers[i], groupId: null, groupSlot: 0 });
+    }
 
-    chosenSeats.forEach((seat, idx) => {
+    const counterDesksZ = [-72.9, -71.0, -69.1];
+    const sofaSpotsX = [-11.05, -10.2, -9.35];
+
+    chosenSeats.forEach(({ seat, groupId, groupSlot }, idx) => {
       const actor = createNpcActor(idx + 11);
-      // Stagger NPCs across realistic lifecycle: some already seated if show started, some at counter/waiting, some arriving!
       const isAlreadyLive = !!active;
-      const counterZ = -73.0 + (idx % 3) * 1.9 + (Math.random() - 0.5) * 0.6;
-      const waitX = -14.6 + (idx % 6) * 1.15 + (Math.random() - 0.5) * 0.4;
-      const waitZ = -74.3 + Math.floor((idx % 18) / 6) * 3.1 + (Math.random() - 0.5) * 0.5;
+      const deskIdx = idx % 3;
+      const counterZ = counterDesksZ[deskIdx];
+      const queueDepth = Math.floor(idx / 3) % 5;
       const npc = {
         id: `c_${crowdKey}_${idx}`,
         role: 'cinema',
         seat,
+        groupId,
+        groupSlot,
+        deskIdx,
         actor,
-        speed: 1.55 + (idx % 5) * 0.14,
+        speed: 1.75 + (idx % 5) * 0.14,
         walkPhase: Math.random() * Math.PI * 2,
         state: 'to_lounge',
         waitTimer: 0,
         waypoints: [],
         wpIdx: 0,
-        delayTimer: (idx % 24) * 0.55
+        delayTimer: 0,
+        sofaIdx: idx < 3 ? idx : -1,
+        activity: ''
       };
 
-      if (isAlreadyLive && idx < chosenSeats.length * 0.65) {
-        // Already seated inside auditorium watching the live show
+      if (isAlreadyLive && idx < chosenSeats.length * 0.62) {
         npc.state = 'seated';
-        npc.delayTimer = 0;
         seatNpcActorOnSeat(actor, seat);
         ticketBookingState.bookedSeatIds.add(seat.label);
+      } else if (!isAlreadyLive && idx < 3) {
+        // Relax on Burgundy Velvet Sofa in Ticket Lounge before show
+        npc.state = 'sofa_sit';
+        seatNpcActorOnPos(actor, sofaSpotsX[idx], 0.09, -75.05, 0, false);
+        npc.activity = 'Relaxing on Lounge Sofa';
       } else if (idx % 3 === 0) {
-        // Queuing/buying at Ticket Counter
+        // Ordered Counter Queue
         npc.state = 'to_counter';
-        npc.delayTimer = (idx % 12) * 0.45;
-        actor.group.position.set(-4.2 + (Math.random() - 0.5) * 2.4, 0, -68 - Math.random() * 5);
+        actor.group.position.set(-4.2 + (Math.random() - 0.5) * 2.2, 0, -68 - Math.random() * 5);
         npc.waypoints = [
           { x: -6.0, z: -71.0 },
-          { x: -15.8 - (idx % 2) * 0.5, z: counterZ }
+          { x: -16.0 + queueDepth * 0.85, z: counterZ }
         ];
       } else {
         // Walking from promenade into Ticket Lounge
-        actor.group.position.set((Math.random() - 0.5) * 6.0, 0, -48 - Math.random() * 18);
+        const grpOff = groupSlot === 1 ? 0.55 : 0;
+        actor.group.position.set((Math.random() - 0.5) * 5.0 + grpOff, 0, -16 - Math.random() * 50);
         npc.waypoints = [
-          { x: -4.2, z: -71.0 },
-          { x: -6.0, z: -71.0 },
-          { x: -16.0, z: counterZ }
+          { x: -4.2, z: -71.0 + grpOff * 0.4 },
+          { x: -6.0, z: -71.0 + grpOff * 0.4 },
+          { x: -16.0 + queueDepth * 0.85, z: counterZ }
         ];
       }
-      npc.waitSpot = { x: waitX, z: waitZ };
       spaceNpcState.npcs.push(npc);
     });
   }
@@ -6360,6 +6417,23 @@
     syncNpcsForActiveCrowd();
   }
 
+  function ensureNpcThoughtBubble() {
+    let el = document.getElementById('npc-thought-bubble');
+    if (el || !stageElement) return el;
+    el = document.createElement('div');
+    el.id = 'npc-thought-bubble';
+    el.style.cssText = [
+      'position:absolute', 'top:62px', 'left:50%', 'transform:translateX(-50%)',
+      'z-index:28', 'display:none', 'padding:6px 14px', 'border-radius:999px',
+      'background:rgba(15,13,18,0.82)', 'backdrop-filter:blur(10px)', '-webkit-backdrop-filter:blur(10px)',
+      'border:1px solid rgba(242,207,116,0.42)', 'color:#f5d580',
+      'font-size:11.5px', 'font-weight:600', 'letter-spacing:0.03em',
+      'pointer-events:none', 'white-space:nowrap'
+    ].join(';');
+    stageElement.appendChild(el);
+    return el;
+  }
+
   function updateSpaceNpcs() {
     if (!spaceNpcState.initialized) return;
     const now = performance.now();
@@ -6369,19 +6443,94 @@
     syncNpcsForActiveCrowd();
     const active = getActiveScheduledShow();
 
+    // Staff Employee Eye-Contact with Player
+    if (camera) {
+      spaceNpcState.employees.forEach((emp) => {
+        const d = Math.hypot(camera.position.x - emp.group.position.x, camera.position.z - emp.group.position.z);
+        if (d < 4.0) {
+          const targetWorldYaw = Math.atan2(camera.position.x - emp.group.position.x, camera.position.z - emp.group.position.z);
+          let rel = targetWorldYaw - emp.baseRotY;
+          while (rel > Math.PI) rel -= Math.PI * 2;
+          while (rel < -Math.PI) rel += Math.PI * 2;
+          rel = Math.max(-0.85, Math.min(0.85, rel));
+          emp.headPivot.rotation.y += (rel - emp.headPivot.rotation.y) * 0.12;
+        } else {
+          emp.headPivot.rotation.y += (0 - emp.headPivot.rotation.y) * 0.08;
+        }
+      });
+    }
+
+    // Track nearest NPC/Employee for Thought Bubble HUD
+    let nearestLabel = '';
+    let nearestDist = 3.2;
+    if (camera) {
+      spaceNpcState.employees.forEach((emp) => {
+        const d = Math.hypot(camera.position.x - emp.group.position.x, camera.position.z - emp.group.position.z);
+        if (d < nearestDist) {
+          nearestDist = d;
+          nearestLabel = `💬 ${emp.roleLabel}`;
+        }
+      });
+    }
+
     for (let i = spaceNpcState.npcs.length - 1; i >= 0; i--) {
       const n = spaceNpcState.npcs[i];
       const pos = n.actor.group.position;
 
-      if (n.delayTimer && n.delayTimer > 0) {
-        n.delayTimer -= dt;
+      // Nearest NPC Thought Bubble text
+      if (camera && Math.abs(camera.position.y - cameraY - pos.y) < 1.6) {
+        const dCam = Math.hypot(camera.position.x - pos.x, camera.position.z - pos.z);
+        if (dCam < nearestDist) {
+          nearestDist = dCam;
+          if (n.role === 'shopper') nearestLabel = `💬 ${n.activity || 'Exploring VIEV Mall'}`;
+          else if (n.state === 'buying' || n.state === 'to_counter' || n.state === 'to_lounge') nearestLabel = `💬 Buying ticket for Seat ${n.seat.label}...`;
+          else if (n.state === 'sofa_sit') nearestLabel = `💬 Relaxing before show · Seat ${n.seat.label}`;
+          else if (n.state === 'to_gate' || n.state === 'gate_check') nearestLabel = `💬 Heading to Gate 1 · Seat ${n.seat.label}`;
+          else if (n.state === 'enter_hall') nearestLabel = `💬 Looking for Seat ${n.seat.label}`;
+          else if (n.state === 'seated') nearestLabel = `💬 Watching ${active ? active.show.name : 'Cinema'} · Seat ${n.seat.label}`;
+          else if (n.state === 'exit_hall') nearestLabel = `💬 That show was awesome!`;
+        }
+      }
+
+      if (n.state === 'sofa_sit') {
+        if (active) {
+          // Stand up from sofa when show goes live & head to counter/gate
+          n.state = 'to_counter';
+          n.actor.leftLeg.rotation.x = 0;
+          n.actor.rightLeg.rotation.x = 0;
+          n.actor.leftKnee.rotation.x = 0;
+          n.actor.rightKnee.rotation.x = 0;
+          pos.y = 0;
+          pos.z = -74.3;
+          n.waypoints = [{ x: -16.0, z: -71.0 }];
+          n.wpIdx = 0;
+        }
         continue;
       }
 
       if (n.state === 'seated') {
         n.actor.leftArm.rotation.x = 0;
         n.actor.rightArm.rotation.x = 0;
+        if (cinemaScreenXState.isPlaying) {
+          // Subtle music vibe / head nod while watching show
+          n.actor.headPivot.rotation.x = Math.sin(now * 0.0045 + n.walkPhase) * 0.055;
+          n.actor.headPivot.rotation.y = Math.sin(now * 0.0018 + n.walkPhase) * 0.05;
+        } else {
+          n.actor.headPivot.rotation.x *= 0.9;
+          n.actor.headPivot.rotation.y *= 0.9;
+        }
         continue;
+      }
+
+      // Eye-contact when player is close on ground level
+      if (camera && pos.y < 1.0 && Math.hypot(camera.position.x - pos.x, camera.position.z - pos.z) < 3.4) {
+        const lookYaw = Math.atan2(camera.position.x - pos.x, camera.position.z - pos.z) - n.actor.group.rotation.y;
+        let rel = lookYaw;
+        while (rel > Math.PI) rel -= Math.PI * 2;
+        while (rel < -Math.PI) rel += Math.PI * 2;
+        n.actor.headPivot.rotation.y += (Math.max(-0.7, Math.min(0.7, rel)) - n.actor.headPivot.rotation.y) * 0.1;
+      } else {
+        n.actor.headPivot.rotation.y *= 0.9;
       }
 
       if (n.waitTimer > 0) {
@@ -6394,7 +6543,6 @@
           if (n.role === 'shopper') {
             assignNextShopperGoal(n);
           } else if (n.state === 'buying') {
-            // Purchase complete! Grab ticket in hand, sync seat to iPad map, and head straight to Gate 1
             n.actor.ticketMesh.visible = true;
             ticketBookingState.bookedSeatIds.add(n.seat.label);
             n.state = 'to_gate';
@@ -6404,26 +6552,11 @@
             ];
             n.wpIdx = 0;
           } else if (n.state === 'gate_check') {
-            // Checked at Gate 1! Ticket consumed, enter Cinema Hall
             n.actor.ticketMesh.visible = false;
             n.state = 'enter_hall';
             n.waypoints = buildSeatPathWaypoints(n.seat);
             n.wpIdx = 0;
           }
-        }
-        continue;
-      }
-
-      if (n.state === 'waiting_lounge' && n.wpIdx >= n.waypoints.length) {
-        n.actor.leftLeg.rotation.x *= 0.85;
-        n.actor.rightLeg.rotation.x *= 0.85;
-        if (active) {
-          n.state = 'to_gate';
-          n.waypoints = [
-            { x: -6.0, z: -71.0 },
-            { x: 0.8, z: -74.6 }
-          ];
-          n.wpIdx = 0;
         }
         continue;
       }
@@ -6438,15 +6571,16 @@
         n.wpIdx++;
         if (n.wpIdx >= n.waypoints.length) {
           if (n.role === 'shopper') {
+            if (n.lookRotY !== null && n.lookRotY !== undefined) n.actor.group.rotation.y = n.lookRotY;
             n.waitTimer = 2.0 + Math.random() * 4.0;
           } else if (n.state === 'to_lounge' || n.state === 'to_counter') {
             n.state = 'buying';
-            n.actor.group.rotation.y = -Math.PI / 2; // Face Ticket Counter
-            n.waitTimer = 1.6 + Math.random() * 2.2;
+            n.actor.group.rotation.y = -Math.PI / 2;
+            n.waitTimer = 1.4 + Math.random() * 1.8;
           } else if (n.state === 'to_gate') {
             n.state = 'gate_check';
-            n.actor.group.rotation.y = Math.PI; // Face Gate 1
-            n.waitTimer = 0.9;
+            n.actor.group.rotation.y = Math.PI;
+            n.waitTimer = 0.75;
           } else if (n.state === 'enter_hall') {
             n.state = 'seated';
             seatNpcActorOnSeat(n.actor, n.seat);
@@ -6458,19 +6592,70 @@
         continue;
       }
 
-      const step = Math.min(dist, n.speed * dt);
-      pos.x += (dx / dist) * step;
-      pos.z += (dz / dist) * step;
+      // Latecomer hustle if show already started
+      const effSpeed = (active && (n.state === 'to_gate' || n.state === 'enter_hall')) ? n.speed * 1.32 : n.speed;
+      let moveDx = dx / dist;
+      let moveDz = dz / dist;
+
+      // Personal Space / Crowd Avoidance steering on flat ground (not on stairs)
+      if (pos.y < 0.5 && pos.z > -75.5) {
+        let repX = 0, repZ = 0;
+        if (camera && Math.abs(camera.position.y - cameraY) < 0.8) {
+          const pdx = pos.x - camera.position.x;
+          const pdz = pos.z - camera.position.z;
+          const pd = Math.hypot(pdx, pdz);
+          if (pd > 0.01 && pd < 1.05) {
+            repX += (pdx / pd) * (1.05 - pd) * 1.6;
+            repZ += (pdz / pd) * (1.05 - pd) * 1.6;
+          }
+        }
+        for (let j = 0; j < spaceNpcState.npcs.length; j++) {
+          if (j === i) continue;
+          const o = spaceNpcState.npcs[j].actor.group.position;
+          if (o.y > 0.5) continue;
+          const odx = pos.x - o.x;
+          const odz = pos.z - o.z;
+          const od = Math.hypot(odx, odz);
+          if (od > 0.01 && od < 0.78) {
+            repX += (odx / od) * (0.78 - od) * 1.2;
+            repZ += (odz / od) * (0.78 - od) * 1.2;
+          }
+        }
+        const combX = moveDx + repX;
+        const combZ = moveDz + repZ;
+        const combLen = Math.hypot(combX, combZ) || 1;
+        moveDx = combX / combLen;
+        moveDz = combZ / combLen;
+      }
+
+      const step = Math.min(dist, effSpeed * dt);
+      pos.x += moveDx * step;
+      pos.z += moveDz * step;
       const floorY = getAnyFloorY(pos.x, pos.z, pos.y);
       pos.y += (floorY - pos.y) * 0.28;
 
-      n.actor.group.rotation.y = Math.atan2(dx, dz);
-      n.walkPhase += dt * n.speed * 5.2;
+      n.actor.group.rotation.y = Math.atan2(moveDx, moveDz);
+      n.walkPhase += dt * effSpeed * 5.2;
       const swing = Math.sin(n.walkPhase) * 0.52;
       n.actor.leftLeg.rotation.x = swing;
       n.actor.rightLeg.rotation.x = -swing;
       n.actor.leftArm.rotation.x = -swing * 0.65;
       n.actor.rightArm.rotation.x = swing * 0.65;
+    }
+
+    // Update Thought Bubble HUD
+    const bubble = ensureNpcThoughtBubble();
+    if (bubble) {
+      if (nearestLabel && !ticketBookingState.isOpen) {
+        if (spaceNpcState.lastBubbleText !== nearestLabel) {
+          spaceNpcState.lastBubbleText = nearestLabel;
+          bubble.textContent = nearestLabel;
+        }
+        bubble.style.display = 'block';
+      } else if (spaceNpcState.lastBubbleText !== '') {
+        spaceNpcState.lastBubbleText = '';
+        bubble.style.display = 'none';
+      }
     }
   }
 
