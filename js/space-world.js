@@ -116,6 +116,15 @@
     openProgress: 0,
     targetProgress: 0
   };
+  // Left Corridor-Tail Wood Wall Automatic Glass Double Door State
+  const leftRoomDoorState = {
+    frontLeaf: null,
+    backLeaf: null,
+    doorX: -6.0,
+    doorZ: -71.0,
+    openProgress: 0,
+    targetProgress: 0
+  };
   const cinemaSeatColliders = [];
   const cinemaSeats = [];
   const seatedState = { active: false, seat: null };
@@ -1842,16 +1851,9 @@
       scene.add(p);
     });
 
-    // 5. FAR END LARGE PREMIUM WOOD WALL, AUTOMATIC DOUBLE DOORS & EMPTY CINEMA HALL
+    // 5. FAR END LARGE PREMIUM WOOD WALL, AUTOMATIC SINGLE DOOR & CINEMA HALL
     const zEndWall = -MALL_LENGTH + 8; // -76.0m
     cinemaDoorState.doorZ = zEndWall;
-
-    // Close left corridor wall cleanly between Shop 4 (-66m) and Wood Wall (-76m)
-    const leftTailGeo = new THREE.PlaneGeometry(10.0, MALL_HEIGHT);
-    leftTailGeo.rotateY(Math.PI / 2);
-    const leftTailWall = new THREE.Mesh(leftTailGeo, firstShopSideWallMat);
-    leftTailWall.position.set(-halfW, halfH, -71.0);
-    scene.add(leftTailWall);
 
     function createPremiumWoodWallTexture() {
       const canvas = document.createElement('canvas');
@@ -2022,6 +2024,168 @@
 
     cinemaDoorState.doorGroup = singleCinemaDoorGroup;
     cinemaDoorState.doorX = doorCenterX;
+
+    // 5.0. LEFT WOOD WALL (z = -66m to -76m), AUTOMATIC GLASS DOUBLE DOOR & DARK CHOCOLATE ROOM
+    const lrDoorZ = -71.0;
+    const lrDoorW = 3.4;
+    const lrDoorH = 4.2;
+    const lrWallDepth = 0.40;
+    const lrWingLen = (10.0 - lrDoorW) / 2; // 3.3m front & back wings
+
+    // Front & Back Wood Wall Wings along x = -6.0m
+    const lrFrontWing = new THREE.Mesh(new THREE.BoxGeometry(lrWallDepth, MALL_HEIGHT, lrWingLen), woodWallMat);
+    lrFrontWing.position.set(-halfW, halfH, -66.0 - lrWingLen / 2);
+    scene.add(lrFrontWing);
+
+    const lrBackWing = new THREE.Mesh(new THREE.BoxGeometry(lrWallDepth, MALL_HEIGHT, lrWingLen), woodWallMat);
+    lrBackWing.position.set(-halfW, halfH, -76.0 + lrWingLen / 2);
+    scene.add(lrBackWing);
+
+    const lrTopHeader = new THREE.Mesh(new THREE.BoxGeometry(lrWallDepth, MALL_HEIGHT - lrDoorH, lrDoorW), woodWallMat);
+    lrTopHeader.position.set(-halfW, lrDoorH + (MALL_HEIGHT - lrDoorH) / 2, lrDoorZ);
+    scene.add(lrTopHeader);
+
+    // Brushed Brass Architrave Frame around Glass Double Door
+    const lrFrameF = new THREE.Mesh(new THREE.BoxGeometry(lrWallDepth + 0.06, lrDoorH, 0.10), doorBrassTrimMat);
+    lrFrameF.position.set(-halfW, lrDoorH / 2, lrDoorZ + lrDoorW / 2 - 0.05);
+    scene.add(lrFrameF);
+
+    const lrFrameB = new THREE.Mesh(new THREE.BoxGeometry(lrWallDepth + 0.06, lrDoorH, 0.10), doorBrassTrimMat);
+    lrFrameB.position.set(-halfW, lrDoorH / 2, lrDoorZ - lrDoorW / 2 + 0.05);
+    scene.add(lrFrameB);
+
+    const lrFrameTop = new THREE.Mesh(new THREE.BoxGeometry(lrWallDepth + 0.06, 0.10, lrDoorW), doorBrassTrimMat);
+    lrFrameTop.position.set(-halfW, lrDoorH - 0.05, lrDoorZ);
+    scene.add(lrFrameTop);
+
+    // Automatic Glass Double Doors (hinged on front & back jambs, swinging inward -X)
+    const lrLeafW = (lrDoorW - 0.20) / 2 - 0.01;
+    const lrLeafH = lrDoorH - 0.12;
+    const lrGlassMat = new THREE.MeshStandardMaterial({
+      color: 0x9ac0d6,
+      transparent: true,
+      opacity: 0.34,
+      roughness: 0.08,
+      metalness: 0.18,
+      side: THREE.DoubleSide
+    });
+    const lrRailMat = new THREE.MeshStandardMaterial({
+      color: 0x161210,
+      roughness: 0.35,
+      metalness: 0.65
+    });
+    const lrHandleGeo = new THREE.CylinderGeometry(0.022, 0.022, 1.35, 14);
+
+    function createGlassDoorLeaf(isFront) {
+      const g = new THREE.Group();
+      const hingeZ = isFront ? (lrDoorZ + lrDoorW / 2 - 0.10) : (lrDoorZ - lrDoorW / 2 + 0.10);
+      const dir = isFront ? -1 : 1; // Extends toward center lrDoorZ
+      g.position.set(-halfW, 0, hingeZ);
+
+      const glass = new THREE.Mesh(new THREE.BoxGeometry(0.03, lrLeafH - 0.16, lrLeafW - 0.08), lrGlassMat);
+      glass.position.set(0, lrLeafH / 2, dir * (lrLeafW / 2));
+      g.add(glass);
+
+      const topRail = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, lrLeafW), lrRailMat);
+      topRail.position.set(0, lrLeafH - 0.04, dir * (lrLeafW / 2));
+      g.add(topRail);
+
+      const botRail = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, lrLeafW), lrRailMat);
+      botRail.position.set(0, 0.04, dir * (lrLeafW / 2));
+      g.add(botRail);
+
+      const stile = new THREE.Mesh(new THREE.BoxGeometry(0.06, lrLeafH, 0.06), lrRailMat);
+      stile.position.set(0, lrLeafH / 2, dir * (lrLeafW - 0.03));
+      g.add(stile);
+
+      [-0.06, 0.06].forEach((hx) => {
+        const hMesh = new THREE.Mesh(lrHandleGeo, doorBrassTrimMat);
+        hMesh.position.set(hx, 1.35, dir * (lrLeafW - 0.16));
+        g.add(hMesh);
+      });
+      scene.add(g);
+      return g;
+    }
+
+    leftRoomDoorState.frontLeaf = createGlassDoorLeaf(true);
+    leftRoomDoorState.backLeaf = createGlassDoorLeaf(false);
+
+    // Small Room Inside: Dark Chocolate Walls (0x24130c) + Dark Wood Plank Flooring (x = -6m to -14m, z = -66m to -76m)
+    const lrW = 8.0;
+    const lrL = 10.0;
+    const lrCenterX = -halfW - lrW / 2; // -10.0m
+    const lrCenterZ = -71.0;
+
+    // Dark Wood Plank Floor Texture
+    const dwCanvas = document.createElement('canvas');
+    dwCanvas.width = 256;
+    dwCanvas.height = 256;
+    const dwCtx = dwCanvas.getContext('2d');
+    dwCtx.fillStyle = '#24140b';
+    dwCtx.fillRect(0, 0, 256, 256);
+    for (let y = 0; y < 256; y += 32) {
+      dwCtx.fillStyle = y % 64 === 0 ? 'rgba(54, 31, 18, 0.55)' : 'rgba(26, 13, 7, 0.55)';
+      dwCtx.fillRect(0, y, 256, 30);
+      dwCtx.fillStyle = 'rgba(10, 5, 2, 0.75)';
+      dwCtx.fillRect(0, y + 30, 256, 2);
+    }
+    for (let i = 0; i < 120; i++) {
+      dwCtx.fillStyle = 'rgba(80, 48, 28, 0.14)';
+      dwCtx.fillRect(Math.random() * 256, Math.random() * 256, 45, 1.5);
+    }
+    const darkWoodTex = new THREE.CanvasTexture(dwCanvas);
+    darkWoodTex.wrapS = THREE.RepeatWrapping;
+    darkWoodTex.wrapT = THREE.RepeatWrapping;
+    darkWoodTex.repeat.set(5, 6);
+    darkWoodTex.colorSpace = THREE.SRGBColorSpace;
+
+    const darkWoodFloorMat = new THREE.MeshStandardMaterial({
+      map: darkWoodTex,
+      roughness: 0.42,
+      metalness: 0.08
+    });
+    const darkChocWallMat = new THREE.MeshStandardMaterial({
+      color: 0x26140d,
+      roughness: 0.85,
+      metalness: 0.04,
+      side: THREE.DoubleSide
+    });
+    const darkChocCeilMat = new THREE.MeshStandardMaterial({
+      color: 0x1b0e09,
+      roughness: 0.88,
+      metalness: 0.04,
+      side: THREE.DoubleSide
+    });
+
+    const lrFloorGeo = new THREE.PlaneGeometry(lrW, lrL);
+    lrFloorGeo.rotateX(-Math.PI / 2);
+    const lrFloor = new THREE.Mesh(lrFloorGeo, darkWoodFloorMat);
+    lrFloor.position.set(lrCenterX, 0.005, lrCenterZ);
+    scene.add(lrFloor);
+
+    const lrCeilGeo = new THREE.PlaneGeometry(lrW, lrL);
+    lrCeilGeo.rotateX(Math.PI / 2);
+    const lrCeil = new THREE.Mesh(lrCeilGeo, darkChocCeilMat);
+    lrCeil.position.set(lrCenterX, MALL_HEIGHT, lrCenterZ);
+    scene.add(lrCeil);
+
+    const lrBackGeo = new THREE.PlaneGeometry(lrL, MALL_HEIGHT);
+    lrBackGeo.rotateY(Math.PI / 2);
+    const lrBackWall = new THREE.Mesh(lrBackGeo, darkChocWallMat);
+    lrBackWall.position.set(-halfW - lrW, halfH, lrCenterZ);
+    scene.add(lrBackWall);
+
+    const lrFrontWall = new THREE.Mesh(new THREE.PlaneGeometry(lrW, MALL_HEIGHT), darkChocWallMat);
+    lrFrontWall.position.set(lrCenterX, halfH, -66.0);
+    scene.add(lrFrontWall);
+
+    const lrRearWall = new THREE.Mesh(new THREE.PlaneGeometry(lrW, MALL_HEIGHT), darkChocWallMat);
+    lrRearWall.position.set(lrCenterX, halfH, -76.0);
+    scene.add(lrRearWall);
+
+    const lrLight = new THREE.PointLight(0xffddb0, 0.95, 18, 1.8);
+    lrLight.position.set(lrCenterX, MALL_HEIGHT - 0.6, lrCenterZ);
+    scene.add(lrLight);
 
     // 5.1. RIGHT-SIDE ENTRY WALLED STAIRCASE (>10 STEPS, HIGH RISE) & AUDITORIUM CINEMA HALL (z = -76m to -105m)
     const hallW = 24.0;
@@ -3604,8 +3768,15 @@
           nextX = Math.min(2.55, Math.max(-0.95, nextX));
         }
       } else if (camera.position.z < -66.0) {
-        // Corridor tail between Shop 4 and Wood Wall (-5.2m to +5.2m)
-        nextX = Math.min(5.2, Math.max(-5.2, nextX));
+        // Corridor tail (-5.2m to +5.2m) + Left Dark Chocolate Room (-13.2m to -6.5m)
+        nextX = Math.min(5.2, Math.max(-13.2, nextX));
+        // Glass Double Doorway collision at x = -6.0m (passable only when open & aligned with doorway)
+        if (Math.abs(nextX - leftRoomDoorState.doorX) < 0.55) {
+          const inGlassDoor = Math.abs(camera.position.z - leftRoomDoorState.doorZ) < 1.35 && leftRoomDoorState.openProgress > 0.35;
+          if (!inGlassDoor) {
+            nextX = camera.position.x;
+          }
+        }
       } else {
         nextX = Math.min(5.2, Math.max(-13.2, nextX));
       }
@@ -3645,6 +3816,10 @@
 
       let nextZ = camera.position.z + deltaZ;
       nextZ = Math.min(6.0, Math.max(-104.0, nextZ));
+      // Keep player inside Left Dark Chocolate Room along Z (-75.2m to -66.8m)
+      if (camera.position.x < -5.9 && camera.position.z >= -76.0 && camera.position.z <= -66.0) {
+        nextZ = Math.max(-75.2, Math.min(-66.8, nextZ));
+      }
       if (camera.position.x < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
       }
@@ -4454,6 +4629,19 @@
     });
   }
 
+  function updateLeftRoomDoors() {
+    if (!leftRoomDoorState.frontLeaf || !leftRoomDoorState.backLeaf || !camera) return;
+    const dist = Math.hypot(camera.position.x - leftRoomDoorState.doorX, camera.position.z - leftRoomDoorState.doorZ);
+    leftRoomDoorState.targetProgress = dist < 5.8 ? 1 : 0;
+    const diff = leftRoomDoorState.targetProgress - leftRoomDoorState.openProgress;
+    if (Math.abs(diff) > 0.001) {
+      leftRoomDoorState.openProgress += diff * 0.075;
+      const angle = leftRoomDoorState.openProgress * (Math.PI * 0.48);
+      leftRoomDoorState.frontLeaf.rotation.y = angle;
+      leftRoomDoorState.backLeaf.rotation.y = -angle;
+    }
+  }
+
   /**
    * Render Loop
    */
@@ -4472,6 +4660,7 @@
     renderFirstShopLedScreen(false);
     updateCorridorLedProximityAudio();
     updateCinemaDoors();
+    updateLeftRoomDoors();
     updateCinemaScreenX();
     updateCinemaSeatPrompt();
 
