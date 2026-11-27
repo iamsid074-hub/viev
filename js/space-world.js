@@ -5019,10 +5019,10 @@
       sub: 'SCREENX 270° · DOLBY ATMOS',
       videoSrc: 'song/mangal_rang.mp4',
       slots: [
+        { label: '12:30 PM', startMin: 12 * 60 + 30, endMin: 12 * 60 + 55 },
         { label: '1:00 PM', startMin: 13 * 60, endMin: 13 * 60 + 25 },
         { label: '1:30 PM', startMin: 13 * 60 + 30, endMin: 13 * 60 + 55 },
-        { label: '2:00 PM', startMin: 14 * 60, endMin: 14 * 60 + 25 },
-        { label: '11:50 PM', startMin: 23 * 60 + 50, endMin: 24 * 60 + 15 }
+        { label: '2:00 PM', startMin: 14 * 60, endMin: 14 * 60 + 25 }
       ]
     },
     {
@@ -5068,8 +5068,7 @@
     const { totalMin } = getVievClockParts();
     for (const show of VIEV_SHOW_SCHEDULE) {
       for (const slot of show.slots) {
-        if ((totalMin >= slot.startMin && totalMin < slot.endMin) ||
-            (slot.endMin > 1440 && totalMin < slot.endMin - 1440)) {
+        if (totalMin >= slot.startMin && totalMin < slot.endMin) {
           return { show, slot };
         }
       }
@@ -5610,6 +5609,7 @@
   };
 
   const TICKET_TIMINGS = [
+    { time: '12:30 PM', startMin: 12 * 60 + 30, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
     { time: '1:00 PM', startMin: 13 * 60, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
     { time: '1:30 PM', startMin: 13 * 60 + 30, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
     { time: '2:00 PM', startMin: 14 * 60, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
@@ -5620,8 +5620,7 @@
     { time: '5:00 PM', startMin: 17 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
     { time: '5:30 PM', startMin: 17 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
     { time: '6:15 PM', startMin: 18 * 60 + 15, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '7:00 PM', startMin: 19 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '11:50 PM', startMin: 23 * 60 + 50, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' }
+    { time: '7:00 PM', startMin: 19 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' }
   ];
 
   function getSeatTierInfo(seatId) {
@@ -6030,6 +6029,7 @@
 
   // Crowd profiles per showtime: ranges from Quiet (10) -> Medium (28-36) -> High Rush (58-66) -> HOUSEFULL (all 95 seats!)
   const SHOW_CROWD_PROFILES = {
+    '12:30 PM': 45,
     '1:00 PM': 28,
     '1:30 PM': 95, // HOUSEFULL
     '2:00 PM': 10, // Low crowd
@@ -6040,8 +6040,7 @@
     '5:00 PM': 60, // High rush
     '5:30 PM': 95, // HOUSEFULL
     '6:15 PM': 32, // Medium
-    '7:00 PM': 95, // HOUSEFULL
-    '11:50 PM': 65 // High rush late-night show
+    '7:00 PM': 95  // HOUSEFULL
   };
 
   function getAnyFloorY(x, z, curY) {
