@@ -6068,17 +6068,20 @@
 
   function ensureNpcAssets() {
     if (spaceNpcState.geos) return;
-    const legGeo = new THREE.CylinderGeometry(0.062, 0.052, 0.78, 8);
-    legGeo.translate(0, -0.39, 0);
+    const thighGeo = new THREE.CylinderGeometry(0.062, 0.056, 0.40, 8);
+    thighGeo.translate(0, -0.20, 0);
+    const shinGeo = new THREE.CylinderGeometry(0.054, 0.048, 0.40, 8);
+    shinGeo.translate(0, -0.20, 0);
     const shoeGeo = new THREE.BoxGeometry(0.10, 0.06, 0.20);
-    shoeGeo.translate(0, -0.78, 0.03);
+    shoeGeo.translate(0, -0.40, 0.03);
     const armGeo = new THREE.CylinderGeometry(0.048, 0.042, 0.50, 8);
     armGeo.translate(0, -0.24, 0);
     const handGeo = new THREE.SphereGeometry(0.042, 8, 6);
     handGeo.translate(0, -0.50, 0.01);
 
     spaceNpcState.geos = {
-      leg: legGeo,
+      thigh: thighGeo,
+      shin: shinGeo,
       shoe: shoeGeo,
       arm: armGeo,
       hand: handGeo,
@@ -6115,14 +6118,22 @@
     const root = new THREE.Group();
     const leftLeg = new THREE.Group();
     leftLeg.position.set(-0.095, 0.81, 0);
-    leftLeg.add(new THREE.Mesh(g.leg, pantMat));
-    leftLeg.add(new THREE.Mesh(g.shoe, pantMat));
+    leftLeg.add(new THREE.Mesh(g.thigh, pantMat));
+    const leftKnee = new THREE.Group();
+    leftKnee.position.set(0, -0.39, 0);
+    leftKnee.add(new THREE.Mesh(g.shin, pantMat));
+    leftKnee.add(new THREE.Mesh(g.shoe, pantMat));
+    leftLeg.add(leftKnee);
     root.add(leftLeg);
 
     const rightLeg = new THREE.Group();
     rightLeg.position.set(0.095, 0.81, 0);
-    rightLeg.add(new THREE.Mesh(g.leg, pantMat));
-    rightLeg.add(new THREE.Mesh(g.shoe, pantMat));
+    rightLeg.add(new THREE.Mesh(g.thigh, pantMat));
+    const rightKnee = new THREE.Group();
+    rightKnee.position.set(0, -0.39, 0);
+    rightKnee.add(new THREE.Mesh(g.shin, pantMat));
+    rightKnee.add(new THREE.Mesh(g.shoe, pantMat));
+    rightLeg.add(rightKnee);
     root.add(rightLeg);
 
     const torso = new THREE.Mesh(g.torso, outfitMat);
@@ -6156,7 +6167,24 @@
     root.add(hair);
 
     scene.add(root);
-    return { group: root, leftLeg, rightLeg, leftArm, rightArm, ticketMesh };
+    return { group: root, leftLeg, rightLeg, leftKnee, rightKnee, leftArm, rightArm, ticketMesh };
+  }
+
+  function seatNpcActorOnSeat(actor, seat) {
+    // Hips at local y=0.81 -> group.y = floorY - 0.48 places hips cleanly on seat cushion (floorY + 0.33)
+    actor.group.position.set(seat.x, seat.floorY - 0.48, seat.z + 0.04);
+    actor.group.rotation.y = Math.PI;
+    if (seat.isVip) {
+      actor.leftLeg.rotation.x = -1.18;
+      actor.rightLeg.rotation.x = -1.18;
+      actor.leftKnee.rotation.x = 0.55;
+      actor.rightKnee.rotation.x = 0.55;
+    } else {
+      actor.leftLeg.rotation.x = -Math.PI / 2;
+      actor.rightLeg.rotation.x = -Math.PI / 2;
+      actor.leftKnee.rotation.x = Math.PI / 2;
+      actor.rightKnee.rotation.x = Math.PI / 2;
+    }
   }
 
   function buildSeatPathWaypoints(seat) {
@@ -6225,6 +6253,8 @@
         n.state = 'exit_hall';
         n.actor.leftLeg.rotation.x = 0;
         n.actor.rightLeg.rotation.x = 0;
+        n.actor.leftKnee.rotation.x = 0;
+        n.actor.rightKnee.rotation.x = 0;
         n.waypoints = [
           { x: 0.8, z: -95.1 },
           { x: 0.8, z: -74.6 },
@@ -6277,10 +6307,7 @@
         // Already seated inside auditorium watching the live show
         npc.state = 'seated';
         npc.delayTimer = 0;
-        actor.group.position.set(seat.x, seat.floorY + 0.10, seat.z);
-        actor.group.rotation.y = Math.PI;
-        actor.leftLeg.rotation.x = -Math.PI / 2;
-        actor.rightLeg.rotation.x = -Math.PI / 2;
+        seatNpcActorOnSeat(actor, seat);
         ticketBookingState.bookedSeatIds.add(seat.label);
       } else if (idx % 3 === 0) {
         // Queuing/buying at Ticket Counter
@@ -6367,21 +6394,15 @@
           if (n.role === 'shopper') {
             assignNextShopperGoal(n);
           } else if (n.state === 'buying') {
-            // Purchase complete! Grab ticket in hand & sync seat to iPad map
+            // Purchase complete! Grab ticket in hand, sync seat to iPad map, and head straight to Gate 1
             n.actor.ticketMesh.visible = true;
             ticketBookingState.bookedSeatIds.add(n.seat.label);
-            if (active) {
-              n.state = 'to_gate';
-              n.waypoints = [
-                { x: -6.0, z: -71.0 },
-                { x: 0.8, z: -74.6 }
-              ];
-              n.wpIdx = 0;
-            } else {
-              n.state = 'waiting_lounge';
-              n.waypoints = [n.waitSpot];
-              n.wpIdx = 0;
-            }
+            n.state = 'to_gate';
+            n.waypoints = [
+              { x: -6.0, z: -71.0 },
+              { x: 0.8, z: -74.6 }
+            ];
+            n.wpIdx = 0;
           } else if (n.state === 'gate_check') {
             // Checked at Gate 1! Ticket consumed, enter Cinema Hall
             n.actor.ticketMesh.visible = false;
@@ -6428,10 +6449,7 @@
             n.waitTimer = 0.9;
           } else if (n.state === 'enter_hall') {
             n.state = 'seated';
-            pos.set(n.seat.x, n.seat.floorY + 0.10, n.seat.z);
-            n.actor.group.rotation.y = Math.PI;
-            n.actor.leftLeg.rotation.x = -Math.PI / 2;
-            n.actor.rightLeg.rotation.x = -Math.PI / 2;
+            seatNpcActorOnSeat(n.actor, n.seat);
           } else if (n.state === 'exit_hall') {
             scene.remove(n.actor.group);
             spaceNpcState.npcs.splice(i, 1);
