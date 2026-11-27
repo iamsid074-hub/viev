@@ -30,7 +30,10 @@
   let joystickCenter = { x: 0, y: 0 };
   const JOYSTICK_MAX_RADIUS = 36;
   let walkStepTime = 0;
-  const WALK_SPEED = 0.105; // Natural human walking speed
+  const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (('ontouchstart' in window || navigator.maxTouchPoints > 0) && Math.min(window.innerWidth, window.innerHeight) <= 950);
+  const WALK_SPEED = isMobileDevice ? 0.155 : 0.115; // Responsive walking speed
+  let lastMovePerfMs = performance.now();
 
   // Keyboard Movement State (Desktop / Laptop)
   const keysPressed = {
@@ -4072,12 +4075,12 @@
     camera = new THREE.PerspectiveCamera(65, width / height, 0.25, 220);
     camera.position.set(0, cameraY, 3);
 
-    // 3. WebGL Renderer
+    // 3. WebGL Renderer (cap pixelRatio & disable heavy MSAA on mobile for smooth 60fps)
     renderer = new THREE.WebGLRenderer({
       powerPreference: 'high-performance',
-      antialias: true
+      antialias: !isMobileDevice
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(isMobileDevice ? Math.min(window.devicePixelRatio || 1, 1.15) : Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.domElement.id = 'space-three-canvas';
@@ -4457,7 +4460,12 @@
       const moveX = totalX / factor; // strafe right (+1) / left (-1)
       const moveZ = totalY / factor; // forward (-1) / backward (+1)
 
-      const currentSpeed = keysPressed.sprint ? WALK_SPEED * 2.15 : WALK_SPEED;
+      const nowMoveMs = performance.now();
+      const moveDt = Math.min(0.06, Math.max(0.004, (nowMoveMs - lastMovePerfMs) / 1000));
+      lastMovePerfMs = nowMoveMs;
+      const frameScale = moveDt * 60;
+      const joySprintBoost = (isMobileDevice && Math.hypot(joyX, joyY) > 0.72) ? 1.45 : 1.0;
+      const currentSpeed = (keysPressed.sprint ? WALK_SPEED * 2.15 : WALK_SPEED) * joySprintBoost * frameScale;
       const yaw = camera.rotation.y;
 
       // Direction vectors in X-Z ground plane
@@ -5248,11 +5256,11 @@
     bar = document.createElement('div');
     bar.id = 'cinema-gate-prompt';
     bar.style.cssText = [
-      'position:absolute', 'left:50%', 'bottom:76px', 'transform:translateX(-50%)',
-      'z-index:27', 'display:none', 'align-items:center', 'gap:10px',
-      'padding:9px 18px', 'border-radius:999px',
-      'background:rgba(16,14,15,0.88)', 'backdrop-filter:blur(12px)', '-webkit-backdrop-filter:blur(12px)',
-      'border:1px solid rgba(232,196,104,0.58)', 'box-shadow:0 8px 28px rgba(0,0,0,0.5)',
+      'position:absolute', 'left:50%', 'bottom:10px', 'transform:translateX(-50%)',
+      'z-index:27', 'display:none', 'align-items:center', 'gap:6px',
+      'padding:4px 10px', 'border-radius:999px',
+      'background:rgba(16,14,15,0.86)', 'backdrop-filter:blur(10px)', '-webkit-backdrop-filter:blur(10px)',
+      'border:1px solid rgba(232,196,104,0.52)', 'box-shadow:0 4px 16px rgba(0,0,0,0.45)',
       'pointer-events:auto', 'cursor:pointer'
     ].join(';');
     bar.addEventListener('click', (e) => {
@@ -5299,8 +5307,8 @@
     lastGatePromptKey = key;
     bar.style.display = 'flex';
     bar.innerHTML = denied
-      ? '<span style="color:#f87171;font-size:12.5px;font-weight:700;">❌ No Ticket! Buy at Ticket Counter first</span>'
-      : '<span style="color:#f5d580;font-size:13px;font-weight:700;letter-spacing:0.05em;">🎫 Show Ticket · Enter Gate 1</span>';
+      ? '<span style="color:#f87171;font-size:10px;font-weight:700;">❌ No Ticket · Buy at Counter</span>'
+      : '<span style="color:#f5d580;font-size:10.5px;font-weight:700;letter-spacing:0.04em;">🎫 Show Ticket (Gate 1)</span>';
   }
 
   function ensureCinemaSeatBar() {
@@ -5311,19 +5319,19 @@
     bar.style.cssText = [
       'position:absolute',
       'left:50%',
-      'bottom:76px',
+      'bottom:10px',
       'transform:translateX(-50%)',
       'z-index:25',
       'display:none',
       'align-items:center',
-      'gap:8px',
-      'padding:8px 14px',
+      'gap:5px',
+      'padding:4px 9px',
       'border-radius:999px',
-      'background:rgba(16,14,15,0.82)',
-      'backdrop-filter:blur(12px)',
-      '-webkit-backdrop-filter:blur(12px)',
+      'background:rgba(16,14,15,0.84)',
+      'backdrop-filter:blur(10px)',
+      '-webkit-backdrop-filter:blur(10px)',
       'border:1px solid rgba(232,196,104,0.38)',
-      'box-shadow:0 8px 28px rgba(0,0,0,0.45)',
+      'box-shadow:0 4px 16px rgba(0,0,0,0.45)',
       'font-family:inherit',
       'pointer-events:auto'
     ].join(';');
@@ -5436,7 +5444,7 @@
     // Live Video Color Reflections + 4-Zone Intelligent Ambilight Backlight behind Main Screen
     if (sx.ceilBounceLight && sx.floorBounceLight) {
       if (sx.isPlaying && sx.video && sx.video.readyState >= 2 && sx.reflectCtx) {
-        sx.reflectFrame = (sx.reflectFrame + 1) % 3;
+        sx.reflectFrame = (sx.reflectFrame + 1) % (isMobileDevice ? 8 : 3);
         if (sx.reflectFrame === 0) {
           try {
             sx.reflectCtx.drawImage(sx.video, 0, 0, 4, 4);
@@ -5533,13 +5541,13 @@
 
       const lbl = document.createElement('span');
       lbl.textContent = `Seated · ${seatedState.seat.label} · ${showLabel}`;
-      lbl.style.cssText = 'color:#f3d27a;font-size:12px;font-weight:600;letter-spacing:0.06em;margin-right:6px;';
+      lbl.style.cssText = 'color:#f3d27a;font-size:10px;font-weight:600;letter-spacing:0.04em;margin-right:4px;';
       bar.appendChild(lbl);
 
       const standBtn = document.createElement('button');
       standBtn.type = 'button';
       standBtn.textContent = 'Stand Up';
-      standBtn.style.cssText = 'padding:5px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.12);color:#fff;font-size:12px;font-weight:600;cursor:pointer;';
+      standBtn.style.cssText = 'padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.12);color:#fff;font-size:10px;font-weight:600;cursor:pointer;';
       standBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         standUpFromSeat();
@@ -5593,24 +5601,24 @@
     bar.style.display = 'flex';
 
     const title = document.createElement('span');
-    title.textContent = allowed.length ? `Your Seat (${allowed.join(', ')}):` : 'Seats (No Ticket):';
-    title.style.cssText = 'color:rgba(255,255,255,0.72);font-size:12px;font-weight:500;letter-spacing:0.05em;';
+    title.textContent = allowed.length ? `Seat (${allowed.join(', ')}):` : 'No Ticket:';
+    title.style.cssText = 'color:rgba(255,255,255,0.72);font-size:10px;font-weight:600;letter-spacing:0.03em;';
     bar.appendChild(title);
 
     nearbySet.forEach((seat) => {
       const isAllowed = allowed.includes(seat.label);
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.textContent = isAllowed ? seat.label : `🔒 ${seat.label}`;
+      btn.textContent = isAllowed ? seat.label : `🔒${seat.label}`;
       btn.disabled = !isAllowed;
       btn.title = isAllowed ? `Sit in your ticket seat ${seat.label}` : `Only your ticket seat (${allowed.join(', ') || 'None'}) can be used`;
       btn.style.cssText = [
-        'padding:5px 11px',
+        'padding:3px 7px',
         'border-radius:999px',
         isAllowed
           ? 'border:1px solid #f0c966;background:rgba(240,201,102,0.28);color:#ffe49e;cursor:pointer'
           : 'border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.34);cursor:not-allowed',
-        'font-size:12px',
+        'font-size:10px',
         'font-weight:600',
         'transition:transform 0.15s ease,background 0.15s ease'
       ].join(';');
@@ -5671,14 +5679,14 @@
     bar = document.createElement('div');
     bar.id = 'ticket-purchase-bar';
     bar.style.cssText = [
-      'position:absolute', 'left:50%', 'bottom:76px', 'transform:translateX(-50%)',
-      'z-index:26', 'display:none', 'align-items:center', 'gap:10px',
-      'padding:9px 18px', 'border-radius:999px',
-      'background:rgba(16,14,15,0.86)', 'backdrop-filter:blur(12px)', '-webkit-backdrop-filter:blur(12px)',
-      'border:1px solid rgba(232,196,104,0.55)', 'box-shadow:0 8px 28px rgba(0,0,0,0.5)',
+      'position:absolute', 'left:50%', 'bottom:10px', 'transform:translateX(-50%)',
+      'z-index:26', 'display:none', 'align-items:center', 'gap:6px',
+      'padding:4px 11px', 'border-radius:999px',
+      'background:rgba(16,14,15,0.86)', 'backdrop-filter:blur(10px)', '-webkit-backdrop-filter:blur(10px)',
+      'border:1px solid rgba(232,196,104,0.52)', 'box-shadow:0 4px 16px rgba(0,0,0,0.45)',
       'pointer-events:auto', 'cursor:pointer'
     ].join(';');
-    bar.innerHTML = '<span style="color:#f5d580;font-size:13px;font-weight:700;letter-spacing:0.06em;">🎫 PURCHASE TICKETS</span>';
+    bar.innerHTML = '<span style="color:#f5d580;font-size:10.5px;font-weight:700;letter-spacing:0.04em;">🎫 Purchase Tickets</span>';
     bar.addEventListener('click', (e) => {
       e.stopPropagation();
       openTicketIpad();
@@ -6074,11 +6082,11 @@
     bar = document.createElement('div');
     bar.id = 'lounge-sofa-bar';
     bar.style.cssText = [
-      'position:absolute', 'left:50%', 'bottom:76px', 'transform:translateX(-50%)',
-      'z-index:26', 'display:none', 'align-items:center', 'gap:10px',
-      'padding:9px 18px', 'border-radius:999px',
-      'background:rgba(16,14,15,0.86)', 'backdrop-filter:blur(12px)', '-webkit-backdrop-filter:blur(12px)',
-      'border:1px solid rgba(232,196,104,0.55)', 'box-shadow:0 8px 28px rgba(0,0,0,0.5)',
+      'position:absolute', 'left:50%', 'bottom:10px', 'transform:translateX(-50%)',
+      'z-index:26', 'display:none', 'align-items:center', 'gap:6px',
+      'padding:4px 11px', 'border-radius:999px',
+      'background:rgba(16,14,15,0.86)', 'backdrop-filter:blur(10px)', '-webkit-backdrop-filter:blur(10px)',
+      'border:1px solid rgba(232,196,104,0.52)', 'box-shadow:0 4px 16px rgba(0,0,0,0.45)',
       'pointer-events:auto', 'cursor:pointer'
     ].join(';');
     bar.addEventListener('click', (e) => {
@@ -6119,8 +6127,8 @@
     loungeSofaState.lastKey = key;
     bar.style.display = 'flex';
     bar.innerHTML = loungeSofaState.seated
-      ? '<span style="color:#f5d580;font-size:13px;font-weight:700;">🛋️ Relaxing on Sofa · Stand Up (E)</span>'
-      : '<span style="color:#f5d580;font-size:13px;font-weight:700;">🛋️ Sit on Lounge Sofa (E)</span>';
+      ? '<span style="color:#f5d580;font-size:10.5px;font-weight:700;">🛋️ Stand Up</span>'
+      : '<span style="color:#f5d580;font-size:10.5px;font-weight:700;">🛋️ Sit on Sofa</span>';
   }
 
   function updateSeatWayfinderBeacon() {
@@ -6488,7 +6496,12 @@
     const counterDesksZ = [-72.9, -71.0, -69.1];
     const sofaSpotsX = [-11.05, -10.2, -9.35];
 
+    const maxActorCount = isMobileDevice ? Math.min(16, chosenSeats.length) : chosenSeats.length;
     chosenSeats.forEach(({ seat, groupId, groupSlot }, idx) => {
+      if (idx >= maxActorCount) {
+        ticketBookingState.bookedSeatIds.add(seat.label);
+        return;
+      }
       const actor = createNpcActor(idx + 11);
       const isAlreadyLive = !!active;
       const deskIdx = idx % 3;
@@ -6549,8 +6562,9 @@
     spaceNpcState.initialized = true;
     spaceNpcState.lastTickMs = performance.now();
 
-    // 6 Persistent Mall Shoppers browsing promenade & 4 boutiques
-    for (let i = 0; i < 6; i++) {
+    // Persistent Mall Shoppers browsing promenade & 4 boutiques (3 on mobile for 60fps)
+    const shopperCount = isMobileDevice ? 3 : 6;
+    for (let i = 0; i < shopperCount; i++) {
       const actor = createNpcActor(i);
       const startZ = -6 - i * 10;
       actor.group.position.set((Math.random() - 0.5) * 5.0, 0, startZ);
@@ -6578,11 +6592,11 @@
     el = document.createElement('div');
     el.id = 'npc-thought-bubble';
     el.style.cssText = [
-      'position:absolute', 'top:62px', 'left:50%', 'transform:translateX(-50%)',
-      'z-index:28', 'display:none', 'padding:6px 14px', 'border-radius:999px',
-      'background:rgba(15,13,18,0.82)', 'backdrop-filter:blur(10px)', '-webkit-backdrop-filter:blur(10px)',
-      'border:1px solid rgba(242,207,116,0.42)', 'color:#f5d580',
-      'font-size:11.5px', 'font-weight:600', 'letter-spacing:0.03em',
+      'position:absolute', 'bottom:38px', 'left:50%', 'transform:translateX(-50%)',
+      'z-index:28', 'display:none', 'padding:3px 9px', 'border-radius:999px',
+      'background:rgba(15,13,18,0.82)', 'backdrop-filter:blur(8px)', '-webkit-backdrop-filter:blur(8px)',
+      'border:1px solid rgba(242,207,116,0.38)', 'color:#f5d580',
+      'font-size:9.5px', 'font-weight:600', 'letter-spacing:0.02em',
       'pointer-events:none', 'white-space:nowrap'
     ].join(';');
     stageElement.appendChild(el);
@@ -6764,16 +6778,18 @@
             repZ += (pdz / pd) * (1.05 - pd) * 1.6;
           }
         }
-        for (let j = 0; j < spaceNpcState.npcs.length; j++) {
-          if (j === i) continue;
-          const o = spaceNpcState.npcs[j].actor.group.position;
-          if (o.y > 0.5) continue;
-          const odx = pos.x - o.x;
-          const odz = pos.z - o.z;
-          const od = Math.hypot(odx, odz);
-          if (od > 0.01 && od < 0.78) {
-            repX += (odx / od) * (0.78 - od) * 1.2;
-            repZ += (odz / od) * (0.78 - od) * 1.2;
+        if (!isMobileDevice) {
+          for (let j = 0; j < spaceNpcState.npcs.length; j++) {
+            if (j === i) continue;
+            const o = spaceNpcState.npcs[j].actor.group.position;
+            if (o.y > 0.5) continue;
+            const odx = pos.x - o.x;
+            const odz = pos.z - o.z;
+            const od = Math.hypot(odx, odz);
+            if (od > 0.01 && od < 0.78) {
+              repX += (odx / od) * (0.78 - od) * 1.2;
+              repZ += (odz / od) * (0.78 - od) * 1.2;
+            }
           }
         }
         const combX = moveDx + repX;
