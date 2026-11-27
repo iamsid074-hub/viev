@@ -2831,12 +2831,12 @@
       const rowFloorY = totalStairHeight + (r + 1) * rowRise; // 5.32m up to 7.84m
       const rowCenterZ = rowStartZ + r * rowDepth + rowDepth / 2;
 
-      // Solid Inclining Tier Box beside the stair wall
+      // Solid Inclining Tier Box beside the stair wall (inset 4cm so red carpet never pokes into stairwell)
       const tierDeck = new THREE.Mesh(
-        new THREE.BoxGeometry(audW, rowFloorY, rowDepth),
+        new THREE.BoxGeometry(audW - 0.04, rowFloorY, rowDepth),
         hallFloorMat
       );
-      tierDeck.position.set(audCenterX, rowFloorY / 2, rowCenterZ);
+      tierDeck.position.set(audCenterX - 0.02, rowFloorY / 2, rowCenterZ);
       scene.add(tierDeck);
 
       // 3 crisp compact walkway stairs inside each row tier (going UP along +Z)
@@ -2871,32 +2871,40 @@
     const vipFloorY = totalStairHeight + rowCount * rowRise + 0.56; // 8.40m
 
     const vipDeck = new THREE.Mesh(
-      new THREE.BoxGeometry(audW, vipFloorY, vipDeckLen),
+      new THREE.BoxGeometry(audW - 0.04, vipFloorY, vipDeckLen),
       hallFloorMat
     );
-    vipDeck.position.set(audCenterX, vipFloorY / 2, vipDeckStartZ + vipDeckLen / 2);
+    vipDeck.position.set(audCenterX - 0.02, vipFloorY / 2, vipDeckStartZ + vipDeckLen / 2);
     scene.add(vipDeck);
 
-    // Balcony Bridge extending VIP Terrace over the Entry Door Corridor (x = -1.6m to +3.2m, y = 7.90m to 8.40m)
+    // Balcony Bridge extending VIP Terrace over the Entry Door Corridor (matte charcoal underside + carpet top)
     const vipBalconyBridge = new THREE.Mesh(
-      new THREE.BoxGeometry(stairCorridorW, 0.50, vipDeckLen),
-      hallFloorMat
+      new THREE.BoxGeometry(stairCorridorW, 0.50, vipDeckLen - 0.02),
+      hallWallMat
     );
-    vipBalconyBridge.position.set(stairCenterX, vipFloorY - 0.25, vipDeckStartZ + vipDeckLen / 2);
+    vipBalconyBridge.position.set(stairCenterX, vipFloorY - 0.25, vipDeckStartZ + 0.01 + (vipDeckLen - 0.02) / 2);
     scene.add(vipBalconyBridge);
 
-    // Solid Acoustic Balcony Parapet Wall & Brass Cap above the Stairs (x = -1.6m to +3.2m at z = -80.7m)
+    const vipBridgeCarpet = new THREE.Mesh(
+      new THREE.PlaneGeometry(stairCorridorW, vipDeckLen),
+      hallFloorMat
+    );
+    vipBridgeCarpet.rotation.x = -Math.PI / 2;
+    vipBridgeCarpet.position.set(stairCenterX, vipFloorY + 0.005, vipDeckStartZ + vipDeckLen / 2);
+    scene.add(vipBridgeCarpet);
+
+    // Solid Acoustic Balcony Parapet Wall & Brass Cap above the Stairs (offset cleanly to prevent Z-fighting)
     const balconyParapetWall = new THREE.Mesh(
       new THREE.BoxGeometry(stairCorridorW, 1.35, 0.16),
       hallWallMat
     );
-    balconyParapetWall.position.set(stairCenterX, vipFloorY - 0.50 + 0.675, vipDeckStartZ + 0.08);
+    balconyParapetWall.position.set(stairCenterX, vipFloorY - 0.50 + 0.675, vipDeckStartZ + 0.04);
     scene.add(balconyParapetWall);
     const balconyWallCap = new THREE.Mesh(
       new THREE.BoxGeometry(stairCorridorW + 0.02, 0.06, 0.20),
       doorBrassTrimMat
     );
-    balconyWallCap.position.set(stairCenterX, vipFloorY + 0.85, vipDeckStartZ + 0.08);
+    balconyWallCap.position.set(stairCenterX, vipFloorY + 0.85, vipDeckStartZ + 0.04);
     scene.add(balconyWallCap);
 
     // 4 steps in both walkways up to Top VIP Recliner Terrace (0.14m rise each)
@@ -3068,18 +3076,14 @@
     rightScreenWing.position.set(hallMaxX - 0.25, 0, wingZStart);
     scene.add(rightScreenWing);
 
-    // Dynamic Live Screen Reflection Bounce Lights across Entire Cinema Hall (Ceiling, Floor & Seating)
-    const ceilBounceLight = new THREE.PointLight(0xffffff, 0, 55, 1.0);
-    ceilBounceLight.position.set(hallCenterX, 17.2, -95.0);
+    // Dynamic Live Screen Reflection Bounce Lights for Ceiling & Floor
+    const ceilBounceLight = new THREE.PointLight(0xffffff, 0, 40, 1.35);
+    ceilBounceLight.position.set(hallCenterX, 16.5, -96.5);
     scene.add(ceilBounceLight);
 
-    const floorBounceLight = new THREE.PointLight(0xffffff, 0, 50, 1.0);
-    floorBounceLight.position.set(hallCenterX, 8.2, -98.0);
+    const floorBounceLight = new THREE.PointLight(0xffffff, 0, 34, 1.4);
+    floorBounceLight.position.set(hallCenterX, 7.6, -98.5);
     scene.add(floorBounceLight);
-
-    const audWashLight = new THREE.PointLight(0xffffff, 0, 52, 1.0);
-    audWashLight.position.set(audCenterX, 13.5, -86.0);
-    scene.add(audWashLight);
 
     const reflectCanvas = document.createElement('canvas');
     reflectCanvas.width = 4;
@@ -3141,36 +3145,8 @@
     ambTopLight.position.set(hallCenterX, displayY + displayH / 2 + 0.3, zEndWall - hallL + 0.45);
     scene.add(ambTopLight);
 
-    // Live Video Reflection Sheen Planes on Stage Floor & Coffered Ceiling (Exxclusive-style mirror bloom)
-    const floorReflectMat = new THREE.MeshBasicMaterial({
-      map: ambTex,
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    const floorReflectPlane = new THREE.Mesh(new THREE.PlaneGeometry(23.2, 10.0), floorReflectMat);
-    floorReflectPlane.rotation.x = -Math.PI / 2;
-    floorReflectPlane.position.set(hallCenterX, 4.92, -99.8);
-    scene.add(floorReflectPlane);
-
-    const ceilReflectMat = new THREE.MeshBasicMaterial({
-      map: ambTex,
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    const ceilReflectPlane = new THREE.Mesh(new THREE.PlaneGeometry(23.2, 14.0), ceilReflectMat);
-    ceilReflectPlane.rotation.x = Math.PI / 2;
-    ceilReflectPlane.position.set(hallCenterX, hallH - 0.42, -96.5);
-    scene.add(ceilReflectPlane);
-
     cinemaScreenXState.ceilBounceLight = ceilBounceLight;
     cinemaScreenXState.floorBounceLight = floorBounceLight;
-    cinemaScreenXState.audWashLight = audWashLight;
-    cinemaScreenXState.floorReflectMat = floorReflectMat;
-    cinemaScreenXState.ceilReflectMat = ceilReflectMat;
     cinemaScreenXState.reflectCtx = reflectCtx;
     cinemaScreenXState.ambilightMat = ambMat;
     cinemaScreenXState.ambilightTex = ambTex;
@@ -3604,7 +3580,7 @@
       const moveX = totalX / factor; // strafe right (+1) / left (-1)
       const moveZ = totalY / factor; // forward (-1) / backward (+1)
 
-      const currentSpeed = keysPressed.sprint ? WALK_SPEED * 1.55 : WALK_SPEED;
+      const currentSpeed = keysPressed.sprint ? WALK_SPEED * 2.15 : WALK_SPEED;
       const yaw = camera.rotation.y;
 
       // Direction vectors in X-Z ground plane
@@ -4322,29 +4298,22 @@
         }
         sx.ceilBounceLight.color.lerp(sx.bounceColor, 0.14);
         sx.floorBounceLight.color.lerp(sx.bounceColor, 0.14);
-        if (sx.audWashLight) sx.audWashLight.color.lerp(sx.bounceColor, 0.14);
         const lum = (sx.bounceColor.r + sx.bounceColor.g + sx.bounceColor.b) / 3;
-        sx.ceilBounceLight.intensity += (lum * 2.5 - sx.ceilBounceLight.intensity) * 0.12;
-        sx.floorBounceLight.intensity += (lum * 2.3 - sx.floorBounceLight.intensity) * 0.12;
-        if (sx.audWashLight) sx.audWashLight.intensity += (lum * 2.1 - sx.audWashLight.intensity) * 0.12;
+        sx.ceilBounceLight.intensity += (lum * 1.15 - sx.ceilBounceLight.intensity) * 0.12;
+        sx.floorBounceLight.intensity += (lum * 0.95 - sx.floorBounceLight.intensity) * 0.12;
         if (sx.ambilightMat) sx.ambilightMat.opacity += (0.72 - sx.ambilightMat.opacity) * 0.12;
-        if (sx.floorReflectMat) sx.floorReflectMat.opacity += (0.28 - sx.floorReflectMat.opacity) * 0.12;
-        if (sx.ceilReflectMat) sx.ceilReflectMat.opacity += (0.22 - sx.ceilReflectMat.opacity) * 0.12;
         if (sx.ambilightLights) {
           sx.ambilightLights.left.color.copy(sx.ambilightZones.left);
           sx.ambilightLights.right.color.copy(sx.ambilightZones.right);
           sx.ambilightLights.top.color.copy(sx.ambilightZones.top);
-          sx.ambilightLights.left.intensity += (0.75 - sx.ambilightLights.left.intensity) * 0.12;
-          sx.ambilightLights.right.intensity += (0.75 - sx.ambilightLights.right.intensity) * 0.12;
-          sx.ambilightLights.top.intensity += (0.70 - sx.ambilightLights.top.intensity) * 0.12;
+          sx.ambilightLights.left.intensity += (0.55 - sx.ambilightLights.left.intensity) * 0.12;
+          sx.ambilightLights.right.intensity += (0.55 - sx.ambilightLights.right.intensity) * 0.12;
+          sx.ambilightLights.top.intensity += (0.50 - sx.ambilightLights.top.intensity) * 0.12;
         }
       } else {
         sx.ceilBounceLight.intensity += (0 - sx.ceilBounceLight.intensity) * 0.12;
         sx.floorBounceLight.intensity += (0 - sx.floorBounceLight.intensity) * 0.12;
-        if (sx.audWashLight) sx.audWashLight.intensity += (0 - sx.audWashLight.intensity) * 0.12;
         if (sx.ambilightMat) sx.ambilightMat.opacity += (0 - sx.ambilightMat.opacity) * 0.12;
-        if (sx.floorReflectMat) sx.floorReflectMat.opacity += (0 - sx.floorReflectMat.opacity) * 0.12;
-        if (sx.ceilReflectMat) sx.ceilReflectMat.opacity += (0 - sx.ceilReflectMat.opacity) * 0.12;
         if (sx.ambilightLights) {
           sx.ambilightLights.left.intensity += (0 - sx.ambilightLights.left.intensity) * 0.12;
           sx.ambilightLights.right.intensity += (0 - sx.ambilightLights.right.intensity) * 0.12;
