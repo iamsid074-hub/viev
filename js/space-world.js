@@ -2048,7 +2048,7 @@
       cpCtx.stroke();
     }
     // Fine velvet pile micro-grain
-    for (let i = 0; i < 6500; i++) {
+    for (let i = 0; i < 1800; i++) {
       const bright = Math.random() > 0.5;
       cpCtx.fillStyle = bright ? 'rgba(130, 24, 38, 0.24)' : 'rgba(28, 4, 8, 0.30)';
       cpCtx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
@@ -2451,7 +2451,6 @@
     cinemaScreenXState.stepLedMat = stepLedMat;
     cinemaScreenXState.seatArmLedMat = seatArmLedMat;
     cinemaScreenXState.ceilPanelMat = ceilPanelMat;
-    cinemaScreenXState.projGlassMat = projGlassMat;
     cinemaScreenXState.lights = [
       { light: coveWash1, base: 0.75 },
       { light: coveWash2, base: 0.75 }
@@ -2514,21 +2513,21 @@
 
     // Matte Charcoal / Graphite Black Stitched Leather Texture (anti-glare IMAX/Dolby cinema standard)
     const leatherCanvas = document.createElement('canvas');
-    leatherCanvas.width = 256;
-    leatherCanvas.height = 256;
+    leatherCanvas.width = 128;
+    leatherCanvas.height = 128;
     const lCtx = leatherCanvas.getContext('2d');
     lCtx.fillStyle = '#242428';
-    lCtx.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 5000; i++) {
+    lCtx.fillRect(0, 0, 128, 128);
+    for (let i = 0; i < 1200; i++) {
       const d = Math.random() > 0.5 ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.22)';
       lCtx.fillStyle = d;
-      lCtx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+      lCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
     }
     // Subtle stitched graphite perimeter seam
     lCtx.strokeStyle = 'rgba(180, 155, 105, 0.22)';
-    lCtx.setLineDash([5, 4]);
-    lCtx.lineWidth = 2;
-    lCtx.strokeRect(10, 10, 236, 236);
+    lCtx.setLineDash([4, 3]);
+    lCtx.lineWidth = 1.5;
+    lCtx.strokeRect(6, 6, 116, 116);
     const leatherTex = new THREE.CanvasTexture(leatherCanvas);
     leatherTex.colorSpace = THREE.SRGBColorSpace;
 
@@ -2537,21 +2536,21 @@
     function getSeatHeadMat(label) {
       if (seatHeadMatCache[label]) return seatHeadMatCache[label];
       const c = document.createElement('canvas');
-      c.width = 256;
-      c.height = 128;
+      c.width = 128;
+      c.height = 64;
       const ctx = c.getContext('2d');
       ctx.fillStyle = '#242428';
-      ctx.fillRect(0, 0, 256, 128);
+      ctx.fillRect(0, 0, 128, 64);
       ctx.strokeStyle = 'rgba(180, 155, 105, 0.22)';
-      ctx.setLineDash([4, 4]);
-      ctx.lineWidth = 2;
-      ctx.strokeRect(8, 8, 240, 112);
+      ctx.setLineDash([3, 3]);
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(4, 4, 120, 56);
       ctx.setLineDash([]);
-      ctx.font = '700 54px "Cinzel", Georgia, serif';
+      ctx.font = '700 28px "Cinzel", Georgia, serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#d4b262';
-      ctx.fillText(label, 128, 65);
+      ctx.fillText(label, 64, 33);
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
       const mat = new THREE.MeshStandardMaterial({
@@ -2587,7 +2586,7 @@
       const geo = new THREE.ExtrudeGeometry(shape, {
         depth: width,
         bevelEnabled: true,
-        bevelSegments: 4,
+        bevelSegments: 2,
         steps: 1,
         bevelSize: bevelSize,
         bevelThickness: bevelThick
@@ -2929,6 +2928,7 @@
       roughness: 0.15,
       metalness: 0.8
     });
+    cinemaScreenXState.projGlassMat = projGlassMat;
     const projGlass = new THREE.Mesh(new THREE.PlaneGeometry(3.45, 1.02), projGlassMat);
     projGlass.rotation.y = Math.PI;
     projGlass.position.set(audCenterX, 11.8, zEndWall - 0.13);
@@ -3077,7 +3077,7 @@
     sxVideo.src = 'video/exxclusive.mp4';
     sxVideo.loop = true;
     sxVideo.playsInline = true;
-    sxVideo.preload = 'metadata';
+    sxVideo.preload = 'none';
     sxVideo.crossOrigin = 'anonymous';
     sxVideo.muted = false;
     const sxTex = new THREE.VideoTexture(sxVideo);
