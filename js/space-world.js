@@ -2449,7 +2449,6 @@
     cinemaScreenXState.coveMat = ceilCoveLedMat;
     cinemaScreenXState.downlightMat = downlightDiscMat;
     cinemaScreenXState.stepLedMat = stepLedMat;
-    cinemaScreenXState.seatArmLedMat = seatArmLedMat;
     cinemaScreenXState.ceilPanelMat = ceilPanelMat;
     cinemaScreenXState.lights = [
       { light: coveWash1, base: 0.75 },
@@ -2580,6 +2579,7 @@
       emissiveIntensity: 0.50,
       roughness: 0.25
     });
+    cinemaScreenXState.seatArmLedMat = seatArmLedMat;
 
     // Helper: Extrude a 2D (z, y) side profile centered on X = 0 with smooth rounded bevels
     function makeSculptedProfile(shape, width, bevelSize, bevelThick) {
