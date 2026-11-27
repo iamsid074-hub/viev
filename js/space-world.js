@@ -2110,10 +2110,10 @@
     leftRoomDoorState.frontLeaf = createGlassDoorLeaf(true);
     leftRoomDoorState.backLeaf = createGlassDoorLeaf(false);
 
-    // Small Room Inside: Dark Chocolate Walls (0x24130c) + Dark Wood Plank Flooring (x = -6m to -14m, z = -66m to -76m)
-    const lrW = 8.0;
+    // Spacious Ticket Room Inside: Dark Chocolate Walls (0x26140d) + Minimal Slate Flooring (x = -6m to -20.5m, z = -66m to -76m)
+    const lrW = 14.5;
     const lrL = 10.0;
-    const lrCenterX = -halfW - lrW / 2; // -10.0m
+    const lrCenterX = -halfW - lrW / 2; // -13.25m
     const lrCenterZ = -71.0;
 
     // Minimal Matte Dark Espresso-Slate Micro-Cement Flooring (clean, stripe-free luxury finish)
@@ -2179,9 +2179,38 @@
     lrRearWall.position.set(lrCenterX, halfH, -75.96);
     scene.add(lrRearWall);
 
-    const lrLight = new THREE.PointLight(0xffddb0, 0.95, 18, 1.8);
-    lrLight.position.set(lrCenterX, MALL_HEIGHT - 0.6, lrCenterZ);
+    const lrLight = new THREE.PointLight(0xffddb0, 0.95, 22, 1.7);
+    lrLight.position.set(-halfW - lrW * 0.3, MALL_HEIGHT - 0.6, lrCenterZ);
     scene.add(lrLight);
+
+    const lrLight2 = new THREE.PointLight(0xffddb0, 0.95, 22, 1.7);
+    lrLight2.position.set(-halfW - lrW * 0.72, MALL_HEIGHT - 0.6, lrCenterZ);
+    scene.add(lrLight2);
+
+    // Architectural "TICKETS · BOX OFFICE" Gold Plaque above Glass Double Door
+    const tSignCanvas = document.createElement('canvas');
+    tSignCanvas.width = 512;
+    tSignCanvas.height = 128;
+    const tsCtx = tSignCanvas.getContext('2d');
+    tsCtx.fillStyle = '#140c08';
+    tsCtx.fillRect(0, 0, 512, 128);
+    tsCtx.strokeStyle = '#d4af37';
+    tsCtx.lineWidth = 4;
+    tsCtx.strokeRect(8, 8, 496, 112);
+    tsCtx.font = '600 42px "Cinzel", Georgia, serif';
+    tsCtx.textAlign = 'center';
+    tsCtx.textBaseline = 'middle';
+    tsCtx.fillStyle = '#f2cf74';
+    tsCtx.fillText('TICKET LOUNGE', 256, 66);
+    const tSignTex = new THREE.CanvasTexture(tSignCanvas);
+    tSignTex.colorSpace = THREE.SRGBColorSpace;
+    const ticketSignMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.6, 0.65),
+      new THREE.MeshStandardMaterial({ map: tSignTex, emissiveMap: tSignTex, emissive: new THREE.Color(0xffe08a), emissiveIntensity: 0.35, roughness: 0.35 })
+    );
+    ticketSignMesh.rotation.y = Math.PI / 2;
+    ticketSignMesh.position.set(-halfW + 0.22, lrDoorH + 0.55, lrDoorZ);
+    scene.add(ticketSignMesh);
 
     // 5.1. RIGHT-SIDE ENTRY WALLED STAIRCASE (>10 STEPS, HIGH RISE) & AUDITORIUM CINEMA HALL (z = -76m to -105m)
     const hallW = 24.0;
@@ -3764,8 +3793,8 @@
           nextX = Math.min(2.55, Math.max(-0.95, nextX));
         }
       } else if (camera.position.z < -66.0) {
-        // Corridor tail (-5.2m to +5.2m) + Left Dark Chocolate Room (-13.2m to -6.5m)
-        nextX = Math.min(5.2, Math.max(-13.2, nextX));
+        // Corridor tail (-5.2m to +5.2m) + Expanded Ticket Room (-19.7m to -6.5m)
+        nextX = Math.min(5.2, Math.max(-19.7, nextX));
         // Glass Double Doorway collision at x = -6.0m (passable only when open & aligned with doorway)
         if (Math.abs(nextX - leftRoomDoorState.doorX) < 0.55) {
           const inGlassDoor = Math.abs(camera.position.z - leftRoomDoorState.doorZ) < 1.35 && leftRoomDoorState.openProgress > 0.35;
