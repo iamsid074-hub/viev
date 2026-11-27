@@ -5235,17 +5235,18 @@
   function ensureCornerTicketBadge() {
     let badge = document.getElementById('corner-ticket-badge');
     if (badge) return badge;
+    const host = stageElement || document.body;
     badge = document.createElement('div');
     badge.id = 'corner-ticket-badge';
     badge.style.cssText = [
-      'position:fixed', 'top:14px', 'right:14px', 'z-index:45', 'display:none',
+      'position:absolute', 'top:14px', 'right:14px', 'z-index:9990', 'display:none',
       'border-radius:6px',
       'background:linear-gradient(145deg, #f6f4ef, #e9e5dc)',
       'box-shadow:0 10px 28px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(0,0,0,0.1)',
       'color:#151515', 'font-family:"Courier New", monospace', 'pointer-events:auto',
       'overflow:hidden', 'max-width:295px'
     ].join(';');
-    document.body.appendChild(badge);
+    host.appendChild(badge);
     return badge;
   }
 
@@ -5308,18 +5309,19 @@
   function renderTicketIpad() {
     let ov = document.getElementById('ticket-ipad-overlay');
     if (!ov) {
+      const host = stageElement || document.body;
       ov = document.createElement('div');
       ov.id = 'ticket-ipad-overlay';
       ov.style.cssText = [
-        'position:fixed', 'inset:0', 'z-index:60', 'display:none',
+        'position:absolute', 'inset:0', 'z-index:9999', 'display:none',
         'align-items:center', 'justify-content:center',
         'background:rgba(6,5,8,0.72)', 'backdrop-filter:blur(8px)', '-webkit-backdrop-filter:blur(8px)',
-        'padding:16px'
+        'padding:16px', 'pointer-events:auto'
       ].join(';');
       ov.addEventListener('click', (e) => {
         if (e.target === ov) closeTicketIpad();
       });
-      document.body.appendChild(ov);
+      host.appendChild(ov);
     }
     ov.style.display = 'flex';
 
