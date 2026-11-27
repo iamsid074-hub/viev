@@ -4410,6 +4410,12 @@
    */
   function updatePlayerMovement() {
     if (!camera || ticketBookingState.isOpen) return;
+    if (loungeSofaState.seated) {
+      camera.position.x += (-10.2 - camera.position.x) * 0.2;
+      camera.position.z += (-75.05 - camera.position.z) * 0.2;
+      camera.position.y += (1.16 - camera.position.y) * 0.2;
+      return;
+    }
 
     // 1. Discrete Keyboard Multi-Key Vector
     let keyX = 0;
@@ -5168,13 +5174,27 @@
     });
 
     ctx.textAlign = 'center';
-    ctx.fillStyle = active ? '#4ade80' : '#94a3b8';
+    ctx.fillStyle = active ? '#4ade80' : '#38bdf8';
     ctx.font = 'bold 23px Arial, sans-serif';
-    ctx.fillText(
-      active ? `● NOW SCREENING IN HALL 1: ${active.show.name} (${active.slot.label})` : 'AUTO-PLAY ENABLED · SHOW STARTS AT SCHEDULED TIME',
-      512,
-      628
-    );
+    let footerMsg = 'ALL SHOWS COMPLETED FOR TODAY';
+    if (active) {
+      const rem = Math.max(1, active.slot.endMin - totalMin);
+      footerMsg = `● LIVE NOW: ${active.show.name} (${active.slot.label})  ·  ${rem}m REMAINING`;
+    } else {
+      let nextUp = null;
+      for (const sh of VIEV_SHOW_SCHEDULE) {
+        for (const sl of sh.slots) {
+          if (sl.startMin > totalMin && (!nextUp || sl.startMin < nextUp.sl.startMin)) {
+            nextUp = { sh, sl };
+          }
+        }
+      }
+      if (nextUp) {
+        const minsLeft = nextUp.sl.startMin - totalMin;
+        footerMsg = `NEXT SHOW: ${nextUp.sh.name} IN ${minsLeft}m  (${nextUp.sl.label})`;
+      }
+    }
+    ctx.fillText(footerMsg, 512, 628);
     siteTimeEngine.schedTex.needsUpdate = true;
   }
 
@@ -5241,6 +5261,7 @@
         // Consume 1 ticket for 1 entry, save allowed seats, and open Gate 1 automatically
         cinemaGateAccessState.allowedSeats = [...ticketBookingState.confirmedTicket.seats];
         ticketBookingState.confirmedTicket = null;
+        try { localStorage.removeItem('viev_confirmed_ticket'); } catch (_) { }
         cinemaGateAccessState.unlocked = true;
         cinemaGateAccessState.wasInside = false;
         const zoomOv = document.getElementById('ticket-zoom-overlay');
@@ -5612,7 +5633,12 @@
     selectedTime: '1:00 PM',
     selectedSeats: [],
     paymentMethod: 'UPI / QR',
-    confirmedTicket: null,
+    confirmedTicket: (() => {
+      try {
+        const raw = localStorage.getItem('viev_confirmed_ticket');
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) { return null; }
+    })(),
     bookedSeatIds: new Set(['C4', 'C5', 'D6', 'D7', 'E5', 'V6'])
   };
 
@@ -5756,6 +5782,10 @@
     badge.style.display = 'block';
     const seatLabel = t.seats.join(', ');
     const isVip = t.seats.some(s => s.startsWith('V'));
+    const slotMatch = TICKET_TIMINGS.find(s => s.time === t.time);
+    const { totalMin } = getVievClockParts();
+    const minsToShow = slotMatch ? (slotMatch.startMin - totalMin) : 99;
+    const isUrgent = minsToShow <= 5 && minsToShow >= -25;
     badge.innerHTML = `
       <div style="display:flex;align-items:stretch;">
         <div style="padding:8px 10px;border-right:1.5px dashed #8a867e;flex:1;min-width:170px;">
@@ -5770,6 +5800,7 @@
             <div>DATE: NOV 27, 2026 · TIME: ${t.time}</div>
             <div>ADMISSION: ₹${t.total} · TKT-09876</div>
           </div>
+          ${isUrgent ? '<div style="margin-top:4px;padding:2px 5px;border-radius:4px;background:#b91c1c;color:#fff;font-family:Arial,sans-serif;font-size:7.5px;font-weight:800;text-align:center;">🔔 SHOW STARTING · HEAD TO GATE 1</div>' : ''}
           <div style="margin-top:5px;height:14px;width:100%;background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 3.5px,#111 3.5px 4.5px,transparent 4.5px 7px,#111 7px 9px,transparent 9px 11px);"></div>
         </div>
         <div style="padding:8px 7px;width:72px;display:flex;flex-direction:column;justify-content:space-between;background:rgba(0,0,0,0.02);">
@@ -5832,18 +5863,25 @@
       const timingPills = TICKET_TIMINGS.map(s => {
         const active = s.time === ticketBookingState.selectedTime;
         const expired = totalMin >= s.startMin;
-        return `<button type="button" data-time="${s.time}" style="flex:0 0 auto;padding:9px 16px;border-radius:999px;border:1px solid ${active ? '#f2cf74' : 'rgba(255,255,255,0.18)'};background:${active ? 'linear-gradient(135deg,#f2cf74,#c89d42)' : 'rgba(255,255,255,0.06)'};color:${active ? '#160e08' : '#fff'};opacity:${expired ? '0.42' : '1'};text-decoration:${expired ? 'line-through' : 'none'};font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">${s.time}</button>`;
+        const crowd = SHOW_CROWD_PROFILES[s.time] || 28;
+        const dot = expired ? '⚪' : (crowd >= 95 ? '🔴' : (crowd >= 55 ? '🟠' : '🟢'));
+        const tag = expired ? '' : (crowd >= 95 ? ' · FULL' : (crowd >= 55 ? ' · FAST' : ''));
+        return `<button type="button" data-time="${s.time}" style="flex:0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid ${active ? '#f2cf74' : 'rgba(255,255,255,0.18)'};background:${active ? 'linear-gradient(135deg,#f2cf74,#c89d42)' : 'rgba(255,255,255,0.06)'};color:${active ? '#160e08' : '#fff'};opacity:${expired ? '0.42' : '1'};text-decoration:${expired ? 'line-through' : 'none'};font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">${dot} ${s.time}${tag}</button>`;
       }).join('');
 
+      const posterSrc = slot.showName === 'MANGAL RANG' ? 'assets/ramayana_logo.png' : 'assets/video/shop3_poster.jpg';
+      const showDesc = slot.showName === 'MANGAL RANG'
+        ? 'Divine orchestral epic from VIEV Exxclusive · Experience in 270° panoramic ScreenX & Dolby Atmos.'
+        : 'High-energy live music video premiere · Experience in VIEV Luxe Hall 1 with Dolby Atmos sound.';
       const showContent = (slot.hasShow && !isSlotExpired)
         ? `
           <div style="display:flex;gap:20px;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(242,207,116,0.28);border-radius:18px;padding:16px;margin-top:16px;flex-wrap:wrap;">
-            <img src="assets/300-days-poster.jpg" alt="300 DAYS" style="width:128px;height:210px;object-fit:cover;border-radius:12px;border:1px solid rgba(242,207,116,0.35);flex-shrink:0;" />
+            <img src="${posterSrc}" alt="${slot.showName}" style="width:136px;height:190px;object-fit:contain;background:#0a080c;padding:8px;border-radius:12px;border:1px solid rgba(242,207,116,0.35);flex-shrink:0;" />
             <div style="flex:1;min-width:220px;">
-              <div style="display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(242,207,116,0.16);color:#f2cf74;font-size:10.5px;font-weight:700;letter-spacing:0.1em;">NOW SHOWING · ${slot.time}</div>
+              <div style="display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(242,207,116,0.16);color:#f2cf74;font-size:10.5px;font-weight:700;letter-spacing:0.1em;">UPCOMING · ${slot.time}</div>
               <h2 style="margin:10px 0 4px;font-size:26px;color:#fff;letter-spacing:0.04em;">${slot.showName}</h2>
-              <div style="font-size:12.5px;color:rgba(255,255,255,0.72);margin-bottom:10px;">${slot.format} · 2h 18m · VIEV LUXE HALL 1</div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.62);line-height:1.5;margin-bottom:16px;">No distance can keep them apart. Experience the romance in full 270° panoramic ScreenX &amp; Dolby Atmos sound.</div>
+              <div style="font-size:12.5px;color:rgba(255,255,255,0.72);margin-bottom:10px;">${slot.format} · VIEV LUXE HALL 1</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.62);line-height:1.5;margin-bottom:16px;">${showDesc}</div>
               <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                 <button type="button" id="ipad-go-seats" style="padding:11px 22px;border-radius:12px;border:none;background:linear-gradient(135deg,#f2cf74,#c89d42);color:#160e08;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:0.04em;">Select Seats →</button>
                 <span style="font-size:11.5px;color:rgba(255,255,255,0.6);">From ₹250 · VIP ₹850</span>
@@ -5916,7 +5954,10 @@
             Seats: <strong style="color:#f2cf74;">${ticketBookingState.selectedSeats.length ? ticketBookingState.selectedSeats.join(', ') : 'None'}</strong>
             <span style="margin-left:10px;">Total: <strong style="color:#4ade80;">₹${totalAmount}</strong></span>
           </div>
-          <button type="button" id="ipad-go-pay" ${ticketBookingState.selectedSeats.length === 0 ? 'disabled' : ''} style="padding:9px 20px;border-radius:10px;border:none;background:${ticketBookingState.selectedSeats.length ? 'linear-gradient(135deg,#f2cf74,#c89d42)' : 'rgba(255,255,255,0.12)'};color:${ticketBookingState.selectedSeats.length ? '#160e08' : 'rgba(255,255,255,0.4)'};font-size:12.5px;font-weight:800;cursor:${ticketBookingState.selectedSeats.length ? 'pointer' : 'not-allowed'};">Next → Payment</button>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button type="button" id="ipad-best-seat" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(242,207,116,0.5);background:rgba(242,207,116,0.14);color:#f2cf74;font-size:12px;font-weight:700;cursor:pointer;">✨ Best Seat</button>
+            <button type="button" id="ipad-go-pay" ${ticketBookingState.selectedSeats.length === 0 ? 'disabled' : ''} style="padding:9px 20px;border-radius:10px;border:none;background:${ticketBookingState.selectedSeats.length ? 'linear-gradient(135deg,#f2cf74,#c89d42)' : 'rgba(255,255,255,0.12)'};color:${ticketBookingState.selectedSeats.length ? '#160e08' : 'rgba(255,255,255,0.4)'};font-size:12.5px;font-weight:800;cursor:${ticketBookingState.selectedSeats.length ? 'pointer' : 'not-allowed'};">Next → Payment</button>
+          </div>
         </div>
       `;
     } else {
@@ -5985,6 +6026,15 @@
         renderTicketIpad();
       });
     });
+    ov.querySelector('#ipad-best-seat')?.addEventListener('click', () => {
+      const preferred = ['D7', 'D6', 'E7', 'E6', 'F7', 'F6', 'V6', 'V5', 'C7', 'C6', 'G7', 'G6'];
+      const pick = preferred.find(id => !ticketBookingState.bookedSeatIds.has(id)) ||
+        (cinemaSeats.find(s => !ticketBookingState.bookedSeatIds.has(s.label))?.label);
+      if (pick) {
+        ticketBookingState.selectedSeats = [pick];
+        renderTicketIpad();
+      }
+    });
     ov.querySelector('#ipad-go-pay')?.addEventListener('click', () => {
       if (ticketBookingState.selectedSeats.length > 0) {
         ticketBookingState.step = 'payment';
@@ -6009,8 +6059,113 @@
         seats: [...ticketBookingState.selectedSeats],
         total: totalAmount
       };
+      try { localStorage.setItem('viev_confirmed_ticket', JSON.stringify(ticketBookingState.confirmedTicket)); } catch (_) { }
       closeTicketIpad();
       updateCornerTicketBadge();
+    });
+  }
+
+  const loungeSofaState = { seated: false, lastKey: '' };
+  let seatWayfinderBeacon = null;
+
+  function ensureLoungeSofaBar() {
+    let bar = document.getElementById('lounge-sofa-bar');
+    if (bar || !stageElement) return bar;
+    bar = document.createElement('div');
+    bar.id = 'lounge-sofa-bar';
+    bar.style.cssText = [
+      'position:absolute', 'left:50%', 'bottom:76px', 'transform:translateX(-50%)',
+      'z-index:26', 'display:none', 'align-items:center', 'gap:10px',
+      'padding:9px 18px', 'border-radius:999px',
+      'background:rgba(16,14,15,0.86)', 'backdrop-filter:blur(12px)', '-webkit-backdrop-filter:blur(12px)',
+      'border:1px solid rgba(232,196,104,0.55)', 'box-shadow:0 8px 28px rgba(0,0,0,0.5)',
+      'pointer-events:auto', 'cursor:pointer'
+    ].join(';');
+    bar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleLoungeSofaSit();
+    });
+    stageElement.appendChild(bar);
+    return bar;
+  }
+
+  function toggleLoungeSofaSit() {
+    if (loungeSofaState.seated) {
+      loungeSofaState.seated = false;
+      if (camera) {
+        camera.position.z = -74.0;
+        camera.position.y = cameraY;
+      }
+    } else {
+      loungeSofaState.seated = true;
+    }
+    loungeSofaState.lastKey = '';
+  }
+
+  function updateLoungeSofaPrompt() {
+    const bar = ensureLoungeSofaBar();
+    if (!bar || !camera) return;
+    const nearSofa = !ticketBookingState.isOpen &&
+      (loungeSofaState.seated || (camera.position.x >= -12.6 && camera.position.x <= -7.8 && camera.position.z >= -75.8 && camera.position.z <= -72.8));
+    if (!nearSofa) {
+      if (loungeSofaState.lastKey !== 'hidden') {
+        loungeSofaState.lastKey = 'hidden';
+        bar.style.display = 'none';
+      }
+      return;
+    }
+    const key = loungeSofaState.seated ? 'seated' : 'sit';
+    if (loungeSofaState.lastKey === key) return;
+    loungeSofaState.lastKey = key;
+    bar.style.display = 'flex';
+    bar.innerHTML = loungeSofaState.seated
+      ? '<span style="color:#f5d580;font-size:13px;font-weight:700;">🛋️ Relaxing on Sofa · Stand Up (E)</span>'
+      : '<span style="color:#f5d580;font-size:13px;font-weight:700;">🛋️ Sit on Lounge Sofa (E)</span>';
+  }
+
+  function updateSeatWayfinderBeacon() {
+    if (!scene || !camera) return;
+    const allowed = cinemaGateAccessState.allowedSeats || [];
+    const showBeacon = camera.position.z < -76.2 && !seatedState.active && allowed.length > 0;
+    if (!showBeacon) {
+      if (seatWayfinderBeacon) seatWayfinderBeacon.visible = false;
+      return;
+    }
+    const targetSeat = cinemaSeats.find(s => s.label === allowed[0]);
+    if (!targetSeat) {
+      if (seatWayfinderBeacon) seatWayfinderBeacon.visible = false;
+      return;
+    }
+    if (!seatWayfinderBeacon) {
+      const geo = new THREE.OctahedronGeometry(0.18, 0);
+      const mat = new THREE.MeshBasicMaterial({ color: 0xf5d580 });
+      seatWayfinderBeacon = new THREE.Mesh(geo, mat);
+      scene.add(seatWayfinderBeacon);
+    }
+    seatWayfinderBeacon.visible = true;
+    const bob = Math.sin(performance.now() * 0.004) * 0.14;
+    seatWayfinderBeacon.position.set(targetSeat.x, targetSeat.floorY + 1.55 + bob, targetSeat.z);
+    seatWayfinderBeacon.rotation.y += 0.035;
+  }
+
+  if (!window.__vievSpaceKeyShortcutBound) {
+    window.__vievSpaceKeyShortcutBound = true;
+    window.addEventListener('keydown', (e) => {
+      if (!isRunning || (e.key !== 'e' && e.key !== 'E') || ticketBookingState.isOpen) return;
+      const pBar = document.getElementById('ticket-purchase-bar');
+      if (pBar && pBar.style.display !== 'none') {
+        openTicketIpad();
+        return;
+      }
+      const gBar = document.getElementById('cinema-gate-prompt');
+      if (gBar && gBar.style.display !== 'none') {
+        gBar.click();
+        return;
+      }
+      const sBar = document.getElementById('lounge-sofa-bar');
+      if (sBar && sBar.style.display !== 'none') {
+        toggleLoungeSofaSit();
+      }
     });
   }
 
@@ -6698,7 +6853,9 @@
     updateCinemaScreenX();
     updateCinemaSeatPrompt();
     updateTicketCounterPrompt();
+    updateLoungeSofaPrompt();
     updateCinemaGatePrompt();
+    updateSeatWayfinderBeacon();
     updateCornerTicketBadge();
     updateSiteClockTexture(false);
 
