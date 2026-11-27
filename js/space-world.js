@@ -5238,13 +5238,12 @@
     badge = document.createElement('div');
     badge.id = 'corner-ticket-badge';
     badge.style.cssText = [
-      'position:fixed', 'top:16px', 'right:16px', 'z-index:45', 'display:none',
-      'padding:10px 14px', 'border-radius:12px',
-      'background:linear-gradient(135deg, rgba(24,16,18,0.92), rgba(14,10,12,0.95))',
-      'backdrop-filter:blur(12px)', '-webkit-backdrop-filter:blur(12px)',
-      'border:1px solid rgba(240,201,102,0.65)',
-      'box-shadow:0 8px 24px rgba(0,0,0,0.55)',
-      'color:#fff', 'font-family:inherit', 'min-width:175px', 'pointer-events:auto'
+      'position:fixed', 'top:14px', 'right:14px', 'z-index:45', 'display:none',
+      'border-radius:6px',
+      'background:linear-gradient(145deg, #f6f4ef, #e9e5dc)',
+      'box-shadow:0 10px 28px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(0,0,0,0.1)',
+      'color:#151515', 'font-family:"Courier New", monospace', 'pointer-events:auto',
+      'overflow:hidden', 'max-width:295px'
     ].join(';');
     document.body.appendChild(badge);
     return badge;
@@ -5260,14 +5259,35 @@
       return;
     }
     badge.style.display = 'block';
+    const seatLabel = t.seats.join(', ');
+    const isVip = t.seats.some(s => s.startsWith('V'));
     badge.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
-        <span style="color:#f2cf74;font-size:10px;font-weight:800;letter-spacing:0.12em;">🎫 VIEV E-TICKET</span>
-        <span style="color:#4ade80;font-size:9px;font-weight:700;background:rgba(74,222,128,0.14);padding:2px 6px;border-radius:999px;">CONFIRMED</span>
+      <div style="display:flex;align-items:stretch;">
+        <div style="padding:8px 10px;border-right:1.5px dashed #8a867e;flex:1;min-width:170px;">
+          <div style="display:flex;justify-content:space-between;font-size:7.5px;font-weight:700;letter-spacing:0.04em;color:#333;">
+            <span>VIEV .inc CINEMAS</span>
+            <span>#20261127-0042</span>
+          </div>
+          <div style="font-family:Arial,sans-serif;font-size:13px;font-weight:900;color:#111;margin-top:3px;letter-spacing:0.02em;">300 DAYS <span style="font-size:8.5px;font-weight:600;color:#444;">(PG-13)</span></div>
+          <div style="font-size:8px;color:#444;margin-bottom:4px;">(∞) To Go. · 141 Min</div>
+          <div style="font-family:Arial,sans-serif;font-size:10px;font-weight:800;color:#111;margin-bottom:3px;">HALL: 01 | SEAT: ${seatLabel}${isVip ? ' (VIP)' : ''}</div>
+          <div style="font-size:7.5px;color:#333;line-height:1.35;">
+            <div>DATE: NOV 27, 2026 · TIME: ${t.time}</div>
+            <div>ADMISSION: ₹${t.total} · TKT-09876</div>
+          </div>
+          <div style="margin-top:5px;height:14px;width:100%;background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 3.5px,#111 3.5px 4.5px,transparent 4.5px 7px,#111 7px 9px,transparent 9px 11px);"></div>
+        </div>
+        <div style="padding:8px 7px;width:72px;display:flex;flex-direction:column;justify-content:space-between;background:rgba(0,0,0,0.02);">
+          <div>
+            <div style="font-size:7.5px;font-weight:700;color:#333;">VIEV .inc</div>
+            <div style="font-family:Arial,sans-serif;font-size:9px;font-weight:900;color:#111;margin-top:2px;">300 DAYS</div>
+            <div style="font-size:7px;color:#444;margin-top:2px;">${t.time}</div>
+            <div style="font-size:7.5px;font-weight:700;color:#111;margin-top:3px;">HALL 01</div>
+            <div style="font-size:7.5px;font-weight:800;color:#111;">${seatLabel}</div>
+          </div>
+          <div style="font-size:8px;font-weight:800;color:#111;">₹${t.total}</div>
+        </div>
       </div>
-      <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.03em;">${t.movie}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.78);margin-top:2px;">${t.time} · Seats: <strong style="color:#f5d580;">${t.seats.join(', ')}</strong></div>
-      <div style="font-size:9.5px;color:rgba(242,207,116,0.72);margin-top:5px;border-top:1px dashed rgba(255,255,255,0.16);padding-top:4px;">Walk into Cinema Hall to use</div>
     `;
   }
 
