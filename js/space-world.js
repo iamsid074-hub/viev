@@ -2520,16 +2520,349 @@
       scene.add(pGroup);
     });
 
-    // Luxury Burgundy Velvet Sofa Cutout PNG (Right Side, z = -75.20)
-    const luxurySofaTex = textureLoader.load('assets/luxury-sofa.png');
-    luxurySofaTex.colorSpace = THREE.SRGBColorSpace;
-    const luxurySofaMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(3.05, 1.48),
-      new THREE.MeshBasicMaterial({ map: luxurySofaTex, transparent: true, alphaTest: 0.08, side: THREE.DoubleSide })
-    );
-    luxurySofaMesh.position.set(-10.2, 0.74, -75.20);
-    luxurySofaMesh.rotation.y = 0.16;
-    scene.add(luxurySofaMesh);
+    // Luxury Sculpted Burgundy Velvet 3-Seater Sofa with Brushed-Gold Base & Plump Damask Pillows (Right Side, z = -75.35)
+    const sofaGroup = new THREE.Group();
+    sofaGroup.position.set(-10.2, 0, -75.35);
+
+    // Rich Deep Oxblood Crushed-Velvet Texture (contrasts cleanly with lighter Wine-Red walls)
+    const velvetCanv = document.createElement('canvas');
+    velvetCanv.width = 256;
+    velvetCanv.height = 256;
+    const vCtx = velvetCanv.getContext('2d');
+    const vGrad = vCtx.createLinearGradient(0, 0, 256, 256);
+    vGrad.addColorStop(0, '#360814');
+    vGrad.addColorStop(0.5, '#25050d');
+    vGrad.addColorStop(1, '#3d0a17');
+    vCtx.fillStyle = vGrad;
+    vCtx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 2400; i++) {
+      vCtx.fillStyle = i % 2 === 0 ? 'rgba(255,190,205,0.03)' : 'rgba(0,0,0,0.06)';
+      vCtx.fillRect((i * 73) % 256, (i * 137) % 256, 2, 2);
+    }
+    const velvetTex = new THREE.CanvasTexture(velvetCanv);
+    velvetTex.colorSpace = THREE.SRGBColorSpace;
+    velvetTex.wrapS = velvetTex.wrapT = THREE.RepeatWrapping;
+    const sofaVelvetMat = new THREE.MeshStandardMaterial({ map: velvetTex, roughness: 0.72, metalness: 0.08 });
+
+    // Damask Gold & Deep Emerald Pillow Textures
+    const damaskCanv = document.createElement('canvas');
+    damaskCanv.width = 128;
+    damaskCanv.height = 128;
+    const dCtx = damaskCanv.getContext('2d');
+    dCtx.fillStyle = '#9c7832';
+    dCtx.fillRect(0, 0, 128, 128);
+    dCtx.strokeStyle = 'rgba(245,215,130,0.45)';
+    dCtx.lineWidth = 2;
+    for (let y = 8; y < 128; y += 16) {
+      for (let x = 8; x < 128; x += 16) {
+        dCtx.beginPath();
+        dCtx.arc(x, y, 5, 0, Math.PI * 2);
+        dCtx.stroke();
+      }
+    }
+    const damaskTex = new THREE.CanvasTexture(damaskCanv);
+    damaskTex.colorSpace = THREE.SRGBColorSpace;
+    const pillowGoldMat = new THREE.MeshStandardMaterial({ map: damaskTex, roughness: 0.48, metalness: 0.38 });
+    const pillowEmeraldMat = new THREE.MeshStandardMaterial({ color: 0x113624, roughness: 0.76, metalness: 0.06 });
+
+    // Helper for soft beveled upholstered cushions
+    function makePlushBox(w, h, d, bevel = 0.04) {
+      const sw = w - bevel * 2;
+      const sh = h - bevel * 2;
+      const shape = new THREE.Shape();
+      const r = Math.min(0.05, sw * 0.15, sh * 0.15);
+      shape.moveTo(-sw / 2 + r, -sh / 2);
+      shape.lineTo(sw / 2 - r, -sh / 2);
+      shape.quadraticCurveTo(sw / 2, -sh / 2, sw / 2, -sh / 2 + r);
+      shape.lineTo(sw / 2, sh / 2 - r);
+      shape.quadraticCurveTo(sw / 2, sh / 2, sw / 2 - r, sh / 2);
+      shape.lineTo(-sw / 2 + r, sh / 2);
+      shape.quadraticCurveTo(-sw / 2, sh / 2, -sw / 2, sh / 2 - r);
+      shape.lineTo(-sw / 2, -sh / 2 + r);
+      shape.quadraticCurveTo(-sw / 2, -sh / 2, -sw / 2 + r, -sh / 2);
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: d - bevel * 2,
+        bevelEnabled: true,
+        bevelThickness: bevel,
+        bevelSize: bevel,
+        bevelSegments: 4
+      });
+      geo.center();
+      return geo;
+    }
+
+    // Brushed-gold plinth rail & 6 angled tapered brass legs
+    const sofaRail = new THREE.Mesh(new THREE.BoxGeometry(2.92, 0.045, 0.94), plantGoldMat);
+    sofaRail.position.set(0, 0.175, 0);
+    sofaGroup.add(sofaRail);
+
+    const sofaLegGeo = new THREE.CylinderGeometry(0.026, 0.013, 0.16, 12);
+    [-1.40, 0, 1.40].forEach((lx) => {
+      [-0.42, 0.42].forEach((lz) => {
+        const leg = new THREE.Mesh(sofaLegGeo, plantGoldMat);
+        leg.position.set(lx, 0.08, lz);
+        leg.rotation.z = lx < 0 ? 0.12 : (lx > 0 ? -0.12 : 0);
+        sofaGroup.add(leg);
+      });
+    });
+
+    // Upholstered lower deck & sculpted back rail
+    const sofaBase = new THREE.Mesh(makePlushBox(2.90, 0.16, 0.92, 0.03), sofaVelvetMat);
+    sofaBase.position.set(0, 0.27, 0);
+    sofaGroup.add(sofaBase);
+
+    const sofaBackFrame = new THREE.Mesh(makePlushBox(2.90, 0.62, 0.18, 0.04), sofaVelvetMat);
+    sofaBackFrame.position.set(0, 0.60, -0.37);
+    sofaGroup.add(sofaBackFrame);
+
+    // Sloped tapered designer armrests (Extrude profile along X)
+    const armProfile = new THREE.Shape();
+    armProfile.moveTo(-0.46, 0);
+    armProfile.lineTo(0.46, 0);
+    armProfile.lineTo(0.44, 0.36);
+    armProfile.quadraticCurveTo(0.38, 0.42, -0.44, 0.50);
+    armProfile.closePath();
+    const armGeo = new THREE.ExtrudeGeometry(armProfile, {
+      depth: 0.13,
+      bevelEnabled: true,
+      bevelThickness: 0.025,
+      bevelSize: 0.025,
+      bevelSegments: 4
+    });
+    armGeo.rotateY(Math.PI / 2);
+    armGeo.center();
+    [-1.38, 1.38].forEach((ax) => {
+      const arm = new THREE.Mesh(armGeo, sofaVelvetMat);
+      arm.position.set(ax, 0.47, 0);
+      sofaGroup.add(arm);
+    });
+
+    // 3 Plush Rounded Seat Cushions + 3 Sculpted Backrest Cushions
+    const seatCushGeo = makePlushBox(0.84, 0.17, 0.74, 0.045);
+    const backCushGeo = makePlushBox(0.83, 0.44, 0.21, 0.05);
+    [-0.85, 0, 0.85].forEach((cx) => {
+      const seatCush = new THREE.Mesh(seatCushGeo, sofaVelvetMat);
+      seatCush.position.set(cx, 0.40, 0.06);
+      sofaGroup.add(seatCush);
+
+      const backCush = new THREE.Mesh(backCushGeo, sofaVelvetMat);
+      backCush.position.set(cx, 0.67, -0.21);
+      backCush.rotation.x = -0.11;
+      sofaGroup.add(backCush);
+    });
+
+    // 5 Plump Rounded Accent Throw Pillows (Emerald Velvet, Damask Gold, Deep Burgundy)
+    const plumpPillowGeo = new THREE.SphereGeometry(0.18, 16, 12);
+    plumpPillowGeo.scale(1.05, 0.95, 0.38);
+    [
+      { x: -1.06, z: -0.04, ry: 0.42, mat: pillowEmeraldMat },
+      { x: -0.78, z: -0.07, ry: 0.18, mat: sofaVelvetMat },
+      { x: 0.02, z: -0.08, ry: -0.08, mat: pillowGoldMat },
+      { x: 0.35, z: -0.09, ry: -0.22, mat: pillowEmeraldMat },
+      { x: 1.04, z: -0.04, ry: -0.40, mat: sofaVelvetMat }
+    ].forEach((p) => {
+      const pil = new THREE.Mesh(plumpPillowGeo, p.mat);
+      pil.position.set(p.x, 0.58, p.z);
+      pil.rotation.set(-0.26, p.ry, 0);
+      sofaGroup.add(pil);
+    });
+    scene.add(sofaGroup);
+
+    // Two Brushed-Gold Luxury Planters (Left & Right of Ticket Counter)
+    const plantGoldMat = new THREE.MeshStandardMaterial({ color: 0xc8a45a, roughness: 0.28, metalness: 0.85 });
+    const plantSoilMat = new THREE.MeshStandardMaterial({ color: 0x1a1410, roughness: 0.95 });
+    const plantLeafMat = new THREE.MeshStandardMaterial({ color: 0x2f6b2e, roughness: 0.52, side: THREE.DoubleSide });
+    const plantLeafLightMat = new THREE.MeshStandardMaterial({ color: 0x4b8a3e, roughness: 0.48, side: THREE.DoubleSide });
+    const potGeo = new THREE.CylinderGeometry(0.26, 0.22, 0.68, 22);
+    const soilGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.04, 18);
+    const bladeGeo = new THREE.ConeGeometry(0.055, 0.78, 5);
+    const monsteraGeo = new THREE.CircleGeometry(0.18, 7);
+
+    [
+      { px: -17.7, pz: -66.95 },
+      { px: -17.7, pz: -75.05 }
+    ].forEach(({ px, pz }, pIdx) => {
+      const pGroup = new THREE.Group();
+      pGroup.position.set(px, 0, pz);
+
+      const pot = new THREE.Mesh(potGeo, plantGoldMat);
+      pot.position.y = 0.34;
+      pGroup.add(pot);
+
+      const soil = new THREE.Mesh(soilGeo, plantSoilMat);
+      soil.position.y = 0.67;
+      pGroup.add(soil);
+
+      // Upright variegated snake-plant blades + fanned monstera leaves
+      for (let i = 0; i < 9; i++) {
+        const ang = (i / 9) * Math.PI * 2 + pIdx * 0.4;
+        const rad = (i % 3) * 0.06 + 0.04;
+        const blade = new THREE.Mesh(bladeGeo, i % 2 === 0 ? plantLeafMat : plantLeafLightMat);
+        blade.position.set(Math.cos(ang) * rad, 1.02 + (i % 3) * 0.07, Math.sin(ang) * rad);
+        blade.rotation.z = Math.cos(ang) * 0.16;
+        blade.rotation.x = Math.sin(ang) * 0.16;
+        blade.scale.set(1.0, 0.85 + (i % 3) * 0.14, 0.25);
+        pGroup.add(blade);
+      }
+      for (let j = 0; j < 7; j++) {
+        const ang = (j / 7) * Math.PI * 2 + 0.3;
+        const leaf = new THREE.Mesh(monsteraGeo, j % 2 === 0 ? plantLeafLightMat : plantLeafMat);
+        leaf.position.set(Math.cos(ang) * 0.20, 0.92 + (j % 2) * 0.14, Math.sin(ang) * 0.20);
+        leaf.rotation.x = -Math.PI / 2 + 0.55;
+        leaf.rotation.z = ang;
+        leaf.scale.set(1.25, 0.95, 1);
+        pGroup.add(leaf);
+      }
+      scene.add(pGroup);
+    });
+
+    // Luxury Sculpted Burgundy Velvet 3-Seater Sofa with Brushed-Gold Base & Plump Damask Pillows (Right Side, z = -75.35)
+    const sofaGroup = new THREE.Group();
+    sofaGroup.position.set(-10.2, 0, -75.35);
+
+    // Rich Deep Oxblood Crushed-Velvet Texture (contrasts cleanly with lighter Wine-Red walls)
+    const velvetCanv = document.createElement('canvas');
+    velvetCanv.width = 256;
+    velvetCanv.height = 256;
+    const vCtx = velvetCanv.getContext('2d');
+    const vGrad = vCtx.createLinearGradient(0, 0, 256, 256);
+    vGrad.addColorStop(0, '#360814');
+    vGrad.addColorStop(0.5, '#25050d');
+    vGrad.addColorStop(1, '#3d0a17');
+    vCtx.fillStyle = vGrad;
+    vCtx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 2400; i++) {
+      vCtx.fillStyle = i % 2 === 0 ? 'rgba(255,190,205,0.03)' : 'rgba(0,0,0,0.06)';
+      vCtx.fillRect((i * 73) % 256, (i * 137) % 256, 2, 2);
+    }
+    const velvetTex = new THREE.CanvasTexture(velvetCanv);
+    velvetTex.colorSpace = THREE.SRGBColorSpace;
+    velvetTex.wrapS = velvetTex.wrapT = THREE.RepeatWrapping;
+    const sofaVelvetMat = new THREE.MeshStandardMaterial({ map: velvetTex, roughness: 0.72, metalness: 0.08 });
+
+    // Damask Gold & Deep Emerald Pillow Textures
+    const damaskCanv = document.createElement('canvas');
+    damaskCanv.width = 128;
+    damaskCanv.height = 128;
+    const dCtx = damaskCanv.getContext('2d');
+    dCtx.fillStyle = '#9c7832';
+    dCtx.fillRect(0, 0, 128, 128);
+    dCtx.strokeStyle = 'rgba(245,215,130,0.45)';
+    dCtx.lineWidth = 2;
+    for (let y = 8; y < 128; y += 16) {
+      for (let x = 8; x < 128; x += 16) {
+        dCtx.beginPath();
+        dCtx.arc(x, y, 5, 0, Math.PI * 2);
+        dCtx.stroke();
+      }
+    }
+    const damaskTex = new THREE.CanvasTexture(damaskCanv);
+    damaskTex.colorSpace = THREE.SRGBColorSpace;
+    const pillowGoldMat = new THREE.MeshStandardMaterial({ map: damaskTex, roughness: 0.48, metalness: 0.38 });
+    const pillowEmeraldMat = new THREE.MeshStandardMaterial({ color: 0x113624, roughness: 0.76, metalness: 0.06 });
+
+    // Helper for soft beveled upholstered cushions
+    function makePlushBox(w, h, d, bevel = 0.04) {
+      const sw = w - bevel * 2;
+      const sh = h - bevel * 2;
+      const shape = new THREE.Shape();
+      const r = Math.min(0.05, sw * 0.15, sh * 0.15);
+      shape.moveTo(-sw / 2 + r, -sh / 2);
+      shape.lineTo(sw / 2 - r, -sh / 2);
+      shape.quadraticCurveTo(sw / 2, -sh / 2, sw / 2, -sh / 2 + r);
+      shape.lineTo(sw / 2, sh / 2 - r);
+      shape.quadraticCurveTo(sw / 2, sh / 2, sw / 2 - r, sh / 2);
+      shape.lineTo(-sw / 2 + r, sh / 2);
+      shape.quadraticCurveTo(-sw / 2, sh / 2, -sw / 2, sh / 2 - r);
+      shape.lineTo(-sw / 2, -sh / 2 + r);
+      shape.quadraticCurveTo(-sw / 2, -sh / 2, -sw / 2 + r, -sh / 2);
+      const geo = new THREE.ExtrudeGeometry(shape, {
+        depth: d - bevel * 2,
+        bevelEnabled: true,
+        bevelThickness: bevel,
+        bevelSize: bevel,
+        bevelSegments: 4
+      });
+      geo.center();
+      return geo;
+    }
+
+    // Brushed-gold plinth rail & 6 angled tapered brass legs
+    const sofaRail = new THREE.Mesh(new THREE.BoxGeometry(2.92, 0.045, 0.94), plantGoldMat);
+    sofaRail.position.set(0, 0.175, 0);
+    sofaGroup.add(sofaRail);
+
+    const sofaLegGeo = new THREE.CylinderGeometry(0.026, 0.013, 0.16, 12);
+    [-1.40, 0, 1.40].forEach((lx) => {
+      [-0.42, 0.42].forEach((lz) => {
+        const leg = new THREE.Mesh(sofaLegGeo, plantGoldMat);
+        leg.position.set(lx, 0.08, lz);
+        leg.rotation.z = lx < 0 ? 0.12 : (lx > 0 ? -0.12 : 0);
+        sofaGroup.add(leg);
+      });
+    });
+
+    // Upholstered lower deck & sculpted back rail
+    const sofaBase = new THREE.Mesh(makePlushBox(2.90, 0.16, 0.92, 0.03), sofaVelvetMat);
+    sofaBase.position.set(0, 0.27, 0);
+    sofaGroup.add(sofaBase);
+
+    const sofaBackFrame = new THREE.Mesh(makePlushBox(2.90, 0.62, 0.18, 0.04), sofaVelvetMat);
+    sofaBackFrame.position.set(0, 0.60, -0.37);
+    sofaGroup.add(sofaBackFrame);
+
+    // Sloped tapered designer armrests (Extrude profile along X)
+    const armProfile = new THREE.Shape();
+    armProfile.moveTo(-0.46, 0);
+    armProfile.lineTo(0.46, 0);
+    armProfile.lineTo(0.44, 0.36);
+    armProfile.quadraticCurveTo(0.38, 0.42, -0.44, 0.50);
+    armProfile.closePath();
+    const armGeo = new THREE.ExtrudeGeometry(armProfile, {
+      depth: 0.13,
+      bevelEnabled: true,
+      bevelThickness: 0.025,
+      bevelSize: 0.025,
+      bevelSegments: 4
+    });
+    armGeo.rotateY(Math.PI / 2);
+    armGeo.center();
+    [-1.38, 1.38].forEach((ax) => {
+      const arm = new THREE.Mesh(armGeo, sofaVelvetMat);
+      arm.position.set(ax, 0.47, 0);
+      sofaGroup.add(arm);
+    });
+
+    // 3 Plush Rounded Seat Cushions + 3 Sculpted Backrest Cushions
+    const seatCushGeo = makePlushBox(0.84, 0.17, 0.74, 0.045);
+    const backCushGeo = makePlushBox(0.83, 0.44, 0.21, 0.05);
+    [-0.85, 0, 0.85].forEach((cx) => {
+      const seatCush = new THREE.Mesh(seatCushGeo, sofaVelvetMat);
+      seatCush.position.set(cx, 0.40, 0.06);
+      sofaGroup.add(seatCush);
+
+      const backCush = new THREE.Mesh(backCushGeo, sofaVelvetMat);
+      backCush.position.set(cx, 0.67, -0.21);
+      backCush.rotation.x = -0.11;
+      sofaGroup.add(backCush);
+    });
+
+    // 5 Plump Rounded Accent Throw Pillows (Emerald Velvet, Damask Gold, Deep Burgundy)
+    const plumpPillowGeo = new THREE.SphereGeometry(0.18, 16, 12);
+    plumpPillowGeo.scale(1.05, 0.95, 0.38);
+    [
+      { x: -1.06, z: -0.04, ry: 0.42, mat: pillowEmeraldMat },
+      { x: -0.78, z: -0.07, ry: 0.18, mat: sofaVelvetMat },
+      { x: 0.02, z: -0.08, ry: -0.08, mat: pillowGoldMat },
+      { x: 0.35, z: -0.09, ry: -0.22, mat: pillowEmeraldMat },
+      { x: 1.04, z: -0.04, ry: -0.40, mat: sofaVelvetMat }
+    ].forEach((p) => {
+      const pil = new THREE.Mesh(plumpPillowGeo, p.mat);
+      pil.position.set(p.x, 0.58, p.z);
+      pil.rotation.set(-0.26, p.ry, 0);
+      sofaGroup.add(pil);
+    });
+    scene.add(sofaGroup);
 
     const stBaseGeo = new THREE.CylinderGeometry(0.16, 0.18, 0.04, 16);
     const stPoleGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.92, 12);
@@ -4103,7 +4436,7 @@
    * Full Multi-Direction & Diagonal Sliding Support
    */
   function updatePlayerMovement() {
-    if (!camera) return;
+    if (!camera || ticketBookingState.isOpen) return;
 
     // 1. Discrete Keyboard Multi-Key Vector
     let keyX = 0;
@@ -5041,6 +5374,328 @@
     });
   }
 
+  // =========================================================================
+  // TICKET COUNTER IPAD BOOKING KIOSK & PERSISTENT CORNER TICKET BADGE
+  // =========================================================================
+  const ticketBookingState = {
+    isOpen: false,
+    step: 'timings', // 'timings' | 'seats' | 'payment'
+    selectedTime: '7:00 PM',
+    selectedSeats: [],
+    paymentMethod: 'UPI / QR',
+    confirmedTicket: null,
+    bookedSeatIds: new Set(['C4', 'C5', 'D6', 'D7', 'E5', 'V6'])
+  };
+
+  const TICKET_TIMINGS = [
+    { time: '9:00 AM', hasShow: true, format: 'DOLBY ATMOS · 2D' },
+    { time: '11:00 AM', hasShow: false },
+    { time: '1:00 PM', hasShow: true, format: 'SCREENX 270° · DOLBY ATMOS' },
+    { time: '2:00 PM', hasShow: false },
+    { time: '7:00 PM', hasShow: true, format: 'SCREENX 270° · DOLBY ATMOS' },
+    { time: '8:00 PM', hasShow: true, format: 'IMAX LASER · 2D' },
+    { time: '10:00 PM', hasShow: true, format: 'SCREENX 270° · VIP NIGHT' }
+  ];
+
+  function getSeatTierInfo(seatId) {
+    if (seatId.startsWith('V')) return { tier: 'VIP RECLINER', price: 850, color: '#f0c966' };
+    const row = seatId[0];
+    if (row === 'F' || row === 'G') return { tier: 'PLATINUM', price: 520, color: '#c4b5fd' };
+    if (row === 'D' || row === 'E') return { tier: 'GOLD', price: 380, color: '#fbbf24' };
+    return { tier: 'SILVER', price: 250, color: '#94a3b8' };
+  }
+
+  function ensureTicketPurchaseBar() {
+    let bar = document.getElementById('ticket-purchase-bar');
+    if (bar || !stageElement) return bar;
+    bar = document.createElement('div');
+    bar.id = 'ticket-purchase-bar';
+    bar.style.cssText = [
+      'position:absolute', 'left:50%', 'bottom:76px', 'transform:translateX(-50%)',
+      'z-index:26', 'display:none', 'align-items:center', 'gap:10px',
+      'padding:9px 18px', 'border-radius:999px',
+      'background:rgba(16,14,15,0.86)', 'backdrop-filter:blur(12px)', '-webkit-backdrop-filter:blur(12px)',
+      'border:1px solid rgba(232,196,104,0.55)', 'box-shadow:0 8px 28px rgba(0,0,0,0.5)',
+      'pointer-events:auto', 'cursor:pointer'
+    ].join(';');
+    bar.innerHTML = '<span style="color:#f5d580;font-size:13px;font-weight:700;letter-spacing:0.06em;">🎫 PURCHASE TICKETS</span>';
+    bar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openTicketIpad();
+    });
+    stageElement.appendChild(bar);
+    return bar;
+  }
+
+  function ensureCornerTicketBadge() {
+    let badge = document.getElementById('corner-ticket-badge');
+    if (badge) return badge;
+    badge = document.createElement('div');
+    badge.id = 'corner-ticket-badge';
+    badge.style.cssText = [
+      'position:fixed', 'top:16px', 'right:16px', 'z-index:45', 'display:none',
+      'padding:10px 14px', 'border-radius:12px',
+      'background:linear-gradient(135deg, rgba(24,16,18,0.92), rgba(14,10,12,0.95))',
+      'backdrop-filter:blur(12px)', '-webkit-backdrop-filter:blur(12px)',
+      'border:1px solid rgba(240,201,102,0.65)',
+      'box-shadow:0 8px 24px rgba(0,0,0,0.55)',
+      'color:#fff', 'font-family:inherit', 'min-width:175px', 'pointer-events:auto'
+    ].join(';');
+    document.body.appendChild(badge);
+    return badge;
+  }
+
+  function updateCornerTicketBadge() {
+    const badge = ensureCornerTicketBadge();
+    if (!badge || !camera) return;
+    const t = ticketBookingState.confirmedTicket;
+    // Always show until player enters the Cinema Hall (z < -76.5)
+    if (!t || camera.position.z < -76.5) {
+      badge.style.display = 'none';
+      return;
+    }
+    badge.style.display = 'block';
+    badge.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+        <span style="color:#f2cf74;font-size:10px;font-weight:800;letter-spacing:0.12em;">🎫 VIEV E-TICKET</span>
+        <span style="color:#4ade80;font-size:9px;font-weight:700;background:rgba(74,222,128,0.14);padding:2px 6px;border-radius:999px;">CONFIRMED</span>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.03em;">${t.movie}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.78);margin-top:2px;">${t.time} · Seats: <strong style="color:#f5d580;">${t.seats.join(', ')}</strong></div>
+      <div style="font-size:9.5px;color:rgba(242,207,116,0.72);margin-top:5px;border-top:1px dashed rgba(255,255,255,0.16);padding-top:4px;">Walk into Cinema Hall to use</div>
+    `;
+  }
+
+  function closeTicketIpad() {
+    ticketBookingState.isOpen = false;
+    const ov = document.getElementById('ticket-ipad-overlay');
+    if (ov) ov.style.display = 'none';
+  }
+
+  function openTicketIpad() {
+    if (document.pointerLockElement) document.exitPointerLock?.();
+    ticketBookingState.isOpen = true;
+    ticketBookingState.step = 'timings';
+    ticketBookingState.selectedSeats = [];
+    renderTicketIpad();
+  }
+
+  function renderTicketIpad() {
+    let ov = document.getElementById('ticket-ipad-overlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'ticket-ipad-overlay';
+      ov.style.cssText = [
+        'position:fixed', 'inset:0', 'z-index:60', 'display:none',
+        'align-items:center', 'justify-content:center',
+        'background:rgba(6,5,8,0.72)', 'backdrop-filter:blur(8px)', '-webkit-backdrop-filter:blur(8px)',
+        'padding:16px'
+      ].join(';');
+      ov.addEventListener('click', (e) => {
+        if (e.target === ov) closeTicketIpad();
+      });
+      document.body.appendChild(ov);
+    }
+    ov.style.display = 'flex';
+
+    const slot = TICKET_TIMINGS.find(s => s.time === ticketBookingState.selectedTime) || TICKET_TIMINGS[0];
+    const totalAmount = ticketBookingState.selectedSeats.reduce((sum, sid) => sum + getSeatTierInfo(sid).price, 0);
+
+    let bodyHtml = '';
+    if (ticketBookingState.step === 'timings') {
+      const timingPills = TICKET_TIMINGS.map(s => {
+        const active = s.time === ticketBookingState.selectedTime;
+        return `<button type="button" data-time="${s.time}" style="flex:0 0 auto;padding:9px 16px;border-radius:999px;border:1px solid ${active ? '#f2cf74' : 'rgba(255,255,255,0.18)'};background:${active ? 'linear-gradient(135deg,#f2cf74,#c89d42)' : 'rgba(255,255,255,0.06)'};color:${active ? '#160e08' : '#fff'};font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">${s.time}</button>`;
+      }).join('');
+
+      const showContent = slot.hasShow
+        ? `
+          <div style="display:flex;gap:20px;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(242,207,116,0.28);border-radius:18px;padding:16px;margin-top:16px;flex-wrap:wrap;">
+            <img src="assets/300-days-poster.jpg" alt="300 DAYS" style="width:128px;height:210px;object-fit:cover;border-radius:12px;border:1px solid rgba(242,207,116,0.35);flex-shrink:0;" />
+            <div style="flex:1;min-width:220px;">
+              <div style="display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(242,207,116,0.16);color:#f2cf74;font-size:10.5px;font-weight:700;letter-spacing:0.1em;">NOW SHOWING · ${slot.time}</div>
+              <h2 style="margin:10px 0 4px;font-size:26px;color:#fff;letter-spacing:0.04em;">300 DAYS <span style="color:#f2cf74;font-size:18px;">(∞) To Go.</span></h2>
+              <div style="font-size:12.5px;color:rgba(255,255,255,0.72);margin-bottom:10px;">${slot.format} · 2h 18m · VIEV LUXE HALL 1</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.62);line-height:1.5;margin-bottom:16px;">No distance can keep them apart. Experience the romance in full 270° panoramic ScreenX &amp; Dolby Atmos sound.</div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <button type="button" id="ipad-go-seats" style="padding:11px 22px;border-radius:12px;border:none;background:linear-gradient(135deg,#f2cf74,#c89d42);color:#160e08;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:0.04em;">Select Seats →</button>
+                <span style="font-size:11.5px;color:rgba(255,255,255,0.6);">From ₹250 · VIP ₹850</span>
+              </div>
+            </div>
+          </div>`
+        : `
+          <div style="text-align:center;padding:54px 20px;margin-top:16px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.16);border-radius:18px;">
+            <div style="font-size:28px;margin-bottom:8px;">🎬</div>
+            <div style="font-size:16px;font-weight:700;color:#fff;">No Show Scheduled at ${slot.time}</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,0.6);margin-top:6px;">Select another show timing above (e.g. 9:00 AM, 1:00 PM, 7:00 PM, 8:00 PM, 10:00 PM)</div>
+          </div>`;
+
+      bodyHtml = `
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:rgba(242,207,116,0.85);margin-bottom:8px;">SELECT SHOW TIMING</div>
+        <div id="ipad-timing-strip" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:8px;scrollbar-width:thin;">${timingPills}</div>
+        ${showContent}
+      `;
+    } else if (ticketBookingState.step === 'seats') {
+      const renderSeatBtn = (sid) => {
+        const isBooked = ticketBookingState.bookedSeatIds.has(sid);
+        const isSel = ticketBookingState.selectedSeats.includes(sid);
+        const info = getSeatTierInfo(sid);
+        const bg = isBooked ? 'rgba(255,255,255,0.08)' : (isSel ? '#f2cf74' : 'rgba(255,255,255,0.05)');
+        const brd = isBooked ? 'rgba(255,255,255,0.12)' : (isSel ? '#ffe79e' : info.color);
+        const clr = isBooked ? 'rgba(255,255,255,0.28)' : (isSel ? '#160e08' : '#fff');
+        return `<button type="button" data-seat="${sid}" ${isBooked ? 'disabled' : ''} title="${sid} · ${info.tier} ₹${info.price}" style="width:28px;height:24px;border-radius:6px;border:1px solid ${brd};background:${bg};color:${clr};font-size:9px;font-weight:700;cursor:${isBooked ? 'not-allowed' : 'pointer'};padding:0;">${sid}</button>`;
+      };
+
+      const rowsHtml = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((rowChar) => {
+        const info = getSeatTierInfo(rowChar + '1');
+        const left4 = [1, 2, 3, 4].map(n => renderSeatBtn(rowChar + n)).join('');
+        const mid5 = [5, 6, 7, 8, 9].map(n => renderSeatBtn(rowChar + n)).join('');
+        const right3 = [10, 11, 12].map(n => renderSeatBtn(rowChar + n)).join('');
+        return `
+          <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:4px;">
+            <span style="width:18px;font-size:10px;font-weight:700;color:${info.color};text-align:right;margin-right:4px;">${rowChar}</span>
+            <div style="display:flex;gap:3px;">${left4}</div>
+            <div style="width:14px;"></div>
+            <div style="display:flex;gap:3px;">${mid5}</div>
+            <div style="width:14px;"></div>
+            <div style="display:flex;gap:3px;">${right3}</div>
+          </div>`;
+      }).join('');
+
+      const vipHtml = Array.from({ length: 11 }, (_, i) => renderSeatBtn('V' + (i + 1))).join('');
+
+      bodyHtml = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <button type="button" id="ipad-back-timings" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:11.5px;cursor:pointer;">← Timings</button>
+          <div style="font-size:12px;font-weight:700;color:#fff;">300 DAYS · <span style="color:#f2cf74;">${ticketBookingState.selectedTime}</span></div>
+          <div style="display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,0.78);flex-wrap:wrap;">
+            <span><b style="color:#94a3b8;">●</b> Silver ₹250</span>
+            <span><b style="color:#fbbf24;">●</b> Gold ₹380</span>
+            <span><b style="color:#c4b5fd;">●</b> Platinum ₹520</span>
+            <span><b style="color:#f0c966;">●</b> VIP ₹850</span>
+          </div>
+        </div>
+        <div style="text-align:center;margin:6px auto 10px;width:74%;height:8px;border-radius:999px;background:linear-gradient(90deg,transparent,#f2cf74,transparent);opacity:0.85;"></div>
+        <div style="text-align:center;font-size:9.5px;letter-spacing:0.18em;color:rgba(255,255,255,0.55);margin-bottom:10px;">SCREEN · SCREENX 270°</div>
+        <div style="overflow-x:auto;padding-bottom:6px;">
+          ${rowsHtml}
+          <div style="margin-top:8px;padding-top:7px;border-top:1px dashed rgba(242,207,116,0.28);display:flex;align-items:center;justify-content:center;gap:4px;">
+            <span style="font-size:9.5px;font-weight:800;color:#f0c966;margin-right:6px;">VIP</span>
+            <div style="display:flex;gap:4px;">${vipHtml}</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.12);gap:10px;flex-wrap:wrap;">
+          <div style="font-size:12px;color:#fff;">
+            Seats: <strong style="color:#f2cf74;">${ticketBookingState.selectedSeats.length ? ticketBookingState.selectedSeats.join(', ') : 'None'}</strong>
+            <span style="margin-left:10px;">Total: <strong style="color:#4ade80;">₹${totalAmount}</strong></span>
+          </div>
+          <button type="button" id="ipad-go-pay" ${ticketBookingState.selectedSeats.length === 0 ? 'disabled' : ''} style="padding:9px 20px;border-radius:10px;border:none;background:${ticketBookingState.selectedSeats.length ? 'linear-gradient(135deg,#f2cf74,#c89d42)' : 'rgba(255,255,255,0.12)'};color:${ticketBookingState.selectedSeats.length ? '#160e08' : 'rgba(255,255,255,0.4)'};font-size:12.5px;font-weight:800;cursor:${ticketBookingState.selectedSeats.length ? 'pointer' : 'not-allowed'};">Next → Payment</button>
+        </div>
+      `;
+    } else {
+      const methods = ['UPI / QR', 'Credit / Debit Card', 'VIEV Wallet'].map((m) => {
+        const act = ticketBookingState.paymentMethod === m;
+        return `<button type="button" data-pay="${m}" style="flex:1;min-width:120px;padding:12px;border-radius:12px;border:1px solid ${act ? '#f2cf74' : 'rgba(255,255,255,0.16)'};background:${act ? 'rgba(242,207,116,0.16)' : 'rgba(255,255,255,0.04)'};color:${act ? '#f2cf74' : '#fff'};font-size:12px;font-weight:700;cursor:pointer;">${m}</button>`;
+      }).join('');
+
+      bodyHtml = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <button type="button" id="ipad-back-seats" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:11.5px;cursor:pointer;">← Change Seats</button>
+          <span style="font-size:12px;font-weight:700;color:#f2cf74;">CHECKOUT &amp; PAYMENT</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(242,207,116,0.28);border-radius:16px;padding:16px;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;">
+            <span>300 DAYS (∞) To Go.</span>
+            <span style="color:#f2cf74;">${ticketBookingState.selectedTime}</span>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.72);margin-bottom:8px;">Hall: VIEV LUXE HALL 1 · ScreenX 270°</div>
+          <div style="font-size:12.5px;color:#fff;">Selected Seats: <strong style="color:#f2cf74;">${ticketBookingState.selectedSeats.join(', ')}</strong></div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,0.16);display:flex;justify-content:space-between;font-size:15px;font-weight:800;">
+            <span style="color:#fff;">Total Payable</span>
+            <span style="color:#4ade80;">₹${totalAmount}</span>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;color:rgba(242,207,116,0.85);margin-bottom:8px;">PAYMENT METHOD</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">${methods}</div>
+        <button type="button" id="ipad-confirm-pay" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#f2cf74,#c89d42);color:#160e08;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.05em;">Confirm &amp; Pay ₹${totalAmount}</button>
+      `;
+    }
+
+    ov.innerHTML = `
+      <div style="width:min(820px,95vw);max-height:90vh;overflow-y:auto;background:#110f12;border-radius:28px;border:8px solid #26252a;box-shadow:0 24px 70px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.08);padding:14px 20px 20px;color:#fff;font-family:inherit;position:relative;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.1);">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#3a3b42;display:inline-block;"></span>
+            <span style="font-size:11px;font-weight:800;letter-spacing:0.14em;color:#f2cf74;">VIEV BOX OFFICE · iPad</span>
+          </div>
+          <button type="button" id="ipad-close-btn" style="padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">✕ Close</button>
+        </div>
+        ${bodyHtml}
+      </div>
+    `;
+
+    ov.querySelector('#ipad-close-btn')?.addEventListener('click', closeTicketIpad);
+    ov.querySelectorAll('[data-time]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        ticketBookingState.selectedTime = btn.getAttribute('data-time');
+        renderTicketIpad();
+      });
+    });
+    ov.querySelector('#ipad-go-seats')?.addEventListener('click', () => {
+      ticketBookingState.step = 'seats';
+      renderTicketIpad();
+    });
+    ov.querySelector('#ipad-back-timings')?.addEventListener('click', () => {
+      ticketBookingState.step = 'timings';
+      renderTicketIpad();
+    });
+    ov.querySelectorAll('[data-seat]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const sid = btn.getAttribute('data-seat');
+        const idx = ticketBookingState.selectedSeats.indexOf(sid);
+        if (idx >= 0) ticketBookingState.selectedSeats.splice(idx, 1);
+        else ticketBookingState.selectedSeats.push(sid);
+        renderTicketIpad();
+      });
+    });
+    ov.querySelector('#ipad-go-pay')?.addEventListener('click', () => {
+      if (ticketBookingState.selectedSeats.length > 0) {
+        ticketBookingState.step = 'payment';
+        renderTicketIpad();
+      }
+    });
+    ov.querySelector('#ipad-back-seats')?.addEventListener('click', () => {
+      ticketBookingState.step = 'seats';
+      renderTicketIpad();
+    });
+    ov.querySelectorAll('[data-pay]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        ticketBookingState.paymentMethod = btn.getAttribute('data-pay');
+        renderTicketIpad();
+      });
+    });
+    ov.querySelector('#ipad-confirm-pay')?.addEventListener('click', () => {
+      ticketBookingState.selectedSeats.forEach(s => ticketBookingState.bookedSeatIds.add(s));
+      ticketBookingState.confirmedTicket = {
+        movie: '300 DAYS',
+        time: ticketBookingState.selectedTime,
+        seats: [...ticketBookingState.selectedSeats],
+        total: totalAmount
+      };
+      closeTicketIpad();
+      updateCornerTicketBadge();
+    });
+  }
+
+  function updateTicketCounterPrompt() {
+    const bar = ensureTicketPurchaseBar();
+    if (!bar || !camera) return;
+    const nearCounter = !ticketBookingState.isOpen &&
+      camera.position.x >= -19.2 && camera.position.x <= -13.8 &&
+      camera.position.z >= -75.2 && camera.position.z <= -66.8;
+    bar.style.display = nearCounter ? 'flex' : 'none';
+  }
+
   function updateLeftRoomDoors() {
     if (!leftRoomDoorState.frontLeaf || !leftRoomDoorState.backLeaf || !camera) return;
     const dist = Math.hypot(camera.position.x - leftRoomDoorState.doorX, camera.position.z - leftRoomDoorState.doorZ);
@@ -5075,6 +5730,8 @@
     updateLeftRoomDoors();
     updateCinemaScreenX();
     updateCinemaSeatPrompt();
+    updateTicketCounterPrompt();
+    updateCornerTicketBadge();
 
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
