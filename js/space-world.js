@@ -2042,15 +2042,15 @@
       roughness: 0.94,
       metalness: 0.02
     });
-    // Deep Luxury Crimson Acoustic Wall Texture (vertical fabric pleats)
+    // Matte Charcoal Acoustic Wall Texture (vertical fabric pleats matching cinema seats #242428)
     const wallAccCanvas = document.createElement('canvas');
     wallAccCanvas.width = 128;
     wallAccCanvas.height = 128;
     const waCtx = wallAccCanvas.getContext('2d');
-    waCtx.fillStyle = '#3a0b12';
+    waCtx.fillStyle = '#242428';
     waCtx.fillRect(0, 0, 128, 128);
     for (let x = 0; x < 128; x += 8) {
-      waCtx.fillStyle = x % 16 === 0 ? 'rgba(72, 16, 26, 0.45)' : 'rgba(22, 4, 8, 0.45)';
+      waCtx.fillStyle = x % 16 === 0 ? 'rgba(50, 50, 56, 0.45)' : 'rgba(18, 18, 22, 0.45)';
       waCtx.fillRect(x, 0, 4, 128);
     }
     const wallAccTex = new THREE.CanvasTexture(wallAccCanvas);
