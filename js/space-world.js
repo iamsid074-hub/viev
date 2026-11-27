@@ -5035,7 +5035,8 @@
         { label: '4:30 PM', startMin: 16 * 60 + 30, endMin: 16 * 60 + 55 },
         { label: '5:00 PM', startMin: 17 * 60, endMin: 17 * 60 + 25 },
         { label: '5:30 PM', startMin: 17 * 60 + 30, endMin: 17 * 60 + 55 },
-        { label: '6:15 PM', startMin: 18 * 60 + 15, endMin: 18 * 60 + 40 }
+        { label: '6:15 PM', startMin: 18 * 60 + 15, endMin: 18 * 60 + 40 },
+        { label: '6:40 PM', startMin: 18 * 60 + 40, endMin: 19 * 60 + 5 }
       ]
     }
   ];
@@ -5139,8 +5140,8 @@
 
       let px = 68;
       const py = yTop + 124;
-      const bw = show.slots.length > 6 ? 114 : 132;
-      const gap = show.slots.length > 6 ? 10 : 14;
+      const bw = show.slots.length > 7 ? 102 : (show.slots.length > 6 ? 114 : 132);
+      const gap = show.slots.length > 7 ? 8 : (show.slots.length > 6 ? 10 : 14);
       show.slots.forEach((sl) => {
         const slotLive = isLive && active.slot.label === sl.label;
         ctx.fillStyle = slotLive ? '#4ade80' : 'rgba(15, 23, 42, 0.95)';
@@ -5149,7 +5150,7 @@
         ctx.lineWidth = 2;
         ctx.strokeRect(px, py, bw, 48);
         ctx.fillStyle = slotLive ? '#052e16' : '#f1f5f9';
-        ctx.font = show.slots.length > 6 ? 'bold 20px Arial, sans-serif' : 'bold 22px Arial, sans-serif';
+        ctx.font = show.slots.length > 7 ? 'bold 18px Arial, sans-serif' : (show.slots.length > 6 ? 'bold 20px Arial, sans-serif' : 'bold 22px Arial, sans-serif');
         ctx.textAlign = 'center';
         ctx.fillText(sl.label, px + bw / 2, py + 32);
         px += bw + gap;
@@ -5611,7 +5612,8 @@
     { time: '4:30 PM', startMin: 16 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
     { time: '5:00 PM', startMin: 17 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
     { time: '5:30 PM', startMin: 17 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '6:15 PM', startMin: 18 * 60 + 15, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' }
+    { time: '6:15 PM', startMin: 18 * 60 + 15, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
+    { time: '6:40 PM', startMin: 18 * 60 + 40, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' }
   ];
 
   function getSeatTierInfo(seatId) {
