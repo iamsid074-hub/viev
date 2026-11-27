@@ -120,6 +120,22 @@
   const cinemaSeats = [];
   const seatedState = { active: false, seat: null };
   let lastSeatBarKey = '';
+  const cinemaScreenXState = {
+    video: null,
+    tex: null,
+    mainMesh: null,
+    leftWing: null,
+    rightWing: null,
+    idleMat: null,
+    videoMainMat: null,
+    videoWingMat: null,
+    isPlaying: false,
+    screenXEnabled: true,
+    dimCur: 0,
+    lights: [],
+    coveMat: null,
+    downlightMat: null
+  };
   let lookTouchId = null;
   let prevPointerX = 0;
   let prevPointerY = 0;
@@ -2423,6 +2439,13 @@
     coveWash2.position.set(hallCenterX + 6.0, hallH - 1.4, hallCenterZ - 5.0);
     scene.add(coveWash2);
 
+    cinemaScreenXState.coveMat = ceilCoveLedMat;
+    cinemaScreenXState.downlightMat = downlightDiscMat;
+    cinemaScreenXState.lights = [
+      { light: coveWash1, base: 0.75 },
+      { light: coveWash2, base: 0.75 }
+    ];
+
     // Back Wall (z = -114m)
     const hallBackWall = new THREE.Mesh(new THREE.PlaneGeometry(hallW, hallH), hallWallMat);
     hallBackWall.position.set(hallCenterX, hallH / 2, zEndWall - hallL);
@@ -2466,6 +2489,13 @@
     const hallLight4 = new THREE.PointLight(0xffe2b5, 0.95, 30, 1.8);
     hallLight4.position.set(-6.0, 10.8, -100.5);
     scene.add(hallLight4);
+
+    cinemaScreenXState.lights.push(
+      { light: hallLight1, base: 0.95 },
+      { light: hallLight2, base: 1.0 },
+      { light: hallLight3, base: 0.9 },
+      { light: hallLight4, base: 0.95 }
+    );
 
     // 5.2. SCULPTED SEAMLESS VIEV LUXURY CINEMA SEATS & PHYSICAL COLLIDERS
     cinemaSeatColliders.length = 0;
@@ -2907,8 +2937,9 @@
       bayRight.position.set(hallMaxX - 0.09, hallH / 2, bayZ);
       scene.add(bayRight);
     }
-    [-98.0, -92.5, -87.0, -81.5].forEach((sz, idx) => {
-      const spkY = 9.4 + idx * 0.45;
+    [-98.0, -92.5, -86.0, -80.5].forEach((sz, idx) => {
+      // Keep front 2 speakers below the 7.7m ScreenX side wings so panoramic walls stay unobstructed
+      const spkY = idx < 2 ? 6.6 : 10.0 + (idx - 2) * 0.5;
       // Left Wall Speaker
       const spkL = new THREE.Group();
       spkL.position.set(hallMinX + 0.28, spkY, sz);
@@ -2936,7 +2967,7 @@
     wallSlopeCap.position.set(hallMinX + 0.20, (5.3 + 8.5) / 2, (stairEndZ + divEndZ) / 2);
     scene.add(wallSlopeCap);
 
-    // Giant True-Black Cinema Display on Back Wall (z = -104.9m) shifted higher above all seating sightlines
+    // Giant True-Black Cinema Display + 270-Degree ScreenX Panoramic Side Wings
     const displayW = 22.8;
     const displayH = 10.6;
     const displayY = 13.0; // Spans y = 7.7m to 18.3m under the 19.5m ceiling
@@ -2958,11 +2989,54 @@
       metalness: 0.0
     });
     const screenSurface = new THREE.Mesh(
-      new THREE.BoxGeometry(displayW, displayH, 0.14),
+      new THREE.PlaneGeometry(displayW, displayH),
       screenMat
     );
-    screenSurface.position.set(hallCenterX, displayY, zEndWall - hallL + 0.08);
+    screenSurface.position.set(hallCenterX, displayY, zEndWall - hallL + 0.15);
     scene.add(screenSurface);
+
+    // ScreenX Left & Right Panoramic Side Wings (z = -104.9m to -87.4m, flush at display height)
+    const wingLen = 17.5;
+    const wingCenterZ = (zEndWall - hallL) + wingLen / 2;
+    const leftWingBezel = new THREE.Mesh(new THREE.BoxGeometry(0.08, displayH + 0.08, wingLen + 0.08), microBezelMat);
+    leftWingBezel.position.set(hallMinX + 0.22, displayY, wingCenterZ);
+    scene.add(leftWingBezel);
+
+    const leftScreenWing = new THREE.Mesh(new THREE.PlaneGeometry(wingLen, displayH), screenMat);
+    leftScreenWing.rotation.y = Math.PI / 2;
+    leftScreenWing.position.set(hallMinX + 0.27, displayY, wingCenterZ);
+    scene.add(leftScreenWing);
+
+    const rightWingBezel = new THREE.Mesh(new THREE.BoxGeometry(0.08, displayH + 0.08, wingLen + 0.08), microBezelMat);
+    rightWingBezel.position.set(hallMaxX - 0.22, displayY, wingCenterZ);
+    scene.add(rightWingBezel);
+
+    const rightScreenWing = new THREE.Mesh(new THREE.PlaneGeometry(wingLen, displayH), screenMat);
+    rightScreenWing.rotation.y = -Math.PI / 2;
+    rightScreenWing.position.set(hallMaxX - 0.27, displayY, wingCenterZ);
+    scene.add(rightScreenWing);
+
+    // Synchronized Triple-Screen VideoTexture setup for ScreenX
+    const sxVideo = document.createElement('video');
+    sxVideo.src = 'video/exxclusive.mp4';
+    sxVideo.loop = true;
+    sxVideo.playsInline = true;
+    sxVideo.preload = 'metadata';
+    sxVideo.crossOrigin = 'anonymous';
+    sxVideo.muted = false;
+    const sxTex = new THREE.VideoTexture(sxVideo);
+    sxTex.colorSpace = THREE.SRGBColorSpace;
+    sxTex.minFilter = THREE.LinearFilter;
+    sxTex.magFilter = THREE.LinearFilter;
+
+    cinemaScreenXState.video = sxVideo;
+    cinemaScreenXState.tex = sxTex;
+    cinemaScreenXState.mainMesh = screenSurface;
+    cinemaScreenXState.leftWing = leftScreenWing;
+    cinemaScreenXState.rightWing = rightScreenWing;
+    cinemaScreenXState.idleMat = screenMat;
+    cinemaScreenXState.videoMainMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xffffff });
+    cinemaScreenXState.videoWingMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xaab0be });
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
     const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
@@ -3988,13 +4062,70 @@
     lastSeatBarKey = '';
   }
 
+  function toggleCinemaPlayback() {
+    const sx = cinemaScreenXState;
+    if (!sx.video) return;
+    if (sx.isPlaying) {
+      sx.video.pause();
+      sx.isPlaying = false;
+    } else {
+      sx.video.play().then(() => {
+        sx.isPlaying = true;
+        lastSeatBarKey = '';
+      }).catch(() => { });
+      sx.isPlaying = true;
+    }
+    lastSeatBarKey = '';
+  }
+
+  function toggleScreenXMode() {
+    cinemaScreenXState.screenXEnabled = !cinemaScreenXState.screenXEnabled;
+    lastSeatBarKey = '';
+  }
+
+  function updateCinemaScreenX() {
+    const sx = cinemaScreenXState;
+    if (!sx.mainMesh || !sx.leftWing || !sx.rightWing) return;
+
+    // Auto-pause if player walks back out into the main mall
+    if (sx.isPlaying && camera && camera.position.z >= -75.0) {
+      sx.video.pause();
+      sx.isPlaying = false;
+      lastSeatBarKey = '';
+    }
+
+    const wantMainVideo = sx.isPlaying && sx.videoMainMat;
+    const wantWingVideo = sx.isPlaying && sx.screenXEnabled && sx.videoWingMat;
+    if (sx.mainMesh.material !== (wantMainVideo ? sx.videoMainMat : sx.idleMat)) {
+      sx.mainMesh.material = wantMainVideo ? sx.videoMainMat : sx.idleMat;
+    }
+    if (sx.leftWing.material !== (wantWingVideo ? sx.videoWingMat : sx.idleMat)) {
+      sx.leftWing.material = wantWingVideo ? sx.videoWingMat : sx.idleMat;
+      sx.rightWing.material = wantWingVideo ? sx.videoWingMat : sx.idleMat;
+    }
+
+    // Smooth Auto Cinema-Dimming (darkens hall lights & ceiling cove when movie plays)
+    const dimTarget = sx.isPlaying ? 1 : 0;
+    const diff = dimTarget - sx.dimCur;
+    if (Math.abs(diff) > 0.002) {
+      sx.dimCur += diff * 0.05;
+      const mult = 1 - sx.dimCur * 0.86; // Dim down to 14%
+      for (let i = 0; i < sx.lights.length; i++) {
+        sx.lights[i].light.intensity = sx.lights[i].base * mult;
+      }
+      if (sx.coveMat) sx.coveMat.emissiveIntensity = 1.55 * (1 - sx.dimCur * 0.72);
+      if (sx.downlightMat) sx.downlightMat.emissiveIntensity = 1.8 * (1 - sx.dimCur * 0.82);
+    }
+  }
+
   function updateCinemaSeatPrompt() {
     if (!camera || !stageElement || cinemaSeats.length === 0) return;
     const bar = ensureCinemaSeatBar();
     if (!bar) return;
 
     if (seatedState.active && seatedState.seat) {
-      const key = `seated:${seatedState.seat.label}`;
+      const sx = cinemaScreenXState;
+      const key = `seated:${seatedState.seat.label}:${sx.isPlaying}:${sx.screenXEnabled}`;
       if (lastSeatBarKey === key) return;
       lastSeatBarKey = key;
       bar.innerHTML = '';
@@ -4004,6 +4135,35 @@
       lbl.textContent = `Seated · ${seatedState.seat.label}`;
       lbl.style.cssText = 'color:#f3d27a;font-size:12px;font-weight:600;letter-spacing:0.06em;margin-right:4px;';
       bar.appendChild(lbl);
+
+      const playBtn = document.createElement('button');
+      playBtn.type = 'button';
+      playBtn.textContent = sx.isPlaying ? '⏸ Pause' : '▶ Play';
+      playBtn.style.cssText = 'padding:5px 12px;border-radius:999px;border:1px solid #f0c966;background:rgba(240,201,102,0.22);color:#ffe49e;font-size:12px;font-weight:600;cursor:pointer;';
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleCinemaPlayback();
+      });
+      bar.appendChild(playBtn);
+
+      const sxBtn = document.createElement('button');
+      sxBtn.type = 'button';
+      sxBtn.textContent = sx.screenXEnabled ? 'ScreenX 270°: ON' : 'ScreenX 270°: OFF';
+      sxBtn.style.cssText = [
+        'padding:5px 11px',
+        'border-radius:999px',
+        sx.screenXEnabled
+          ? 'border:1px solid rgba(110,210,255,0.65);background:rgba(70,165,245,0.22);color:#bfe6ff'
+          : 'border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75)',
+        'font-size:12px',
+        'font-weight:600',
+        'cursor:pointer'
+      ].join(';');
+      sxBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleScreenXMode();
+      });
+      bar.appendChild(sxBtn);
 
       const standBtn = document.createElement('button');
       standBtn.type = 'button';
@@ -4107,6 +4267,7 @@
     renderFirstShopLedScreen(false);
     updateCorridorLedProximityAudio();
     updateCinemaDoors();
+    updateCinemaScreenX();
     updateCinemaSeatPrompt();
 
     renderer.render(scene, camera);
@@ -4168,6 +4329,10 @@
    * Close Dedicated SPACE Overlay & Return to Settings
    */
   function closeSpace() {
+    if (cinemaScreenXState.video && cinemaScreenXState.isPlaying) {
+      cinemaScreenXState.video.pause();
+      cinemaScreenXState.isPlaying = false;
+    }
     if (container) container.style.display = 'none';
     document.body.classList.remove('has-space-active');
     document.documentElement.classList.remove('has-space-active');
