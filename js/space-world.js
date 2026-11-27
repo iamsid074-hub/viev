@@ -2520,153 +2520,16 @@
       scene.add(pGroup);
     });
 
-    // Luxury Sculpted Burgundy Velvet 3-Seater Sofa with Brushed-Gold Base & Plump Damask Pillows (Right Side, z = -75.35)
-    const sofaGroup = new THREE.Group();
-    sofaGroup.position.set(-10.2, 0, -75.35);
-
-    // Rich Deep Oxblood Crushed-Velvet Texture (contrasts cleanly with lighter Wine-Red walls)
-    const velvetCanv = document.createElement('canvas');
-    velvetCanv.width = 256;
-    velvetCanv.height = 256;
-    const vCtx = velvetCanv.getContext('2d');
-    const vGrad = vCtx.createLinearGradient(0, 0, 256, 256);
-    vGrad.addColorStop(0, '#360814');
-    vGrad.addColorStop(0.5, '#25050d');
-    vGrad.addColorStop(1, '#3d0a17');
-    vCtx.fillStyle = vGrad;
-    vCtx.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 2400; i++) {
-      vCtx.fillStyle = i % 2 === 0 ? 'rgba(255,190,205,0.03)' : 'rgba(0,0,0,0.06)';
-      vCtx.fillRect((i * 73) % 256, (i * 137) % 256, 2, 2);
-    }
-    const velvetTex = new THREE.CanvasTexture(velvetCanv);
-    velvetTex.colorSpace = THREE.SRGBColorSpace;
-    velvetTex.wrapS = velvetTex.wrapT = THREE.RepeatWrapping;
-    const sofaVelvetMat = new THREE.MeshStandardMaterial({ map: velvetTex, roughness: 0.72, metalness: 0.08 });
-
-    // Damask Gold & Deep Emerald Pillow Textures
-    const damaskCanv = document.createElement('canvas');
-    damaskCanv.width = 128;
-    damaskCanv.height = 128;
-    const dCtx = damaskCanv.getContext('2d');
-    dCtx.fillStyle = '#9c7832';
-    dCtx.fillRect(0, 0, 128, 128);
-    dCtx.strokeStyle = 'rgba(245,215,130,0.45)';
-    dCtx.lineWidth = 2;
-    for (let y = 8; y < 128; y += 16) {
-      for (let x = 8; x < 128; x += 16) {
-        dCtx.beginPath();
-        dCtx.arc(x, y, 5, 0, Math.PI * 2);
-        dCtx.stroke();
-      }
-    }
-    const damaskTex = new THREE.CanvasTexture(damaskCanv);
-    damaskTex.colorSpace = THREE.SRGBColorSpace;
-    const pillowGoldMat = new THREE.MeshStandardMaterial({ map: damaskTex, roughness: 0.48, metalness: 0.38 });
-    const pillowEmeraldMat = new THREE.MeshStandardMaterial({ color: 0x113624, roughness: 0.76, metalness: 0.06 });
-
-    // Helper for soft beveled upholstered cushions
-    function makePlushBox(w, h, d, bevel = 0.04) {
-      const sw = w - bevel * 2;
-      const sh = h - bevel * 2;
-      const shape = new THREE.Shape();
-      const r = Math.min(0.05, sw * 0.15, sh * 0.15);
-      shape.moveTo(-sw / 2 + r, -sh / 2);
-      shape.lineTo(sw / 2 - r, -sh / 2);
-      shape.quadraticCurveTo(sw / 2, -sh / 2, sw / 2, -sh / 2 + r);
-      shape.lineTo(sw / 2, sh / 2 - r);
-      shape.quadraticCurveTo(sw / 2, sh / 2, sw / 2 - r, sh / 2);
-      shape.lineTo(-sw / 2 + r, sh / 2);
-      shape.quadraticCurveTo(-sw / 2, sh / 2, -sw / 2, sh / 2 - r);
-      shape.lineTo(-sw / 2, -sh / 2 + r);
-      shape.quadraticCurveTo(-sw / 2, -sh / 2, -sw / 2 + r, -sh / 2);
-      const geo = new THREE.ExtrudeGeometry(shape, {
-        depth: d - bevel * 2,
-        bevelEnabled: true,
-        bevelThickness: bevel,
-        bevelSize: bevel,
-        bevelSegments: 4
-      });
-      geo.center();
-      return geo;
-    }
-
-    // Brushed-gold plinth rail & 6 angled tapered brass legs
-    const sofaRail = new THREE.Mesh(new THREE.BoxGeometry(2.92, 0.045, 0.94), plantGoldMat);
-    sofaRail.position.set(0, 0.175, 0);
-    sofaGroup.add(sofaRail);
-
-    const sofaLegGeo = new THREE.CylinderGeometry(0.026, 0.013, 0.16, 12);
-    [-1.40, 0, 1.40].forEach((lx) => {
-      [-0.42, 0.42].forEach((lz) => {
-        const leg = new THREE.Mesh(sofaLegGeo, plantGoldMat);
-        leg.position.set(lx, 0.08, lz);
-        leg.rotation.z = lx < 0 ? 0.12 : (lx > 0 ? -0.12 : 0);
-        sofaGroup.add(leg);
-      });
-    });
-
-    // Upholstered lower deck & sculpted back rail
-    const sofaBase = new THREE.Mesh(makePlushBox(2.90, 0.16, 0.92, 0.03), sofaVelvetMat);
-    sofaBase.position.set(0, 0.27, 0);
-    sofaGroup.add(sofaBase);
-
-    const sofaBackFrame = new THREE.Mesh(makePlushBox(2.90, 0.62, 0.18, 0.04), sofaVelvetMat);
-    sofaBackFrame.position.set(0, 0.60, -0.37);
-    sofaGroup.add(sofaBackFrame);
-
-    // Sloped tapered designer armrests (Extrude profile along X)
-    const armProfile = new THREE.Shape();
-    armProfile.moveTo(-0.46, 0);
-    armProfile.lineTo(0.46, 0);
-    armProfile.lineTo(0.44, 0.36);
-    armProfile.quadraticCurveTo(0.38, 0.42, -0.44, 0.50);
-    armProfile.closePath();
-    const armGeo = new THREE.ExtrudeGeometry(armProfile, {
-      depth: 0.13,
-      bevelEnabled: true,
-      bevelThickness: 0.025,
-      bevelSize: 0.025,
-      bevelSegments: 4
-    });
-    armGeo.rotateY(Math.PI / 2);
-    armGeo.center();
-    [-1.38, 1.38].forEach((ax) => {
-      const arm = new THREE.Mesh(armGeo, sofaVelvetMat);
-      arm.position.set(ax, 0.47, 0);
-      sofaGroup.add(arm);
-    });
-
-    // 3 Plush Rounded Seat Cushions + 3 Sculpted Backrest Cushions
-    const seatCushGeo = makePlushBox(0.84, 0.17, 0.74, 0.045);
-    const backCushGeo = makePlushBox(0.83, 0.44, 0.21, 0.05);
-    [-0.85, 0, 0.85].forEach((cx) => {
-      const seatCush = new THREE.Mesh(seatCushGeo, sofaVelvetMat);
-      seatCush.position.set(cx, 0.40, 0.06);
-      sofaGroup.add(seatCush);
-
-      const backCush = new THREE.Mesh(backCushGeo, sofaVelvetMat);
-      backCush.position.set(cx, 0.67, -0.21);
-      backCush.rotation.x = -0.11;
-      sofaGroup.add(backCush);
-    });
-
-    // 5 Plump Rounded Accent Throw Pillows (Emerald Velvet, Damask Gold, Deep Burgundy)
-    const plumpPillowGeo = new THREE.SphereGeometry(0.18, 16, 12);
-    plumpPillowGeo.scale(1.05, 0.95, 0.38);
-    [
-      { x: -1.06, z: -0.04, ry: 0.42, mat: pillowEmeraldMat },
-      { x: -0.78, z: -0.07, ry: 0.18, mat: sofaVelvetMat },
-      { x: 0.02, z: -0.08, ry: -0.08, mat: pillowGoldMat },
-      { x: 0.35, z: -0.09, ry: -0.22, mat: pillowEmeraldMat },
-      { x: 1.04, z: -0.04, ry: -0.40, mat: sofaVelvetMat }
-    ].forEach((p) => {
-      const pil = new THREE.Mesh(plumpPillowGeo, p.mat);
-      pil.position.set(p.x, 0.58, p.z);
-      pil.rotation.set(-0.26, p.ry, 0);
-      sofaGroup.add(pil);
-    });
-    scene.add(sofaGroup);
+    // Luxury Burgundy Velvet Sofa Cutout PNG (Right Side, z = -75.20)
+    const luxurySofaTex = textureLoader.load('assets/luxury-sofa.png');
+    luxurySofaTex.colorSpace = THREE.SRGBColorSpace;
+    const luxurySofaMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.05, 1.48),
+      new THREE.MeshBasicMaterial({ map: luxurySofaTex, transparent: true, alphaTest: 0.08, side: THREE.DoubleSide })
+    );
+    luxurySofaMesh.position.set(-10.2, 0.74, -75.20);
+    luxurySofaMesh.rotation.y = 0.16;
+    scene.add(luxurySofaMesh);
 
     const stBaseGeo = new THREE.CylinderGeometry(0.16, 0.18, 0.04, 16);
     const stPoleGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.92, 12);
