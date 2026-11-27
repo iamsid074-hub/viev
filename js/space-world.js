@@ -2938,8 +2938,8 @@
       scene.add(bayRight);
     }
     [-98.0, -92.5, -86.0, -80.5].forEach((sz, idx) => {
-      // Keep front 2 speakers below the 7.7m ScreenX side wings so panoramic walls stay unobstructed
-      const spkY = idx < 2 ? 6.6 : 10.0 + (idx - 2) * 0.5;
+      // Keep all 4 side speakers cleanly tucked below the full-length sloped ScreenX wings
+      const spkY = [6.6, 6.9, 8.3, 9.4][idx];
       // Left Wall Speaker
       const spkL = new THREE.Group();
       spkL.position.set(hallMinX + 0.28, spkY, sz);
@@ -2967,14 +2967,15 @@
     wallSlopeCap.position.set(hallMinX + 0.20, (5.3 + 8.5) / 2, (stairEndZ + divEndZ) / 2);
     scene.add(wallSlopeCap);
 
-    // Giant True-Black Cinema Display + 270-Degree ScreenX Panoramic Side Wings
+    // Giant True-Black Cinema Display + Full-Length Sloped 270-Degree ScreenX Panoramic Side Wings
     const displayW = 22.8;
     const displayH = 10.6;
     const displayY = 13.0; // Spans y = 7.7m to 18.3m under the 19.5m ceiling
     const microBezelMat = new THREE.MeshStandardMaterial({
       color: 0x070709,
       roughness: 0.65,
-      metalness: 0.25
+      metalness: 0.25,
+      side: THREE.DoubleSide
     });
     const screenBezel = new THREE.Mesh(
       new THREE.BoxGeometry(displayW + 0.08, displayH + 0.08, 0.12),
@@ -2986,7 +2987,8 @@
     const screenMat = new THREE.MeshStandardMaterial({
       color: 0x030304,
       roughness: 0.96,
-      metalness: 0.0
+      metalness: 0.0,
+      side: THREE.DoubleSide
     });
     const screenSurface = new THREE.Mesh(
       new THREE.PlaneGeometry(displayW, displayH),
@@ -2995,25 +2997,54 @@
     screenSurface.position.set(hallCenterX, displayY, zEndWall - hallL + 0.15);
     scene.add(screenSurface);
 
-    // ScreenX Left & Right Panoramic Side Wings (z = -104.9m to -87.4m, flush at display height)
-    const wingLen = 17.5;
-    const wingCenterZ = (zEndWall - hallL) + wingLen / 2;
-    const leftWingBezel = new THREE.Mesh(new THREE.BoxGeometry(0.08, displayH + 0.08, wingLen + 0.08), microBezelMat);
-    leftWingBezel.position.set(hallMinX + 0.22, displayY, wingCenterZ);
+    // Full-Length Sloped ScreenX Side Wings (z = -104.9m all the way to -76.2m, bottom slopes from y = 7.7m up to 11.2m)
+    const wingZStart = zEndWall - hallL + 0.1; // -104.9m
+    const wingZSlopeStart = -94.0;
+    const wingZEnd = -76.2;
+    const wingTotalLen = wingZEnd - wingZStart; // 28.7m
+    const wingYBotFlat = displayY - displayH / 2; // 7.7m
+    const wingYBotBack = 11.2;
+    const wingYTop = displayY + displayH / 2; // 18.3m
+
+    const makeSlopedWingGeo = (pad) => {
+      const s = new THREE.Shape();
+      s.moveTo(-pad, wingYBotFlat - pad);
+      s.lineTo(wingZSlopeStart - wingZStart, wingYBotFlat - pad);
+      s.lineTo(wingTotalLen + pad, wingYBotBack - pad);
+      s.lineTo(wingTotalLen + pad, wingYTop + pad);
+      s.lineTo(-pad, wingYTop + pad);
+      s.closePath();
+      const geo = new THREE.ShapeGeometry(s);
+      // Normalize UVs across full sloped wing so video maps cleanly without distortion
+      const posAttr = geo.attributes.position;
+      const uvAttr = geo.attributes.uv;
+      for (let i = 0; i < posAttr.count; i++) {
+        const lx = posAttr.getX(i);
+        const ly = posAttr.getY(i);
+        uvAttr.setXY(i, lx / wingTotalLen, (ly - wingYBotFlat) / displayH);
+      }
+      uvAttr.needsUpdate = true;
+      geo.rotateY(-Math.PI / 2); // Maps shape X (0..28.7) -> +Z
+      return geo;
+    };
+
+    const wingBezelGeo = makeSlopedWingGeo(0.04);
+    const wingScreenGeo = makeSlopedWingGeo(0.0);
+
+    const leftWingBezel = new THREE.Mesh(wingBezelGeo, microBezelMat);
+    leftWingBezel.position.set(hallMinX + 0.21, 0, wingZStart);
     scene.add(leftWingBezel);
 
-    const leftScreenWing = new THREE.Mesh(new THREE.PlaneGeometry(wingLen, displayH), screenMat);
-    leftScreenWing.rotation.y = Math.PI / 2;
-    leftScreenWing.position.set(hallMinX + 0.27, displayY, wingCenterZ);
+    const leftScreenWing = new THREE.Mesh(wingScreenGeo, screenMat);
+    leftScreenWing.position.set(hallMinX + 0.25, 0, wingZStart);
     scene.add(leftScreenWing);
 
-    const rightWingBezel = new THREE.Mesh(new THREE.BoxGeometry(0.08, displayH + 0.08, wingLen + 0.08), microBezelMat);
-    rightWingBezel.position.set(hallMaxX - 0.22, displayY, wingCenterZ);
+    const rightWingBezel = new THREE.Mesh(wingBezelGeo, microBezelMat);
+    rightWingBezel.position.set(hallMaxX - 0.21, 0, wingZStart);
     scene.add(rightWingBezel);
 
-    const rightScreenWing = new THREE.Mesh(new THREE.PlaneGeometry(wingLen, displayH), screenMat);
-    rightScreenWing.rotation.y = -Math.PI / 2;
-    rightScreenWing.position.set(hallMaxX - 0.27, displayY, wingCenterZ);
+    const rightScreenWing = new THREE.Mesh(wingScreenGeo, screenMat);
+    rightScreenWing.position.set(hallMaxX - 0.25, 0, wingZStart);
     scene.add(rightScreenWing);
 
     // Synchronized Triple-Screen VideoTexture setup for ScreenX
@@ -3036,7 +3067,7 @@
     cinemaScreenXState.rightWing = rightScreenWing;
     cinemaScreenXState.idleMat = screenMat;
     cinemaScreenXState.videoMainMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xffffff });
-    cinemaScreenXState.videoWingMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xaab0be });
+    cinemaScreenXState.videoWingMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xaab0be, side: THREE.DoubleSide });
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
     const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
