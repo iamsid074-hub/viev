@@ -2506,13 +2506,14 @@
       ctx.lineWidth = 2;
       ctx.strokeRect(8, 8, 240, 112);
       ctx.setLineDash([]);
-      ctx.font = '700 54px "Cinzel", Georgia, serif';
+      ctx.font = '700 58px "Cinzel", Georgia, serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'rgba(24, 16, 10, 0.45)';
-      ctx.fillText(label, 130, 67);
-      ctx.fillStyle = '#f2cf74';
-      ctx.fillText(label, 128, 64);
+      ctx.fillStyle = '#24170e';
+      ctx.fillText(label, 128, 66);
+      ctx.strokeStyle = 'rgba(235, 194, 94, 0.55)';
+      ctx.lineWidth = 2;
+      ctx.strokeText(label, 128, 66);
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
       const mat = new THREE.MeshStandardMaterial({
@@ -2674,7 +2675,7 @@
       backGroup.add(head);
 
       const logoPlane = new THREE.Mesh(geo.headLogo, getSeatHeadMat(label));
-      logoPlane.position.set(0, 0.78, 0.165);
+      logoPlane.position.set(0, isRecliner ? 0.80 : 0.78, isRecliner ? 0.205 : 0.192);
       backGroup.add(logoPlane);
       g.add(backGroup);
 
