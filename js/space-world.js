@@ -2265,190 +2265,224 @@
         highP.rotation.y = ang;
         highP.position.set(bx + nx * 0.015, trHighY, bz + nz * 0.015);
         scene.add(highP);
-
-        // Cylindrical bronze up-down wall sconce on designated bays
-        if (sconceIndices.includes(i)) {
-          const sx = bx + nx * 0.10;
-          const sz = bz + nz * 0.10;
-          const sBody = new THREE.Mesh(trSconceBodyGeo, doorBrassTrimMat);
-          sBody.position.set(sx, 2.45, sz);
-          scene.add(sBody);
-          [-0.23, 0.23].forEach((dy) => {
-            const sGlow = new THREE.Mesh(trSconceGlowGeo, ticketLedSlitMat);
-            sGlow.position.set(sx, 2.45 + dy, sz);
-            scene.add(sGlow);
-          });
-        }
-
-        // Gold vertical inlay strip + recessed upper warm LED light slit at seam
-        if (i > 0) {
-          const st = i / bayCount;
-          const jx = x0 + (x1 - x0) * st;
-          const jz = z0 + (z1 - z0) * st;
-          const isLit = ledIndices.includes(i);
-          const seamH = isLit ? trPanelLowH : (trPanelLowH + trPanelHighH);
-          const seamY = isLit ? trLowY : (0.22 + (trPanelLowH + trPanelHighH) / 2);
-
-          const brassStrip = new THREE.Mesh(new THREE.BoxGeometry(0.035, seamH, 0.025), doorBrassTrimMat);
-          brassStrip.rotation.y = ang;
-          brassStrip.position.set(jx + nx * 0.022, seamY, jz + nz * 0.022);
-          scene.add(brassStrip);
-
-          if (isLit) {
-            const ledSlit = new THREE.Mesh(new THREE.BoxGeometry(0.038, trPanelHighH, 0.032), ticketLedSlitMat);
-            ledSlit.rotation.y = ang;
-            ledSlit.position.set(jx + nx * 0.025, trHighY, jz + nz * 0.025);
-            scene.add(ledSlit);
-          }
-        }
       }
     }
 
-    // Apply plum suede paneling + gold inlays + upper LED slits + sconces to all 4 Ticket Room walls
+    // Apply clean 2-tiered Wine-Red suede acoustic paneling to all 4 Ticket Room walls (no gold strips/LED slits/sconces)
     const trBackX = -halfW - lrW; // -20.5m
-    addTicketWallBayDetails(trBackX, -66.04, trBackX, -75.96, 1, 0, 6, [1, 4], [1, 2, 4, 5]);
-    addTicketWallBayDetails(-halfW - 0.22, -66.04, trBackX, -66.04, 0, -1, 8, [1, 4, 6], [1, 2, 5, 6]);
-    addTicketWallBayDetails(trBackX, -75.96, -halfW - 0.22, -75.96, 0, 1, 8, [1, 3, 6], [2, 3, 6, 7]);
-    addTicketWallBayDetails(-halfW - 0.21, -66.04, -halfW - 0.21, -69.30, -1, 0, 2, [0], [1]);
-    addTicketWallBayDetails(-halfW - 0.21, -72.70, -halfW - 0.21, -75.96, -1, 0, 2, [1], [1]);
+    addTicketWallBayDetails(trBackX, -66.04, trBackX, -75.96, 1, 0, 6, [], []);
+    addTicketWallBayDetails(-halfW - 0.22, -66.04, trBackX, -66.04, 0, -1, 8, [], []);
+    addTicketWallBayDetails(trBackX, -75.96, -halfW - 0.22, -75.96, 0, 1, 8, [], []);
+    addTicketWallBayDetails(-halfW - 0.21, -66.04, -halfW - 0.21, -69.30, -1, 0, 2, [], []);
+    addTicketWallBayDetails(-halfW - 0.21, -72.70, -halfW - 0.21, -75.96, -1, 0, 2, [], []);
 
-    // 5.0B. LUXURY TICKET COUNTER, 3 POS TERMINALS, SHOWTIME BOARDS & VELVET STANCHIONS
+    // 5.0B. UNIQUE ARCHITECTURAL TICKET COUNTER (Fluted Walnut + Waterfall Marble + PC & Customer Tablets + 3 Vertical LEDs)
     const tcGroup = new THREE.Group();
     tcGroup.position.set(-17.8, 0, lrCenterZ);
 
-    const tcBodyMat = new THREE.MeshStandardMaterial({ color: 0x1e1e20, roughness: 0.45, metalness: 0.12 });
-    const tcTopMat = new THREE.MeshStandardMaterial({ color: 0x111114, roughness: 0.22, metalness: 0.25 });
-    const tcPosScreenMat = new THREE.MeshStandardMaterial({ color: 0x7a828e, roughness: 0.35, metalness: 0.55 });
+    const tcBodyMat = new THREE.MeshStandardMaterial({ color: 0x161414, roughness: 0.48, metalness: 0.14 });
+    const tcTopMat = new THREE.MeshStandardMaterial({ color: 0x0e0e11, roughness: 0.20, metalness: 0.28 });
+    const tcAlumMat = new THREE.MeshStandardMaterial({ color: 0x9aa0a8, roughness: 0.28, metalness: 0.78 });
+    const tcGlassDivMat = new THREE.MeshStandardMaterial({
+      color: 0xa8c8d8,
+      transparent: true,
+      opacity: 0.28,
+      roughness: 0.08,
+      metalness: 0.2,
+      side: THREE.DoubleSide
+    });
 
-    const tcStraightL = 4.6;
+    const tcStraightL = 4.8;
     const tcDepth = 1.06;
     const tcRadius = tcDepth / 2;
 
-    const tcBody = new THREE.Mesh(new THREE.BoxGeometry(tcDepth, 0.92, tcStraightL), tcBodyMat);
-    tcBody.position.set(0, 0.54, 0);
-    tcGroup.add(tcBody);
+    // Recessed dark architectural toe-kick plinth (no protruding white bar)
+    const tcToeKick = new THREE.Mesh(new THREE.BoxGeometry(tcDepth - 0.18, 0.12, tcStraightL), tcTopMat);
+    tcToeKick.position.set(-0.04, 0.06, 0);
+    tcGroup.add(tcToeKick);
+
+    // Fluted dark-walnut front fascia + matte-obsidian inner core + rounded ends
+    const tcCore = new THREE.Mesh(new THREE.BoxGeometry(tcDepth - 0.06, 0.88, tcStraightL), tcBodyMat);
+    tcCore.position.set(0, 0.56, 0);
+    tcGroup.add(tcCore);
+
+    const tcFrontWood = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.86, tcStraightL - 0.04), woodWallMat);
+    tcFrontWood.position.set(tcDepth / 2 - 0.02, 0.56, 0);
+    tcGroup.add(tcFrontWood);
 
     [-tcStraightL / 2, tcStraightL / 2].forEach((ez) => {
-      const endCyl = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius, tcRadius, 0.92, 24), tcBodyMat);
-      endCyl.position.set(0, 0.54, ez);
+      const endCyl = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius - 0.02, tcRadius - 0.02, 0.88, 24), woodWallMat);
+      endCyl.position.set(0, 0.56, ez);
       tcGroup.add(endCyl);
 
-      const topEndBrass = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius + 0.015, tcRadius + 0.015, 0.08, 24), doorBrassTrimMat);
-      topEndBrass.position.set(0, 0.97, ez);
-      tcGroup.add(topEndBrass);
+      const endToe = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius - 0.10, tcRadius - 0.10, 0.12, 24), tcTopMat);
+      endToe.position.set(-0.02, 0.06, ez);
+      tcGroup.add(endToe);
 
-      const botEndBrass = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius + 0.01, tcRadius + 0.01, 0.11, 24), doorBrassTrimMat);
-      botEndBrass.position.set(0, 0.055, ez);
-      tcGroup.add(botEndBrass);
-
-      const endMarble = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius + 0.025, tcRadius + 0.025, 0.07, 24), tcTopMat);
-      endMarble.position.set(0, 1.045, ez);
+      const endMarble = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius + 0.03, tcRadius + 0.03, 0.08, 24), tcTopMat);
+      endMarble.position.set(0, 1.04, ez);
       tcGroup.add(endMarble);
     });
 
-    const tcTopBrass = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.03, 0.08, tcStraightL), doorBrassTrimMat);
-    tcTopBrass.position.set(0, 0.97, 0);
-    tcGroup.add(tcTopBrass);
-
-    const tcBotBrass = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.02, 0.11, tcStraightL), doorBrassTrimMat);
-    tcBotBrass.position.set(0, 0.055, 0);
-    tcGroup.add(tcBotBrass);
-
-    const tcUnderLed = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.06, 0.03, tcStraightL + 0.8), ticketLedSlitMat);
-    tcUnderLed.position.set(0.03, 0.02, 0);
-    tcGroup.add(tcUnderLed);
-
-    const tcTopSlab = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.05, 0.07, tcStraightL), tcTopMat);
-    tcTopSlab.position.set(0, 1.045, 0);
+    // Waterfall Dark Marble Countertop + Sleek Raised Transaction Ledge
+    const tcTopSlab = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.06, 0.08, tcStraightL), tcTopMat);
+    tcTopSlab.position.set(0, 1.04, 0);
     tcGroup.add(tcTopSlab);
 
+    // Slim recessed brass accent reveal under countertop
+    const tcSubBrass = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.02, 0.025, tcStraightL), doorBrassTrimMat);
+    tcSubBrass.position.set(0.01, 0.99, 0);
+    tcGroup.add(tcSubBrass);
+
+    // 4 Sleek Glass & Brass Station Dividers along front counter
     [-tcStraightL / 2, -tcStraightL / 6, tcStraightL / 6, tcStraightL / 2].forEach((dz) => {
-      const divBar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.86, 0.035), doorBrassTrimMat);
-      divBar.position.set(tcDepth / 2 + 0.012, 0.52, dz);
-      tcGroup.add(divBar);
+      const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.90, 0.03), doorBrassTrimMat);
+      pillar.position.set(tcDepth / 2 + 0.01, 0.56, dz);
+      tcGroup.add(pillar);
+
+      if (Math.abs(dz) < tcStraightL / 2 - 0.1) {
+        const glassWing = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.34, 0.015), tcGlassDivMat);
+        glassWing.position.set(0.18, 1.25, dz);
+        tcGroup.add(glassWing);
+      }
     });
 
-    const monGeo = new THREE.BoxGeometry(0.035, 0.34, 0.54);
-    const standGeo = new THREE.BoxGeometry(0.05, 0.16, 0.07);
-    const baseGeo = new THREE.BoxGeometry(0.16, 0.02, 0.20);
+    // Shared CanvasTexture for Staff PC Monitor POS UI + Customer Tablet UI
+    const posUiCanvas = document.createElement('canvas');
+    posUiCanvas.width = 256;
+    posUiCanvas.height = 144;
+    const puCtx = posUiCanvas.getContext('2d');
+    puCtx.fillStyle = '#0c1118';
+    puCtx.fillRect(0, 0, 256, 144);
+    puCtx.fillStyle = '#d4af37';
+    puCtx.fillRect(0, 0, 256, 22);
+    puCtx.fillStyle = '#140c08';
+    puCtx.font = 'bold 11px Arial, sans-serif';
+    puCtx.fillText('VIEV BOX OFFICE · SEAT MAP', 10, 15);
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 8; c++) {
+        puCtx.fillStyle = (r === 2 && c > 2 && c < 6) ? '#f0c966' : '#2d3b4e';
+        puCtx.fillRect(16 + c * 28, 36 + r * 22, 20, 14);
+      }
+    }
+    const posUiTex = new THREE.CanvasTexture(posUiCanvas);
+    posUiTex.colorSpace = THREE.SRGBColorSpace;
+    const posScreenMat = new THREE.MeshBasicMaterial({ map: posUiTex });
+
+    // 3 Proper Staff PC Setups + Customer Tilted Tablets + NFC Readers + Ticket Printers
+    const monBodyGeo = new THREE.BoxGeometry(0.028, 0.36, 0.62);
+    const monFaceGeo = new THREE.PlaneGeometry(0.58, 0.32);
+    const standGeo = new THREE.BoxGeometry(0.035, 0.16, 0.08);
+    const baseGeo = new THREE.BoxGeometry(0.16, 0.018, 0.22);
+    const kbGeo = new THREE.BoxGeometry(0.14, 0.014, 0.36);
+    const tabletBodyGeo = new THREE.BoxGeometry(0.016, 0.20, 0.30);
+    const tabletFaceGeo = new THREE.PlaneGeometry(0.28, 0.18);
     const printerGeo = new THREE.BoxGeometry(0.14, 0.12, 0.14);
-    const cardGeo = new THREE.BoxGeometry(0.10, 0.13, 0.08);
+    const cardGeo = new THREE.BoxGeometry(0.09, 0.12, 0.075);
+
     [-tcStraightL / 3, 0, tcStraightL / 3].forEach((pz) => {
-      const mon = new THREE.Mesh(monGeo, tcPosScreenMat);
-      mon.position.set(-0.04, 1.32, pz);
-      mon.rotation.z = 0.08;
+      // Staff Widescreen iMac-style PC Setup (facing staff -X)
+      const mon = new THREE.Mesh(monBodyGeo, tcAlumMat);
+      mon.position.set(-0.08, 1.34, pz);
+      mon.rotation.z = 0.06;
       tcGroup.add(mon);
 
-      const stand = new THREE.Mesh(standGeo, tcPosScreenMat);
-      stand.position.set(-0.06, 1.15, pz);
+      const monScreen = new THREE.Mesh(monFaceGeo, posScreenMat);
+      monScreen.rotation.y = -Math.PI / 2;
+      monScreen.position.set(-0.096, 1.34, pz);
+      tcGroup.add(monScreen);
+
+      const stand = new THREE.Mesh(standGeo, tcAlumMat);
+      stand.position.set(-0.05, 1.15, pz);
       tcGroup.add(stand);
 
-      const sBase = new THREE.Mesh(baseGeo, tcPosScreenMat);
-      sBase.position.set(-0.04, 1.09, pz);
+      const sBase = new THREE.Mesh(baseGeo, tcAlumMat);
+      sBase.position.set(-0.05, 1.09, pz);
       tcGroup.add(sBase);
 
+      const keyboard = new THREE.Mesh(kbGeo, tcAlumMat);
+      keyboard.position.set(-0.24, 1.09, pz);
+      tcGroup.add(keyboard);
+
+      // Customer-Facing Tilted Tablet Kiosk (facing customer +X)
+      const tab = new THREE.Mesh(tabletBodyGeo, tcAlumMat);
+      tab.position.set(0.26, 1.22, pz);
+      tab.rotation.z = -0.45;
+      tcGroup.add(tab);
+
+      const tabScreen = new THREE.Mesh(tabletFaceGeo, posScreenMat);
+      tabScreen.rotation.y = Math.PI / 2;
+      tabScreen.rotation.order = 'YXZ';
+      tabScreen.rotation.x = -0.45;
+      tabScreen.position.set(0.272, 1.225, pz);
+      tcGroup.add(tabScreen);
+
+      const tabStand = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.14, 0.06), tcAlumMat);
+      tabStand.position.set(0.24, 1.13, pz);
+      tcGroup.add(tabStand);
+
+      // Thermal Ticket Printer & Tap-to-Pay NFC Terminal
       const printer = new THREE.Mesh(printerGeo, tcTopMat);
-      printer.position.set(0.08, 1.14, pz + 0.42);
+      printer.position.set(0.10, 1.14, pz + 0.44);
       tcGroup.add(printer);
 
       const cardTap = new THREE.Mesh(cardGeo, tcTopMat);
-      cardTap.position.set(0.16, 1.14, pz - 0.38);
-      cardTap.rotation.z = -0.3;
+      cardTap.position.set(0.22, 1.14, pz - 0.36);
+      cardTap.rotation.z = -0.35;
       tcGroup.add(cardTap);
     });
 
-    const tcUnderLight = new THREE.PointLight(0xffcb78, 0.85, 8, 1.8);
-    tcUnderLight.position.set(0.85, 0.45, 0);
+    const tcUnderLight = new THREE.PointLight(0xffcb78, 0.45, 6, 2.0);
+    tcUnderLight.position.set(0.75, 0.35, 0);
     tcGroup.add(tcUnderLight);
     scene.add(tcGroup);
 
+    // 3 Tall Bezelless Vertical LED Displays on Back Wall (x = -20.42m, y = 3.25m)
     const showMovies = [
-      { title: 'VIEV EXCLUSIVE', sub: 'SCREENX 270°', time: '07:30 PM  ·  VIP' },
-      { title: 'AASHAYEIN', sub: 'DOLBY ATMOS', time: '09:00 PM  ·  HALL 1' },
-      { title: 'MIDNIGHT LUXE', sub: 'RECLINER SUITE', time: '10:45 PM  ·  V1-V11' }
+      { title: 'VIEV EXCLUSIVE', sub: 'SCREENX 270°', time: '07:30 PM · VIP' },
+      { title: 'AASHAYEIN', sub: 'DOLBY ATMOS', time: '09:00 PM · HALL 1' },
+      { title: 'MIDNIGHT LUXE', sub: 'RECLINER SUITE', time: '10:45 PM · V1-V11' }
     ];
     showMovies.forEach((m, idx) => {
-      const bz = -72.55 + idx * 1.55;
-      const bFrame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.65, 1.20), tcTopMat);
-      bFrame.position.set(trBackX + 0.04, 2.85, bz);
-      scene.add(bFrame);
+      const bz = -72.65 + idx * 1.65;
+      const ledFrame = new THREE.Mesh(new THREE.BoxGeometry(0.05, 2.58, 1.24), tcTopMat);
+      ledFrame.position.set(trBackX + 0.03, 3.25, bz);
+      scene.add(ledFrame);
 
       const bCanv = document.createElement('canvas');
       bCanv.width = 256;
-      bCanv.height = 360;
+      bCanv.height = 512;
       const bCtx = bCanv.getContext('2d');
-      const bgGrad = bCtx.createLinearGradient(0, 0, 0, 360);
-      bgGrad.addColorStop(0, '#1e1116');
-      bgGrad.addColorStop(1, '#0c090b');
+      const bgGrad = bCtx.createLinearGradient(0, 0, 0, 512);
+      bgGrad.addColorStop(0, '#2a0d16');
+      bgGrad.addColorStop(0.55, '#12080c');
+      bgGrad.addColorStop(1, '#080608');
       bCtx.fillStyle = bgGrad;
-      bCtx.fillRect(0, 0, 256, 360);
-      bCtx.strokeStyle = '#d4af37';
-      bCtx.lineWidth = 4;
-      bCtx.strokeRect(10, 10, 236, 340);
-      bCtx.fillStyle = '#d4af37';
-      bCtx.font = 'bold 16px Arial, sans-serif';
-      bCtx.textAlign = 'center';
-      bCtx.fillText('NOW SHOWING', 128, 44);
-      bCtx.fillStyle = '#ffffff';
-      bCtx.font = 'bold 24px Georgia, serif';
-      bCtx.fillText(m.title, 128, 155);
-      bCtx.fillStyle = 'rgba(255,255,255,0.72)';
-      bCtx.font = '16px Arial, sans-serif';
-      bCtx.fillText(m.sub, 128, 192);
+      bCtx.fillRect(0, 0, 256, 512);
       bCtx.fillStyle = '#f2cf74';
-      bCtx.fillRect(28, 250, 200, 44);
+      bCtx.font = 'bold 18px Arial, sans-serif';
+      bCtx.textAlign = 'center';
+      bCtx.fillText('NOW SHOWING', 128, 56);
+      bCtx.fillStyle = '#ffffff';
+      bCtx.font = 'bold 26px Georgia, serif';
+      bCtx.fillText(m.title, 128, 215);
+      bCtx.fillStyle = 'rgba(255,255,255,0.75)';
+      bCtx.font = '18px Arial, sans-serif';
+      bCtx.fillText(m.sub, 128, 258);
+      bCtx.fillStyle = '#f2cf74';
+      bCtx.fillRect(24, 370, 208, 52);
       bCtx.fillStyle = '#140c08';
-      bCtx.font = 'bold 16px Arial, sans-serif';
-      bCtx.fillText(m.time, 128, 277);
+      bCtx.font = 'bold 17px Arial, sans-serif';
+      bCtx.fillText(m.time, 128, 402);
 
       const bTex = new THREE.CanvasTexture(bCanv);
       bTex.colorSpace = THREE.SRGBColorSpace;
       const bScreen = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.12, 1.56),
+        new THREE.PlaneGeometry(1.18, 2.50),
         new THREE.MeshBasicMaterial({ map: bTex })
       );
       bScreen.rotation.y = Math.PI / 2;
-      bScreen.position.set(trBackX + 0.08, 2.85, bz);
+      bScreen.position.set(trBackX + 0.065, 3.25, bz);
       scene.add(bScreen);
     });
 
