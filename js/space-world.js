@@ -2471,27 +2471,27 @@
     cinemaSeatColliders.length = 0;
     cinemaSeats.length = 0;
 
-    // Rich Warm Champagne-Taupe Stitched Leather Texture (prevents white blowout, shows leather grain & seams)
+    // Matte Charcoal / Graphite Black Stitched Leather Texture (anti-glare IMAX/Dolby cinema standard)
     const leatherCanvas = document.createElement('canvas');
     leatherCanvas.width = 256;
     leatherCanvas.height = 256;
     const lCtx = leatherCanvas.getContext('2d');
-    lCtx.fillStyle = '#9c846d';
+    lCtx.fillStyle = '#242428';
     lCtx.fillRect(0, 0, 256, 256);
     for (let i = 0; i < 5000; i++) {
-      const d = Math.random() > 0.5 ? 'rgba(255,245,232,0.06)' : 'rgba(42,30,20,0.09)';
+      const d = Math.random() > 0.5 ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.22)';
       lCtx.fillStyle = d;
       lCtx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
     }
-    // Subtle stitched leather perimeter seam
-    lCtx.strokeStyle = 'rgba(58, 42, 28, 0.35)';
+    // Subtle stitched graphite perimeter seam
+    lCtx.strokeStyle = 'rgba(180, 155, 105, 0.22)';
     lCtx.setLineDash([5, 4]);
     lCtx.lineWidth = 2;
     lCtx.strokeRect(10, 10, 236, 236);
     const leatherTex = new THREE.CanvasTexture(leatherCanvas);
     leatherTex.colorSpace = THREE.SRGBColorSpace;
 
-    // Per-seat Numbered Headrest Material Cache (replaces "VIEV" with A1..G12 and V1..V11)
+    // Per-seat Numbered Headrest Material Cache (charcoal leather + subtle champagne-gold seat number)
     const seatHeadMatCache = {};
     function getSeatHeadMat(label) {
       if (seatHeadMatCache[label]) return seatHeadMatCache[label];
@@ -2499,38 +2499,35 @@
       c.width = 256;
       c.height = 128;
       const ctx = c.getContext('2d');
-      ctx.fillStyle = '#9c846d';
+      ctx.fillStyle = '#242428';
       ctx.fillRect(0, 0, 256, 128);
-      ctx.strokeStyle = 'rgba(58, 42, 28, 0.35)';
+      ctx.strokeStyle = 'rgba(180, 155, 105, 0.22)';
       ctx.setLineDash([4, 4]);
       ctx.lineWidth = 2;
       ctx.strokeRect(8, 8, 240, 112);
       ctx.setLineDash([]);
-      ctx.font = '700 58px "Cinzel", Georgia, serif';
+      ctx.font = '700 54px "Cinzel", Georgia, serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#24170e';
-      ctx.fillText(label, 128, 66);
-      ctx.strokeStyle = 'rgba(235, 194, 94, 0.55)';
-      ctx.lineWidth = 2;
-      ctx.strokeText(label, 128, 66);
+      ctx.fillStyle = '#d4b262';
+      ctx.fillText(label, 128, 65);
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
       const mat = new THREE.MeshStandardMaterial({
         map: tex,
-        roughness: 0.62,
-        metalness: 0.06
+        roughness: 0.78,
+        metalness: 0.04
       });
       seatHeadMatCache[label] = mat;
       return mat;
     }
 
-    // Materials matching VIEV Luxury Seat Model (Supple Champagne-Taupe Leather + Glossy Obsidian Pods + Warm LED + Brass)
+    // Materials: Anti-glare Matte Charcoal Leather + Glossy Obsidian Pods + Subtle Warm LED + Brass
     const seatLeatherMat = new THREE.MeshStandardMaterial({
       map: leatherTex,
       color: 0xffffff,
-      roughness: 0.64,
-      metalness: 0.04
+      roughness: 0.78,
+      metalness: 0.03
     });
     const seatObsidianMat = new THREE.MeshStandardMaterial({
       color: 0x131111,
@@ -2538,10 +2535,10 @@
       metalness: 0.36
     });
     const seatArmLedMat = new THREE.MeshStandardMaterial({
-      color: 0xffe099,
-      emissive: new THREE.Color(0xffaa2b),
-      emissiveIntensity: 1.35,
-      roughness: 0.2
+      color: 0xffd27a,
+      emissive: new THREE.Color(0xff9d24),
+      emissiveIntensity: 0.50,
+      roughness: 0.25
     });
 
     // Helper: Extrude a 2D (z, y) side profile centered on X = 0 with smooth rounded bevels
