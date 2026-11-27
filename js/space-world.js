@@ -1993,7 +1993,7 @@
     // 5.1. RIGHT-SIDE ENTRY WALLED STAIRCASE (>10 STEPS, HIGH RISE) & AUDITORIUM CINEMA HALL (z = -76m to -105m)
     const hallW = 24.0;
     const hallL = 29.0;
-    const hallH = 16.5;
+    const hallH = 19.5;
     const hallMinX = -20.8;
     const hallMaxX = 3.2; // Right wall sits beside the right-side entry corridor
     const hallCenterX = (hallMinX + hallMaxX) / 2; // -8.8m
@@ -2950,10 +2950,10 @@
     wallSlopeCap.position.set(hallMinX + 0.20, (5.3 + 8.5) / 2, (stairEndZ + divEndZ) / 2);
     scene.add(wallSlopeCap);
 
-    // Giant True-Black Cinema Display on Back Wall (z = -104.9m) with ultra-thin micro-bezel
+    // Giant True-Black Cinema Display on Back Wall (z = -104.9m) shifted higher above all seating sightlines
     const displayW = 22.8;
-    const displayH = 10.4;
-    const displayY = 10.6; // Spans y = 5.4m to 15.8m under the 16.5m ceiling
+    const displayH = 10.6;
+    const displayY = 13.0; // Spans y = 7.7m to 18.3m under the 19.5m ceiling
     const microBezelMat = new THREE.MeshStandardMaterial({
       color: 0x070709,
       roughness: 0.65,
@@ -3986,7 +3986,7 @@
     seatedState.active = true;
     seatedState.seat = seat;
     targetYaw = 0; // Smoothly face the Giant Cinema Display (-Z)
-    targetPitch = -0.02;
+    targetPitch = 0.06;
     lastSeatBarKey = '';
   }
 
