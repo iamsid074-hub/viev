@@ -2437,16 +2437,31 @@
     tcGroup.add(tcUnderLight);
     scene.add(tcGroup);
 
-    // 3 Tall Bezelless Vertical LED Displays on Back Wall (x = -20.42m, y = 3.25m)
-    const showMovies = [
-      { title: 'VIEV EXCLUSIVE', sub: 'SCREENX 270°', time: '07:30 PM · VIP' },
-      { title: 'AASHAYEIN', sub: 'DOLBY ATMOS', time: '09:00 PM · HALL 1' },
-      { title: 'MIDNIGHT LUXE', sub: 'RECLINER SUITE', time: '10:45 PM · V1-V11' }
+    // VIEV.inc Brushed-Gold Logo centered on Back Wall above Ticket Counter
+    const vievIncLogoTex = textureLoader.load('assets/viev-inc-logo.png');
+    vievIncLogoTex.colorSpace = THREE.SRGBColorSpace;
+    const vievIncLogoMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(4.2, 1.25),
+      new THREE.MeshBasicMaterial({ map: vievIncLogoTex, transparent: true, alphaTest: 0.05 })
+    );
+    vievIncLogoMesh.rotation.y = Math.PI / 2;
+    vievIncLogoMesh.position.set(trBackX + 0.06, 3.25, lrCenterZ);
+    scene.add(vievIncLogoMesh);
+
+    const logoBackGlow = new THREE.PointLight(0xffcf7a, 0.55, 7, 2.0);
+    logoBackGlow.position.set(trBackX + 0.55, 3.25, lrCenterZ);
+    scene.add(logoBackGlow);
+
+    // 1 Tall Bezelless Vertical LED Display on EACH Side Wall (South z = -66.04 & North z = -75.96)
+    const sideWallLeds = [
+      { zPos: -66.04, nz: -1, rotY: Math.PI, title: 'VIEV EXCLUSIVE', sub: 'SCREENX 270°', time: '07:30 PM · VIP' },
+      { zPos: -75.96, nz: 1, rotY: 0, title: 'AASHAYEIN', sub: 'DOLBY ATMOS', time: '09:00 PM · HALL 1' }
     ];
-    showMovies.forEach((m, idx) => {
-      const bz = -72.65 + idx * 1.65;
-      const ledFrame = new THREE.Mesh(new THREE.BoxGeometry(0.05, 2.58, 1.24), tcTopMat);
-      ledFrame.position.set(trBackX + 0.03, 3.25, bz);
+    sideWallLeds.forEach((m) => {
+      const ledX = -12.8;
+      const ledY = 2.65;
+      const ledFrame = new THREE.Mesh(new THREE.BoxGeometry(1.24, 2.58, 0.05), tcTopMat);
+      ledFrame.position.set(ledX, ledY, m.zPos + m.nz * 0.045);
       scene.add(ledFrame);
 
       const bCanv = document.createElement('canvas');
@@ -2481,8 +2496,8 @@
         new THREE.PlaneGeometry(1.18, 2.50),
         new THREE.MeshBasicMaterial({ map: bTex })
       );
-      bScreen.rotation.y = Math.PI / 2;
-      bScreen.position.set(trBackX + 0.065, 3.25, bz);
+      bScreen.rotation.y = m.rotY;
+      bScreen.position.set(ledX, ledY, m.zPos + m.nz * 0.075);
       scene.add(bScreen);
     });
 
@@ -4149,8 +4164,15 @@
           }
         }
       }
-      // Physical Cinema Seat Collision Helper (prevents walking through any seat)
+      // Physical Cinema Seat & Ticket Room Counter/Barrier Collision Helper
       const isBlockedBySeat = (x, z, curY) => {
+        // Solid Ticket Room Counter (-17.8, -71.0) & Stanchion Rope Barriers
+        if (z >= -76.0 && z <= -66.0 && x < -6.0) {
+          // Ticket Counter (including rounded end caps)
+          if (x >= -18.61 && x <= -16.99 && z >= -74.21 && z <= -67.79) return true;
+          // South & North Stanchion Rope Barriers
+          if (x >= -16.86 && x <= -15.04 && ((z >= -70.38 && z <= -69.82) || (z >= -72.18 && z <= -71.62))) return true;
+        }
         if (z >= -76.0 || cinemaSeatColliders.length === 0) return false;
         const pad = 0.24;
         const approxFloorY = curY - cameraY;
