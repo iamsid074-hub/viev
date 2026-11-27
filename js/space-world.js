@@ -134,7 +134,14 @@
     dimCur: 0,
     lights: [],
     coveMat: null,
-    downlightMat: null
+    downlightMat: null,
+    globalAmbient: null,
+    globalDir: null,
+    ceilBounceLight: null,
+    floorBounceLight: null,
+    reflectCtx: null,
+    reflectFrame: 0,
+    bounceColor: new THREE.Color(0x8899bb)
   };
   let lookTouchId = null;
   let prevPointerX = 0;
@@ -2115,8 +2122,8 @@
     const cottonBlackFloorMat = new THREE.MeshStandardMaterial({
       map: cottonBlackTex,
       color: 0xffffff,
-      roughness: 0.96,
-      metalness: 0.01
+      roughness: 0.62,
+      metalness: 0.14
     });
 
     // Entry Landing Floor inside Stair Corridor (z = -76m to -79m, flat y = 0, Cotton Black)
@@ -2279,8 +2286,8 @@
     const ceilSoffitMat = new THREE.MeshStandardMaterial({
       map: ceilSuedeTex,
       color: 0x26211d,
-      roughness: 0.86,
-      metalness: 0.08
+      roughness: 0.58,
+      metalness: 0.12
     });
     const ceilPanelMat = new THREE.MeshStandardMaterial({
       map: ceilStarTex,
@@ -2967,8 +2974,8 @@
     wallSlopeCap.position.set(hallMinX + 0.20, (5.3 + 8.5) / 2, (stairEndZ + divEndZ) / 2);
     scene.add(wallSlopeCap);
 
-    // Giant True-Black Cinema Display + Full-Length Sloped 270-Degree ScreenX Panoramic Side Wings
-    const displayW = 22.8;
+    // Giant True-Black Cinema Display + Seamless 270-Degree ScreenX Panoramic Side Wings
+    const displayW = 23.48; // Reaches -20.54m to +2.94m for ultra-tight ~1cm corner seam with side wings
     const displayH = 10.6;
     const displayY = 13.0; // Spans y = 7.7m to 18.3m under the 19.5m ceiling
     const microBezelMat = new THREE.MeshStandardMaterial({
@@ -2978,7 +2985,7 @@
       side: THREE.DoubleSide
     });
     const screenBezel = new THREE.Mesh(
-      new THREE.BoxGeometry(displayW + 0.08, displayH + 0.08, 0.12),
+      new THREE.BoxGeometry(displayW + 0.04, displayH + 0.04, 0.12),
       microBezelMat
     );
     screenBezel.position.set(hallCenterX, displayY, zEndWall - hallL + 0.06);
@@ -2997,11 +3004,11 @@
     screenSurface.position.set(hallCenterX, displayY, zEndWall - hallL + 0.15);
     scene.add(screenSurface);
 
-    // Full-Length Sloped ScreenX Side Wings (z = -104.9m all the way to -76.2m, bottom slopes from y = 7.7m up to 11.2m)
-    const wingZStart = zEndWall - hallL + 0.1; // -104.9m
+    // Full-Length Sloped ScreenX Side Wings (z = -104.88m all the way to -76.2m, ultra-tight corner seam)
+    const wingZStart = zEndWall - hallL + 0.12; // -104.88m
     const wingZSlopeStart = -94.0;
     const wingZEnd = -76.2;
-    const wingTotalLen = wingZEnd - wingZStart; // 28.7m
+    const wingTotalLen = wingZEnd - wingZStart; // 28.68m
     const wingYBotFlat = displayY - displayH / 2; // 7.7m
     const wingYBotBack = 11.2;
     const wingYTop = displayY + displayH / 2; // 18.3m
@@ -3024,11 +3031,11 @@
         uvAttr.setXY(i, lx / wingTotalLen, (ly - wingYBotFlat) / displayH);
       }
       uvAttr.needsUpdate = true;
-      geo.rotateY(-Math.PI / 2); // Maps shape X (0..28.7) -> +Z
+      geo.rotateY(-Math.PI / 2); // Maps shape X (0..28.68) -> +Z
       return geo;
     };
 
-    const wingBezelGeo = makeSlopedWingGeo(0.04);
+    const wingBezelGeo = makeSlopedWingGeo(0.02);
     const wingScreenGeo = makeSlopedWingGeo(0.0);
 
     const leftWingBezel = new THREE.Mesh(wingBezelGeo, microBezelMat);
@@ -3046,6 +3053,20 @@
     const rightScreenWing = new THREE.Mesh(wingScreenGeo, screenMat);
     rightScreenWing.position.set(hallMaxX - 0.25, 0, wingZStart);
     scene.add(rightScreenWing);
+
+    // Dynamic Live Screen Reflection Bounce Lights for Ceiling & Floor
+    const ceilBounceLight = new THREE.PointLight(0xffffff, 0, 40, 1.35);
+    ceilBounceLight.position.set(hallCenterX, 16.5, -96.5);
+    scene.add(ceilBounceLight);
+
+    const floorBounceLight = new THREE.PointLight(0xffffff, 0, 34, 1.4);
+    floorBounceLight.position.set(hallCenterX, 7.6, -98.5);
+    scene.add(floorBounceLight);
+
+    const reflectCanvas = document.createElement('canvas');
+    reflectCanvas.width = 4;
+    reflectCanvas.height = 4;
+    const reflectCtx = reflectCanvas.getContext('2d', { willReadFrequently: true });
 
     // Synchronized Triple-Screen VideoTexture setup for ScreenX
     const sxVideo = document.createElement('video');
@@ -3067,7 +3088,11 @@
     cinemaScreenXState.rightWing = rightScreenWing;
     cinemaScreenXState.idleMat = screenMat;
     cinemaScreenXState.videoMainMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xffffff });
-    cinemaScreenXState.videoWingMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xaab0be, side: THREE.DoubleSide });
+    // Side ScreenX wings subtly dimmed (~42%) so main front screen remains the focal point
+    cinemaScreenXState.videoWingMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0x626674, side: THREE.DoubleSide });
+    cinemaScreenXState.ceilBounceLight = ceilBounceLight;
+    cinemaScreenXState.floorBounceLight = floorBounceLight;
+    cinemaScreenXState.reflectCtx = reflectCtx;
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
     const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
@@ -3132,10 +3157,12 @@
     // 4. Ambient and Directional Lights for warm cream tone & minimal reflection
     const ambientLight = new THREE.AmbientLight(0xf5e6cc, 0.72);
     scene.add(ambientLight);
+    cinemaScreenXState.globalAmbient = ambientLight;
 
     const dirLight = new THREE.DirectionalLight(0xf7e2bc, 0.85);
     dirLight.position.set(4, 12, 8);
     scene.add(dirLight);
+    cinemaScreenXState.globalDir = dirLight;
 
     // 5. Build the Mall Promenade with Open Boutiques
     buildMallCorridor();
@@ -4135,17 +4162,48 @@
       sx.rightWing.material = wantWingVideo ? sx.videoWingMat : sx.idleMat;
     }
 
-    // Smooth Auto Cinema-Dimming (darkens hall lights & ceiling cove when movie plays)
+    // Smooth Full Theatre Darkness when movie plays + live screen color reflections on ceiling & floor
     const dimTarget = sx.isPlaying ? 1 : 0;
     const diff = dimTarget - sx.dimCur;
     if (Math.abs(diff) > 0.002) {
-      sx.dimCur += diff * 0.05;
-      const mult = 1 - sx.dimCur * 0.86; // Dim down to 14%
+      sx.dimCur += diff * 0.06;
+      const mult = Math.max(0, 1 - sx.dimCur); // Turn hall lights completely OFF (0%) during movie
       for (let i = 0; i < sx.lights.length; i++) {
         sx.lights[i].light.intensity = sx.lights[i].base * mult;
       }
-      if (sx.coveMat) sx.coveMat.emissiveIntensity = 1.55 * (1 - sx.dimCur * 0.72);
-      if (sx.downlightMat) sx.downlightMat.emissiveIntensity = 1.8 * (1 - sx.dimCur * 0.82);
+      if (sx.coveMat) sx.coveMat.emissiveIntensity = 1.55 * mult;
+      if (sx.downlightMat) sx.downlightMat.emissiveIntensity = 1.8 * mult;
+      if (sx.globalAmbient) sx.globalAmbient.intensity = 0.72 * (1 - sx.dimCur * 0.96);
+      if (sx.globalDir) sx.globalDir.intensity = 0.85 * (1 - sx.dimCur * 0.96);
+    }
+
+    // Live Video Color Reflections bouncing onto Coffered Ceiling & Cotton-Black Stage Floor
+    if (sx.ceilBounceLight && sx.floorBounceLight) {
+      if (sx.isPlaying && sx.video && sx.video.readyState >= 2 && sx.reflectCtx) {
+        sx.reflectFrame = (sx.reflectFrame + 1) % 3;
+        if (sx.reflectFrame === 0) {
+          try {
+            sx.reflectCtx.drawImage(sx.video, 0, 0, 4, 4);
+            const data = sx.reflectCtx.getImageData(0, 0, 4, 4).data;
+            let r = 0, g = 0, b = 0;
+            for (let i = 0; i < data.length; i += 4) {
+              r += data[i];
+              g += data[i + 1];
+              b += data[i + 2];
+            }
+            const px = 16 * 255;
+            sx.bounceColor.setRGB(r / px, g / px, b / px);
+          } catch (_) { }
+        }
+        sx.ceilBounceLight.color.lerp(sx.bounceColor, 0.14);
+        sx.floorBounceLight.color.lerp(sx.bounceColor, 0.14);
+        const lum = Math.max(0.25, (sx.bounceColor.r + sx.bounceColor.g + sx.bounceColor.b) / 3);
+        sx.ceilBounceLight.intensity += (lum * 2.4 - sx.ceilBounceLight.intensity) * 0.12;
+        sx.floorBounceLight.intensity += (lum * 2.1 - sx.floorBounceLight.intensity) * 0.12;
+      } else {
+        sx.ceilBounceLight.intensity += (0 - sx.ceilBounceLight.intensity) * 0.12;
+        sx.floorBounceLight.intensity += (0 - sx.floorBounceLight.intensity) * 0.12;
+      }
     }
   }
 
