@@ -2116,33 +2116,28 @@
     const lrCenterX = -halfW - lrW / 2; // -10.0m
     const lrCenterZ = -71.0;
 
-    // Dark Wood Plank Floor Texture
+    // Minimal Matte Dark Espresso-Slate Micro-Cement Flooring (clean, stripe-free luxury finish)
     const dwCanvas = document.createElement('canvas');
-    dwCanvas.width = 256;
-    dwCanvas.height = 256;
+    dwCanvas.width = 128;
+    dwCanvas.height = 128;
     const dwCtx = dwCanvas.getContext('2d');
-    dwCtx.fillStyle = '#24140b';
-    dwCtx.fillRect(0, 0, 256, 256);
-    for (let y = 0; y < 256; y += 32) {
-      dwCtx.fillStyle = y % 64 === 0 ? 'rgba(54, 31, 18, 0.55)' : 'rgba(26, 13, 7, 0.55)';
-      dwCtx.fillRect(0, y, 256, 30);
-      dwCtx.fillStyle = 'rgba(10, 5, 2, 0.75)';
-      dwCtx.fillRect(0, y + 30, 256, 2);
+    dwCtx.fillStyle = '#1b1512';
+    dwCtx.fillRect(0, 0, 128, 128);
+    for (let i = 0; i < 1400; i++) {
+      const shade = Math.random() > 0.5 ? 'rgba(48, 36, 30, 0.14)' : 'rgba(12, 8, 6, 0.18)';
+      dwCtx.fillStyle = shade;
+      dwCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
     }
-    for (let i = 0; i < 120; i++) {
-      dwCtx.fillStyle = 'rgba(80, 48, 28, 0.14)';
-      dwCtx.fillRect(Math.random() * 256, Math.random() * 256, 45, 1.5);
-    }
-    const darkWoodTex = new THREE.CanvasTexture(dwCanvas);
-    darkWoodTex.wrapS = THREE.RepeatWrapping;
-    darkWoodTex.wrapT = THREE.RepeatWrapping;
-    darkWoodTex.repeat.set(5, 6);
-    darkWoodTex.colorSpace = THREE.SRGBColorSpace;
+    const darkMinimalTex = new THREE.CanvasTexture(dwCanvas);
+    darkMinimalTex.wrapS = THREE.RepeatWrapping;
+    darkMinimalTex.wrapT = THREE.RepeatWrapping;
+    darkMinimalTex.repeat.set(6, 8);
+    darkMinimalTex.colorSpace = THREE.SRGBColorSpace;
 
-    const darkWoodFloorMat = new THREE.MeshStandardMaterial({
-      map: darkWoodTex,
-      roughness: 0.42,
-      metalness: 0.08
+    const darkMinimalFloorMat = new THREE.MeshStandardMaterial({
+      map: darkMinimalTex,
+      roughness: 0.78,
+      metalness: 0.05
     });
     const darkChocWallMat = new THREE.MeshStandardMaterial({
       color: 0x26140d,
@@ -2159,14 +2154,14 @@
 
     const lrFloorGeo = new THREE.PlaneGeometry(lrW, lrL);
     lrFloorGeo.rotateX(-Math.PI / 2);
-    const lrFloor = new THREE.Mesh(lrFloorGeo, darkWoodFloorMat);
+    const lrFloor = new THREE.Mesh(lrFloorGeo, darkMinimalFloorMat);
     lrFloor.position.set(lrCenterX, 0.005, lrCenterZ);
     scene.add(lrFloor);
 
     const lrCeilGeo = new THREE.PlaneGeometry(lrW, lrL);
     lrCeilGeo.rotateX(Math.PI / 2);
     const lrCeil = new THREE.Mesh(lrCeilGeo, darkChocCeilMat);
-    lrCeil.position.set(lrCenterX, MALL_HEIGHT, lrCenterZ);
+    lrCeil.position.set(lrCenterX, MALL_HEIGHT - 0.02, lrCenterZ);
     scene.add(lrCeil);
 
     const lrBackGeo = new THREE.PlaneGeometry(lrL, MALL_HEIGHT);
@@ -2175,12 +2170,13 @@
     lrBackWall.position.set(-halfW - lrW, halfH, lrCenterZ);
     scene.add(lrBackWall);
 
+    // Offset 4cm inside room bounds so walls never Z-fight with Shop 4 (-66m) or Cinema Hall (-76m)
     const lrFrontWall = new THREE.Mesh(new THREE.PlaneGeometry(lrW, MALL_HEIGHT), darkChocWallMat);
-    lrFrontWall.position.set(lrCenterX, halfH, -66.0);
+    lrFrontWall.position.set(lrCenterX, halfH, -66.04);
     scene.add(lrFrontWall);
 
     const lrRearWall = new THREE.Mesh(new THREE.PlaneGeometry(lrW, MALL_HEIGHT), darkChocWallMat);
-    lrRearWall.position.set(lrCenterX, halfH, -76.0);
+    lrRearWall.position.set(lrCenterX, halfH, -75.96);
     scene.add(lrRearWall);
 
     const lrLight = new THREE.PointLight(0xffddb0, 0.95, 18, 1.8);
