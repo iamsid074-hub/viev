@@ -2139,17 +2139,46 @@
       roughness: 0.78,
       metalness: 0.05
     });
-    const darkChocWallMat = new THREE.MeshStandardMaterial({
-      color: 0x26140d,
-      roughness: 0.85,
-      metalness: 0.04,
-      side: THREE.DoubleSide
-    });
-    const darkChocCeilMat = new THREE.MeshStandardMaterial({
-      color: 0x1b0e09,
+    // Luxury Plum/Burgundy Suede Acoustic Panel Material (matching Ticket Room wall reference)
+    const trSuedeCanvas = document.createElement('canvas');
+    trSuedeCanvas.width = 128;
+    trSuedeCanvas.height = 128;
+    const trCtx = trSuedeCanvas.getContext('2d');
+    trCtx.fillStyle = '#471220';
+    trCtx.fillRect(0, 0, 128, 128);
+    for (let i = 0; i < 1400; i++) {
+      trCtx.fillStyle = Math.random() > 0.5 ? 'rgba(95, 28, 46, 0.22)' : 'rgba(28, 6, 12, 0.24)';
+      trCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 2);
+    }
+    const trSuedeTex = new THREE.CanvasTexture(trSuedeCanvas);
+    trSuedeTex.wrapS = THREE.RepeatWrapping;
+    trSuedeTex.wrapT = THREE.RepeatWrapping;
+    trSuedeTex.repeat.set(8, 4);
+    trSuedeTex.colorSpace = THREE.SRGBColorSpace;
+
+    const ticketPlumWallMat = new THREE.MeshStandardMaterial({
+      map: trSuedeTex,
+      color: 0xffffff,
       roughness: 0.88,
       metalness: 0.04,
       side: THREE.DoubleSide
+    });
+    const ticketDarkTrimMat = new THREE.MeshStandardMaterial({
+      color: 0x160e0c,
+      roughness: 0.65,
+      metalness: 0.22
+    });
+    const ticketCeilMat = new THREE.MeshStandardMaterial({
+      color: 0xded3c4,
+      roughness: 0.90,
+      metalness: 0.02,
+      side: THREE.DoubleSide
+    });
+    const ticketLedSlitMat = new THREE.MeshStandardMaterial({
+      color: 0xffe6b0,
+      emissive: new THREE.Color(0xffb44d),
+      emissiveIntensity: 1.55,
+      roughness: 0.2
     });
 
     const lrFloorGeo = new THREE.PlaneGeometry(lrW, lrL);
@@ -2160,30 +2189,134 @@
 
     const lrCeilGeo = new THREE.PlaneGeometry(lrW, lrL);
     lrCeilGeo.rotateX(Math.PI / 2);
-    const lrCeil = new THREE.Mesh(lrCeilGeo, darkChocCeilMat);
+    const lrCeil = new THREE.Mesh(lrCeilGeo, ticketCeilMat);
     lrCeil.position.set(lrCenterX, MALL_HEIGHT - 0.02, lrCenterZ);
     scene.add(lrCeil);
 
     const lrBackGeo = new THREE.PlaneGeometry(lrL, MALL_HEIGHT);
     lrBackGeo.rotateY(Math.PI / 2);
-    const lrBackWall = new THREE.Mesh(lrBackGeo, darkChocWallMat);
+    const lrBackWall = new THREE.Mesh(lrBackGeo, ticketPlumWallMat);
     lrBackWall.position.set(-halfW - lrW, halfH, lrCenterZ);
     scene.add(lrBackWall);
 
     // Offset 4cm inside room bounds so walls never Z-fight with Shop 4 (-66m) or Cinema Hall (-76m)
-    const lrFrontWall = new THREE.Mesh(new THREE.PlaneGeometry(lrW, MALL_HEIGHT), darkChocWallMat);
+    const lrFrontWall = new THREE.Mesh(new THREE.PlaneGeometry(lrW, MALL_HEIGHT), ticketPlumWallMat);
     lrFrontWall.position.set(lrCenterX, halfH, -66.04);
     scene.add(lrFrontWall);
 
-    const lrRearWall = new THREE.Mesh(new THREE.PlaneGeometry(lrW, MALL_HEIGHT), darkChocWallMat);
+    const lrRearWall = new THREE.Mesh(new THREE.PlaneGeometry(lrW, MALL_HEIGHT), ticketPlumWallMat);
     lrRearWall.position.set(lrCenterX, halfH, -75.96);
     scene.add(lrRearWall);
 
-    const lrLight = new THREE.PointLight(0xffddb0, 0.95, 22, 1.7);
+    // Inner-side plum cladding around the Glass Double Door (x = -6.21m, facing into Ticket Room)
+    const lrDoorInnerF = new THREE.Mesh(new THREE.PlaneGeometry(lrWingLen, MALL_HEIGHT), ticketPlumWallMat);
+    lrDoorInnerF.rotation.y = -Math.PI / 2;
+    lrDoorInnerF.position.set(-halfW - 0.21, halfH, -66.0 - lrWingLen / 2);
+    scene.add(lrDoorInnerF);
+
+    const lrDoorInnerB = new THREE.Mesh(new THREE.PlaneGeometry(lrWingLen, MALL_HEIGHT), ticketPlumWallMat);
+    lrDoorInnerB.rotation.y = -Math.PI / 2;
+    lrDoorInnerB.position.set(-halfW - 0.21, halfH, -76.0 + lrWingLen / 2);
+    scene.add(lrDoorInnerB);
+
+    const lrDoorInnerTop = new THREE.Mesh(new THREE.PlaneGeometry(lrDoorW, MALL_HEIGHT - lrDoorH), ticketPlumWallMat);
+    lrDoorInnerTop.rotation.y = -Math.PI / 2;
+    lrDoorInnerTop.position.set(-halfW - 0.21, lrDoorH + (MALL_HEIGHT - lrDoorH) / 2, lrDoorZ);
+    scene.add(lrDoorInnerTop);
+
+    // Helper: Build 2-Tiered Suede Panels, Gold Brass Inlays, Upper LED Light Slits & Dark Base/Crown Trim
+    const trPanelLowH = 3.60;
+    const trPanelHighH = 2.22;
+    const trLowY = 0.22 + trPanelLowH / 2;   // 2.02m
+    const trHighY = 3.88 + trPanelHighH / 2; // 4.99m
+    const trSconceBodyGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.44, 14);
+    const trSconceGlowGeo = new THREE.CylinderGeometry(0.068, 0.068, 0.05, 14);
+
+    function addTicketWallBayDetails(x0, z0, x1, z1, nx, nz, bayCount, sconceIndices, ledIndices) {
+      const len = Math.hypot(x1 - x0, z1 - z0);
+      const ang = Math.atan2(x1 - x0, z1 - z0);
+      const midX = (x0 + x1) / 2;
+      const midZ = (z0 + z1) / 2;
+
+      // Dark architectural baseboard & crown molding
+      const baseTrim = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.22, len), ticketDarkTrimMat);
+      baseTrim.rotation.y = ang;
+      baseTrim.position.set(midX + nx * 0.03, 0.11, midZ + nz * 0.03);
+      scene.add(baseTrim);
+
+      const crownTrim = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.26, len), ticketDarkTrimMat);
+      crownTrim.rotation.y = ang;
+      crownTrim.position.set(midX + nx * 0.04, MALL_HEIGHT - 0.15, midZ + nz * 0.04);
+      scene.add(crownTrim);
+
+      const baySpan = len / bayCount;
+      for (let i = 0; i < bayCount; i++) {
+        const t = (i + 0.5) / bayCount;
+        const bx = x0 + (x1 - x0) * t;
+        const bz = z0 + (z1 - z0) * t;
+
+        // Raised bevel suede lower & upper panel blocks (crisp shadow seam between them)
+        const lowP = new THREE.Mesh(new THREE.BoxGeometry(0.03, trPanelLowH - 0.04, baySpan - 0.06), ticketPlumWallMat);
+        lowP.rotation.y = ang;
+        lowP.position.set(bx + nx * 0.015, trLowY, bz + nz * 0.015);
+        scene.add(lowP);
+
+        const highP = new THREE.Mesh(new THREE.BoxGeometry(0.03, trPanelHighH - 0.04, baySpan - 0.06), ticketPlumWallMat);
+        highP.rotation.y = ang;
+        highP.position.set(bx + nx * 0.015, trHighY, bz + nz * 0.015);
+        scene.add(highP);
+
+        // Cylindrical bronze up-down wall sconce on designated bays
+        if (sconceIndices.includes(i)) {
+          const sx = bx + nx * 0.10;
+          const sz = bz + nz * 0.10;
+          const sBody = new THREE.Mesh(trSconceBodyGeo, doorBrassTrimMat);
+          sBody.position.set(sx, 2.45, sz);
+          scene.add(sBody);
+          [-0.23, 0.23].forEach((dy) => {
+            const sGlow = new THREE.Mesh(trSconceGlowGeo, ticketLedSlitMat);
+            sGlow.position.set(sx, 2.45 + dy, sz);
+            scene.add(sGlow);
+          });
+        }
+
+        // Gold vertical inlay strip + recessed upper warm LED light slit at seam
+        if (i > 0) {
+          const st = i / bayCount;
+          const jx = x0 + (x1 - x0) * st;
+          const jz = z0 + (z1 - z0) * st;
+          const isLit = ledIndices.includes(i);
+          const seamH = isLit ? trPanelLowH : (trPanelLowH + trPanelHighH);
+          const seamY = isLit ? trLowY : (0.22 + (trPanelLowH + trPanelHighH) / 2);
+
+          const brassStrip = new THREE.Mesh(new THREE.BoxGeometry(0.035, seamH, 0.025), doorBrassTrimMat);
+          brassStrip.rotation.y = ang;
+          brassStrip.position.set(jx + nx * 0.022, seamY, jz + nz * 0.022);
+          scene.add(brassStrip);
+
+          if (isLit) {
+            const ledSlit = new THREE.Mesh(new THREE.BoxGeometry(0.038, trPanelHighH, 0.032), ticketLedSlitMat);
+            ledSlit.rotation.y = ang;
+            ledSlit.position.set(jx + nx * 0.025, trHighY, jz + nz * 0.025);
+            scene.add(ledSlit);
+          }
+        }
+      }
+    }
+
+    // Apply plum suede paneling + gold inlays + upper LED slits + sconces to all 4 Ticket Room walls
+    const trBackX = -halfW - lrW; // -20.5m
+    addTicketWallBayDetails(trBackX, -66.04, trBackX, -75.96, 1, 0, 6, [1, 4], [1, 2, 4, 5]);
+    addTicketWallBayDetails(-halfW - 0.22, -66.04, trBackX, -66.04, 0, -1, 8, [1, 4, 6], [1, 2, 5, 6]);
+    addTicketWallBayDetails(trBackX, -75.96, -halfW - 0.22, -75.96, 0, 1, 8, [1, 3, 6], [2, 3, 6, 7]);
+    addTicketWallBayDetails(-halfW - 0.21, -66.04, -halfW - 0.21, -69.30, -1, 0, 2, [0], [1]);
+    addTicketWallBayDetails(-halfW - 0.21, -72.70, -halfW - 0.21, -75.96, -1, 0, 2, [1], [1]);
+
+    const lrLight = new THREE.PointLight(0xffddb0, 0.90, 22, 1.7);
     lrLight.position.set(-halfW - lrW * 0.3, MALL_HEIGHT - 0.6, lrCenterZ);
     scene.add(lrLight);
 
-    const lrLight2 = new THREE.PointLight(0xffddb0, 0.95, 22, 1.7);
+    const lrLight2 = new THREE.PointLight(0xffddb0, 0.90, 22, 1.7);
     lrLight2.position.set(-halfW - lrW * 0.72, MALL_HEIGHT - 0.6, lrCenterZ);
     scene.add(lrLight2);
 
