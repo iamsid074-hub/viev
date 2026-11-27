@@ -4087,6 +4087,7 @@
 
     // 5. Build the Mall Promenade with Open Boutiques
     buildMallCorridor();
+    initSpaceNpcs();
 
     // 6. Setup Joystick, Keyboard & Look Controls
     setupJoystickControls();
@@ -5198,7 +5199,11 @@
       cinemaGateAccessState.wasInside = false;
       cinemaGateAccessState.allowedSeats = [];
     }
-    cinemaDoorState.targetProgress = (cinemaGateAccessState.unlocked && dist < 7.5) ? 1 : 0;
+    const npcAtGate = spaceNpcState.npcs.some(n =>
+      (n.state === 'gate_check' || n.state === 'enter_hall' || n.state === 'exit_hall') &&
+      Math.hypot(n.actor.group.position.x - cinemaDoorState.doorX, n.actor.group.position.z - cinemaDoorState.doorZ) < 3.4
+    );
+    cinemaDoorState.targetProgress = ((cinemaGateAccessState.unlocked && dist < 7.5) || npcAtGate) ? 1 : 0;
     const diff = cinemaDoorState.targetProgress - cinemaDoorState.openProgress;
     if (Math.abs(diff) > 0.001) {
       cinemaDoorState.openProgress += diff * 0.065;
@@ -6008,10 +6013,453 @@
     bar.style.display = nearCounter ? 'flex' : 'none';
   }
 
+  // =========================================================================
+  // DYNAMIC UNLIMITED-CROWD NPC SYSTEM (MALL SHOPPERS & CINEMA GOERS)
+  // =========================================================================
+  const spaceNpcState = {
+    initialized: false,
+    npcs: [],
+    activeCrowdKey: '',
+    lastTickMs: 0,
+    geos: null,
+    mats: null
+  };
+
+  // Crowd profiles per showtime: ranges from Quiet (10) -> Medium (28-36) -> High Rush (58-66) -> HOUSEFULL (all 95 seats!)
+  const SHOW_CROWD_PROFILES = {
+    '1:00 PM': 28,
+    '1:30 PM': 95, // HOUSEFULL
+    '2:00 PM': 10, // Low crowd
+    '3:00 PM': 64, // High rush
+    '3:30 PM': 95, // HOUSEFULL
+    '4:00 PM': 12, // Low crowd
+    '4:30 PM': 36, // Medium
+    '5:00 PM': 60, // High rush
+    '5:30 PM': 95, // HOUSEFULL
+    '6:15 PM': 32, // Medium
+    '7:00 PM': 95  // HOUSEFULL
+  };
+
+  function getAnyFloorY(x, z, curY) {
+    if (z >= -76.0) return 0;
+    if (z < -95.8) return 4.90;
+    if (z >= -78.95 && curY >= 7.0) return 8.40;
+    if (x < -1.6) {
+      if (z >= -77.95) return 8.40;
+      if (z >= -78.95) {
+        const vipStep = Math.min(3, Math.max(0, Math.floor((z - (-78.95)) / 0.25)));
+        return 7.84 + (vipStep + 1) * 0.14;
+      }
+      if (z > -94.0) {
+        const subStep = Math.min(20, Math.max(0, Math.floor((z - (-94.0)) / (2.15 / 3))));
+        return 4.90 + (subStep + 1) * 0.14;
+      }
+      return 4.90;
+    }
+    if (z < -79.0) {
+      const stepIdx = Math.min(14, Math.max(0, Math.floor((-79.0 - z) / 1.2) + 1));
+      return stepIdx * 0.35;
+    }
+    return 0;
+  }
+
+  function ensureNpcAssets() {
+    if (spaceNpcState.geos) return;
+    const legGeo = new THREE.CylinderGeometry(0.062, 0.052, 0.78, 8);
+    legGeo.translate(0, -0.39, 0);
+    const shoeGeo = new THREE.BoxGeometry(0.10, 0.06, 0.20);
+    shoeGeo.translate(0, -0.78, 0.03);
+    const armGeo = new THREE.CylinderGeometry(0.048, 0.042, 0.50, 8);
+    armGeo.translate(0, -0.24, 0);
+    const handGeo = new THREE.SphereGeometry(0.042, 8, 6);
+    handGeo.translate(0, -0.50, 0.01);
+
+    spaceNpcState.geos = {
+      leg: legGeo,
+      shoe: shoeGeo,
+      arm: armGeo,
+      hand: handGeo,
+      torso: new THREE.BoxGeometry(0.38, 0.52, 0.20),
+      neck: new THREE.CylinderGeometry(0.05, 0.055, 0.09, 8),
+      head: new THREE.SphereGeometry(0.118, 12, 10),
+      hair: new THREE.SphereGeometry(0.124, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.56),
+      ticket: new THREE.BoxGeometry(0.08, 0.01, 0.13)
+    };
+
+    const outfitColors = [0x1e293b, 0x3b1824, 0x16382b, 0x3d2f24, 0x2a2438, 0x475569, 0x6b2c3e, 0x1e3a5f, 0x2f2f35, 0x5c4033];
+    const pantColors = [0x14151a, 0x1f2430, 0x292524, 0x18181b];
+    const skinColors = [0xe0b18e, 0xc9936d, 0xf0c7a8, 0x9c6848];
+    const hairColors = [0x171210, 0x3b2618, 0x5a3e28, 0x0f0f12];
+
+    spaceNpcState.mats = {
+      outfits: outfitColors.map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.72 })),
+      pants: pantColors.map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.78 })),
+      skins: skinColors.map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.68 })),
+      hairs: hairColors.map(c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.82 })),
+      ticket: new THREE.MeshBasicMaterial({ color: 0xf4f0e6 })
+    };
+  }
+
+  function createNpcActor(seedIdx) {
+    ensureNpcAssets();
+    const g = spaceNpcState.geos;
+    const m = spaceNpcState.mats;
+    const outfitMat = m.outfits[seedIdx % m.outfits.length];
+    const pantMat = m.pants[(seedIdx * 3) % m.pants.length];
+    const skinMat = m.skins[(seedIdx * 5) % m.skins.length];
+    const hairMat = m.hairs[(seedIdx * 7) % m.hairs.length];
+
+    const root = new THREE.Group();
+    const leftLeg = new THREE.Group();
+    leftLeg.position.set(-0.095, 0.81, 0);
+    leftLeg.add(new THREE.Mesh(g.leg, pantMat));
+    leftLeg.add(new THREE.Mesh(g.shoe, pantMat));
+    root.add(leftLeg);
+
+    const rightLeg = new THREE.Group();
+    rightLeg.position.set(0.095, 0.81, 0);
+    rightLeg.add(new THREE.Mesh(g.leg, pantMat));
+    rightLeg.add(new THREE.Mesh(g.shoe, pantMat));
+    root.add(rightLeg);
+
+    const torso = new THREE.Mesh(g.torso, outfitMat);
+    torso.position.set(0, 1.09, 0);
+    root.add(torso);
+
+    const leftArm = new THREE.Group();
+    leftArm.position.set(-0.24, 1.32, 0);
+    leftArm.add(new THREE.Mesh(g.arm, outfitMat));
+    leftArm.add(new THREE.Mesh(g.hand, skinMat));
+    root.add(leftArm);
+
+    const rightArm = new THREE.Group();
+    rightArm.position.set(0.24, 1.32, 0);
+    rightArm.add(new THREE.Mesh(g.arm, outfitMat));
+    rightArm.add(new THREE.Mesh(g.hand, skinMat));
+    const ticketMesh = new THREE.Mesh(g.ticket, m.ticket);
+    ticketMesh.position.set(0, -0.50, 0.08);
+    ticketMesh.visible = false;
+    rightArm.add(ticketMesh);
+    root.add(rightArm);
+
+    const neck = new THREE.Mesh(g.neck, skinMat);
+    neck.position.set(0, 1.39, 0);
+    root.add(neck);
+    const head = new THREE.Mesh(g.head, skinMat);
+    head.position.set(0, 1.53, 0);
+    root.add(head);
+    const hair = new THREE.Mesh(g.hair, hairMat);
+    hair.position.set(0, 1.55, -0.01);
+    root.add(hair);
+
+    scene.add(root);
+    return { group: root, leftLeg, rightLeg, leftArm, rightArm, ticketMesh };
+  }
+
+  function buildSeatPathWaypoints(seat) {
+    const pts = [
+      { x: 0.8, z: -74.6 },
+      { x: 0.8, z: -77.5 },
+      { x: 0.8, z: -95.1 }
+    ];
+    if (seat.isVip) {
+      pts.push({ x: -1.1, z: -95.1 });
+      pts.push({ x: -1.1, z: -78.2 });
+      pts.push({ x: seat.x, z: -77.6 });
+    } else {
+      const colNum = parseInt(seat.label.slice(1), 10) || 5;
+      const walkX = colNum <= 4 ? -14.65 : -6.80;
+      pts.push({ x: walkX, z: -95.1 });
+      pts.push({ x: walkX, z: seat.z });
+    }
+    pts.push({ x: seat.x, z: seat.z });
+    return pts;
+  }
+
+  function assignNextShopperGoal(npc) {
+    const shopCentersZ = [-3, -21, -39, -57];
+    if (Math.random() < 0.65) {
+      const sz = shopCentersZ[Math.floor(Math.random() * shopCentersZ.length)];
+      const jx = -11.5 + Math.random() * 3.8;
+      const jz = sz + (Math.random() - 0.5) * 4.5;
+      npc.waypoints = [
+        { x: -3.2 + (Math.random() - 0.5) * 1.2, z: sz },
+        { x: jx, z: jz }
+      ];
+    } else {
+      npc.waypoints = [
+        { x: (Math.random() - 0.5) * 6.5, z: 2 - Math.random() * 68 }
+      ];
+    }
+    npc.wpIdx = 0;
+    npc.waitTimer = 2.5 + Math.random() * 4.5;
+  }
+
+  function syncNpcsForActiveCrowd() {
+    if (!scene || cinemaSeats.length === 0) return;
+    const { totalMin } = getVievClockParts();
+    const active = getActiveScheduledShow();
+    // Pick current live show or next upcoming show
+    let targetSlot = active ? active.slot : null;
+    let targetShow = active ? active.show : null;
+    if (!targetSlot) {
+      for (const sh of VIEV_SHOW_SCHEDULE) {
+        for (const sl of sh.slots) {
+          if (sl.startMin > totalMin && (!targetSlot || sl.startMin < targetSlot.startMin)) {
+            targetSlot = sl;
+            targetShow = sh;
+          }
+        }
+      }
+    }
+    const crowdKey = targetSlot ? `${targetShow.id}_${targetSlot.label}` : 'closed';
+    if (spaceNpcState.activeCrowdKey === crowdKey) return;
+    spaceNpcState.activeCrowdKey = crowdKey;
+
+    // Release any currently seated NPCs from previous show to exit cleanly
+    spaceNpcState.npcs.forEach((n) => {
+      if (n.role === 'cinema' && n.state !== 'exit_hall' && n.state !== 'done') {
+        n.state = 'exit_hall';
+        n.actor.leftLeg.rotation.x = 0;
+        n.actor.rightLeg.rotation.x = 0;
+        n.waypoints = [
+          { x: 0.8, z: -95.1 },
+          { x: 0.8, z: -74.6 },
+          { x: (Math.random() - 0.5) * 5.0, z: -40 - Math.random() * 25 }
+        ];
+        n.wpIdx = 0;
+      }
+    });
+
+    // Clear old NPC bookings and generate crowd count for this show slot
+    ticketBookingState.bookedSeatIds.clear();
+    const userSeats = new Set([
+      ...(ticketBookingState.confirmedTicket ? ticketBookingState.confirmedTicket.seats : []),
+      ...(cinemaGateAccessState.allowedSeats || [])
+    ]);
+    userSeats.forEach(s => ticketBookingState.bookedSeatIds.add(s));
+
+    if (!targetSlot) return;
+    const desiredCount = Math.min(cinemaSeats.length, SHOW_CROWD_PROFILES[targetSlot.label] || 28);
+    const availableSeats = cinemaSeats.filter(s => !userSeats.has(s.label));
+    // Shuffle seats deterministically/randomly so every show fills naturally
+    for (let i = availableSeats.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [availableSeats[i], availableSeats[j]] = [availableSeats[j], availableSeats[i]];
+    }
+    const chosenSeats = availableSeats.slice(0, Math.min(desiredCount, availableSeats.length));
+
+    chosenSeats.forEach((seat, idx) => {
+      const actor = createNpcActor(idx + 11);
+      // Stagger NPCs across realistic lifecycle: some already seated if show started, some at counter/waiting, some arriving!
+      const isAlreadyLive = !!active;
+      const counterZ = -73.0 + (idx % 3) * 1.9 + (Math.random() - 0.5) * 0.6;
+      const waitX = -14.6 + (idx % 6) * 1.15 + (Math.random() - 0.5) * 0.4;
+      const waitZ = -74.3 + Math.floor((idx % 18) / 6) * 3.1 + (Math.random() - 0.5) * 0.5;
+      const npc = {
+        id: `c_${crowdKey}_${idx}`,
+        role: 'cinema',
+        seat,
+        actor,
+        speed: 1.55 + (idx % 5) * 0.14,
+        walkPhase: Math.random() * Math.PI * 2,
+        state: 'to_lounge',
+        waitTimer: 0,
+        waypoints: [],
+        wpIdx: 0,
+        delayTimer: (idx % 24) * 0.55
+      };
+
+      if (isAlreadyLive && idx < chosenSeats.length * 0.65) {
+        // Already seated inside auditorium watching the live show
+        npc.state = 'seated';
+        npc.delayTimer = 0;
+        actor.group.position.set(seat.x, seat.floorY + 0.10, seat.z);
+        actor.group.rotation.y = Math.PI;
+        actor.leftLeg.rotation.x = -Math.PI / 2;
+        actor.rightLeg.rotation.x = -Math.PI / 2;
+        ticketBookingState.bookedSeatIds.add(seat.label);
+      } else if (idx % 3 === 0) {
+        // Queuing/buying at Ticket Counter
+        npc.state = 'to_counter';
+        npc.delayTimer = (idx % 12) * 0.45;
+        actor.group.position.set(-4.2 + (Math.random() - 0.5) * 2.4, 0, -68 - Math.random() * 5);
+        npc.waypoints = [
+          { x: -6.0, z: -71.0 },
+          { x: -15.8 - (idx % 2) * 0.5, z: counterZ }
+        ];
+      } else {
+        // Walking from promenade into Ticket Lounge
+        actor.group.position.set((Math.random() - 0.5) * 6.0, 0, -48 - Math.random() * 18);
+        npc.waypoints = [
+          { x: -4.2, z: -71.0 },
+          { x: -6.0, z: -71.0 },
+          { x: -16.0, z: counterZ }
+        ];
+      }
+      npc.waitSpot = { x: waitX, z: waitZ };
+      spaceNpcState.npcs.push(npc);
+    });
+  }
+
+  function initSpaceNpcs() {
+    if (spaceNpcState.initialized || !scene) return;
+    spaceNpcState.initialized = true;
+    spaceNpcState.lastTickMs = performance.now();
+
+    // 6 Persistent Mall Shoppers browsing promenade & 4 boutiques
+    for (let i = 0; i < 6; i++) {
+      const actor = createNpcActor(i);
+      const startZ = -6 - i * 10;
+      actor.group.position.set((Math.random() - 0.5) * 5.0, 0, startZ);
+      const shopper = {
+        id: `shopper_${i}`,
+        role: 'shopper',
+        actor,
+        speed: 1.35 + (i % 3) * 0.16,
+        walkPhase: Math.random() * Math.PI * 2,
+        state: 'roam',
+        waitTimer: 0,
+        waypoints: [],
+        wpIdx: 0
+      };
+      assignNextShopperGoal(shopper);
+      spaceNpcState.npcs.push(shopper);
+    }
+
+    syncNpcsForActiveCrowd();
+  }
+
+  function updateSpaceNpcs() {
+    if (!spaceNpcState.initialized) return;
+    const now = performance.now();
+    const dt = Math.min(0.05, Math.max(0.001, (now - spaceNpcState.lastTickMs) / 1000));
+    spaceNpcState.lastTickMs = now;
+
+    syncNpcsForActiveCrowd();
+    const active = getActiveScheduledShow();
+
+    for (let i = spaceNpcState.npcs.length - 1; i >= 0; i--) {
+      const n = spaceNpcState.npcs[i];
+      const pos = n.actor.group.position;
+
+      if (n.delayTimer && n.delayTimer > 0) {
+        n.delayTimer -= dt;
+        continue;
+      }
+
+      if (n.state === 'seated') {
+        n.actor.leftArm.rotation.x = 0;
+        n.actor.rightArm.rotation.x = 0;
+        continue;
+      }
+
+      if (n.waitTimer > 0) {
+        n.waitTimer -= dt;
+        n.actor.leftLeg.rotation.x *= 0.85;
+        n.actor.rightLeg.rotation.x *= 0.85;
+        n.actor.leftArm.rotation.x *= 0.85;
+        n.actor.rightArm.rotation.x *= 0.85;
+        if (n.waitTimer <= 0) {
+          if (n.role === 'shopper') {
+            assignNextShopperGoal(n);
+          } else if (n.state === 'buying') {
+            // Purchase complete! Grab ticket in hand & sync seat to iPad map
+            n.actor.ticketMesh.visible = true;
+            ticketBookingState.bookedSeatIds.add(n.seat.label);
+            if (active) {
+              n.state = 'to_gate';
+              n.waypoints = [
+                { x: -6.0, z: -71.0 },
+                { x: 0.8, z: -74.6 }
+              ];
+              n.wpIdx = 0;
+            } else {
+              n.state = 'waiting_lounge';
+              n.waypoints = [n.waitSpot];
+              n.wpIdx = 0;
+            }
+          } else if (n.state === 'gate_check') {
+            // Checked at Gate 1! Ticket consumed, enter Cinema Hall
+            n.actor.ticketMesh.visible = false;
+            n.state = 'enter_hall';
+            n.waypoints = buildSeatPathWaypoints(n.seat);
+            n.wpIdx = 0;
+          }
+        }
+        continue;
+      }
+
+      if (n.state === 'waiting_lounge' && n.wpIdx >= n.waypoints.length) {
+        n.actor.leftLeg.rotation.x *= 0.85;
+        n.actor.rightLeg.rotation.x *= 0.85;
+        if (active) {
+          n.state = 'to_gate';
+          n.waypoints = [
+            { x: -6.0, z: -71.0 },
+            { x: 0.8, z: -74.6 }
+          ];
+          n.wpIdx = 0;
+        }
+        continue;
+      }
+
+      if (!n.waypoints || n.wpIdx >= n.waypoints.length) continue;
+      const target = n.waypoints[n.wpIdx];
+      const dx = target.x - pos.x;
+      const dz = target.z - pos.z;
+      const dist = Math.hypot(dx, dz);
+
+      if (dist < 0.24) {
+        n.wpIdx++;
+        if (n.wpIdx >= n.waypoints.length) {
+          if (n.role === 'shopper') {
+            n.waitTimer = 2.0 + Math.random() * 4.0;
+          } else if (n.state === 'to_lounge' || n.state === 'to_counter') {
+            n.state = 'buying';
+            n.actor.group.rotation.y = -Math.PI / 2; // Face Ticket Counter
+            n.waitTimer = 1.6 + Math.random() * 2.2;
+          } else if (n.state === 'to_gate') {
+            n.state = 'gate_check';
+            n.actor.group.rotation.y = Math.PI; // Face Gate 1
+            n.waitTimer = 0.9;
+          } else if (n.state === 'enter_hall') {
+            n.state = 'seated';
+            pos.set(n.seat.x, n.seat.floorY + 0.10, n.seat.z);
+            n.actor.group.rotation.y = Math.PI;
+            n.actor.leftLeg.rotation.x = -Math.PI / 2;
+            n.actor.rightLeg.rotation.x = -Math.PI / 2;
+          } else if (n.state === 'exit_hall') {
+            scene.remove(n.actor.group);
+            spaceNpcState.npcs.splice(i, 1);
+          }
+        }
+        continue;
+      }
+
+      const step = Math.min(dist, n.speed * dt);
+      pos.x += (dx / dist) * step;
+      pos.z += (dz / dist) * step;
+      const floorY = getAnyFloorY(pos.x, pos.z, pos.y);
+      pos.y += (floorY - pos.y) * 0.28;
+
+      n.actor.group.rotation.y = Math.atan2(dx, dz);
+      n.walkPhase += dt * n.speed * 5.2;
+      const swing = Math.sin(n.walkPhase) * 0.52;
+      n.actor.leftLeg.rotation.x = swing;
+      n.actor.rightLeg.rotation.x = -swing;
+      n.actor.leftArm.rotation.x = -swing * 0.65;
+      n.actor.rightArm.rotation.x = swing * 0.65;
+    }
+  }
+
   function updateLeftRoomDoors() {
     if (!leftRoomDoorState.frontLeaf || !leftRoomDoorState.backLeaf || !camera) return;
     const dist = Math.hypot(camera.position.x - leftRoomDoorState.doorX, camera.position.z - leftRoomDoorState.doorZ);
-    leftRoomDoorState.targetProgress = dist < 5.8 ? 1 : 0;
+    const npcNearDoor = spaceNpcState.npcs.some(n =>
+      Math.hypot(n.actor.group.position.x - leftRoomDoorState.doorX, n.actor.group.position.z - leftRoomDoorState.doorZ) < 4.5
+    );
+    leftRoomDoorState.targetProgress = (dist < 5.8 || npcNearDoor) ? 1 : 0;
     const diff = leftRoomDoorState.targetProgress - leftRoomDoorState.openProgress;
     if (Math.abs(diff) > 0.001) {
       leftRoomDoorState.openProgress += diff * 0.075;
@@ -6040,6 +6488,7 @@
     updateCorridorLedProximityAudio();
     updateCinemaDoors();
     updateLeftRoomDoors();
+    updateSpaceNpcs();
     updateCinemaScreenX();
     updateCinemaSeatPrompt();
     updateTicketCounterPrompt();
