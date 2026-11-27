@@ -4098,7 +4098,6 @@
 
     // 5. Build the Mall Promenade with Open Boutiques
     buildMallCorridor();
-    initSpaceNpcs();
 
     // 6. Setup Joystick, Keyboard & Look Controls
     setupJoystickControls();
@@ -5053,14 +5052,8 @@
       sub: 'MUSIC VIDEO · DOLBY ATMOS',
       videoSrc: 'song/main_singer_khaandani.mp4',
       slots: [
-        { label: '3:00 PM', startMin: 15 * 60, endMin: 15 * 60 + 25 },
-        { label: '3:30 PM', startMin: 15 * 60 + 30, endMin: 15 * 60 + 55 },
-        { label: '4:00 PM', startMin: 16 * 60, endMin: 16 * 60 + 25 },
-        { label: '4:30 PM', startMin: 16 * 60 + 30, endMin: 16 * 60 + 55 },
-        { label: '5:00 PM', startMin: 17 * 60, endMin: 17 * 60 + 25 },
-        { label: '5:30 PM', startMin: 17 * 60 + 30, endMin: 17 * 60 + 55 },
-        { label: '6:15 PM', startMin: 18 * 60 + 15, endMin: 18 * 60 + 40 },
-        { label: '7:00 PM', startMin: 19 * 60, endMin: 19 * 60 + 25 }
+        { label: '8:00 PM', startMin: 20 * 60, endMin: 20 * 60 + 25 },
+        { label: '11:00 PM', startMin: 23 * 60, endMin: 23 * 60 + 25 }
       ]
     }
   ];
@@ -5655,14 +5648,8 @@
     { time: '1:00 PM', startMin: 13 * 60, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
     { time: '1:30 PM', startMin: 13 * 60 + 30, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
     { time: '2:00 PM', startMin: 14 * 60, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
-    { time: '3:00 PM', startMin: 15 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '3:30 PM', startMin: 15 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '4:00 PM', startMin: 16 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '4:30 PM', startMin: 16 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '5:00 PM', startMin: 17 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '5:30 PM', startMin: 17 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '6:15 PM', startMin: 18 * 60 + 15, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '7:00 PM', startMin: 19 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' }
+    { time: '8:00 PM', startMin: 20 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
+    { time: '11:00 PM', startMin: 23 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' }
   ];
 
   function getSeatTierInfo(seatId) {
@@ -6204,16 +6191,10 @@
   const SHOW_CROWD_PROFILES = {
     '12:30 PM': 45,
     '1:00 PM': 28,
-    '1:30 PM': 95, // HOUSEFULL
-    '2:00 PM': 10, // Low crowd
-    '3:00 PM': 64, // High rush
-    '3:30 PM': 95, // HOUSEFULL
-    '4:00 PM': 12, // Low crowd
-    '4:30 PM': 36, // Medium
-    '5:00 PM': 60, // High rush
-    '5:30 PM': 95, // HOUSEFULL
-    '6:15 PM': 32, // Medium
-    '7:00 PM': 95  // HOUSEFULL
+    '1:30 PM': 95,
+    '2:00 PM': 10,
+    '8:00 PM': 48,
+    '11:00 PM': 95
   };
 
   function getAnyFloorY(x, z, curY) {
@@ -6865,7 +6846,6 @@
     updateCorridorLedProximityAudio();
     updateCinemaDoors();
     updateLeftRoomDoors();
-    updateSpaceNpcs();
     updateCinemaScreenX();
     updateCinemaSeatPrompt();
     updateTicketCounterPrompt();
