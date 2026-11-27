@@ -6192,7 +6192,7 @@
       ];
     }
     npc.wpIdx = 0;
-    npc.waitTimer = 2.5 + Math.random() * 4.5;
+    npc.waitTimer = 0;
   }
 
   function syncNpcsForActiveCrowd() {
@@ -6261,19 +6261,18 @@
         role: 'cinema',
         seat,
         actor,
-        speed: 1.55 + (idx % 5) * 0.14,
+        speed: 1.75 + (idx % 5) * 0.14,
         walkPhase: Math.random() * Math.PI * 2,
         state: 'to_lounge',
         waitTimer: 0,
         waypoints: [],
         wpIdx: 0,
-        delayTimer: (idx % 24) * 0.55
+        delayTimer: 0
       };
 
       if (isAlreadyLive && idx < chosenSeats.length * 0.65) {
         // Already seated inside auditorium watching the live show
         npc.state = 'seated';
-        npc.delayTimer = 0;
         actor.group.position.set(seat.x, seat.floorY + 0.10, seat.z);
         actor.group.rotation.y = Math.PI;
         actor.leftLeg.rotation.x = -Math.PI / 2;
@@ -6282,15 +6281,14 @@
       } else if (idx % 3 === 0) {
         // Queuing/buying at Ticket Counter
         npc.state = 'to_counter';
-        npc.delayTimer = (idx % 12) * 0.45;
         actor.group.position.set(-4.2 + (Math.random() - 0.5) * 2.4, 0, -68 - Math.random() * 5);
         npc.waypoints = [
           { x: -6.0, z: -71.0 },
           { x: -15.8 - (idx % 2) * 0.5, z: counterZ }
         ];
       } else {
-        // Walking from promenade into Ticket Lounge
-        actor.group.position.set((Math.random() - 0.5) * 6.0, 0, -48 - Math.random() * 18);
+        // Walking from promenade into Ticket Lounge (naturally staggered along Z)
+        actor.group.position.set((Math.random() - 0.5) * 6.0, 0, -18 - Math.random() * 48);
         npc.waypoints = [
           { x: -4.2, z: -71.0 },
           { x: -6.0, z: -71.0 },
