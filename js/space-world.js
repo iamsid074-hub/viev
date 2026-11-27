@@ -2025,6 +2025,157 @@
     cinemaDoorState.doorGroup = singleCinemaDoorGroup;
     cinemaDoorState.doorX = doorCenterX;
 
+    // Real 3D Wall-Mounted Commercial OLED LED Display protruding from Left Wood Wall beside Gate 1
+    const schedWallZ = zEndWall + woodWallDepth / 2;
+    const ledChassisMat = new THREE.MeshStandardMaterial({ color: 0x0b0c10, roughness: 0.26, metalness: 0.82 });
+    const ledMountArm = new THREE.Mesh(new THREE.BoxGeometry(1.65, 0.72, 0.10), ledChassisMat);
+    ledMountArm.position.set(-3.2, 3.05, schedWallZ + 0.05);
+    scene.add(ledMountArm);
+
+    const schedLedFrame = new THREE.Mesh(
+      new THREE.BoxGeometry(4.52, 2.94, 0.11),
+      ledChassisMat
+    );
+    schedLedFrame.position.set(-3.2, 3.05, schedWallZ + 0.145);
+    scene.add(schedLedFrame);
+
+    const schedCanv = document.createElement('canvas');
+    schedCanv.width = 1024;
+    schedCanv.height = 660;
+    const schedCtx = schedCanv.getContext('2d');
+    const schedTex = new THREE.CanvasTexture(schedCanv);
+    schedTex.colorSpace = THREE.SRGBColorSpace;
+    const schedScreen = new THREE.Mesh(
+      new THREE.PlaneGeometry(4.36, 2.78),
+      new THREE.MeshStandardMaterial({
+        map: schedTex,
+        emissiveMap: schedTex,
+        emissive: new THREE.Color(0xffffff),
+        emissiveIntensity: 0.92,
+        roughness: 0.14,
+        metalness: 0.08
+      })
+    );
+    schedScreen.position.set(-3.2, 3.05, schedWallZ + 0.205);
+    scene.add(schedScreen);
+
+    const schedBackGlow = new THREE.PointLight(0x88b8ff, 0.35, 5.5, 2.0);
+    schedBackGlow.position.set(-3.2, 3.05, schedWallZ + 0.10);
+    scene.add(schedBackGlow);
+
+    siteTimeEngine.schedCtx = schedCtx;
+    siteTimeEngine.schedTex = schedTex;
+
+    // Architectural "GATE 1" Plaque above Cinema Gate 1 (matching TICKET LOUNGE espresso-gold style)
+    const gateSignCanv = document.createElement('canvas');
+    gateSignCanv.width = 512;
+    gateSignCanv.height = 128;
+    const gsCtx = gateSignCanv.getContext('2d');
+    gsCtx.fillStyle = '#140c08';
+    gsCtx.fillRect(0, 0, 512, 128);
+    gsCtx.strokeStyle = '#d4af37';
+    gsCtx.lineWidth = 4;
+    gsCtx.strokeRect(8, 8, 496, 112);
+    gsCtx.fillStyle = '#f2cf74';
+    gsCtx.font = '600 48px "Cinzel", Georgia, serif';
+    gsCtx.textAlign = 'center';
+    gsCtx.textBaseline = 'middle';
+    gsCtx.fillText('GATE 1', 256, 66);
+    const gateSignTex = new THREE.CanvasTexture(gateSignCanv);
+    gateSignTex.colorSpace = THREE.SRGBColorSpace;
+    const gateSignMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.2, 0.55),
+      new THREE.MeshStandardMaterial({ map: gateSignTex, emissiveMap: gateSignTex, emissive: new THREE.Color(0xffe08a), emissiveIntensity: 0.35, roughness: 0.35 })
+    );
+    gateSignMesh.position.set(doorCenterX, doorOpenH + 0.54, zEndWall + woodWallDepth / 2 + 0.04);
+    scene.add(gateSignMesh);
+
+    // Live Digital Clock above "W E" on Right Wall (Site Time Engine: 10s real = 1m VIEV)
+    const clockBezel = new THREE.Mesh(
+      new THREE.BoxGeometry(0.05, 0.72, 1.72),
+      doorBrassTrimMat
+    );
+    clockBezel.position.set(halfW - 0.025, 4.55, -68.2);
+    scene.add(clockBezel);
+
+    const clockCanv = document.createElement('canvas');
+    clockCanv.width = 512;
+    clockCanv.height = 224;
+    const clockCtx = clockCanv.getContext('2d');
+    const clockTex = new THREE.CanvasTexture(clockCanv);
+    clockTex.colorSpace = THREE.SRGBColorSpace;
+    const clockScreen = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.62, 0.62),
+      new THREE.MeshBasicMaterial({ map: clockTex })
+    );
+    clockScreen.rotation.y = -Math.PI / 2;
+    clockScreen.position.set(halfW - 0.055, 4.55, -68.2);
+    scene.add(clockScreen);
+    siteTimeEngine.clockCanvas = clockCanv;
+    siteTimeEngine.clockCtx = clockCtx;
+    siteTimeEngine.clockTex = clockTex;
+    updateSiteClockTexture(true);
+
+    // Reusable 3D VIEV Cinema Staff Uniform Character
+    function createVievEmployee(ex, ez, rotY) {
+      const emp = new THREE.Group();
+      emp.position.set(ex, 0, ez);
+      emp.rotation.y = rotY;
+      const suitMat = new THREE.MeshStandardMaterial({ color: 0x16161b, roughness: 0.62, metalness: 0.1 });
+      const shirtMat = new THREE.MeshStandardMaterial({ color: 0xf4f2ee, roughness: 0.5 });
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xd9a884, roughness: 0.68 });
+      const hairMat = new THREE.MeshStandardMaterial({ color: 0x1a1412, roughness: 0.8 });
+
+      // Shoes & Legs
+      [-0.10, 0.10].forEach((lx) => {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.058, 0.82, 12), suitMat);
+        leg.position.set(lx, 0.44, 0);
+        emp.add(leg);
+        const shoe = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.07, 0.22), suitMat);
+        shoe.position.set(lx, 0.035, 0.04);
+        emp.add(shoe);
+      });
+      // Torso Blazer + White Shirt V + Gold Tie + Name Badge
+      const torso = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.56, 0.22), suitMat);
+      torso.position.set(0, 1.13, 0);
+      emp.add(torso);
+      const shirt = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.42, 0.02), shirtMat);
+      shirt.position.set(0, 1.18, 0.105);
+      emp.add(shirt);
+      const tie = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.34, 0.025), doorBrassTrimMat);
+      tie.position.set(0, 1.16, 0.112);
+      emp.add(tie);
+      const badge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.035, 0.02), doorBrassTrimMat);
+      badge.position.set(-0.12, 1.26, 0.114);
+      emp.add(badge);
+      // Arms
+      [-0.26, 0.26].forEach((ax) => {
+        const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.045, 0.52, 10), suitMat);
+        arm.position.set(ax, 1.12, 0);
+        emp.add(arm);
+        const hand = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), skinMat);
+        hand.position.set(ax, 0.84, 0.02);
+        emp.add(hand);
+      });
+      // Neck, Head & Hair
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.06, 0.10, 10), skinMat);
+      neck.position.set(0, 1.44, 0);
+      emp.add(neck);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.125, 16, 14), skinMat);
+      head.position.set(0, 1.59, 0);
+      emp.add(head);
+      const hair = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.56), hairMat);
+      hair.position.set(0, 1.61, -0.01);
+      emp.add(hair);
+
+      scene.add(emp);
+      return emp;
+    }
+
+    // Cinema Gate 1 Attendant & Ticket Counter Staff
+    createVievEmployee(doorCenterX + 1.65, zEndWall + 0.85, 0);
+    createVievEmployee(-18.75, -71.0, Math.PI / 2);
+
     // 5.0. LEFT WOOD WALL (z = -66m to -76m), AUTOMATIC GLASS DOUBLE DOOR & DARK CHOCOLATE ROOM
     const lrDoorZ = -71.0;
     const lrDoorW = 3.4;
@@ -3795,12 +3946,20 @@
 
     // Synchronized Triple-Screen VideoTexture setup for ScreenX
     const sxVideo = document.createElement('video');
-    sxVideo.src = 'video/exxclusive.mp4';
-    sxVideo.loop = true;
+    sxVideo.src = 'song/mangal_rang.mp4';
+    sxVideo.loop = false;
     sxVideo.playsInline = true;
     sxVideo.preload = 'none';
     sxVideo.crossOrigin = 'anonymous';
     sxVideo.muted = false;
+    cinemaScreenXState.completedSlots = new Set();
+    sxVideo.addEventListener('ended', () => {
+      if (cinemaScreenXState.activeSlotKey) {
+        cinemaScreenXState.completedSlots.add(cinemaScreenXState.activeSlotKey);
+      }
+      cinemaScreenXState.isPlaying = false;
+      lastSeatBarKey = '';
+    });
     const sxTex = new THREE.VideoTexture(sxVideo);
     sxTex.colorSpace = THREE.SRGBColorSpace;
     sxTex.minFilter = THREE.LinearFilter;
@@ -4843,16 +5002,267 @@
     }
   }
 
+  const cinemaGateAccessState = {
+    unlocked: false,
+    wasInside: false,
+    deniedMsgUntil: 0,
+    allowedSeats: []
+  };
+
+  const VIEV_EPOCH_MS = 1795759828843; // Persistent epoch anchor: starts at 12:00 PM & never resets on reload/commit/deploy
+
+  const VIEV_SHOW_SCHEDULE = [
+    {
+      id: 'mangal_rang',
+      name: 'MANGAL RANG',
+      sub: 'SCREENX 270° · DOLBY ATMOS',
+      videoSrc: 'song/mangal_rang.mp4',
+      slots: [
+        { label: '1:00 PM', startMin: 13 * 60, endMin: 13 * 60 + 25 },
+        { label: '1:30 PM', startMin: 13 * 60 + 30, endMin: 13 * 60 + 55 },
+        { label: '2:00 PM', startMin: 14 * 60, endMin: 14 * 60 + 25 }
+      ]
+    },
+    {
+      id: 'main_singer_khaandani',
+      name: 'MAIN SINGER KHAANDANI',
+      sub: 'MUSIC VIDEO · DOLBY ATMOS',
+      videoSrc: 'song/main_singer_khaandani.mp4',
+      slots: [
+        { label: '3:00 PM', startMin: 15 * 60, endMin: 15 * 60 + 25 },
+        { label: '3:30 PM', startMin: 15 * 60 + 30, endMin: 15 * 60 + 55 },
+        { label: '4:00 PM', startMin: 16 * 60, endMin: 16 * 60 + 25 },
+        { label: '4:30 PM', startMin: 16 * 60 + 30, endMin: 16 * 60 + 55 },
+        { label: '5:00 PM', startMin: 17 * 60, endMin: 17 * 60 + 25 },
+        { label: '5:30 PM', startMin: 17 * 60 + 30, endMin: 17 * 60 + 55 }
+      ]
+    }
+  ];
+
+  const siteTimeEngine = {
+    baseSeconds: 12 * 3600,
+    lastSec: -1,
+    lastSchedMin: -1,
+    clockCanvas: null,
+    clockCtx: null,
+    clockTex: null,
+    schedCtx: null,
+    schedTex: null
+  };
+
+  function getVievClockParts() {
+    // 10 real seconds = 1 VIEV minute (6x speed), persistent across reloads/deploys
+    const elapsedVievSec = Math.max(0, Math.floor(((Date.now() - VIEV_EPOCH_MS) / 1000) * 6));
+    const totalSec = (siteTimeEngine.baseSeconds + elapsedVievSec) % 86400;
+    const h24 = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return { elapsedVievSec, totalSec, totalMin: h24 * 60 + m, h24, m, s };
+  }
+
+  function getActiveScheduledShow() {
+    const { totalMin } = getVievClockParts();
+    for (const show of VIEV_SHOW_SCHEDULE) {
+      for (const slot of show.slots) {
+        if (totalMin >= slot.startMin && totalMin < slot.endMin) {
+          return { show, slot };
+        }
+      }
+    }
+    return null;
+  }
+
+  function getSiteTimeFormatted(withSeconds = false) {
+    const { h24, m, s } = getVievClockParts();
+    const ampm = h24 >= 12 ? 'PM' : 'AM';
+    const h12 = (h24 % 12) || 12;
+    const mm = String(m).padStart(2, '0');
+    const ss = String(s).padStart(2, '0');
+    return withSeconds ? `${h12}:${mm}:${ss} ${ampm}` : `${h12}:${mm} ${ampm}`;
+  }
+
+  function updateScheduleLedTexture(force = false) {
+    if (!siteTimeEngine.schedCtx || !siteTimeEngine.schedTex) return;
+    const { totalMin } = getVievClockParts();
+    if (!force && totalMin === siteTimeEngine.lastSchedMin) return;
+    siteTimeEngine.lastSchedMin = totalMin;
+
+    const ctx = siteTimeEngine.schedCtx;
+    const active = getActiveScheduledShow();
+    // Deep OLED jet-black screen with subtle LED grid scanlines
+    ctx.fillStyle = '#040508';
+    ctx.fillRect(0, 0, 1024, 660);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    for (let y = 0; y < 660; y += 6) {
+      ctx.fillRect(0, y, 1024, 1);
+    }
+
+    // Sleek Digital Header Bar
+    ctx.fillStyle = '#0c1018';
+    ctx.fillRect(0, 0, 1024, 88);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(0, 86, 1024, 2);
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = 'bold 30px Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('VIEV CINEMAS  ·  HALL 1 SHOWTIMES', 42, 54);
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 28px "Courier New", monospace';
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText(getSiteTimeFormatted(false), 982, 54);
+
+    // Show 1: MANGAL RANG & Show 2: OS 4.0 AD
+    VIEV_SHOW_SCHEDULE.forEach((show, idx) => {
+      const yTop = 118 + idx * 234;
+      const isLive = active && active.show.id === show.id;
+      ctx.fillStyle = isLive ? 'rgba(56, 189, 248, 0.12)' : 'rgba(255, 255, 255, 0.035)';
+      ctx.fillRect(40, yTop, 944, 206);
+      ctx.strokeStyle = isLive ? '#38bdf8' : 'rgba(255,255,255,0.12)';
+      ctx.lineWidth = isLive ? 3 : 1.5;
+      ctx.strokeRect(40, yTop, 944, 206);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 42px Arial, sans-serif';
+      ctx.fillText(`${idx + 1}. ${show.name}`, 68, yTop + 58);
+
+      ctx.fillStyle = isLive ? '#4ade80' : '#94a3b8';
+      ctx.font = 'bold 21px Arial, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(isLive ? `● LIVE NOW · ${active.slot.label}` : show.sub, 954, yTop + 54);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 19px Arial, sans-serif';
+      ctx.fillText('ALLOTTED TIMINGS', 68, yTop + 106);
+
+      let px = 68;
+      const py = yTop + 124;
+      show.slots.forEach((sl) => {
+        const slotLive = isLive && active.slot.label === sl.label;
+        const bw = 132;
+        ctx.fillStyle = slotLive ? '#4ade80' : 'rgba(15, 23, 42, 0.95)';
+        ctx.fillRect(px, py, bw, 48);
+        ctx.strokeStyle = slotLive ? '#86efac' : 'rgba(56, 189, 248, 0.45)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(px, py, bw, 48);
+        ctx.fillStyle = slotLive ? '#052e16' : '#f1f5f9';
+        ctx.font = 'bold 22px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(sl.label, px + bw / 2, py + 32);
+        px += bw + 14;
+      });
+    });
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = active ? '#4ade80' : '#94a3b8';
+    ctx.font = 'bold 23px Arial, sans-serif';
+    ctx.fillText(
+      active ? `● NOW SCREENING IN HALL 1: ${active.show.name} (${active.slot.label})` : 'AUTO-PLAY ENABLED · SHOW STARTS AT SCHEDULED TIME',
+      512,
+      628
+    );
+    siteTimeEngine.schedTex.needsUpdate = true;
+  }
+
+  function updateSiteClockTexture(force = false) {
+    if (!siteTimeEngine.clockCtx || !siteTimeEngine.clockTex) return;
+    const { elapsedVievSec } = getVievClockParts();
+    if (!force && elapsedVievSec === siteTimeEngine.lastSec) return;
+    siteTimeEngine.lastSec = elapsedVievSec;
+    const ctx = siteTimeEngine.clockCtx;
+    ctx.fillStyle = '#09090d';
+    ctx.fillRect(0, 0, 512, 224);
+    ctx.fillStyle = 'rgba(242, 207, 116, 0.85)';
+    ctx.font = 'bold 24px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('VIEV CINEMAS · SITE TIME', 256, 54);
+    ctx.fillStyle = '#ffdf88';
+    ctx.font = 'bold 74px "Courier New", monospace';
+    ctx.fillText(getSiteTimeFormatted(true), 256, 146);
+    siteTimeEngine.clockTex.needsUpdate = true;
+    updateScheduleLedTexture(force);
+  }
+
   function updateCinemaDoors() {
     if (!cinemaDoorState.doorGroup || !camera) return;
     const dist = Math.hypot(camera.position.x - cinemaDoorState.doorX, camera.position.z - cinemaDoorState.doorZ);
-    cinemaDoorState.targetProgress = dist < 7.5 ? 1 : 0;
+    // 1 ticket = 1 entry: once player enters hall and later exits, lock gate again
+    if (camera.position.z < -77.2) {
+      cinemaGateAccessState.wasInside = true;
+    } else if (cinemaGateAccessState.wasInside && camera.position.z > -75.0) {
+      cinemaGateAccessState.unlocked = false;
+      cinemaGateAccessState.wasInside = false;
+      cinemaGateAccessState.allowedSeats = [];
+    }
+    cinemaDoorState.targetProgress = (cinemaGateAccessState.unlocked && dist < 7.5) ? 1 : 0;
     const diff = cinemaDoorState.targetProgress - cinemaDoorState.openProgress;
     if (Math.abs(diff) > 0.001) {
       cinemaDoorState.openProgress += diff * 0.065;
       const angle = cinemaDoorState.openProgress * (Math.PI * 0.48);
       cinemaDoorState.doorGroup.rotation.y = angle;
     }
+  }
+
+  let lastGatePromptKey = '';
+  function ensureCinemaGatePrompt() {
+    let bar = document.getElementById('cinema-gate-prompt');
+    if (bar || !stageElement) return bar;
+    bar = document.createElement('div');
+    bar.id = 'cinema-gate-prompt';
+    bar.style.cssText = [
+      'position:absolute', 'left:50%', 'bottom:76px', 'transform:translateX(-50%)',
+      'z-index:27', 'display:none', 'align-items:center', 'gap:10px',
+      'padding:9px 18px', 'border-radius:999px',
+      'background:rgba(16,14,15,0.88)', 'backdrop-filter:blur(12px)', '-webkit-backdrop-filter:blur(12px)',
+      'border:1px solid rgba(232,196,104,0.58)', 'box-shadow:0 8px 28px rgba(0,0,0,0.5)',
+      'pointer-events:auto', 'cursor:pointer'
+    ].join(';');
+    bar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (ticketBookingState.confirmedTicket) {
+        // Consume 1 ticket for 1 entry, save allowed seats, and open Gate 1 automatically
+        cinemaGateAccessState.allowedSeats = [...ticketBookingState.confirmedTicket.seats];
+        ticketBookingState.confirmedTicket = null;
+        cinemaGateAccessState.unlocked = true;
+        cinemaGateAccessState.wasInside = false;
+        const zoomOv = document.getElementById('ticket-zoom-overlay');
+        if (zoomOv) zoomOv.style.display = 'none';
+        updateCornerTicketBadge();
+      } else {
+        cinemaGateAccessState.deniedMsgUntil = performance.now() + 2600;
+      }
+      lastGatePromptKey = '';
+      updateCinemaGatePrompt();
+    });
+    stageElement.appendChild(bar);
+    return bar;
+  }
+
+  function updateCinemaGatePrompt() {
+    const bar = ensureCinemaGatePrompt();
+    if (!bar || !camera) return;
+    const dist = Math.hypot(camera.position.x - cinemaDoorState.doorX, camera.position.z - cinemaDoorState.doorZ);
+    const shouldShow = !ticketBookingState.isOpen &&
+      camera.position.z >= -76.2 &&
+      !cinemaGateAccessState.unlocked &&
+      dist < 5.2;
+
+    if (!shouldShow) {
+      if (lastGatePromptKey !== 'hidden') {
+        lastGatePromptKey = 'hidden';
+        bar.style.display = 'none';
+      }
+      return;
+    }
+    const denied = performance.now() < cinemaGateAccessState.deniedMsgUntil;
+    const key = denied ? 'denied' : 'ready';
+    if (lastGatePromptKey === key) return;
+    lastGatePromptKey = key;
+    bar.style.display = 'flex';
+    bar.innerHTML = denied
+      ? '<span style="color:#f87171;font-size:12.5px;font-weight:700;">❌ No Ticket! Buy at Ticket Counter first</span>'
+      : '<span style="color:#f5d580;font-size:13px;font-weight:700;letter-spacing:0.05em;">🎫 Show Ticket · Enter Gate 1</span>';
   }
 
   function ensureCinemaSeatBar() {
@@ -4929,8 +5339,28 @@
     const sx = cinemaScreenXState;
     if (!sx.mainMesh || !sx.leftWing || !sx.rightWing) return;
 
-    // Auto-pause if player walks back out into the main mall
-    if (sx.isPlaying && camera && camera.position.z >= -75.0) {
+    // Auto-start & auto-stop Cinema playback strictly once per scheduled slot (no repeat)
+    const active = getActiveScheduledShow();
+    const insideHall = camera && camera.position.z < -76.2;
+    const slotKey = active ? `${active.show.id}_${active.slot.label}` : null;
+    const alreadyPlayed = slotKey && sx.completedSlots && sx.completedSlots.has(slotKey);
+    if (active && insideHall && sx.video && !alreadyPlayed) {
+      if (sx.activeSlotKey !== slotKey) {
+        sx.activeSlotKey = slotKey;
+        if (sx.activeShowId !== active.show.id) {
+          sx.activeShowId = active.show.id;
+          sx.video.src = active.show.videoSrc;
+          sx.video.load();
+        } else {
+          sx.video.currentTime = 0;
+        }
+      }
+      if (!sx.isPlaying && !sx.video.ended) {
+        sx.isPlaying = true;
+        sx.video.play().catch(() => { });
+        lastSeatBarKey = '';
+      }
+    } else if (sx.isPlaying && sx.video) {
       sx.video.pause();
       sx.isPlaying = false;
       lastSeatBarKey = '';
@@ -5055,45 +5485,18 @@
 
     if (seatedState.active && seatedState.seat) {
       const sx = cinemaScreenXState;
-      const key = `seated:${seatedState.seat.label}:${sx.isPlaying}:${sx.screenXEnabled}`;
+      const active = getActiveScheduledShow();
+      const showLabel = active ? active.show.name : (sx.isPlaying ? 'PLAYING' : 'STANDBY');
+      const key = `seated:${seatedState.seat.label}:${showLabel}`;
       if (lastSeatBarKey === key) return;
       lastSeatBarKey = key;
       bar.innerHTML = '';
       bar.style.display = 'flex';
 
       const lbl = document.createElement('span');
-      lbl.textContent = `Seated · ${seatedState.seat.label}`;
-      lbl.style.cssText = 'color:#f3d27a;font-size:12px;font-weight:600;letter-spacing:0.06em;margin-right:4px;';
+      lbl.textContent = `Seated · ${seatedState.seat.label} · ${showLabel}`;
+      lbl.style.cssText = 'color:#f3d27a;font-size:12px;font-weight:600;letter-spacing:0.06em;margin-right:6px;';
       bar.appendChild(lbl);
-
-      const playBtn = document.createElement('button');
-      playBtn.type = 'button';
-      playBtn.textContent = sx.isPlaying ? '⏸ Pause' : '▶ Play';
-      playBtn.style.cssText = 'padding:5px 12px;border-radius:999px;border:1px solid #f0c966;background:rgba(240,201,102,0.22);color:#ffe49e;font-size:12px;font-weight:600;cursor:pointer;';
-      playBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleCinemaPlayback();
-      });
-      bar.appendChild(playBtn);
-
-      const sxBtn = document.createElement('button');
-      sxBtn.type = 'button';
-      sxBtn.textContent = sx.screenXEnabled ? 'ScreenX 270°: ON' : 'ScreenX 270°: OFF';
-      sxBtn.style.cssText = [
-        'padding:5px 11px',
-        'border-radius:999px',
-        sx.screenXEnabled
-          ? 'border:1px solid rgba(110,210,255,0.65);background:rgba(70,165,245,0.22);color:#bfe6ff'
-          : 'border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.75)',
-        'font-size:12px',
-        'font-weight:600',
-        'cursor:pointer'
-      ].join(';');
-      sxBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleScreenXMode();
-      });
-      bar.appendChild(sxBtn);
 
       const standBtn = document.createElement('button');
       standBtn.type = 'button';
@@ -5143,7 +5546,8 @@
       .sort((a, b) => a.x - b.x)
       .slice(0, 5);
 
-    const key = `near:${nearest.label}:${nearbySet.map((s) => s.label).join(',')}`;
+    const allowed = cinemaGateAccessState.allowedSeats || [];
+    const key = `near:${nearest.label}:${nearbySet.map((s) => s.label).join(',')}:allow:${allowed.join(',')}`;
     if (lastSeatBarKey === key) return;
     lastSeatBarKey = key;
 
@@ -5151,30 +5555,33 @@
     bar.style.display = 'flex';
 
     const title = document.createElement('span');
-    title.textContent = 'Sit:';
+    title.textContent = allowed.length ? `Your Seat (${allowed.join(', ')}):` : 'Seats (No Ticket):';
     title.style.cssText = 'color:rgba(255,255,255,0.72);font-size:12px;font-weight:500;letter-spacing:0.05em;';
     bar.appendChild(title);
 
     nearbySet.forEach((seat) => {
-      const isClosest = seat.label === nearest.label;
+      const isAllowed = allowed.includes(seat.label);
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.textContent = seat.label;
+      btn.textContent = isAllowed ? seat.label : `🔒 ${seat.label}`;
+      btn.disabled = !isAllowed;
+      btn.title = isAllowed ? `Sit in your ticket seat ${seat.label}` : `Only your ticket seat (${allowed.join(', ') || 'None'}) can be used`;
       btn.style.cssText = [
         'padding:5px 11px',
         'border-radius:999px',
-        isClosest
-          ? 'border:1px solid #f0c966;background:rgba(240,201,102,0.22);color:#ffe49e'
-          : 'border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff',
+        isAllowed
+          ? 'border:1px solid #f0c966;background:rgba(240,201,102,0.28);color:#ffe49e;cursor:pointer'
+          : 'border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.34);cursor:not-allowed',
         'font-size:12px',
         'font-weight:600',
-        'cursor:pointer',
         'transition:transform 0.15s ease,background 0.15s ease'
       ].join(';');
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        sitInSeat(seat);
-      });
+      if (isAllowed) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sitInSeat(seat);
+        });
+      }
       bar.appendChild(btn);
     });
   }
@@ -5185,7 +5592,7 @@
   const ticketBookingState = {
     isOpen: false,
     step: 'timings', // 'timings' | 'seats' | 'payment'
-    selectedTime: '7:00 PM',
+    selectedTime: '1:00 PM',
     selectedSeats: [],
     paymentMethod: 'UPI / QR',
     confirmedTicket: null,
@@ -5193,13 +5600,15 @@
   };
 
   const TICKET_TIMINGS = [
-    { time: '9:00 AM', hasShow: true, format: 'DOLBY ATMOS · 2D' },
-    { time: '11:00 AM', hasShow: false },
-    { time: '1:00 PM', hasShow: true, format: 'SCREENX 270° · DOLBY ATMOS' },
-    { time: '2:00 PM', hasShow: false },
-    { time: '7:00 PM', hasShow: true, format: 'SCREENX 270° · DOLBY ATMOS' },
-    { time: '8:00 PM', hasShow: true, format: 'IMAX LASER · 2D' },
-    { time: '10:00 PM', hasShow: true, format: 'SCREENX 270° · VIP NIGHT' }
+    { time: '1:00 PM', startMin: 13 * 60, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
+    { time: '1:30 PM', startMin: 13 * 60 + 30, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
+    { time: '2:00 PM', startMin: 14 * 60, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' },
+    { time: '3:00 PM', startMin: 15 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
+    { time: '3:30 PM', startMin: 15 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
+    { time: '4:00 PM', startMin: 16 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
+    { time: '4:30 PM', startMin: 16 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
+    { time: '5:00 PM', startMin: 17 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
+    { time: '5:30 PM', startMin: 17 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' }
   ];
 
   function getSeatTierInfo(seatId) {
@@ -5243,11 +5652,76 @@
       'border-radius:6px',
       'background:linear-gradient(145deg, #f6f4ef, #e9e5dc)',
       'box-shadow:0 10px 28px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(0,0,0,0.1)',
-      'color:#151515', 'font-family:"Courier New", monospace', 'pointer-events:auto',
+      'color:#151515', 'font-family:"Courier New", monospace', 'pointer-events:auto', 'cursor:pointer',
       'overflow:hidden', 'max-width:295px'
     ].join(';');
+    badge.title = 'Click to view full ticket';
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openCornerTicketModal();
+    });
     host.appendChild(badge);
     return badge;
+  }
+
+  function openCornerTicketModal() {
+    const t = ticketBookingState.confirmedTicket;
+    if (!t) return;
+    if (document.pointerLockElement) document.exitPointerLock?.();
+    let zoomOv = document.getElementById('ticket-zoom-overlay');
+    if (!zoomOv) {
+      const host = stageElement || document.body;
+      zoomOv = document.createElement('div');
+      zoomOv.id = 'ticket-zoom-overlay';
+      zoomOv.style.cssText = [
+        'position:absolute', 'inset:0', 'z-index:9999', 'display:none',
+        'align-items:center', 'justify-content:center',
+        'background:rgba(6,5,8,0.75)', 'backdrop-filter:blur(8px)', '-webkit-backdrop-filter:blur(8px)',
+        'padding:16px', 'pointer-events:auto'
+      ].join(';');
+      zoomOv.addEventListener('click', (e) => {
+        if (e.target === zoomOv) zoomOv.style.display = 'none';
+      });
+      host.appendChild(zoomOv);
+    }
+    const seatLabel = t.seats.join(', ');
+    const isVip = t.seats.some(s => s.startsWith('V'));
+    zoomOv.style.display = 'flex';
+    zoomOv.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;max-width:94vw;">
+        <div style="display:flex;align-items:stretch;background:linear-gradient(145deg,#f7f5f0,#e6e1d7);color:#141414;font-family:'Courier New',monospace;border-radius:10px;box-shadow:0 24px 60px rgba(0,0,0,0.75);overflow:hidden;border:1px solid rgba(0,0,0,0.12);">
+          <div style="padding:20px 24px;border-right:2px dashed #8a867e;min-width:280px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:#333;">
+              <span>VIEV .inc CINEMAS</span>
+              <span>TICKET #20261127-0042</span>
+            </div>
+            <div style="font-family:Arial,sans-serif;font-size:26px;font-weight:900;color:#111;margin-top:8px;">${t.movie} <span style="font-size:15px;font-weight:600;color:#444;">(U/A)</span></div>
+            <div style="font-size:12px;color:#444;margin-bottom:12px;">(∞) To Go. · 141 Min</div>
+            <div style="font-family:Arial,sans-serif;font-size:17px;font-weight:800;color:#111;margin-bottom:8px;">HALL: 01 | SEAT: ${seatLabel}${isVip ? ' (VIP)' : ''}</div>
+            <div style="font-size:12px;color:#222;line-height:1.5;">
+              <div>DATE: FRI, NOV 27, 2026 &nbsp; TIME: ${t.time}</div>
+              <div>ADMISSION: ₹${t.total} · BARCODE: TKT-09876</div>
+            </div>
+            <div style="margin-top:12px;height:28px;width:100%;background:repeating-linear-gradient(90deg,#111 0 3px,transparent 3px 5px,#111 5px 6px,transparent 6px 10px,#111 10px 13px,transparent 13px 16px);"></div>
+          </div>
+          <div style="padding:20px 16px;width:118px;display:flex;flex-direction:column;justify-content:space-between;background:rgba(0,0,0,0.03);">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#333;">VIEV .inc</div>
+              <div style="font-family:Arial,sans-serif;font-size:14px;font-weight:900;color:#111;margin-top:6px;">${t.movie}</div>
+              <div style="font-size:11px;color:#444;margin-top:6px;">NOV 27, 2026</div>
+              <div style="font-size:11px;color:#444;">${t.time}</div>
+              <div style="font-size:11px;font-weight:800;color:#111;margin-top:10px;">HALL 01</div>
+              <div style="font-size:11px;font-weight:800;color:#111;">SEAT ${seatLabel}</div>
+            </div>
+            <div style="font-size:13px;font-weight:800;color:#111;">₹${t.total}</div>
+          </div>
+        </div>
+        <button type="button" id="ticket-zoom-close" style="padding:9px 22px;border-radius:999px;border:1px solid rgba(242,207,116,0.55);background:rgba(18,15,18,0.9);color:#f2cf74;font-size:13px;font-weight:700;cursor:pointer;">✕ Close</button>
+      </div>
+    `;
+    zoomOv.querySelector('#ticket-zoom-close')?.addEventListener('click', () => {
+      zoomOv.style.display = 'none';
+    });
   }
 
   function updateCornerTicketBadge() {
@@ -5269,7 +5743,7 @@
             <span>VIEV .inc CINEMAS</span>
             <span>#20261127-0042</span>
           </div>
-          <div style="font-family:Arial,sans-serif;font-size:13px;font-weight:900;color:#111;margin-top:3px;letter-spacing:0.02em;">300 DAYS <span style="font-size:8.5px;font-weight:600;color:#444;">(PG-13)</span></div>
+          <div style="font-family:Arial,sans-serif;font-size:13px;font-weight:900;color:#111;margin-top:3px;letter-spacing:0.02em;">${t.movie} <span style="font-size:8.5px;font-weight:600;color:#444;">(U/A)</span></div>
           <div style="font-size:8px;color:#444;margin-bottom:4px;">(∞) To Go. · 141 Min</div>
           <div style="font-family:Arial,sans-serif;font-size:10px;font-weight:800;color:#111;margin-bottom:3px;">HALL: 01 | SEAT: ${seatLabel}${isVip ? ' (VIP)' : ''}</div>
           <div style="font-size:7.5px;color:#333;line-height:1.35;">
@@ -5281,7 +5755,7 @@
         <div style="padding:8px 7px;width:72px;display:flex;flex-direction:column;justify-content:space-between;background:rgba(0,0,0,0.02);">
           <div>
             <div style="font-size:7.5px;font-weight:700;color:#333;">VIEV .inc</div>
-            <div style="font-family:Arial,sans-serif;font-size:9px;font-weight:900;color:#111;margin-top:2px;">300 DAYS</div>
+            <div style="font-family:Arial,sans-serif;font-size:9px;font-weight:900;color:#111;margin-top:2px;">${t.movie}</div>
             <div style="font-size:7px;color:#444;margin-top:2px;">${t.time}</div>
             <div style="font-size:7.5px;font-weight:700;color:#111;margin-top:3px;">HALL 01</div>
             <div style="font-size:7.5px;font-weight:800;color:#111;">${seatLabel}</div>
@@ -5300,6 +5774,9 @@
 
   function openTicketIpad() {
     if (document.pointerLockElement) document.exitPointerLock?.();
+    const { totalMin } = getVievClockParts();
+    const nextSlot = TICKET_TIMINGS.find(s => s.startMin > totalMin);
+    if (nextSlot) ticketBookingState.selectedTime = nextSlot.time;
     ticketBookingState.isOpen = true;
     ticketBookingState.step = 'timings';
     ticketBookingState.selectedSeats = [];
@@ -5325,23 +5802,26 @@
     }
     ov.style.display = 'flex';
 
+    const { totalMin } = getVievClockParts();
     const slot = TICKET_TIMINGS.find(s => s.time === ticketBookingState.selectedTime) || TICKET_TIMINGS[0];
+    const isSlotExpired = totalMin >= slot.startMin;
     const totalAmount = ticketBookingState.selectedSeats.reduce((sum, sid) => sum + getSeatTierInfo(sid).price, 0);
 
     let bodyHtml = '';
     if (ticketBookingState.step === 'timings') {
       const timingPills = TICKET_TIMINGS.map(s => {
         const active = s.time === ticketBookingState.selectedTime;
-        return `<button type="button" data-time="${s.time}" style="flex:0 0 auto;padding:9px 16px;border-radius:999px;border:1px solid ${active ? '#f2cf74' : 'rgba(255,255,255,0.18)'};background:${active ? 'linear-gradient(135deg,#f2cf74,#c89d42)' : 'rgba(255,255,255,0.06)'};color:${active ? '#160e08' : '#fff'};font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">${s.time}</button>`;
+        const expired = totalMin >= s.startMin;
+        return `<button type="button" data-time="${s.time}" style="flex:0 0 auto;padding:9px 16px;border-radius:999px;border:1px solid ${active ? '#f2cf74' : 'rgba(255,255,255,0.18)'};background:${active ? 'linear-gradient(135deg,#f2cf74,#c89d42)' : 'rgba(255,255,255,0.06)'};color:${active ? '#160e08' : '#fff'};opacity:${expired ? '0.42' : '1'};text-decoration:${expired ? 'line-through' : 'none'};font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;">${s.time}</button>`;
       }).join('');
 
-      const showContent = slot.hasShow
+      const showContent = (slot.hasShow && !isSlotExpired)
         ? `
           <div style="display:flex;gap:20px;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(242,207,116,0.28);border-radius:18px;padding:16px;margin-top:16px;flex-wrap:wrap;">
             <img src="assets/300-days-poster.jpg" alt="300 DAYS" style="width:128px;height:210px;object-fit:cover;border-radius:12px;border:1px solid rgba(242,207,116,0.35);flex-shrink:0;" />
             <div style="flex:1;min-width:220px;">
               <div style="display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(242,207,116,0.16);color:#f2cf74;font-size:10.5px;font-weight:700;letter-spacing:0.1em;">NOW SHOWING · ${slot.time}</div>
-              <h2 style="margin:10px 0 4px;font-size:26px;color:#fff;letter-spacing:0.04em;">300 DAYS <span style="color:#f2cf74;font-size:18px;">(∞) To Go.</span></h2>
+              <h2 style="margin:10px 0 4px;font-size:26px;color:#fff;letter-spacing:0.04em;">${slot.showName}</h2>
               <div style="font-size:12.5px;color:rgba(255,255,255,0.72);margin-bottom:10px;">${slot.format} · 2h 18m · VIEV LUXE HALL 1</div>
               <div style="font-size:12px;color:rgba(255,255,255,0.62);line-height:1.5;margin-bottom:16px;">No distance can keep them apart. Experience the romance in full 270° panoramic ScreenX &amp; Dolby Atmos sound.</div>
               <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -5353,8 +5833,8 @@
         : `
           <div style="text-align:center;padding:54px 20px;margin-top:16px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.16);border-radius:18px;">
             <div style="font-size:28px;margin-bottom:8px;">🎬</div>
-            <div style="font-size:16px;font-weight:700;color:#fff;">No Show Scheduled at ${slot.time}</div>
-            <div style="font-size:12.5px;color:rgba(255,255,255,0.6);margin-top:6px;">Select another show timing above (e.g. 9:00 AM, 1:00 PM, 7:00 PM, 8:00 PM, 10:00 PM)</div>
+            <div style="font-size:16px;font-weight:700;color:#fff;">${isSlotExpired ? `Booking Closed · ${slot.time} Show Already Started` : `No Show Scheduled at ${slot.time}`}</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,0.6);margin-top:6px;">${isSlotExpired ? `Current VIEV Time is ${getSiteTimeFormatted(false)} — please select an upcoming showtime.` : 'Please select another show timing above.'}</div>
           </div>`;
 
       bodyHtml = `
@@ -5394,7 +5874,7 @@
       bodyHtml = `
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
           <button type="button" id="ipad-back-timings" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:11.5px;cursor:pointer;">← Timings</button>
-          <div style="font-size:12px;font-weight:700;color:#fff;">300 DAYS · <span style="color:#f2cf74;">${ticketBookingState.selectedTime}</span></div>
+          <div style="font-size:12px;font-weight:700;color:#fff;">${slot.showName} · <span style="color:#f2cf74;">${ticketBookingState.selectedTime}</span></div>
           <div style="display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,0.78);flex-wrap:wrap;">
             <span><b style="color:#94a3b8;">●</b> Silver ₹250</span>
             <span><b style="color:#fbbf24;">●</b> Gold ₹380</span>
@@ -5432,7 +5912,7 @@
         </div>
         <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(242,207,116,0.28);border-radius:16px;padding:16px;margin-bottom:14px;">
           <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#fff;margin-bottom:6px;">
-            <span>300 DAYS (∞) To Go.</span>
+            <span>${slot.showName}</span>
             <span style="color:#f2cf74;">${ticketBookingState.selectedTime}</span>
           </div>
           <div style="font-size:12px;color:rgba(255,255,255,0.72);margin-bottom:8px;">Hall: VIEV LUXE HALL 1 · ScreenX 270°</div>
@@ -5453,7 +5933,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.1);">
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="width:8px;height:8px;border-radius:50%;background:#3a3b42;display:inline-block;"></span>
-            <span style="font-size:11px;font-weight:800;letter-spacing:0.14em;color:#f2cf74;">VIEV BOX OFFICE · iPad</span>
+            <span style="font-size:11px;font-weight:800;letter-spacing:0.14em;color:#f2cf74;">VIEV BOX OFFICE · iPad · ${getSiteTimeFormatted(false)}</span>
           </div>
           <button type="button" id="ipad-close-btn" style="padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">✕ Close</button>
         </div>
@@ -5504,7 +5984,7 @@
     ov.querySelector('#ipad-confirm-pay')?.addEventListener('click', () => {
       ticketBookingState.selectedSeats.forEach(s => ticketBookingState.bookedSeatIds.add(s));
       ticketBookingState.confirmedTicket = {
-        movie: '300 DAYS',
+        movie: slot.showName || 'MANGAL RANG',
         time: ticketBookingState.selectedTime,
         seats: [...ticketBookingState.selectedSeats],
         total: totalAmount
@@ -5558,7 +6038,9 @@
     updateCinemaScreenX();
     updateCinemaSeatPrompt();
     updateTicketCounterPrompt();
+    updateCinemaGatePrompt();
     updateCornerTicketBadge();
+    updateSiteClockTexture(false);
 
     renderer.render(scene, camera);
     animFrameId = requestAnimationFrame(animate);
