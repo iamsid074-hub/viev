@@ -2869,20 +2869,6 @@
       });
     }
 
-    // VIP Divider Parapet Wall & Brass Cap Rail separating Row 7 from Top VIP Terrace (walkways stay open)
-    [
-      { x: -17.95, w: 5.0 },
-      { x: -10.725, w: 6.25 },
-      { x: -4.125, w: 3.75 }
-    ].forEach((p) => {
-      const parapet = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.72, 0.14), hallWallMat);
-      parapet.position.set(p.x, row7TopY + 0.36, vipDeckStartZ + 0.07);
-      scene.add(parapet);
-      const cap = new THREE.Mesh(new THREE.BoxGeometry(p.w + 0.02, 0.06, 0.18), doorBrassTrimMat);
-      cap.position.set(p.x, row7TopY + 0.74, vipDeckStartZ + 0.07);
-      scene.add(cap);
-    });
-
     // Place Top VIP Special Recliner Seats with normal comfortable front/rear spacing (z = -76.95m)
     const vipSeatXs = [
       ...blockSeatXs(-20.45, 3, 1.65), // Extreme Left 3 VIP Recliners
