@@ -2452,54 +2452,137 @@
     logoBackGlow.position.set(trBackX + 0.55, 3.25, lrCenterZ);
     scene.add(logoBackGlow);
 
-    // 1 Tall Bezelless Vertical LED Display on EACH Side Wall (South z = -66.04 & North z = -75.96)
-    const sideWallLeds = [
-      { zPos: -66.04, nz: -1, rotY: Math.PI, title: 'VIEV EXCLUSIVE', sub: 'SCREENX 270°', time: '07:30 PM · VIP' },
-      { zPos: -75.96, nz: 1, rotY: 0, title: 'AASHAYEIN', sub: 'DOLBY ATMOS', time: '09:00 PM · HALL 1' }
-    ];
-    sideWallLeds.forEach((m) => {
+    // 1 Tall Bezelless Vertical LED Display on EACH Side Wall with "300 DAYS" Poster
+    const poster300Tex = textureLoader.load('assets/300-days-poster.jpg');
+    poster300Tex.colorSpace = THREE.SRGBColorSpace;
+    const poster300Mat = new THREE.MeshBasicMaterial({ map: poster300Tex });
+    [
+      { zPos: -66.04, nz: -1, rotY: Math.PI },
+      { zPos: -75.96, nz: 1, rotY: 0 }
+    ].forEach((m) => {
       const ledX = -12.8;
       const ledY = 2.65;
-      const ledFrame = new THREE.Mesh(new THREE.BoxGeometry(1.24, 2.58, 0.05), tcTopMat);
+      const ledFrame = new THREE.Mesh(new THREE.BoxGeometry(1.36, 2.58, 0.05), tcTopMat);
       ledFrame.position.set(ledX, ledY, m.zPos + m.nz * 0.045);
       scene.add(ledFrame);
 
-      const bCanv = document.createElement('canvas');
-      bCanv.width = 256;
-      bCanv.height = 512;
-      const bCtx = bCanv.getContext('2d');
-      const bgGrad = bCtx.createLinearGradient(0, 0, 0, 512);
-      bgGrad.addColorStop(0, '#2a0d16');
-      bgGrad.addColorStop(0.55, '#12080c');
-      bgGrad.addColorStop(1, '#080608');
-      bCtx.fillStyle = bgGrad;
-      bCtx.fillRect(0, 0, 256, 512);
-      bCtx.fillStyle = '#f2cf74';
-      bCtx.font = 'bold 18px Arial, sans-serif';
-      bCtx.textAlign = 'center';
-      bCtx.fillText('NOW SHOWING', 128, 56);
-      bCtx.fillStyle = '#ffffff';
-      bCtx.font = 'bold 26px Georgia, serif';
-      bCtx.fillText(m.title, 128, 215);
-      bCtx.fillStyle = 'rgba(255,255,255,0.75)';
-      bCtx.font = '18px Arial, sans-serif';
-      bCtx.fillText(m.sub, 128, 258);
-      bCtx.fillStyle = '#f2cf74';
-      bCtx.fillRect(24, 370, 208, 52);
-      bCtx.fillStyle = '#140c08';
-      bCtx.font = 'bold 17px Arial, sans-serif';
-      bCtx.fillText(m.time, 128, 402);
-
-      const bTex = new THREE.CanvasTexture(bCanv);
-      bTex.colorSpace = THREE.SRGBColorSpace;
-      const bScreen = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.18, 2.50),
-        new THREE.MeshBasicMaterial({ map: bTex })
-      );
+      const bScreen = new THREE.Mesh(new THREE.PlaneGeometry(1.30, 2.48), poster300Mat);
       bScreen.rotation.y = m.rotY;
       bScreen.position.set(ledX, ledY, m.zPos + m.nz * 0.075);
       scene.add(bScreen);
     });
+
+    // Two Brushed-Gold Luxury Planters (Left & Right of Ticket Counter)
+    const plantGoldMat = new THREE.MeshStandardMaterial({ color: 0xc8a45a, roughness: 0.28, metalness: 0.85 });
+    const plantSoilMat = new THREE.MeshStandardMaterial({ color: 0x1a1410, roughness: 0.95 });
+    const plantLeafMat = new THREE.MeshStandardMaterial({ color: 0x2f6b2e, roughness: 0.52, side: THREE.DoubleSide });
+    const plantLeafLightMat = new THREE.MeshStandardMaterial({ color: 0x4b8a3e, roughness: 0.48, side: THREE.DoubleSide });
+    const potGeo = new THREE.CylinderGeometry(0.26, 0.22, 0.68, 22);
+    const soilGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.04, 18);
+    const bladeGeo = new THREE.ConeGeometry(0.055, 0.78, 5);
+    const monsteraGeo = new THREE.CircleGeometry(0.18, 7);
+
+    [
+      { px: -17.7, pz: -66.95 },
+      { px: -17.7, pz: -75.05 }
+    ].forEach(({ px, pz }, pIdx) => {
+      const pGroup = new THREE.Group();
+      pGroup.position.set(px, 0, pz);
+
+      const pot = new THREE.Mesh(potGeo, plantGoldMat);
+      pot.position.y = 0.34;
+      pGroup.add(pot);
+
+      const soil = new THREE.Mesh(soilGeo, plantSoilMat);
+      soil.position.y = 0.67;
+      pGroup.add(soil);
+
+      // Upright variegated snake-plant blades + fanned monstera leaves
+      for (let i = 0; i < 9; i++) {
+        const ang = (i / 9) * Math.PI * 2 + pIdx * 0.4;
+        const rad = (i % 3) * 0.06 + 0.04;
+        const blade = new THREE.Mesh(bladeGeo, i % 2 === 0 ? plantLeafMat : plantLeafLightMat);
+        blade.position.set(Math.cos(ang) * rad, 1.02 + (i % 3) * 0.07, Math.sin(ang) * rad);
+        blade.rotation.z = Math.cos(ang) * 0.16;
+        blade.rotation.x = Math.sin(ang) * 0.16;
+        blade.scale.set(1.0, 0.85 + (i % 3) * 0.14, 0.25);
+        pGroup.add(blade);
+      }
+      for (let j = 0; j < 7; j++) {
+        const ang = (j / 7) * Math.PI * 2 + 0.3;
+        const leaf = new THREE.Mesh(monsteraGeo, j % 2 === 0 ? plantLeafLightMat : plantLeafMat);
+        leaf.position.set(Math.cos(ang) * 0.20, 0.92 + (j % 2) * 0.14, Math.sin(ang) * 0.20);
+        leaf.rotation.x = -Math.PI / 2 + 0.55;
+        leaf.rotation.z = ang;
+        leaf.scale.set(1.25, 0.95, 1);
+        pGroup.add(leaf);
+      }
+      scene.add(pGroup);
+    });
+
+    // Luxury Burgundy Velvet 3-Seater Sofa with Brushed-Gold Base & Throw Pillows (Right Side, z = -75.35)
+    const sofaGroup = new THREE.Group();
+    sofaGroup.position.set(-10.2, 0, -75.35);
+    const sofaVelvetMat = new THREE.MeshStandardMaterial({ color: 0x5c1426, roughness: 0.86, metalness: 0.05 });
+    const pillowEmeraldMat = new THREE.MeshStandardMaterial({ color: 0x1d4732, roughness: 0.82 });
+    const pillowGoldMat = new THREE.MeshStandardMaterial({ color: 0xc29b48, roughness: 0.52, metalness: 0.35 });
+
+    // Brushed-gold plinth rail & 6 tapered gold legs
+    const sofaRail = new THREE.Mesh(new THREE.BoxGeometry(2.86, 0.045, 0.92), plantGoldMat);
+    sofaRail.position.set(0, 0.16, 0);
+    sofaGroup.add(sofaRail);
+
+    const sofaLegGeo = new THREE.CylinderGeometry(0.025, 0.015, 0.15, 10);
+    [-1.36, 0, 1.36].forEach((lx) => {
+      [-0.41, 0.41].forEach((lz) => {
+        const leg = new THREE.Mesh(sofaLegGeo, plantGoldMat);
+        leg.position.set(lx, 0.075, lz);
+        sofaGroup.add(leg);
+      });
+    });
+
+    // Base frame, backrest, left/right sloped armrests
+    const sofaBase = new THREE.Mesh(new THREE.BoxGeometry(2.84, 0.14, 0.90), sofaVelvetMat);
+    sofaBase.position.set(0, 0.25, 0);
+    sofaGroup.add(sofaBase);
+
+    const sofaBackFrame = new THREE.Mesh(new THREE.BoxGeometry(2.84, 0.58, 0.16), sofaVelvetMat);
+    sofaBackFrame.position.set(0, 0.58, -0.37);
+    sofaGroup.add(sofaBackFrame);
+
+    [-1.34, 1.34].forEach((ax) => {
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.46, 0.90), sofaVelvetMat);
+      arm.position.set(ax, 0.44, 0);
+      sofaGroup.add(arm);
+    });
+
+    // 3 Plush Seat Cushions + 3 Backrest Cushions
+    [-0.84, 0, 0.84].forEach((cx) => {
+      const seatCush = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.14, 0.72), sofaVelvetMat);
+      seatCush.position.set(cx, 0.38, 0.06);
+      sofaGroup.add(seatCush);
+
+      const backCush = new THREE.Mesh(new THREE.BoxGeometry(0.81, 0.40, 0.18), sofaVelvetMat);
+      backCush.position.set(cx, 0.64, -0.22);
+      backCush.rotation.x = -0.10;
+      sofaGroup.add(backCush);
+    });
+
+    // 5 Accent Throw Pillows (Emerald, Gold, Burgundy)
+    const pillowGeo = new THREE.BoxGeometry(0.32, 0.30, 0.10);
+    [
+      { x: -1.06, z: -0.06, ry: 0.38, mat: pillowEmeraldMat },
+      { x: -0.78, z: -0.08, ry: 0.18, mat: sofaVelvetMat },
+      { x: 0.02, z: -0.09, ry: -0.10, mat: pillowGoldMat },
+      { x: 0.36, z: -0.10, ry: -0.22, mat: pillowEmeraldMat },
+      { x: 1.02, z: -0.06, ry: -0.36, mat: sofaVelvetMat }
+    ].forEach((p) => {
+      const pil = new THREE.Mesh(pillowGeo, p.mat);
+      pil.position.set(p.x, 0.56, p.z);
+      pil.rotation.set(-0.22, p.ry, 0);
+      sofaGroup.add(pil);
+    });
+    scene.add(sofaGroup);
 
     const stBaseGeo = new THREE.CylinderGeometry(0.16, 0.18, 0.04, 16);
     const stPoleGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.92, 12);
@@ -4166,12 +4249,16 @@
       }
       // Physical Cinema Seat & Ticket Room Counter/Barrier Collision Helper
       const isBlockedBySeat = (x, z, curY) => {
-        // Solid Ticket Room Counter (-17.8, -71.0) & Stanchion Rope Barriers
+        // Solid Ticket Room Counter (-17.8, -71.0), Stanchion Barriers, Planters & Lounge Sofa
         if (z >= -76.0 && z <= -66.0 && x < -6.0) {
           // Ticket Counter (including rounded end caps)
           if (x >= -18.61 && x <= -16.99 && z >= -74.21 && z <= -67.79) return true;
           // South & North Stanchion Rope Barriers
           if (x >= -16.86 && x <= -15.04 && ((z >= -70.38 && z <= -69.82) || (z >= -72.18 && z <= -71.62))) return true;
+          // Left & Right Brushed-Gold Planters
+          if (x >= -18.12 && x <= -17.28 && ((z >= -67.38 && z <= -66.52) || (z >= -75.48 && z <= -74.62))) return true;
+          // Right-Side Burgundy Velvet Lounge Sofa
+          if (x >= -11.95 && x <= -8.45 && z >= -75.95 && z <= -74.62) return true;
         }
         if (z >= -76.0 || cinemaSeatColliders.length === 0) return false;
         const pad = 0.24;
