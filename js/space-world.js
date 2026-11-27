@@ -3104,10 +3104,10 @@
     cinemaScreenXState.videoMainMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xffffff });
     // Side ScreenX wings subtly dimmed (~28%) so main front screen remains the 100% focal point
     cinemaScreenXState.videoWingMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0x454954, side: THREE.DoubleSide });
-    // 4-Zone Intelligent Ambilight Backlight Halo behind Main Display
+    // Exxclusive-Style Blurred Video Bloom Ambilight Halo behind Main Display
     const ambCanvas = document.createElement('canvas');
-    ambCanvas.width = 64;
-    ambCanvas.height = 32;
+    ambCanvas.width = 128;
+    ambCanvas.height = 64;
     const ambCtx = ambCanvas.getContext('2d');
     const ambTex = new THREE.CanvasTexture(ambCanvas);
     ambTex.colorSpace = THREE.SRGBColorSpace;
@@ -3119,7 +3119,7 @@
       depthWrite: false
     });
     const ambHalo = new THREE.Mesh(
-      new THREE.PlaneGeometry(displayW + 2.2, displayH + 2.2),
+      new THREE.PlaneGeometry(displayW + 8.0, displayH + 6.8),
       ambMat
     );
     ambHalo.position.set(hallCenterX, displayY, zEndWall - hallL + 0.03);
@@ -4267,22 +4267,23 @@
             sx.ambilightZones.left.lerp(new THREE.Color(lr, lg, lb), 0.35);
             sx.ambilightZones.right.lerp(new THREE.Color(rr, rg, rb), 0.35);
 
-            // Paint smooth 4-edge feathered Ambilight halo canvas
+            // Exxclusive 3.0 Style: draw live video with heavy blur + saturation, feathered by soft radial mask
             if (sx.ambilightCtx && sx.ambilightTex) {
               const ctx = sx.ambilightCtx;
-              ctx.clearRect(0, 0, 64, 32);
-              const paintEdge = (x0, y0, x1, y1, col) => {
-                const grad = ctx.createLinearGradient(x0, y0, x1, y1);
-                const cr = Math.round(col.r * 255), cg = Math.round(col.g * 255), cb = Math.round(col.b * 255);
-                grad.addColorStop(0, `rgba(${cr},${cg},${cb},0.95)`);
-                grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, 64, 32);
-              };
-              paintEdge(0, 0, 0, 10, sx.ambilightZones.top);
-              paintEdge(0, 32, 0, 22, sx.ambilightZones.bottom);
-              paintEdge(0, 0, 14, 0, sx.ambilightZones.left);
-              paintEdge(64, 0, 50, 0, sx.ambilightZones.right);
+              ctx.globalCompositeOperation = 'source-over';
+              ctx.clearRect(0, 0, 128, 64);
+              ctx.filter = 'blur(14px) saturate(210%) brightness(1.15)';
+              ctx.drawImage(sx.video, 10, 6, 108, 52);
+              ctx.filter = 'none';
+              // Smooth radial edge fade so there is zero rectangular box border
+              ctx.globalCompositeOperation = 'destination-in';
+              const mask = ctx.createRadialGradient(64, 32, 18, 64, 32, 64);
+              mask.addColorStop(0, 'rgba(255,255,255,1)');
+              mask.addColorStop(0.65, 'rgba(255,255,255,0.65)');
+              mask.addColorStop(1, 'rgba(255,255,255,0)');
+              ctx.fillStyle = mask;
+              ctx.fillRect(0, 0, 128, 64);
+              ctx.globalCompositeOperation = 'source-over';
               sx.ambilightTex.needsUpdate = true;
             }
           } catch (_) { }
@@ -4292,14 +4293,14 @@
         const lum = (sx.bounceColor.r + sx.bounceColor.g + sx.bounceColor.b) / 3;
         sx.ceilBounceLight.intensity += (lum * 1.15 - sx.ceilBounceLight.intensity) * 0.12;
         sx.floorBounceLight.intensity += (lum * 0.95 - sx.floorBounceLight.intensity) * 0.12;
-        if (sx.ambilightMat) sx.ambilightMat.opacity += (0.85 - sx.ambilightMat.opacity) * 0.12;
+        if (sx.ambilightMat) sx.ambilightMat.opacity += (0.72 - sx.ambilightMat.opacity) * 0.12;
         if (sx.ambilightLights) {
           sx.ambilightLights.left.color.copy(sx.ambilightZones.left);
           sx.ambilightLights.right.color.copy(sx.ambilightZones.right);
           sx.ambilightLights.top.color.copy(sx.ambilightZones.top);
-          sx.ambilightLights.left.intensity += (1.1 - sx.ambilightLights.left.intensity) * 0.12;
-          sx.ambilightLights.right.intensity += (1.1 - sx.ambilightLights.right.intensity) * 0.12;
-          sx.ambilightLights.top.intensity += (1.0 - sx.ambilightLights.top.intensity) * 0.12;
+          sx.ambilightLights.left.intensity += (0.55 - sx.ambilightLights.left.intensity) * 0.12;
+          sx.ambilightLights.right.intensity += (0.55 - sx.ambilightLights.right.intensity) * 0.12;
+          sx.ambilightLights.top.intensity += (0.50 - sx.ambilightLights.top.intensity) * 0.12;
         }
       } else {
         sx.ceilBounceLight.intensity += (0 - sx.ceilBounceLight.intensity) * 0.12;
