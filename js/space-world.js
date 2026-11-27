@@ -2139,8 +2139,8 @@
       scene.add(stepLed);
     }
 
-    // Sloped Stair Divider Parapet Wall (stops cleanly at Top VIP Terrace z = -80.7m so it never cuts across VIP seats!)
-    const divEndZ = -80.7;
+    // Sloped Stair Divider Parapet Wall (stops cleanly at Top VIP Terrace z = -78.95m)
+    const divEndZ = -78.95;
     const stairWallShape = new THREE.Shape();
     stairWallShape.moveTo(stairEndZ, 0);
     stairWallShape.lineTo(divEndZ, 0);
@@ -2757,7 +2757,7 @@
     //   Right Walkway:         -7.60 to  -6.00 (1.60m stepped walkway)
     //   Right Side 3 seats:    -6.00 to  -2.25 (3 x 1.25m)
     const rowStartZ = -94.0;
-    const rowDepth = 1.90;
+    const rowDepth = 2.15;
     const rowRise = 0.42;
     const rowCount = 7;
     const walkwayCenters = [-14.65, -6.80];
@@ -2853,7 +2853,7 @@
     scene.add(balconyWallCap);
 
     // 4 steps in both walkways up to Top VIP Recliner Terrace (0.14m rise each)
-    const vipStepZone = 1.4;
+    const vipStepZone = 1.0;
     const vipSubCount = 4;
     const vipSubDepth = vipStepZone / vipSubCount;
     const vipSubRise = 0.56 / vipSubCount;
@@ -2886,13 +2886,13 @@
       scene.add(cap);
     });
 
-    // Place Top VIP Special Recliner Seats tucked cleanly near the back wall (z = -76.85m, minimal rear gap)
+    // Place Top VIP Special Recliner Seats with normal comfortable front/rear spacing (z = -76.95m)
     const vipSeatXs = [
       ...blockSeatXs(-20.45, 3, 1.65), // Extreme Left 3 VIP Recliners
       ...blockSeatXs(-14.20, 5, 1.65), // Centre 5 VIP Recliners
       ...blockSeatXs(-2.80, 3, 1.65)   // Right 3 VIP Recliners
     ];
-    vipSeatXs.forEach((vx, vi) => addVipRecliner(vx, vipFloorY, -76.85, `V${vi + 1}`));
+    vipSeatXs.forEach((vx, vi) => addVipRecliner(vx, vipFloorY, -76.95, `V${vi + 1}`));
 
     // Recessed Glass Projection Booth Window (Top Centre of Back/Top Wall at z = -76.08m, y = 11.8m)
     const projFrame = new THREE.Mesh(new THREE.BoxGeometry(3.8, 1.35, 0.12), seatObsidianMat);
@@ -3416,7 +3416,7 @@
       const deltaZ = (-moveZ * (-Math.cos(yaw)) + moveX * (-Math.sin(yaw))) * currentSpeed;
 
       // Axis-independent collision sliding (diagonal movement slides along walls smoothly)
-      const onVipBalcony = camera.position.z < -76.2 && camera.position.z >= -80.7 && camera.position.y >= 7.0;
+      const onVipBalcony = camera.position.z < -76.2 && camera.position.z >= -78.95 && camera.position.y >= 7.0;
       let nextX = camera.position.x + deltaX;
       if (camera.position.z < -95.8 || onVipBalcony) {
         // Upper Flat Floor behind stairs OR full-width Top VIP Balcony (-19.8m to +2.55m)
@@ -3474,9 +3474,9 @@
       if (camera.position.x < -5.8 && camera.position.z >= -66.0 && [-12, -30, -48].some(divZ => Math.abs(nextZ - divZ) < 0.65)) {
         nextZ = camera.position.z;
       }
-      // Physical Balcony Railing Guard over Entry Stairs (prevents falling off front edge at z = -80.7m when x > -1.6m)
+      // Physical Balcony Railing Guard over Entry Stairs (prevents falling off front edge at z = -78.95m when x > -1.6m)
       if (onVipBalcony && camera.position.x > -1.6) {
-        nextZ = Math.max(-80.2, Math.min(-76.6, nextZ));
+        nextZ = Math.max(-78.45, Math.min(-76.6, nextZ));
       } else if (camera.position.x < -1.6 && camera.position.z < -76.2) {
         nextZ = Math.max(-104.0, Math.min(-76.6, nextZ));
       } else if (Math.abs(nextZ - cinemaDoorState.doorZ) < 0.55) {
@@ -3494,15 +3494,15 @@
       const getCinemaFloorY = (x, z, curY) => {
         if (z >= -76.0) return 0;
         if (z < -95.8) return 4.90;
-        if (z >= -80.7 && curY >= 7.0) return 8.40; // Solid Top VIP Balcony across full width
+        if (z >= -78.95 && curY >= 7.0) return 8.40; // Solid Top VIP Balcony across full width
         if (x < -1.6) {
-          if (z >= -79.3) return 8.40;
-          if (z >= -80.7) {
-            const vipStep = Math.min(3, Math.max(0, Math.floor((z - (-80.7)) / 0.35)));
+          if (z >= -77.95) return 8.40;
+          if (z >= -78.95) {
+            const vipStep = Math.min(3, Math.max(0, Math.floor((z - (-78.95)) / 0.25)));
             return 7.84 + (vipStep + 1) * 0.14;
           }
           if (z > -94.0) {
-            const subStep = Math.min(20, Math.max(0, Math.floor((z - (-94.0)) / (1.90 / 3))));
+            const subStep = Math.min(20, Math.max(0, Math.floor((z - (-94.0)) / (2.15 / 3))));
             return 4.90 + (subStep + 1) * 0.14;
           }
           return 4.90;
@@ -3525,15 +3525,15 @@
       if (camera.position.z < -76.0) {
         if (camera.position.z < -95.8) {
           baseFloorY = 4.90;
-        } else if (camera.position.z >= -80.7 && camera.position.y >= 7.0) {
+        } else if (camera.position.z >= -78.95 && camera.position.y >= 7.0) {
           baseFloorY = 8.40;
         } else if (camera.position.x < -1.6) {
-          if (camera.position.z >= -79.3) baseFloorY = 8.40;
-          else if (camera.position.z >= -80.7) {
-            const vipStep = Math.min(3, Math.max(0, Math.floor((camera.position.z - (-80.7)) / 0.35)));
+          if (camera.position.z >= -77.95) baseFloorY = 8.40;
+          else if (camera.position.z >= -78.95) {
+            const vipStep = Math.min(3, Math.max(0, Math.floor((camera.position.z - (-78.95)) / 0.25)));
             baseFloorY = 7.84 + (vipStep + 1) * 0.14;
           } else if (camera.position.z > -94.0) {
-            const subStep = Math.min(20, Math.max(0, Math.floor((camera.position.z - (-94.0)) / (1.90 / 3))));
+            const subStep = Math.min(20, Math.max(0, Math.floor((camera.position.z - (-94.0)) / (2.15 / 3))));
             baseFloorY = 4.90 + (subStep + 1) * 0.14;
           } else {
             baseFloorY = 4.90;
