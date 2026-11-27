@@ -141,7 +141,17 @@
     floorBounceLight: null,
     reflectCtx: null,
     reflectFrame: 0,
-    bounceColor: new THREE.Color(0x8899bb)
+    bounceColor: new THREE.Color(0x8899bb),
+    ambilightMat: null,
+    ambilightTex: null,
+    ambilightCtx: null,
+    ambilightZones: {
+      top: new THREE.Color(0x000000),
+      bottom: new THREE.Color(0x000000),
+      left: new THREE.Color(0x000000),
+      right: new THREE.Color(0x000000)
+    },
+    ambilightLights: null
   };
   let lookTouchId = null;
   let prevPointerX = 0;
@@ -3094,9 +3104,46 @@
     cinemaScreenXState.videoMainMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0xffffff });
     // Side ScreenX wings subtly dimmed (~28%) so main front screen remains the 100% focal point
     cinemaScreenXState.videoWingMat = new THREE.MeshBasicMaterial({ map: sxTex, color: 0x454954, side: THREE.DoubleSide });
+    // 4-Zone Intelligent Ambilight Backlight Halo behind Main Display
+    const ambCanvas = document.createElement('canvas');
+    ambCanvas.width = 64;
+    ambCanvas.height = 32;
+    const ambCtx = ambCanvas.getContext('2d');
+    const ambTex = new THREE.CanvasTexture(ambCanvas);
+    ambTex.colorSpace = THREE.SRGBColorSpace;
+    const ambMat = new THREE.MeshBasicMaterial({
+      map: ambTex,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const ambHalo = new THREE.Mesh(
+      new THREE.PlaneGeometry(displayW + 2.2, displayH + 2.2),
+      ambMat
+    );
+    ambHalo.position.set(hallCenterX, displayY, zEndWall - hallL + 0.03);
+    scene.add(ambHalo);
+
+    const ambLeftLight = new THREE.PointLight(0xffffff, 0, 18, 1.6);
+    ambLeftLight.position.set(hallCenterX - displayW / 2 - 0.3, displayY, zEndWall - hallL + 0.45);
+    scene.add(ambLeftLight);
+
+    const ambRightLight = new THREE.PointLight(0xffffff, 0, 18, 1.6);
+    ambRightLight.position.set(hallCenterX + displayW / 2 + 0.3, displayY, zEndWall - hallL + 0.45);
+    scene.add(ambRightLight);
+
+    const ambTopLight = new THREE.PointLight(0xffffff, 0, 20, 1.6);
+    ambTopLight.position.set(hallCenterX, displayY + displayH / 2 + 0.3, zEndWall - hallL + 0.45);
+    scene.add(ambTopLight);
+
     cinemaScreenXState.ceilBounceLight = ceilBounceLight;
     cinemaScreenXState.floorBounceLight = floorBounceLight;
     cinemaScreenXState.reflectCtx = reflectCtx;
+    cinemaScreenXState.ambilightMat = ambMat;
+    cinemaScreenXState.ambilightTex = ambTex;
+    cinemaScreenXState.ambilightCtx = ambCtx;
+    cinemaScreenXState.ambilightLights = { left: ambLeftLight, right: ambRightLight, top: ambTopLight };
 
     // Warm spotlight illuminating the Premium Wood Wall & Double Doors from corridor
     const featureWallSpot = new THREE.PointLight(0xffedd1, 1.1, 16, 2.0);
@@ -4185,22 +4232,59 @@
       if (sx.globalDir) sx.globalDir.intensity = 0.85 * mult;
     }
 
-    // Live Video Color Reflections bouncing onto Coffered Ceiling & Cotton-Black Stage Floor
+    // Live Video Color Reflections + 4-Zone Intelligent Ambilight Backlight behind Main Screen
     if (sx.ceilBounceLight && sx.floorBounceLight) {
       if (sx.isPlaying && sx.video && sx.video.readyState >= 2 && sx.reflectCtx) {
         sx.reflectFrame = (sx.reflectFrame + 1) % 3;
         if (sx.reflectFrame === 0) {
           try {
             sx.reflectCtx.drawImage(sx.video, 0, 0, 4, 4);
-            const data = sx.reflectCtx.getImageData(0, 0, 4, 4).data;
+            const d = sx.reflectCtx.getImageData(0, 0, 4, 4).data;
             let r = 0, g = 0, b = 0;
-            for (let i = 0; i < data.length; i += 4) {
-              r += data[i];
-              g += data[i + 1];
-              b += data[i + 2];
+            for (let i = 0; i < d.length; i += 4) {
+              r += d[i]; g += d[i + 1]; b += d[i + 2];
             }
             const px = 16 * 255;
             sx.bounceColor.setRGB(r / px, g / px, b / px);
+
+            // Sample 4 edge zones of the 4x4 frame: Top (row 0), Bottom (row 3), Left (col 0), Right (col 3)
+            const avgIdx = (indices) => {
+              let zr = 0, zg = 0, zb = 0;
+              for (let k = 0; k < indices.length; k++) {
+                const o = indices[k] * 4;
+                zr += d[o]; zg += d[o + 1]; zb += d[o + 2];
+              }
+              const s = indices.length * 255;
+              return [zr / s, zg / s, zb / s];
+            };
+            const [tr, tg, tb] = avgIdx([0, 1, 2, 3]);
+            const [br, bg, bb] = avgIdx([12, 13, 14, 15]);
+            const [lr, lg, lb] = avgIdx([0, 4, 8, 12]);
+            const [rr, rg, rb] = avgIdx([3, 7, 11, 15]);
+
+            sx.ambilightZones.top.lerp(new THREE.Color(tr, tg, tb), 0.35);
+            sx.ambilightZones.bottom.lerp(new THREE.Color(br, bg, bb), 0.35);
+            sx.ambilightZones.left.lerp(new THREE.Color(lr, lg, lb), 0.35);
+            sx.ambilightZones.right.lerp(new THREE.Color(rr, rg, rb), 0.35);
+
+            // Paint smooth 4-edge feathered Ambilight halo canvas
+            if (sx.ambilightCtx && sx.ambilightTex) {
+              const ctx = sx.ambilightCtx;
+              ctx.clearRect(0, 0, 64, 32);
+              const paintEdge = (x0, y0, x1, y1, col) => {
+                const grad = ctx.createLinearGradient(x0, y0, x1, y1);
+                const cr = Math.round(col.r * 255), cg = Math.round(col.g * 255), cb = Math.round(col.b * 255);
+                grad.addColorStop(0, `rgba(${cr},${cg},${cb},0.95)`);
+                grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 64, 32);
+              };
+              paintEdge(0, 0, 0, 10, sx.ambilightZones.top);
+              paintEdge(0, 32, 0, 22, sx.ambilightZones.bottom);
+              paintEdge(0, 0, 14, 0, sx.ambilightZones.left);
+              paintEdge(64, 0, 50, 0, sx.ambilightZones.right);
+              sx.ambilightTex.needsUpdate = true;
+            }
           } catch (_) { }
         }
         sx.ceilBounceLight.color.lerp(sx.bounceColor, 0.14);
@@ -4208,9 +4292,24 @@
         const lum = (sx.bounceColor.r + sx.bounceColor.g + sx.bounceColor.b) / 3;
         sx.ceilBounceLight.intensity += (lum * 1.15 - sx.ceilBounceLight.intensity) * 0.12;
         sx.floorBounceLight.intensity += (lum * 0.95 - sx.floorBounceLight.intensity) * 0.12;
+        if (sx.ambilightMat) sx.ambilightMat.opacity += (0.85 - sx.ambilightMat.opacity) * 0.12;
+        if (sx.ambilightLights) {
+          sx.ambilightLights.left.color.copy(sx.ambilightZones.left);
+          sx.ambilightLights.right.color.copy(sx.ambilightZones.right);
+          sx.ambilightLights.top.color.copy(sx.ambilightZones.top);
+          sx.ambilightLights.left.intensity += (1.1 - sx.ambilightLights.left.intensity) * 0.12;
+          sx.ambilightLights.right.intensity += (1.1 - sx.ambilightLights.right.intensity) * 0.12;
+          sx.ambilightLights.top.intensity += (1.0 - sx.ambilightLights.top.intensity) * 0.12;
+        }
       } else {
         sx.ceilBounceLight.intensity += (0 - sx.ceilBounceLight.intensity) * 0.12;
         sx.floorBounceLight.intensity += (0 - sx.floorBounceLight.intensity) * 0.12;
+        if (sx.ambilightMat) sx.ambilightMat.opacity += (0 - sx.ambilightMat.opacity) * 0.12;
+        if (sx.ambilightLights) {
+          sx.ambilightLights.left.intensity += (0 - sx.ambilightLights.left.intensity) * 0.12;
+          sx.ambilightLights.right.intensity += (0 - sx.ambilightLights.right.intensity) * 0.12;
+          sx.ambilightLights.top.intensity += (0 - sx.ambilightLights.top.intensity) * 0.12;
+        }
       }
     }
   }
