@@ -2312,6 +2312,182 @@
     addTicketWallBayDetails(-halfW - 0.21, -66.04, -halfW - 0.21, -69.30, -1, 0, 2, [0], [1]);
     addTicketWallBayDetails(-halfW - 0.21, -72.70, -halfW - 0.21, -75.96, -1, 0, 2, [1], [1]);
 
+    // 5.0B. LUXURY TICKET COUNTER, 3 POS TERMINALS, SHOWTIME BOARDS & VELVET STANCHIONS
+    const tcGroup = new THREE.Group();
+    tcGroup.position.set(-17.8, 0, lrCenterZ); // Faces +X toward the Glass Double Door
+
+    const tcBodyMat = new THREE.MeshStandardMaterial({ color: 0x1e1e20, roughness: 0.45, metalness: 0.12 });
+    const tcTopMat = new THREE.MeshStandardMaterial({ color: 0x111114, roughness: 0.22, metalness: 0.25 });
+    const tcPosScreenMat = new THREE.MeshStandardMaterial({
+      color: 0x7a828e,
+      roughness: 0.35,
+      metalness: 0.55
+    });
+
+    const tcStraightL = 4.6;
+    const tcDepth = 1.06;
+    const tcRadius = tcDepth / 2; // 0.53m rounded ends
+
+    // Main curved stadium-shaped obsidian body + rounded end caps
+    const tcBody = new THREE.Mesh(new THREE.BoxGeometry(tcDepth, 0.92, tcStraightL), tcBodyMat);
+    tcBody.position.set(0, 0.54, 0);
+    tcGroup.add(tcBody);
+
+    [-tcStraightL / 2, tcStraightL / 2].forEach((ez) => {
+      const endCyl = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius, tcRadius, 0.92, 24), tcBodyMat);
+      endCyl.position.set(0, 0.54, ez);
+      tcGroup.add(endCyl);
+
+      const topEndBrass = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius + 0.015, tcRadius + 0.015, 0.08, 24), doorBrassTrimMat);
+      topEndBrass.position.set(0, 0.97, ez);
+      tcGroup.add(topEndBrass);
+
+      const botEndBrass = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius + 0.01, tcRadius + 0.01, 0.11, 24), doorBrassTrimMat);
+      botEndBrass.position.set(0, 0.055, ez);
+      tcGroup.add(botEndBrass);
+
+      const endMarble = new THREE.Mesh(new THREE.CylinderGeometry(tcRadius + 0.025, tcRadius + 0.025, 0.07, 24), tcTopMat);
+      endMarble.position.set(0, 1.045, ez);
+      tcGroup.add(endMarble);
+    });
+
+    // Top brushed-gold trim band, bottom brass plinth & recessed under-counter warm LED strip
+    const tcTopBrass = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.03, 0.08, tcStraightL), doorBrassTrimMat);
+    tcTopBrass.position.set(0, 0.97, 0);
+    tcGroup.add(tcTopBrass);
+
+    const tcBotBrass = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.02, 0.11, tcStraightL), doorBrassTrimMat);
+    tcBotBrass.position.set(0, 0.055, 0);
+    tcGroup.add(tcBotBrass);
+
+    const tcUnderLed = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.06, 0.03, tcStraightL + 0.8), ticketLedSlitMat);
+    tcUnderLed.position.set(0.03, 0.02, 0);
+    tcGroup.add(tcUnderLed);
+
+    // Dark polished granite countertop
+    const tcTopSlab = new THREE.Mesh(new THREE.BoxGeometry(tcDepth + 0.05, 0.07, tcStraightL), tcTopMat);
+    tcTopSlab.position.set(0, 1.045, 0);
+    tcGroup.add(tcTopSlab);
+
+    // 4 Vertical Gold Trim Dividers splitting front face into 3 luxury bays
+    [-tcStraightL / 2, -tcStraightL / 6, tcStraightL / 6, tcStraightL / 2].forEach((dz) => {
+      const divBar = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.86, 0.035), doorBrassTrimMat);
+      divBar.position.set(tcDepth / 2 + 0.012, 0.52, dz);
+      tcGroup.add(divBar);
+    });
+
+    // 3 Countertop POS Workstations (Monitor + Card Reader + Thermal Ticket Printer)
+    const monGeo = new THREE.BoxGeometry(0.035, 0.34, 0.54);
+    const standGeo = new THREE.BoxGeometry(0.05, 0.16, 0.07);
+    const baseGeo = new THREE.BoxGeometry(0.16, 0.02, 0.20);
+    const printerGeo = new THREE.BoxGeometry(0.14, 0.12, 0.14);
+    const cardGeo = new THREE.BoxGeometry(0.10, 0.13, 0.08);
+    [-tcStraightL / 3, 0, tcStraightL / 3].forEach((pz) => {
+      const mon = new THREE.Mesh(monGeo, tcPosScreenMat);
+      mon.position.set(-0.04, 1.32, pz);
+      mon.rotation.z = 0.08;
+      tcGroup.add(mon);
+
+      const stand = new THREE.Mesh(standGeo, tcPosScreenMat);
+      stand.position.set(-0.06, 1.15, pz);
+      tcGroup.add(stand);
+
+      const sBase = new THREE.Mesh(baseGeo, tcPosScreenMat);
+      sBase.position.set(-0.04, 1.09, pz);
+      tcGroup.add(sBase);
+
+      const printer = new THREE.Mesh(printerGeo, seatObsidianMat);
+      printer.position.set(0.08, 1.14, pz + 0.42);
+      tcGroup.add(printer);
+
+      const cardTap = new THREE.Mesh(cardGeo, seatObsidianMat);
+      cardTap.position.set(0.16, 1.14, pz - 0.38);
+      cardTap.rotation.z = -0.3;
+      tcGroup.add(cardTap);
+    });
+
+    // Warm under-counter golden floor wash light
+    const tcUnderLight = new THREE.PointLight(0xffcb78, 0.85, 8, 1.8);
+    tcUnderLight.position.set(0.85, 0.45, 0);
+    tcGroup.add(tcUnderLight);
+    scene.add(tcGroup);
+
+    // 3 Digital Showtime & Movie Menu Boards on Back Wall behind Ticket Counter (x = -20.40m)
+    const showMovies = [
+      { title: 'VIEV EXCLUSIVE', sub: 'SCREENX 270°', time: '07:30 PM  ·  VIP' },
+      { title: 'AASHAYEIN', sub: 'DOLBY ATMOS', time: '09:00 PM  ·  HALL 1' },
+      { title: 'MIDNIGHT LUXE', sub: 'RECLINER SUITE', time: '10:45 PM  ·  V1-V11' }
+    ];
+    showMovies.forEach((m, idx) => {
+      const bz = -72.55 + idx * 1.55;
+      const bFrame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 1.65, 1.20), seatObsidianMat);
+      bFrame.position.set(trBackX + 0.04, 2.85, bz);
+      scene.add(bFrame);
+
+      const bCanv = document.createElement('canvas');
+      bCanv.width = 256;
+      bCanv.height = 360;
+      const bCtx = bCanv.getContext('2d');
+      const bgGrad = bCtx.createLinearGradient(0, 0, 0, 360);
+      bgGrad.addColorStop(0, '#1e1116');
+      bgGrad.addColorStop(1, '#0c090b');
+      bCtx.fillStyle = bgGrad;
+      bCtx.fillRect(0, 0, 256, 360);
+      bCtx.strokeStyle = '#d4af37';
+      bCtx.lineWidth = 4;
+      bCtx.strokeRect(10, 10, 236, 340);
+      bCtx.fillStyle = '#d4af37';
+      bCtx.font = 'bold 16px Arial, sans-serif';
+      bCtx.textAlign = 'center';
+      bCtx.fillText('NOW SHOWING', 128, 44);
+      bCtx.fillStyle = '#ffffff';
+      bCtx.font = 'bold 24px Georgia, serif';
+      bCtx.fillText(m.title, 128, 155);
+      bCtx.fillStyle = 'rgba(255,255,255,0.72)';
+      bCtx.font = '16px Arial, sans-serif';
+      bCtx.fillText(m.sub, 128, 192);
+      bCtx.fillStyle = '#f2cf74';
+      bCtx.fillRect(28, 250, 200, 44);
+      bCtx.fillStyle = '#140c08';
+      bCtx.font = 'bold 16px Arial, sans-serif';
+      bCtx.fillText(m.time, 128, 277);
+
+      const bTex = new THREE.CanvasTexture(bCanv);
+      bTex.colorSpace = THREE.SRGBColorSpace;
+      const bScreen = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.12, 1.56),
+        new THREE.MeshBasicMaterial({ map: bTex })
+      );
+      bScreen.rotation.y = Math.PI / 2;
+      bScreen.position.set(trBackX + 0.08, 2.85, bz);
+      scene.add(bScreen);
+    });
+
+    // 4 Brushed-Brass Velvet Stanchion Queue Posts in front of Ticket Counter
+    const stBaseGeo = new THREE.CylinderGeometry(0.16, 0.18, 0.04, 16);
+    const stPoleGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.92, 12);
+    const stTopGeo = new THREE.SphereGeometry(0.042, 14, 12);
+    [
+      [-15.3, -70.1], [-16.6, -70.1],
+      [-15.3, -71.9], [-16.6, -71.9]
+    ].forEach(([sx, sz]) => {
+      const sb = new THREE.Mesh(stBaseGeo, doorBrassTrimMat);
+      sb.position.set(sx, 0.02, sz);
+      scene.add(sb);
+      const sp = new THREE.Mesh(stPoleGeo, doorBrassTrimMat);
+      sp.position.set(sx, 0.48, sz);
+      scene.add(sp);
+      const st = new THREE.Mesh(stTopGeo, doorBrassTrimMat);
+      st.position.set(sx, 0.96, sz);
+      scene.add(st);
+    });
+    [-70.1, -71.9].forEach((rz) => {
+      const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 1.3, 10), ticketPlumWallMat);
+      rope.rotation.z = Math.PI / 2;
+      rope.position.set(-15.95, 0.80, rz);
+      scene.add(rope);
+    });
+
     const lrLight = new THREE.PointLight(0xffddb0, 0.90, 22, 1.7);
     lrLight.position.set(-halfW - lrW * 0.3, MALL_HEIGHT - 0.6, lrCenterZ);
     scene.add(lrLight);
@@ -3951,8 +4127,12 @@
           }
         }
       }
-      // Physical Cinema Seat Collision Helper (prevents walking through any seat)
+      // Physical Cinema Seat & Ticket Counter Collision Helper
       const isBlockedBySeat = (x, z, curY) => {
+        // Ticket Counter physical collision inside Ticket Room
+        if (z >= -74.2 && z <= -67.8 && x >= -18.6 && x <= -17.0) {
+          return true;
+        }
         if (z >= -76.0 || cinemaSeatColliders.length === 0) return false;
         const pad = 0.24;
         const approxFloorY = curY - cameraY;
