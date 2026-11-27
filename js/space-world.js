@@ -5021,7 +5021,8 @@
       slots: [
         { label: '1:00 PM', startMin: 13 * 60, endMin: 13 * 60 + 25 },
         { label: '1:30 PM', startMin: 13 * 60 + 30, endMin: 13 * 60 + 55 },
-        { label: '2:00 PM', startMin: 14 * 60, endMin: 14 * 60 + 25 }
+        { label: '2:00 PM', startMin: 14 * 60, endMin: 14 * 60 + 25 },
+        { label: '11:50 PM', startMin: 23 * 60 + 50, endMin: 24 * 60 + 15 }
       ]
     },
     {
@@ -5067,7 +5068,8 @@
     const { totalMin } = getVievClockParts();
     for (const show of VIEV_SHOW_SCHEDULE) {
       for (const slot of show.slots) {
-        if (totalMin >= slot.startMin && totalMin < slot.endMin) {
+        if ((totalMin >= slot.startMin && totalMin < slot.endMin) ||
+            (slot.endMin > 1440 && totalMin < slot.endMin - 1440)) {
           return { show, slot };
         }
       }
@@ -5618,7 +5620,8 @@
     { time: '5:00 PM', startMin: 17 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
     { time: '5:30 PM', startMin: 17 * 60 + 30, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
     { time: '6:15 PM', startMin: 18 * 60 + 15, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
-    { time: '7:00 PM', startMin: 19 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' }
+    { time: '7:00 PM', startMin: 19 * 60, hasShow: true, showName: 'MAIN SINGER KHAANDANI', format: 'MUSIC VIDEO · DOLBY ATMOS' },
+    { time: '11:50 PM', startMin: 23 * 60 + 50, hasShow: true, showName: 'MANGAL RANG', format: 'SCREENX 270° · DOLBY ATMOS' }
   ];
 
   function getSeatTierInfo(seatId) {
@@ -6037,7 +6040,8 @@
     '5:00 PM': 60, // High rush
     '5:30 PM': 95, // HOUSEFULL
     '6:15 PM': 32, // Medium
-    '7:00 PM': 95  // HOUSEFULL
+    '7:00 PM': 95, // HOUSEFULL
+    '11:50 PM': 65 // High rush late-night show
   };
 
   function getAnyFloorY(x, z, curY) {
@@ -6192,7 +6196,7 @@
       ];
     }
     npc.wpIdx = 0;
-    npc.waitTimer = 0;
+    npc.waitTimer = 2.5 + Math.random() * 4.5;
   }
 
   function syncNpcsForActiveCrowd() {
@@ -6261,18 +6265,19 @@
         role: 'cinema',
         seat,
         actor,
-        speed: 1.75 + (idx % 5) * 0.14,
+        speed: 1.55 + (idx % 5) * 0.14,
         walkPhase: Math.random() * Math.PI * 2,
         state: 'to_lounge',
         waitTimer: 0,
         waypoints: [],
         wpIdx: 0,
-        delayTimer: 0
+        delayTimer: (idx % 24) * 0.55
       };
 
       if (isAlreadyLive && idx < chosenSeats.length * 0.65) {
         // Already seated inside auditorium watching the live show
         npc.state = 'seated';
+        npc.delayTimer = 0;
         actor.group.position.set(seat.x, seat.floorY + 0.10, seat.z);
         actor.group.rotation.y = Math.PI;
         actor.leftLeg.rotation.x = -Math.PI / 2;
@@ -6281,14 +6286,15 @@
       } else if (idx % 3 === 0) {
         // Queuing/buying at Ticket Counter
         npc.state = 'to_counter';
+        npc.delayTimer = (idx % 12) * 0.45;
         actor.group.position.set(-4.2 + (Math.random() - 0.5) * 2.4, 0, -68 - Math.random() * 5);
         npc.waypoints = [
           { x: -6.0, z: -71.0 },
           { x: -15.8 - (idx % 2) * 0.5, z: counterZ }
         ];
       } else {
-        // Walking from promenade into Ticket Lounge (naturally staggered along Z)
-        actor.group.position.set((Math.random() - 0.5) * 6.0, 0, -18 - Math.random() * 48);
+        // Walking from promenade into Ticket Lounge
+        actor.group.position.set((Math.random() - 0.5) * 6.0, 0, -48 - Math.random() * 18);
         npc.waypoints = [
           { x: -4.2, z: -71.0 },
           { x: -6.0, z: -71.0 },
